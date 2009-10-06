@@ -46,7 +46,7 @@ class CardAdmin(admin.ModelAdmin):
     list_display = ('course', 'client', 'count', 'reg_date', 'exp_date')
     ordering = ('reg_date', 'exp_date', 'count', 'client')
     fieldsets = (
-        (None, {'fields': ('reg_date', 'exp_date', 'count')}),
+        (None, {'fields': ('exp_date', 'count')}),
         (_('Links'), {'fields': ('course', 'client')}),
         )
 admin.site.register(models.Card, CardAdmin)
