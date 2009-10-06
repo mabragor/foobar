@@ -1,0 +1,12 @@
+# -*- coding: utf-8 -*-
+
+USER_NAME = 'rad'
+
+import os, sys
+sys.stdout = sys.stderr
+sys.path.insert(0, os.path.dirname(__file__))
+sys.path.append('/home/%s/django.engine' % (USER_NAME, ))
+sys.path.append('/home/%s/django.apps' % (USER_NAME, ))
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+from django.core.handlers.wsgi import WSGIHandler
+application = WSGIHandler()

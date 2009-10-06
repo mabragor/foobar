@@ -1,0 +1,19 @@
+<VirtualHost *>
+        ServerAdmin ADMIN_EMAIL
+        ServerName foobar
+
+        WSGIScriptAlias / /home/USER_NAME/django.apps/foobar/django.wsgi
+        WSGIDaemonProcess foobar processes=2 maximum-requests=1 threads=1
+        WSGIProcessGroup foobar
+
+        LogLevel debug
+        ErrorLog /var/log/apache2/error-5five.log
+        CustomLog /var/log/apache2/access-5five.log combined
+        ServerSignature On
+
+        Alias /css/             "/home/USER_NAME/django.apps/foobar/css/"
+        Alias /js/              "/home/USER_NAME/django.apps/foobar/js/"
+        Alias /pics/            "/home/USER_NAME/django.apps/foobar/pics/"
+        Alias /media/           "/home/USER_NAME/django.apps/foobar/media/"
+        Alias /adminmedia/      "/home/USER_NAME/django.engine/django/contrib/admin/media/"
+</VirtualHost>
