@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
-from lib.decorators import render_to
-from forms import ScheduleForm
+
 from django.conf import settings
-from django.core.serializers.json import DjangoJSONEncoder
-import simplejson
-from models import Schedule, Course, Room
-from django.http import HttpResponse
+from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
+from django.http import HttpResponse
+from django.core.serializers.json import DjangoJSONEncoder
+
+from forms import ScheduleForm
+from models import Schedule, Course, Room
+
+from lib.decorators import render_to
 
 @render_to('client/index.html')
 def index(request):
