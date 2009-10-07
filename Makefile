@@ -2,7 +2,7 @@ include config.mk
 
 CURRENT_INSTALL_DIR=$(INSTALL_DJANGO_DIR)/$(PROJECTNAME)
 FILES=$(wildcard *.py) $(wildcard *.wsgi)
-SUBDIRS=js css \
+SUBDIRS=js css media lib \
 	client templates
 
 all: subdirs
