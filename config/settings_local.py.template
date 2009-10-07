@@ -30,6 +30,17 @@ INSTALLED_APPS += (
     'client',
 )
 
+#calendar
+CALENDAR_OPTIONS = {
+    'timeslotsPerHour': 2,
+    'businessHours' :{
+        'start': 8,
+        'end': 18,
+        'limitDisplay': True
+    },
+    'timeslotHeight': 30
+}
+
 GOOGLE_ANALYTICS = """
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
