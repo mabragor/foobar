@@ -30,6 +30,9 @@ INSTALLED_APPS += (
     'client',
 )
 
+# auth system
+SESSION_DURATION = 30 # in minutes
+
 #calendar
 CALENDAR_OPTIONS = {
     'timeslotsPerHour': 2,
