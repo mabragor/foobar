@@ -24,7 +24,8 @@ class Client(AbstractUser):
 
 class Room(models.Model):
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
-    
+    color = models.CharField(verbose_name=_(u'Color'), max_length=6)
+
     class Meta:
         verbose_name = _(u'Room')
         verbose_name_plural = _(u'Rooms')
@@ -82,6 +83,20 @@ class Schedule(models.Model):
     begin = models.DateTimeField(verbose_name=_(u'Begins'))
     looking = models.BooleanField(verbose_name=_(u'Is looking for members?'), default=True)
     places = models.BooleanField(verbose_name=_(u'Are there free places?'), default=True)
+
+    def get_calendar_obj(self):
+        from datetime import timedelta, datetime
+        import time
+        obj = {
+            'id': self.pk,
+            'start': int(time.mktime(self.begin.timetuple())),
+            'end': int(time.mktime((self.begin + timedelta(hours=self.course.duration)).timetuple())),
+            'room': self.room.pk,
+            'color': self.room.color,
+            'course': self.course.pk,
+            'title': self.course.__unicode__()
+        }
+        return obj
 
     class Meta:
         verbose_name = _(u'Schedule')

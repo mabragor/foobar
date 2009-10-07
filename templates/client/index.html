@@ -1,0 +1,56 @@
+{% extends 'client/base.html' %}
+
+{% load media %}
+
+{% block css %}
+    <link rel='stylesheet' type='text/css' href='{% media "css/reset.css" %}' />
+    <link rel='stylesheet' type='text/css' href='{% media "css/jquery-ui.css" %}' />
+    <link rel='stylesheet' type='text/css' href='{% media "css/jquery.weekcalendar.css" %}' />
+    <link rel='stylesheet' type='text/css' href='{% media "css/demo.css" %}' />
+{% endblock %}
+
+{% block js %}
+    <script type='text/javascript' src='{% media "js/jquery.min.js" %}'></script>
+    <script type='text/javascript' src='{% media "js/jquery-ui.min.js" %}'></script>
+    <script type='text/javascript' src='{% media "js/jquery.weekcalendar.js" %}'></script>
+    <script type='text/javascript' src='{% media "js/calendar.js" %}'></script>
+    <script type='text/javascript'>
+        var calendar_options = {{ options|safe }};
+        calendar_options['urls'] = {
+            add_event: '{% url client:ajax_add_event %}',
+            del_event: '{% url client:ajax_del_event %}',
+            change_date: '{% url client:ajax_change_date %}'
+        };
+        var events = {{ events|safe }};
+        calendar_options['data'] = function(start, end, callback) {
+            callback(getEventData(events));
+        }
+        function getEventData(events) {
+            var l = events.length;
+            for(var i=0; i<l; i++){
+
+                events[i].start = new Date(events[i].start*1000);
+                events[i].end = new Date(events[i].end*1000);
+            }
+            return events;
+        }
+        $(document).ready(function() {
+        /**************************************/
+                $('#calendar').weekCalendar(jQuery.extend(options, calendar_options));
+        /**************************************/
+        });
+
+    </script>
+{% endblock %}
+
+{% block content %}
+    <h1>jQuery Week Calendar (full demo)</h1>
+    <div id='calendar'></div>
+    <div id="event_edit_container">
+            <form>
+                    <span id="form_error" style="color: #f00;"></span><br/>
+                    <span>Date: </span><span class="date_holder"></span>
+                    {{ form.as_ul }}
+            </form>
+    </div>
+{% endblock %}
