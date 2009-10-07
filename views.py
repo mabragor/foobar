@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from django.conf import settings
+from django.contrib import auth
+from django.contrib.auth.decorators import user_passes_test
 from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse, HttpResponseRedirect
 
-from lib import render_to
+from lib.decorators import render_to
 
 def context_processor(request):
     return {'user': request.user, 'debug': settings.DEBUG}
@@ -31,28 +33,24 @@ def login(request):
         return HttpResponseRedirect('/login/')
 
     context = {
-        'page_title': _(u'Login page')
-        'session_duration': settings.SESSION_DURATION
+        'page_title': _(u'Login page'),
+        'session_duration': settings.SESSION_DURATION,
+        'error_form_not_valid': _(u'Form is not valid'),
         }
 
     if request.session.test_cookie_worked():
-        if request.method == 'POST':
-            form = Login(request.POST, error_class=DivErrorList)
-            context.update( {'form': form} )
-            if form.is_valid():
-                login = form.cleaned_data.get('login', None)
-                passwd = form.cleaned_data.get('passwd', None)
+        form = Login(request.POST or None)
+        if request.method == 'POST' and form.is_valid():
+            login = form.cleaned_data.get('login', None)
+            passwd = form.cleaned_data.get('passwd', None)
                 
-                user = auth.authenticate(username=login, password=passwd)
-                if user is not None and user.is_active:
-                    auth.login(request, user)
-                    return HttpResponseRedirect('/logged/')
-                else:
-                    context = {'error_desc': _(u'Probably, you made a mistake.')}
+            user = auth.authenticate(username=login, password=passwd)
+            if user is not None and user.is_active:
+                auth.login(request, user)
+                return HttpResponseRedirect('/logged/')
             else:
-                context = {'error_desc': _(u'Form is not valid.')}
-        else:
-            context.update( {'form': Login()} )
+                context = {'error_desc': _(u'Probably you\'ve made a mistake.')}
+        context.update( {'form': form} )
         return context
     else: # cookie ещё не установлен
         return HttpResponseRedirect('/')
@@ -78,35 +76,7 @@ def logged(request):
 
     all_groups = request.user.groups.all()
 
-    # Если у пользователя выставлен флаг "Изменить пароль", заставляем
-    # его это сделать.
-
-    if request.user.change_password == 1:
-        return HttpResponseRedirect('/password/')
-
-    # Если зашёл представитель или администратор организации, у
-    # которой просрочен срок регистрации, то отправляем его
-    # регистрироваться повторно.
-
-    def org_is_valid(request):
-        return getattr(settings, 'CHECK_ORG_VALIDATION', False) and \
-            request.user.organization.srd_data is not None and \
-            request.user.organization.srd_data < datetime.now()
-
-    if 'User' in [a.name for a in all_groups]:
-        if org_is_valid(request):
-            return HttpResponseRedirect('/orgexpired/')
-        return HttpResponseRedirect('/invite/')
-    elif 'OrgAdmin' in [a.name for a in all_groups]:
-        if org_is_valid(request):
-            return HttpResponseRedirect('/orgexpired/')
-        return HttpResponseRedirect('/manager/')
-    elif 'Manager' in [a.name for a in all_groups]:
-        return HttpResponseRedirect('/manager/')
-    elif 'Boss' in [a.name for a in all_groups]:
-        return HttpResponseRedirect('/manager/')
-    else:
-        return HttpResponseRedirect('/logout/')
+    return HttpResponseRedirect('/manager/')
 
 @render_to('message.html', context_processor)
 def sessionout(request):

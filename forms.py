@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django import forms
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext_lazy as _
 
 class Login(forms.Form):
     login = forms.CharField(label=_('Login'), max_length=30,
