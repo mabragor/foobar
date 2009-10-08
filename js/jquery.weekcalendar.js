@@ -623,8 +623,9 @@
                 <div class=\"title\"></div></div>";
                 
             $calEvent = $(eventHtml);
-            $modifiedEvent = options.eventRender(calEvent, $calEvent);
+            $modifiedEvent = options.eventRender.call(self, calEvent, $calEvent);
             $calEvent = $modifiedEvent ? $modifiedEvent.appendTo($weekDay) : $calEvent.appendTo($weekDay);
+            //$calEvent.css({lineHeight: (options.timeslotHeight - 2) + "px", fontSize: (options.timeslotHeight / 2) + "px"});
             $calEvent.css({lineHeight: (options.timeslotHeight - 2) + "px", fontSize: (options.timeslotHeight / 2) + "px"});
             
             self._refreshEventDetails(calEvent, $calEvent);
@@ -667,7 +668,10 @@
                     }
                     $.each(this, function(i){
                         var newLeft = (i * newLeftAdd); 
-                        // bring mouseovered event to the front 
+                        // bring mouseovered event to the front
+                        $(this).css({'font-size': '10px',
+                                     'line-height': '15px'});
+                        //------------------------------------
                         if(!self.options.overlapEventsSeparate){
                             $(this).bind("mouseover.z-index",function(){
                                  var $elem = $(this);
@@ -677,7 +681,7 @@
 					            $elem.css({"z-index": "3"});
                             });
                         }
-                         $(this).css({width: newWidth+"%", left: newLeft+"%", right: 0});
+                        $(this).css({width: newWidth+"%", left: newLeft+"%", right: 0});
                     });
                 });
             }
@@ -1273,12 +1277,12 @@
         getter: ['getTimeslotTimes', 'getData', 'formatDate', 'formatTime'],
         defaults: {
             date: new Date(),
-            timeFormat : "h:i a",
+            timeFormat : "G:i",
             dateFormat : "M d, Y",
             use24Hour : false,
             firstDayOfWeek : 0, // 0 = Sunday, 1 = Monday, 2 = Tuesday, ... , 6 = Saturday
             useShortDayNames: false,
-            timeSeparator : " to ",
+            timeSeparator : " - ",
             startParam : "start",
             endParam : "end",
             businessHours : {start: 8, end: 18, limitDisplay : false},

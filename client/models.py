@@ -94,6 +94,7 @@ class Schedule(models.Model):
             'room': self.room.pk,
             'color': self.room.color,
             'course': self.course.pk,
+            'room_name': self.room.__unicode__(),
             'title': self.course.__unicode__()
         }
         return obj

@@ -18,7 +18,19 @@ var options = {
         return false;
     },
     eventRender : function(calEvent, $event) {
+        var options = this.options;
         $event.css("backgroundColor", "#"+calEvent.color);
+        $event.find('.time').css("backgroundColor", "#"+calEvent.color);
+        var content = this._formatDate(calEvent.start, options.timeFormat) + options.timeSeparator + this._formatDate(calEvent.end, options.timeFormat);
+        content += '<br/>'+calEvent.title;
+        content += '<br/>'+calEvent.room_name;
+
+        $event.wTooltip({
+            content: content,
+            style: {
+                'borderColor': calEvent.color
+            }
+        });
     },
     eventNew : function(calEvent, $event) {
         var $self = this.element;
