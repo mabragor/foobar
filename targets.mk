@@ -42,7 +42,7 @@ install_files:
 	done
 
 install_templates:
-	for i in $(FILES) end-of-files-list; do \
+	for i in $(TEMPLATES) end-of-files-list; do \
 	  if [ $$i != end-of-files-list ]; then \
 	    sed 's/$(REGEXP_DEVEL_URL)//' < $$i > $(CURRENT_INSTALL_DIR)/$$i; \
 	  fi; \

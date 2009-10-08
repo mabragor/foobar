@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block content %}
+
+<div class="formtitle">
+  {% trans "Authentication" %}
+</div>
+
+<div>
+  <table width="100%">
+    <tr>
+      <td width="70%" valign="top">
+	<form id="login" method="post" action="">
+	  <table width="100%">
+	    {{ form }}
+	  </table>
+	  <div style="text-align: center;">
+	    <input class="button" type="submit" name="submit" value="{% trans "Enter" %}"/>
+	  </div>
+	</form>
+	<a href="/client/">{% trans "Enter as client" %}</a>
+      </td>
+      <td width="30%" valign="top">
+	{% if error_desc %}
+	<div class="error_desc">
+	  <div class="title">{% trans "Error" %}</div>
+	  <p>{{ error_desc }}</p>
+	</div>
+	{% endif %}
+	<div class="description">
+	  <div class="title">{% trans "Note" %}</div>
+	  <p>
+	    {% blocktrans %}
+	    The user's idle time is limited by <nobr>{{ session_duration }} minutes.</nobr> 
+	    After that time it needs to login again.
+	    {% endblocktrans %}
+	  </p>
+	</div>
+      </td>
+    </tr>
+  </table>
+
+</div>
+{% endblock %}

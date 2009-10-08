@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from lib.decorators import render_to
-from forms import ScheduleForm
+
 from django.conf import settings
 from lib import DatetimeJSONEncoder
 from django.utils import simplejson
@@ -8,6 +7,8 @@ from models import Schedule, Course, Room
 from django.http import HttpResponse
 from django.utils.translation import ugettext_lazy as _
 from datetime import datetime
+from forms import ScheduleForm
+from lib.decorators import render_to
 
 @render_to('client/index.html')
 def index(request):
@@ -55,3 +56,4 @@ def ajax_get_events(request):
     else:
         events = []
     return HttpResponse(simplejson.dumps(events, cls=DatetimeJSONEncoder))
+

@@ -21,8 +21,6 @@ var options = {
         $event.css("backgroundColor", "#"+calEvent.color);
     },
     eventNew : function(calEvent, $event) {
-        console.log('eventNew');
-
         var $self = this.element;
         var $options = this.options;
         var dialogContent = $("#event_edit_container");
@@ -78,7 +76,6 @@ var options = {
     },
     
     eventClick : function(calEvent, $event) {
-        console.log('eventClick');
         var $self = this.element;
         var $options = this.options;
         

@@ -45,24 +45,12 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.sitemaps',
     'django.contrib.webdesign',
-    'client',
 )
 
 # robots begin
 ROBOTS_USE_SITEMAP = True
 ROBOTS_SITEMAP_URL = '/sitemap.xml'
 # robots end
-
-#calendar
-CALENDAR_OPTIONS = {
-    'timeslotsPerHour': 2,
-    'businessHours' :{
-        'start': 8,
-        'end': 18,
-        'limitDisplay': True
-    },
-    'timeslotHeight': 30
-}
 
 try:
     from settings_local import *
