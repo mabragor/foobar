@@ -16,42 +16,54 @@ Ext.onReady(function() {
 	    layout: 'fit',
 	    frame: true,
 	    border: false
-	}, {
+	},{
 	    region: 'west',
-	    layout: 'fit',
+            layout: 'vbox',
 	    frame: true,
 	    border: false,
 	    width: '30%',
 	    split: true,
 	    collapsible: true,
 	    collapseMode: 'mini',
+            layoutConfig: {
+                align : 'stretch',
+                pack  : 'start'
+            },
 	    items: [{
 		title: 'Information',
 		region: 'north',
-		layout: 'fit',
+		//layout: 'fit',
 		frame: true,
 		border: false,
-		html: 'Put customer\'s card on reader, please.'
+		html: 'Put customer\'s card on reader, please.',
+                flex: 1,
+                tbar: [{
+                    text: 'Client',
+                    iconCls: 'icon-info',
+                    handler: function() {}
+                },{
+                    text: 'Search',
+                    iconCls: 'icon-info',
+                    handler: function() {}
+                },{
+                    text: 'Add new',
+                    iconCls: 'icon-plus',
+                    handler: function() {}
+                }]
 	    },{
 		title: 'Courses',
 		region: 'central',
-		layout: 'fit',
+		//layout: 'fit',
 		frame: true,
-		border: false
-	    }],
-	    tbar: [{
-		text: 'Client',
-		iconCls: 'icon-info',
-		handler: function() {}
-	    },{
-		text: 'Search',
-		iconCls: 'icon-info',
-		handler: function() {}
-	    },{
-		text: 'Add new',
-		iconCls: 'icon-plus',
-		handler: function() {}
+		border: false,
+                flex: 1,
+                tbar: [{
+                    text: 'Search',
+                    iconCls: 'icon-info',
+                    handler: function() {}
+                }]
 	    }]
+	    
 	}]
     });
 
