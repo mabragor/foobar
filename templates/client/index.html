@@ -42,14 +42,26 @@
         $(document).ready(function() {
         /**************************************/
                 $('#calendar').weekCalendar(jQuery.extend(options, calendar_options));
+                $('button').hover(
+			function(){
+				$(this).addClass("ui-state-hover");
+			},
+			function(){
+				$(this).removeClass("ui-state-hover");
+			}
+		);
+
         /**************************************/
         });
 
     </script>
+    <script type="text/javascript" src="http://ui.jquery.com/applications/themeroller/themeswitchertool/"></script>
+    <script type="text/javascript"> $(function(){ $('<div style="position: absolute; right: 20px;" />').insertAfter('#header').themeswitcher({height: 150}); });</script>
 {% endblock %}
 
 {% block content %}
-    <h1>jQuery Week Calendar (full demo)</h1>
+    <h1 id="header" style="float: left;">Schedule week calendar.</h1>
+    <div style="clear:both;">&nbsp;</div>
     <div id='calendar'></div>
     <div id="event_edit_container">
             <form>

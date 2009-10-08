@@ -6,17 +6,21 @@
 }
 
 .week-calendar .calendar-nav {
-	padding: 1em;
-	text-align: right;	
+	padding: 3px;
+	text-align: right;
+        height: 30px;
 }
 
 .week-calendar .calendar-nav button {
-	margin: 0 0.5em;	
+    overflow:visible;
+    height: 100%;
+    cursor:pointer;
+    /*width:auto;*/
 }
  
 
 .week-calendar table {
-	border-collapse: collapse;
+    border-collapse: collapse;
     border-spacing: 0;
 }
 .week-calendar table td {

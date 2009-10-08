@@ -280,12 +280,12 @@
             $calendarContainer = $("<div class=\"week-calendar\">").appendTo(self.element);
             
             if(options.buttons) {
-                calendarNavHtml = "<div class=\"calendar-nav\">\
-                    <button class=\"today\">" + options.buttonText.today + "</button>\
-                    <button class=\"prev\">" + options.buttonText.prevWeek + "</button>\
-                    <button class=\"prevDay\">" + options.buttonText.prevDay + "</button>\
-                    <button class=\"nextDay\">" + options.buttonText.nextDay + "</button>\
-                    <button class=\"next\">" + options.buttonText.nextWeek + "</button>\
+                calendarNavHtml = "<div class=\"calendar-nav ui-widget-header\">\
+                    <button class=\"prev ui-state-default ui-corner-all\">" + options.buttonText.prevWeek + "</button>\
+                    <button class=\"prevDay ui-state-default ui-corner-all\">" + options.buttonText.prevDay + "</button>\
+                    <button class=\"today ui-state-default ui-corner-all\">" + options.buttonText.today + "</button>\
+                    <button class=\"nextDay ui-state-default ui-corner-all\">" + options.buttonText.nextDay + "</button>\
+                    <button class=\"next ui-state-default ui-corner-all\">" + options.buttonText.nextWeek + "</button>\
                     </div>";
                     
                 $(calendarNavHtml).appendTo($calendarContainer);
@@ -318,7 +318,7 @@
             }
             
             //render calendar header
-            calendarHeaderHtml = "<table class=\"week-calendar-header\"><tbody><tr><td class=\"time-column-header\"></td>"; 
+            calendarHeaderHtml = "<table class=\"week-calendar-header ui-widget-content\"><tbody><tr><td class=\"time-column-header\"></td>";
             for(var i=1 ; i<=7; i++) {
                 calendarHeaderHtml += "<td class=\"day-column-header day-" + i + "\"></td>";
             }
@@ -349,7 +349,7 @@
             for(var i = start ; i < end; i++) {
     
                 var bhClass = (options.businessHours.start <= i && options.businessHours.end > i) ? "business-hours" : "";                 
-                calendarBodyHtml += "<div class=\"hour-header " + bhClass + "\">"
+                calendarBodyHtml += "<div class=\"hour-header " + bhClass + " ui-widget-content\">"
                 if(options.use24Hour) {
                    calendarBodyHtml += "<div class=\"time-header-cell\">" + self._24HourForIndex(i) + "</div>";
                 } else {
@@ -381,7 +381,7 @@
             $calendarContainer.find(".time-slot").height(options.timeslotHeight -1); //account for border
             
             $calendarContainer.find(".time-header-cell").css({
-                    height :  (options.timeslotHeight * options.timeslotsPerHour) - 11,
+                    height :  (options.timeslotHeight * options.timeslotsPerHour) - 12,
                     padding: 5
                     });
     
