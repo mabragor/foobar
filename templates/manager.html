@@ -1,15 +1,17 @@
 {% extends 'base.html' %}
+{% load media %}
 
 {% block css %}
-  <link rel="stylesheet" href="./media/extjs/resources/css/ext-all.css" type="text/css"/>
+  <link rel="stylesheet" href="{% media 'media/extjs/resources/css/ext-all.css' %}" type="text/css"/>
 {% endblock %}
 
 {% block js %}
-  <script type="text/javascript" src="/js/jquery.js"></script>
-  <script type="text/javascript" src="./media/extjs/adapter/ext/ext-base.js"></script>
-  <script type="text/javascript" src="./media/extjs/ext-all.js"></script>
-  <script type="text/javascript" src="/js/foobar-manager.js"></script>
+  <script type="text/javascript" src="{% media 'js/jquery.js' %}"></script>
+  <script type="text/javascript" src="{% media 'media/extjs/adapter/jquery/ext-jquery-adapter.js' %}"></script>
+  <script type="text/javascript" src="{% media 'media/extjs/ext-all.js' %}"></script>
+  <script type="text/javascript" src="{% media 'js/foobar-manager.js' %}"></script>
 {% endblock %}
 
 {% block content %}
+
 {% endblock %}

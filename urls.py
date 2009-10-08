@@ -18,6 +18,6 @@ urlpatterns = patterns(
 
     # the following line will be removed
     url(r'^client/', include('client.urls', namespace='client')),
-
+    url(r'^manager/', include('manager.urls', namespace='manager')),
     url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
 )

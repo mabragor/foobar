@@ -3,11 +3,12 @@ Ext.BLANK_IMAGE_URL = './media/ext/resources/default/s.gif';
 Ext.onReady(function() {
     Ext.QuickTips.init();
 
-    var panel = new Ext.Panel({
+    var panel = new Ext.Viewport({
 	title: Ext.getDom('page-title').innerHTML,
 	id: 'main',
 	layout: 'border',
-	height: 600,
+        //autoHeight: true,
+	//height: 600,
 	renderTo: Ext.getBody(),
 	items: [{
 	    title: 'Schedule',
