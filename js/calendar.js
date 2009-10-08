@@ -58,11 +58,8 @@ var options = {
                                 if (data.error){
                                     formError.html(data.error);
                                 }else{
-                                    var event = data.obj;
-                                    event.start = new Date(data.obj.start*1000);
-                                    event.end = new Date(data.obj.end*1000);
                                     $self.weekCalendar("removeUnsavedEvents");
-                                    $self.weekCalendar("updateEvent", event);
+                                    $self.weekCalendar("updateEvent", data.obj);
                                     dialogContent.dialog("close");
                                 }
                             }
@@ -120,10 +117,7 @@ var options = {
                             if (data.error){
                                 formError.html(data.error);
                             }else{
-                                var event = data.obj;
-                                event.start = new Date(data.obj.start*1000);
-                                event.end = new Date(data.obj.end*1000);
-                                $self.weekCalendar("updateEvent", event);
+                                $self.weekCalendar("updateEvent", data.obj);
                                 dialogContent.dialog("close");
                             }
                         }

@@ -19,21 +19,25 @@
         calendar_options['urls'] = {
             add_event: '{% url client:ajax_add_event %}',
             del_event: '{% url client:ajax_del_event %}',
-            change_date: '{% url client:ajax_change_date %}'
+            change_date: '{% url client:ajax_change_date %}',
+            get_events: '{% url client:ajax_get_events %}'
         };
-        var events = {{ events|safe }};
         calendar_options['data'] = function(start, end, callback) {
-            callback(getEventData(events));
+            var $options = this;
+            jQuery.ajax({
+                type: 'POST',
+                url: $options.urls.get_events,
+                dataType: 'json',
+                data: {'start': Math.round(start.getTime()/1000),
+                       'end': Math.round(end.getTime()/1000)
+                },
+                error: function(){
+                    alert('Ошибка сервера. Обновите страницу.')
+                },
+                success: callback
+            });
         }
-        function getEventData(events) {
-            var l = events.length;
-            for(var i=0; i<l; i++){
 
-                events[i].start = new Date(events[i].start*1000);
-                events[i].end = new Date(events[i].end*1000);
-            }
-            return events;
-        }
         $(document).ready(function() {
         /**************************************/
                 $('#calendar').weekCalendar(jQuery.extend(options, calendar_options));

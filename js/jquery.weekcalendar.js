@@ -446,7 +446,7 @@
             weekEndDate = self._dateLastMilliOfWeek(date);
             
             options.calendarBeforeLoad(self.element);
-    
+
             self.element.data("startDate", weekStartDate);
             self.element.data("endDate", weekEndDate);
             

@@ -89,8 +89,8 @@ class Schedule(models.Model):
         import time
         obj = {
             'id': self.pk,
-            'start': int(time.mktime(self.begin.timetuple())),
-            'end': int(time.mktime((self.begin + timedelta(hours=self.course.duration)).timetuple())),
+            'start': self.begin,
+            'end': self.begin + timedelta(hours=self.course.duration),
             'room': self.room.pk,
             'color': self.room.color,
             'course': self.course.pk,
