@@ -62,10 +62,25 @@
          * Go to this week
          */
         today : function() {
+            this.options.firstDayOfWeek = 1;
             this._clearCalendar();
             this._loadCalEvents(new Date()); 
         },
-    
+
+        prevDay: function(){
+            this.options.firstDayOfWeek = (this.options.firstDayOfWeek-1) % 7;
+            this._clearCalendar();
+            var newDate = new Date(this.element.data("startDate").getTime() - (MILLIS_IN_WEEK / 7));
+            this._loadCalEvents(newDate);
+        },
+
+        nextDay: function(){
+            this.options.firstDayOfWeek = (this.options.firstDayOfWeek+1) % 7;
+            this._clearCalendar();
+            var newDate = new Date(this.element.data("startDate").getTime() + (MILLIS_IN_WEEK / 7));
+            this._loadCalEvents(newDate);
+        },
+
         /*
          * Go to the previous week relative to the currently displayed week
          */
@@ -85,7 +100,7 @@
             this._clearCalendar();
             this._loadCalEvents(newDate); 
         },
-    
+
         /*
          * Reload the calendar to whatever week the date passed in falls on.
          */
@@ -267,7 +282,9 @@
             if(options.buttons) {
                 calendarNavHtml = "<div class=\"calendar-nav\">\
                     <button class=\"today\">" + options.buttonText.today + "</button>\
-                    <button class=\"prev\">" + options.buttonText.lastWeek + "</button>\
+                    <button class=\"prev\">" + options.buttonText.prevWeek + "</button>\
+                    <button class=\"prevDay\">" + options.buttonText.prevDay + "</button>\
+                    <button class=\"nextDay\">" + options.buttonText.nextDay + "</button>\
                     <button class=\"next\">" + options.buttonText.nextWeek + "</button>\
                     </div>";
                     
@@ -287,7 +304,17 @@
                     self.element.weekCalendar("nextWeek");
                     return false;
                 });
-                
+
+                $calendarContainer.find(".calendar-nav .prevDay").click(function(){
+                    self.element.weekCalendar("prevDay");
+                    return false;
+                });
+
+                $calendarContainer.find(".calendar-nav .nextDay").click(function(){
+                    self.element.weekCalendar("nextDay");
+                    return false;
+                });
+
             }
             
             //render calendar header
@@ -1262,8 +1289,10 @@
             buttons : true,
             buttonText : {
                 today : "today",
-                lastWeek : "&nbsp;&lt;&nbsp;",
-                nextWeek : "&nbsp;&gt;&nbsp;"
+                prevWeek : "&nbsp;&lt;&lt;&lt;&nbsp;",
+                nextWeek : "&nbsp;&gt;&gt;&gt;&nbsp;",
+                prevDay: "&nbsp;&lt;&nbsp;",
+                nextDay: "&nbsp;&gt;&nbsp;"
             },
             scrollToHourMillis : 500,
             allowCalEventOverlap : false,
