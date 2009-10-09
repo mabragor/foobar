@@ -18,10 +18,10 @@ class ClientAdmin(admin.ModelAdmin):
 admin.site.register(models.Client, ClientAdmin)
 
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ('title', )
+    list_display = ('title', 'color')
     ordering = ('title', )
     search_fields = ('title',)
-    fieldsets = ((None, {'fields': ('title', )}),)
+    fieldsets = ((None, {'fields': ('title', 'color')}),)
 admin.site.register(models.Room, RoomAdmin)
 
 class GroupAdmin(admin.ModelAdmin):
