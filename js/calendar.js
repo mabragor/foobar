@@ -115,7 +115,7 @@ var options = {
             buttons: {
                 save : function(){
                     jQuery.ajax({
-                        type: 'GET',
+                        type: 'POST',
                         url: $options.urls.add_event+calEvent.id+'/',
                         dataType: 'json',
                         data: dialogContent.find('form').serialize(),

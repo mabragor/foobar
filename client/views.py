@@ -13,8 +13,10 @@ from lib.decorators import render_to
 @render_to('client/index.html')
 def index(request):
     form = ScheduleForm()
+    rooms = Room.objects.all()
     return {
         'form': form,
+        'rooms': simplejson.dumps([item.get_calendar_obj() for item in rooms], cls=DatetimeJSONEncoder),
         'options': simplejson.dumps(settings.CALENDAR_OPTIONS, cls=DatetimeJSONEncoder)
     }
 
@@ -52,6 +54,8 @@ def ajax_get_events(request):
         start = datetime.fromtimestamp(int(request.POST['start']))
         end = datetime.fromtimestamp(int(request.POST['end']))
         schedules = Schedule.objects.filter(begin__range=(start, end))
+        if 'rooms' in request.POST:
+            schedules = schedules.filter(room__in=request.POST['rooms'])
         events = [item.get_calendar_obj() for item in schedules]
     else:
         events = []

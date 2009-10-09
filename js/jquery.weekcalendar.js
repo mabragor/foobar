@@ -281,6 +281,12 @@
             
             if(options.buttons) {
                 calendarNavHtml = "<div class=\"calendar-nav ui-widget-header\">\
+                    <div class=\"fg-buttonset fg-buttonset-single\" style='float: left'>\
+                    <button class=\"fg-button ui-state-default ui-priority-primary ui-corner-left\">Visual</button>\
+                    <button class=\"fg-button ui-state-default ui-priority-primary\">Code</button>\
+                    <button class=\"fg-button ui-state-default ui-priority-primary ui-state-active\">Split</button>\
+                    <button class=\"fg-button ui-state-default ui-priority-primary ui-corner-right\">Preview</button>\
+                    </div>\
                     <button class=\"prev ui-state-default ui-corner-all\">" + options.buttonText.prevWeek + "</button>\
                     <button class=\"prevDay ui-state-default ui-corner-all\">" + options.buttonText.prevDay + "</button>\
                     <button class=\"today ui-state-default ui-corner-all\">" + options.buttonText.today + "</button>\

@@ -23,15 +23,20 @@
             change_date: '{% url client:ajax_change_date %}',
             get_events: '{% url client:ajax_get_events %}'
         };
-        calendar_options['data'] = function(start, end, callback) {
+        calendar_options['data'] = function(start, end, callback, rooms) {
             var $options = this;
+            var data = {
+                'start': Math.round(start.getTime()/1000),
+                'end': Math.round(end.getTime()/1000)
+            };
+            if (rooms){
+                data['rooms'] = rooms;
+            }
             jQuery.ajax({
                 type: 'POST',
                 url: $options.urls.get_events,
                 dataType: 'json',
-                data: {'start': Math.round(start.getTime()/1000),
-                       'end': Math.round(end.getTime()/1000)
-                },
+                data: data,
                 error: function(){
                     alert('Ошибка сервера. Обновите страницу.')
                 },

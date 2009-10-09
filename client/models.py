@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from datetime import timedelta
 
 class AbstractUser(models.Model):
     first_name = models.CharField(max_length=64)
@@ -25,6 +26,14 @@ class Client(AbstractUser):
 class Room(models.Model):
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
     color = models.CharField(verbose_name=_(u'Color'), max_length=6)
+
+    def get_calendar_obj(self):
+        obj = {
+            'id': self.pk,
+            'color': self.color,
+            'title': self.title
+        }
+        return obj
 
     class Meta:
         verbose_name = _(u'Room')
@@ -84,9 +93,11 @@ class Schedule(models.Model):
     looking = models.BooleanField(verbose_name=_(u'Is looking for members?'), default=True)
     places = models.BooleanField(verbose_name=_(u'Are there free places?'), default=True)
 
+    @property
+    def end(self):
+        return self.begin + timedelta(hours=self.course.duration)
+
     def get_calendar_obj(self):
-        from datetime import timedelta, datetime
-        import time
         obj = {
             'id': self.pk,
             'start': self.begin,
