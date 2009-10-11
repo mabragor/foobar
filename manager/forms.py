@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django import forms
-from models import Schedule, Course
+from storage.models import Schedule, Course
 
 class ScheduleForm(forms.ModelForm):
     begin = forms.DateTimeField(widget=forms.Select())

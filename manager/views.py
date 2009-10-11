@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from django.conf import settings
-from lib import DatetimeJSONEncoder
-from django.utils import simplejson
-from models import Schedule, Course, Room
-from django.http import HttpResponse
-from django.utils.translation import ugettext_lazy as _
 from datetime import datetime
-from forms import ScheduleForm
+
+from django.conf import settings
+from django.http import HttpResponse
+from django.utils import simplejson
+from django.utils.translation import ugettext_lazy as _
+
+from lib import DatetimeJSONEncoder
 from lib.decorators import render_to
+from forms import ScheduleForm
+
+from storage.models import Schedule, Course, Room
 
 #@render_to('manager/index.html')
 @render_to('manager.html')

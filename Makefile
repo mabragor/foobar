@@ -3,7 +3,7 @@ include config.mk
 CURRENT_INSTALL_DIR=$(INSTALL_DJANGO_DIR)/$(PROJECTNAME)
 FILES=$(wildcard *.py) $(wildcard *.wsgi)
 SUBDIRS=js css media lib locale \
-	client manager rfid templates
+	client manager rfid storage templates
 
 all: subdirs
 

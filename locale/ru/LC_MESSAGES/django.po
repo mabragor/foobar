@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-11 00:02+0400\n"
+"POT-Creation-Date: 2009-10-11 22:07+0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,114 +36,123 @@ msgstr "Форма не проходит проверку"
 msgid "Probably you've made a mistake."
 msgstr "Возможно вы сделали ошибку"
 
-#: manager/admin.py:40
-msgid "Relation"
-msgstr "Взаимосвязь"
+#: lib/decorators.py:36
+#, python-format
+msgid "Form is not valid : %s"
+msgstr "Форма не проходит проверку : %s"
 
-#: manager/admin.py:50
-msgid "Links"
-msgstr "Ссылки"
+#: lib/decorators.py:38
+msgid "Service is temporary unavailable. We appologize for any inconvinience."
+msgstr "Сервис временно недоступен. Мы извиняемся за неудобство."
 
-#: manager/models.py:12 manager/models.py:60 manager/models.py:78
-#: manager/models.py:125 manager.mine/models.py:11 manager.mine/models.py:50
-#: manager.mine/models.py:68 manager.mine/models.py:98
-msgid "Registered"
-msgstr "Зарегистрирован"
+#: lib/decorators.py:43
+msgid "It must be POST"
+msgstr "Используйте метод POST"
 
-#: manager/models.py:27 manager/models.py:46 manager/models.py:58
-#: manager.mine/models.py:26 manager.mine/models.py:36
-#: manager.mine/models.py:48
-msgid "Title"
-msgstr "Заголовок"
+#: lib/decorators.py:45
+msgid "Please, do not break our code :)"
+msgstr "Пожалуйста, не ломайте нас :)"
 
-#: manager/models.py:28
-msgid "Color"
-msgstr "Цвет"
-
-#: manager/models.py:39 manager.mine/models.py:29
-msgid "Room"
-msgstr "Зал"
-
-#: manager/models.py:40 manager.mine/models.py:30
-msgid "Rooms"
-msgstr "Залы"
-
-#: manager/models.py:49 manager.mine/models.py:39
-msgid "Style"
-msgstr "Стиль"
-
-#: manager/models.py:50 manager.mine/models.py:40
-msgid "Styles"
-msgstr "Стили"
-
-#: manager/models.py:63 manager.mine/models.py:53
-msgid "Course"
-msgstr "Курс"
-
-#: manager/models.py:64 manager.mine/models.py:54
-msgid "Courses"
-msgstr "Курсы"
-
-#: manager/models.py:79 manager.mine/models.py:69
-msgid "Expired"
-msgstr "Окончено"
-
-#: manager/models.py:80 manager.mine/models.py:70
-msgid "Count"
-msgstr "Количество"
-
-#: manager/models.py:83 manager/models.py:84 manager.mine/models.py:73
-#: manager.mine/models.py:74
-msgid "Card"
-msgstr "Карта"
-
-#: manager/models.py:92 manager.mine/models.py:82
-msgid "Begins"
-msgstr "Начинается"
-
-#: manager/models.py:93 manager.mine/models.py:83
-msgid "Is looking for members?"
-msgstr "Идёт набор участников?"
-
-#: manager/models.py:94 manager.mine/models.py:84
-msgid "Are there free places?"
-msgstr "Есть свободные места?"
-
-#: manager/models.py:114 manager.mine/models.py:87
-msgid "Schedule"
-msgstr "Расписание"
-
-#: manager/models.py:115 manager.mine/models.py:88
-msgid "Schedules"
-msgstr "Расписания"
-
-#: manager/models.py:119 manager.mine/models.py:92
-msgid "Done"
-msgstr "Выполнено"
-
-#: manager/models.py:120 manager.mine/models.py:93
-msgid "Cancel"
-msgstr "Отмена"
-
-#: manager/models.py:126 manager.mine/models.py:99
-msgid "Status"
-msgstr "Статус"
-
-#: manager/models.py:129 manager.mine/models.py:102
-msgid "Action"
-msgstr "Действие"
-
-#: manager/models.py:130 manager.mine/models.py:103
-msgid "Actions"
-msgstr "Действия"
-
-#: manager/views.py:37
+#: manager/views.py:41
 msgid "Incorrect request method."
 msgstr "Неверный метод запроса."
 
-#: manager.mine/views.py:12
-msgid "Manager"
-msgstr "Администратор"
+#: storage/admin.py:40
+msgid "Relation"
+msgstr "Взаимосвязь"
+
+#: storage/admin.py:50
+msgid "Links"
+msgstr "Ссылки"
+
+#: storage/models.py:12 storage/models.py:60 storage/models.py:78
+#: storage/models.py:125
+msgid "Registered"
+msgstr "Зарегистрирован"
+
+#: storage/models.py:27 storage/models.py:46 storage/models.py:58
+msgid "Title"
+msgstr "Заголовок"
+
+#: storage/models.py:28
+msgid "Color"
+msgstr "Цвет"
+
+#: storage/models.py:39
+msgid "Room"
+msgstr "Зал"
+
+#: storage/models.py:40
+msgid "Rooms"
+msgstr "Залы"
+
+#: storage/models.py:49
+msgid "Style"
+msgstr "Стиль"
+
+#: storage/models.py:50
+msgid "Styles"
+msgstr "Стили"
+
+#: storage/models.py:63
+msgid "Course"
+msgstr "Курс"
+
+#: storage/models.py:64
+msgid "Courses"
+msgstr "Курсы"
+
+#: storage/models.py:79
+msgid "Expired"
+msgstr "Окончено"
+
+#: storage/models.py:80
+msgid "Count"
+msgstr "Количество"
+
+#: storage/models.py:83 storage/models.py:84
+msgid "Card"
+msgstr "Карта"
+
+#: storage/models.py:92
+msgid "Begins"
+msgstr "Начинается"
+
+#: storage/models.py:93
+msgid "Is looking for members?"
+msgstr "Идёт набор участников?"
+
+#: storage/models.py:94
+msgid "Are there free places?"
+msgstr "Есть свободные места?"
+
+#: storage/models.py:114
+msgid "Schedule"
+msgstr "Расписание"
+
+#: storage/models.py:115
+msgid "Schedules"
+msgstr "Расписания"
+
+#: storage/models.py:119
+msgid "Done"
+msgstr "Выполнено"
+
+#: storage/models.py:120
+msgid "Cancel"
+msgstr "Отмена"
+
+#: storage/models.py:126
+msgid "Status"
+msgstr "Статус"
+
+#: storage/models.py:129
+msgid "Action"
+msgstr "Действие"
+
+#: storage/models.py:130
+msgid "Actions"
+msgstr "Действия"
 
 #: templates/login.html:8
 msgid "Authentication"
@@ -179,3 +188,4 @@ msgstr ""
 "минутами.</nobr> \n"
 "\t    По истечении данного времени потребуется повторная авторизация.\n"
 "\t    "
+

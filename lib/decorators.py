@@ -35,7 +35,7 @@ def ajax_processor(form_object=None):
                         if settings.DEBUG:
                             result = {'code': '301', 'desc': _(u'Form is not valid : %s') % form.errors}
                         else:
-                            result = {'code': '301', 'desc': _(u'Service is temporary unavailable. We appologize for this.')}
+                            result = {'code': '301', 'desc': _(u'Service is temporary unavailable. We appologize for any inconvinience.')}
                 else:
                     result = func(request, *args, **kwargs)
             else:

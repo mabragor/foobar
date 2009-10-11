@@ -2,7 +2,7 @@
 
 from lib.decorators import ajax_processor
 from rfid.forms import GetRfidCode
-from manager.models import Client
+from storage.models import Client
 
 def rfid_reader(): # FIXME: real code to work with reader
     return '008365B0'
