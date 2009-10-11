@@ -27,7 +27,8 @@ TEMPLATE_DIRS = (
     )
 
 INSTALLED_APPS += (
-    'client',
+    'manager',
+    'rfid',
 )
 
 # auth system

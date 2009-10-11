@@ -10,7 +10,8 @@ from datetime import datetime
 from forms import ScheduleForm
 from lib.decorators import render_to
 
-@render_to('client/index.html')
+#@render_to('manager/index.html')
+@render_to('manager.html')
 def index(request):
     form = ScheduleForm()
     rooms = Room.objects.all()
@@ -34,7 +35,7 @@ def ajax_add_event(request, pk=None):
         else:
             output['error'] = u'Form isn\'t valid.'
     else:
-        output['error'] = u'Incorect request method.'
+        output['error'] = _(u'Incorrect request method.')
     return HttpResponse(simplejson.dumps(output, cls=DatetimeJSONEncoder))
 
 def ajax_del_event(request):

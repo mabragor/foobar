@@ -2,7 +2,7 @@
 
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns('client.views',
+urlpatterns = patterns('manager.views',
     url(r'^$', 'index'),
     url(r'^add_event/$', 'ajax_add_event', name='ajax_add_event'),
     url(r'^add_event/(?P<pk>\d+)/$', 'ajax_add_event'),

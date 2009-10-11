@@ -3,6 +3,38 @@ Ext.BLANK_IMAGE_URL = './media/ext/resources/default/s.gif';
 Ext.onReady(function() {
     Ext.QuickTips.init();
 
+    var client_form = new Ext.form.FormPanel({
+	standardSubmit: true,
+	labelWidth: 100,
+	frame: false,
+	items:[
+	    new Ext.form.TextField({
+		name: 'first_name',
+		fieldLabel: 'First name',
+		allowBlank: false
+	    }), 
+	    new Ext.form.TextField({
+		name: 'last_name',
+		fieldLabel: 'Last name',
+		allowBlank: false
+	    }),
+	    new Ext.form.TextField({
+		name: 'email',
+		fieldLabel: 'E-mail',
+		allowBlank: false
+	    })],
+	buttons: [{
+	    text: 'Surchange',
+	    handler: function() {}
+	}, {
+	    text: 'Apply',
+	    handler: function() {}
+	}, {
+	    text: 'Cancel',
+	    handler: function() {}
+	}]
+    });
+
     var panel = new Ext.Viewport({
 	title: Ext.getDom('page-title').innerHTML,
 	id: 'main',
@@ -35,7 +67,6 @@ Ext.onReady(function() {
 		//layout: 'fit',
 		frame: true,
 		border: false,
-		html: 'Put customer\'s card on reader, please.',
                 flex: 1,
                 tbar: [{
                     text: 'Client',
@@ -49,7 +80,8 @@ Ext.onReady(function() {
                     text: 'Add new',
                     iconCls: 'icon-plus',
                     handler: function() {}
-                }]
+                }],
+		items: client_form
 	    },{
 		title: 'Courses',
 		region: 'central',
@@ -66,5 +98,20 @@ Ext.onReady(function() {
 	    
 	}]
     });
+
+    var conn = new Ext.data.Connection();
+    conn.request({
+	url: '/ajax/rfid/',
+	method: 'POST',
+	params: {},
+	success: function(response) {
+	    json = Ext.util.JSON.decode(response.responseText);
+	    var form = client_form.getForm().setValues(json);
+	},
+	failure: function() {
+	    alert('RFID reading failed');
+	}
+    });
+
 
 });

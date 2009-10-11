@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from django.conf import settings
 from django.shortcuts import render_to_response
+from django.http import HttpResponse
 from django.template import RequestContext
+from django.utils import simplejson
+from django.utils.translation import ugettext as _
 
 def render_to(template, processor=None):
     def renderer(func):
@@ -18,3 +22,28 @@ def render_to(template, processor=None):
             return output
         return wrapper
     return renderer
+
+def ajax_processor(form_object=None):
+    def processor(func):
+        def wrapper(request, *args, **kwargs):
+            if request.method == 'POST':
+                if form_object is not None:
+                    form = form_object(request.POST)
+                    if form.is_valid():
+                        result = func(request, form, *args, **kwargs)
+                    else:
+                        if settings.DEBUG:
+                            result = {'code': '301', 'desc': _(u'Form is not valid : %s') % form.errors}
+                        else:
+                            result = {'code': '301', 'desc': _(u'Service is temporary unavailable. We appologize for this.')}
+                else:
+                    result = func(request, *args, **kwargs)
+            else:
+                if settings.DEBUG:
+                    result = {'code': '401', 'desc': _(u'It must be POST')}
+                else:
+                    result = {'code': '401', 'desc': _(u'Please, do not break our code :)')}
+            json = simplejson.dumps(result)
+            return HttpResponse(json, mimetype="application/json")
+        return wrapper
+    return processor

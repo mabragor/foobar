@@ -1,2 +1,2 @@
 
-APPNAME=client
+APPNAME=manager

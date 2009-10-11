@@ -3,7 +3,7 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
-from client import models
+from manager import models
 
 class CoachAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name', 'email', 'reg_date')
