@@ -2,7 +2,7 @@
 
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns('manager.views',
-    url(r'^$', 'index'),
+urlpatterns = patterns('rfid.views',
+    url(r'^$', 'info_by_rfid'),
 )
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-08 00:30+0400\n"
+"POT-Creation-Date: 2009-10-11 22:07+0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,7 +26,7 @@ msgstr "Пароль"
 
 #: views.py:36
 msgid "Login page"
-msgstr ""
+msgstr "Страница авторизации"
 
 #: views.py:38
 msgid "Form is not valid"
@@ -36,109 +36,123 @@ msgstr "Форма не проходит проверку"
 msgid "Probably you've made a mistake."
 msgstr "Возможно вы сделали ошибку"
 
-#: client/admin.py:40
+#: lib/decorators.py:36
+#, python-format
+msgid "Form is not valid : %s"
+msgstr "Форма не проходит проверку : %s"
+
+#: lib/decorators.py:38
+msgid "Service is temporary unavailable. We appologize for any inconvinience."
+msgstr "Сервис временно недоступен. Мы извиняемся за неудобство."
+
+#: lib/decorators.py:43
+msgid "It must be POST"
+msgstr "Используйте метод POST"
+
+#: lib/decorators.py:45
+msgid "Please, do not break our code :)"
+msgstr "Пожалуйста, не ломайте нас :)"
+
+#: manager/views.py:41
+msgid "Incorrect request method."
+msgstr "Неверный метод запроса."
+
+#: storage/admin.py:40
 msgid "Relation"
 msgstr "Взаимосвязь"
 
-#: client/admin.py:50
+#: storage/admin.py:50
 msgid "Links"
 msgstr "Ссылки"
 
-#: client/models.py:11 client/models.py:51 client/models.py:69
-#: client/models.py:113 manager/models.py:11 manager/models.py:50
-#: manager/models.py:68 manager/models.py:98
+#: storage/models.py:12 storage/models.py:60 storage/models.py:78
+#: storage/models.py:125
 msgid "Registered"
 msgstr "Зарегистрирован"
 
-#: client/models.py:26 client/models.py:37 client/models.py:49
-#: manager/models.py:26 manager/models.py:36 manager/models.py:48
+#: storage/models.py:27 storage/models.py:46 storage/models.py:58
 msgid "Title"
 msgstr "Заголовок"
 
-#: client/models.py:27
+#: storage/models.py:28
 msgid "Color"
 msgstr "Цвет"
 
-#: client/models.py:30 manager/models.py:29
+#: storage/models.py:39
 msgid "Room"
 msgstr "Зал"
 
-#: client/models.py:31 manager/models.py:30
+#: storage/models.py:40
 msgid "Rooms"
 msgstr "Залы"
 
-#: client/models.py:40 manager/models.py:39
+#: storage/models.py:49
 msgid "Style"
 msgstr "Стиль"
 
-#: client/models.py:41 manager/models.py:40
+#: storage/models.py:50
 msgid "Styles"
 msgstr "Стили"
 
-#: client/models.py:54 manager/models.py:53
+#: storage/models.py:63
 msgid "Course"
 msgstr "Курс"
 
-#: client/models.py:55 manager/models.py:54
+#: storage/models.py:64
 msgid "Courses"
 msgstr "Курсы"
 
-#: client/models.py:70 manager/models.py:69
+#: storage/models.py:79
 msgid "Expired"
 msgstr "Окончено"
 
-#: client/models.py:71 manager/models.py:70
+#: storage/models.py:80
 msgid "Count"
 msgstr "Количество"
 
-#: client/models.py:74 client/models.py:75 manager/models.py:73
-#: manager/models.py:74
+#: storage/models.py:83 storage/models.py:84
 msgid "Card"
 msgstr "Карта"
 
-#: client/models.py:83 manager/models.py:82
+#: storage/models.py:92
 msgid "Begins"
 msgstr "Начинается"
 
-#: client/models.py:84 manager/models.py:83
+#: storage/models.py:93
 msgid "Is looking for members?"
 msgstr "Идёт набор участников?"
 
-#: client/models.py:85 manager/models.py:84
+#: storage/models.py:94
 msgid "Are there free places?"
 msgstr "Есть свободные места?"
 
-#: client/models.py:102 manager/models.py:87
+#: storage/models.py:114
 msgid "Schedule"
 msgstr "Расписание"
 
-#: client/models.py:103 manager/models.py:88
+#: storage/models.py:115
 msgid "Schedules"
 msgstr "Расписания"
 
-#: client/models.py:107 manager/models.py:92
+#: storage/models.py:119
 msgid "Done"
 msgstr "Выполнено"
 
-#: client/models.py:108 manager/models.py:93
+#: storage/models.py:120
 msgid "Cancel"
 msgstr "Отмена"
 
-#: client/models.py:114 manager/models.py:99
+#: storage/models.py:126
 msgid "Status"
 msgstr "Статус"
 
-#: client/models.py:117 manager/models.py:102
+#: storage/models.py:129
 msgid "Action"
 msgstr "Действие"
 
-#: client/models.py:118 manager/models.py:103
+#: storage/models.py:130
 msgid "Actions"
 msgstr "Действия"
-
-#: manager/views.py:12
-msgid "Manager"
-msgstr "Администратор"
 
 #: templates/login.html:8
 msgid "Authentication"
@@ -170,7 +184,8 @@ msgid ""
 "\t    "
 msgstr ""
 "\n"
-"\t    Время бездействия пользователя ограничено <nobr>%(session_duration)s минутами."
-"</nobr> \n"
+"\t    Время бездействия пользователя ограничено <nobr>%(session_duration)s "
+"минутами.</nobr> \n"
 "\t    По истечении данного времени потребуется повторная авторизация.\n"
 "\t    "
+

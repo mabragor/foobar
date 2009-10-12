@@ -3,7 +3,7 @@ include config.mk
 CURRENT_INSTALL_DIR=$(INSTALL_DJANGO_DIR)/$(PROJECTNAME)
 FILES=$(wildcard *.py) $(wildcard *.wsgi)
 SUBDIRS=js css media lib locale \
-	client templates
+	client manager rfid storage templates
 
 all: subdirs
 
@@ -42,17 +42,17 @@ postscript:
 	rm code-dirty.pdf
 
 dbcreate:
-	echo "CREATE USER foobar@localhost IDENTIFIED BY 'q1';" >> ./mysql.tmp; \
-	echo "CREATE DATABASE foobar;" >> ./mysql.tmp; \
-	echo "GRANT ALL ON foobar.* TO foobar@localhost;" >> ./mysql.tmp; \
+	echo "CREATE USER $(PROJECTNAME)@localhost IDENTIFIED BY 'q1';" >> ./mysql.tmp; \
+	echo "CREATE DATABASE $(PROJECTNAME);" >> ./mysql.tmp; \
+	echo "GRANT ALL ON $(PROJECTNAME).* TO $(PROJECTNAME)@localhost;" >> ./mysql.tmp; \
 	echo "\. ./mysql.tmp"; \
 	mysql -u root -p; \
 	rm -f ./mysql.tmp
 
 dbdrop:
-	echo "REVOKE ALL ON foobar.* FROM foobar@localhost;" >> ./mysql.tmp
-	echo "DROP DATABASE foobar;" >> ./mysql.tmp
-	echo "DROP USER foobar@localhost;" >> ./mysql.tmp
+	echo "REVOKE ALL ON $(PROJECTNAME).* FROM $(PROJECTNAME)@localhost;" >> ./mysql.tmp
+	echo "DROP DATABASE $(PROJECTNAME);" >> ./mysql.tmp
+	echo "DROP USER $(PROJECTNAME)@localhost;" >> ./mysql.tmp
 	echo "\. ./mysql.tmp"; \
 	mysql -u root -p; \
 	rm -f ./mysql.tmp

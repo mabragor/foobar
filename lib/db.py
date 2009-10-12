@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from django.db import connection
 
 def execute_query(query):

@@ -18,10 +18,10 @@
     <script type='text/javascript'>
         var calendar_options = {{ options|safe }};
         calendar_options['urls'] = {
-            add_event: '{% url client:ajax_add_event %}',
-            del_event: '{% url client:ajax_del_event %}',
-            change_date: '{% url client:ajax_change_date %}',
-            get_events: '{% url client:ajax_get_events %}'
+            add_event: '{% url manager:ajax_add_event %}',
+            del_event: '{% url manager:ajax_del_event %}',
+            change_date: '{% url manager:ajax_change_date %}',
+            get_events: '{% url manager:ajax_get_events %}'
         };
         calendar_options['data'] = function(start, end, callback, rooms) {
             var $options = this;
