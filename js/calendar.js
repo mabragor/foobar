@@ -3,6 +3,8 @@ var options = {
     allowCalEventOverlap : true,
     firstDayOfWeek : 1,
     startParam: 'start',
+    title: 'Schedule',
+    region: 'center',
     /*
     form: {
         dialog: dialog,

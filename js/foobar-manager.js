@@ -7,53 +7,72 @@ Ext.onReady(function() {
     // client's data, add new courses to client account, take subcharge 
     // from him.
     var client_form = new Ext.form.FormPanel({
-	standardSubmit: true,
-	labelWidth: 100,
-	frame: false,
-	items:[
-	    new Ext.form.TextField({ name: 'first_name', fieldLabel: 'First name', allowBlank: false }), 
-	    new Ext.form.TextField({ name: 'last_name', fieldLabel: 'Last name', allowBlank: false }),
-	    new Ext.form.TextField({ name: 'email', fieldLabel: 'E-mail', allowBlank: false })
-	],
-	buttons: [
-	    { text: 'Surchange', handler: function() {} }, 
-	    { text: 'Apply', handler: function() {} }, 
-	    { text: 'Cancel', handler: function() {} }
-	]
+        standardSubmit: true,
+        labelWidth: 100,
+        frame: false,
+        items:[
+            new Ext.form.TextField({
+                name: 'first_name',
+                fieldLabel: 'First name',
+                allowBlank: false
+            }),
+            new Ext.form.TextField({
+                name: 'last_name',
+                fieldLabel: 'Last name',
+                allowBlank: false
+            }),
+            new Ext.form.TextField({
+                name: 'email',
+                fieldLabel: 'E-mail',
+                allowBlank: false
+            })
+        ],
+        buttons: [
+        {
+            text: 'Surchange',
+            handler: function() {}
+        },
+
+        {
+            text: 'Apply',
+            handler: function() {}
+        },
+
+        {
+            text: 'Cancel',
+            handler: function() {}
+        }
+        ]
     });
 
     var panel = new Ext.Viewport({
-	title: Ext.getDom('page-title').innerHTML,
-	id: 'main',
-	layout: 'border',
+        title: Ext.getDom('page-title').innerHTML,
+        id: 'main',
+        layout: 'border',
         //autoHeight: true,
-	//height: 600,
-	renderTo: Ext.getBody(),
-	items: [{
-	    title: 'Schedule',
-	    region: 'center',
-	    layout: 'fit',
-	    frame: true,
-	    border: false
-	},{
-	    region: 'west',
+        //height: 600,
+        renderTo: Ext.getBody(),
+        items: [{
+                xtype: 'ext:ui:schedule-panel'
+            },{
+            region: 'west',
             layout: 'vbox',
-	    frame: true,
-	    border: false,
-	    width: '30%',
-	    split: true,
-	    collapsible: true,
-	    collapseMode: 'mini',
+            frame: true,
+            border: false,
+            width: '30%',
+            split: true,
+            collapsible: true,
+            collapseMode: 'mini',
             layoutConfig: {
                 align : 'stretch',
                 pack  : 'start'
             },
-	    items: [{
-		title: 'Information',
-		region: 'north',
-		//layout: 'fit',
-		frame: true,
-		border: false,
+            items: [{
+                title: 'Information',
+                region: 'north',
+                //layout: 'fit',
+                frame: true,
+                border: false,
                 flex: 1,
                 tbar: [{
                     text: 'Client',
@@ -68,36 +87,35 @@ Ext.onReady(function() {
                     iconCls: 'icon-plus',
                     handler: function() {}
                 }],
-		items: client_form
-	    },{
-		title: 'Courses',
-		region: 'central',
-		//layout: 'fit',
-		frame: true,
-		border: false,
+                items: client_form
+            },{
+                title: 'Courses',
+                //layout: 'fit',
+                frame: true,
+                border: false,
                 flex: 1,
                 tbar: [{
                     text: 'Search',
                     iconCls: 'icon-info',
                     handler: function() {}
                 }]
-	    }]
+            }]
 	    
-	}]
+        }]
     });
 
     var conn = new Ext.data.Connection();
     conn.request({
-	url: '/ajax/rfid/',
-	method: 'POST',
-	params: {},
-	success: function(response) {
-	    json = Ext.util.JSON.decode(response.responseText);
-	    var form = client_form.getForm().setValues(json);
-	},
-	failure: function() {
-	    alert('RFID reading failed');
-	}
+        url: '/ajax/rfid/',
+        method: 'POST',
+        params: {},
+        success: function(response) {
+            json = Ext.util.JSON.decode(response.responseText);
+            var form = client_form.getForm().setValues(json);
+        },
+        failure: function() {
+            alert('RFID reading failed');
+        }
     });
 
 
