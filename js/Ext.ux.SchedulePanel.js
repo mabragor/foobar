@@ -1,0 +1,1 @@
+Ext.ux.SchedulePanel = Ext.extend()

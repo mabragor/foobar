@@ -154,7 +154,7 @@ var options = {
         }).show();
         $(window).resize().resize(); //fixes a bug in modal overlay size ??
     },
-    eventDrop: function(calEvent, oldCalEvent, element){
+    eventDrop: function(calEvent, oldCalEvent, callback){
         var $options = this.options;
         jQuery.ajax({
             type: 'POST',
@@ -166,6 +166,7 @@ var options = {
                 alert('Ошибка сервера. Обновите страницу.')
             },
             success: function(data){
+                //callback(data.result);
             }
         });
     }

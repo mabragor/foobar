@@ -45,9 +45,17 @@ def ajax_del_event(request):
 def ajax_change_date(request):
     if request.method == 'POST':
         event = Schedule.objects.get(pk=request.POST['pk'])
-        event.begin = datetime.fromtimestamp(int(request.POST['start']))
-        event.save()
-    return HttpResponse('{}')
+        data = {
+            'begin': datetime.fromtimestamp(int(request.POST['start'])),
+            'course': event.course.pk,
+            'room': event.room.pk
+        }
+        form = ScheduleForm(data, instance=event)
+        if form.is_valid():
+            event.begin = datetime.fromtimestamp(int(request.POST['start']))
+            event.save()
+            return HttpResponse('{result: true}')
+    return HttpResponse('{result: false}')
 
 def ajax_get_events(request):
     if request.method == 'POST':
