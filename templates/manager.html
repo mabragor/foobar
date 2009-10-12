@@ -16,12 +16,14 @@
 
   <script type="text/javascript" src="{% media 'media/extjs/adapter/jquery/ext-jquery-adapter-debug.js' %}"></script>
   <script type="text/javascript" src="{% media 'media/extjs/ext-all-debug.js' %}"></script>
-
-
     
  <script type="text/javascript" src="{% media 'js/Ext.ux.SchedulePanel.js' %}"></script>
-  <script type="text/javascript" src="{% media 'js/foobar-manager.js' %}"></script>
-    <script type='text/javascript'>
+  <script type="text/javascript" src="{% media 'js/Ext.ux.CoursePanel.js' %}"></script>
+ <script type='text/javascript'>
+        Ext.BLANK_IMAGE_URL = '{% media "media/extjs/resources/images/default/s.gif" %}';
+        var URLS = {
+            get_course_tree: '{% url manager:ajax_get_course_tree %}'
+        };
         var calendar_options = {{ options|safe }};
         calendar_options['urls'] = {
             add_event: '{% url manager:ajax_add_event %}',
@@ -64,6 +66,7 @@
         });
 */
     </script>
+<script type="text/javascript" src="{% media 'js/foobar-manager.js' %}"></script>
 {% endblock %}
 
 {% block content %}

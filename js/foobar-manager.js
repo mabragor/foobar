@@ -1,5 +1,3 @@
-Ext.BLANK_IMAGE_URL = './media/ext/resources/default/s.gif';
-
 Ext.onReady(function() {
     Ext.QuickTips.init();
 
@@ -89,18 +87,15 @@ Ext.onReady(function() {
                 }],
                 items: client_form
             },{
-                title: 'Courses',
-                //layout: 'fit',
-                frame: true,
-                border: false,
-                flex: 1,
+                xtype: 'ext:ux:course-panel',
+                dataUrl: URLS.get_course_tree,
                 tbar: [{
                     text: 'Search',
                     iconCls: 'icon-info',
                     handler: function() {}
                 }]
-            }]
-	    
+            }
+        ]
         }]
     });
 
