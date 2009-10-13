@@ -47,6 +47,7 @@ Ext.onReady(function() {
                 region: 'north',
                 frame: true,
                 border: false,
+                padding: 4,
                 tbar: [ {text: 'Client', iconCls: 'icon-info', handler: function() {}},
                         {text: 'Search', iconCls: 'icon-info', handler: function() {}},
                         {text: 'Add new',iconCls: 'icon-plus', handler: function() {}} ],

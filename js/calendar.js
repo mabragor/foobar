@@ -5,6 +5,7 @@ var options = {
     startParam: 'start',
     title: 'Schedule',
     region: 'center',
+    buttons: false,
     /*
     form: {
         dialog: dialog,
