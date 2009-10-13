@@ -35,6 +35,10 @@ INSTALLED_APPS += (
 # auth system
 SESSION_DURATION = 30 # in minutes
 
+# RFID reader section begins
+DEMO_CODES = ('96AF9B8B9', 'FCFC408EE', '78DB28F8A', '0EAEEEA00', 'AE1CF55A6', '5E85D6AEB', 'F7988111E')
+# RFID reader section ends
+
 #calendar
 CALENDAR_OPTIONS = {
     'timeslotsPerHour': 2,

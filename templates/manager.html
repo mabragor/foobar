@@ -2,24 +2,24 @@
 {% load media %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% media 'media/extjs/resources/css/ext-all.css' %}" type="text/css"/>
-    <link rel='stylesheet' type='text/css' href='{% media "css/jquery-ui.css" %}' />
-    <link rel='stylesheet' type='text/css' href='{% media "css/jquery.weekcalendar.css" %}' />
+    <link rel="stylesheet" type="text/css" href="{% media 'media/extjs/resources/css/ext-all.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% media 'css/jquery-ui.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% media 'css/jquery.weekcalendar.css' %}" />
 {% endblock %}
 
 {% block js %}
-    <script type='text/javascript' src='{% media "js/jquery.min.js" %}'></script>
-    <script type='text/javascript' src='{% media "js/jquery-ui.min.js" %}'></script>
-    <script type='text/javascript' src='{% media "js/jquery.weekcalendar.js" %}'></script>
-    <script type='text/javascript' src='{% media "js/jquery.wtooltip.js" %}'></script>
-    <script type='text/javascript' src='{% media "js/calendar.js" %}'></script>
+    <script type="text/javascript" src="{% media 'js/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% media 'js/jquery-ui.min.js' %}"></script>
+    <script type="text/javascript" src="{% media 'js/jquery.weekcalendar.js' %}"></script>
+    <script type="text/javascript" src="{% media 'js/jquery.wtooltip.js' %}"></script>
+    <script type="text/javascript" src="{% media 'js/calendar.js' %}"></script>
 
-  <script type="text/javascript" src="{% media 'media/extjs/adapter/jquery/ext-jquery-adapter-debug.js' %}"></script>
-  <script type="text/javascript" src="{% media 'media/extjs/ext-all-debug.js' %}"></script>
+    <script type="text/javascript" src="{% media 'media/extjs/adapter/jquery/ext-jquery-adapter-debug.js' %}"></script>
+    <script type="text/javascript" src="{% media 'media/extjs/ext-all-debug.js' %}"></script>
     
- <script type="text/javascript" src="{% media 'js/Ext.ux.SchedulePanel.js' %}"></script>
-  <script type="text/javascript" src="{% media 'js/Ext.ux.CoursePanel.js' %}"></script>
- <script type='text/javascript'>
+    <script type="text/javascript" src="{% media 'js/Ext.ux.SchedulePanel.js' %}"></script>
+    <script type="text/javascript" src="{% media 'js/Ext.ux.CoursePanel.js' %}"></script>
+    <script type="text/javascript">
         Ext.BLANK_IMAGE_URL = '{% media "media/extjs/resources/images/default/s.gif" %}';
         var URLS = {
             get_course_tree: '{% url manager:ajax_get_course_tree %}',
@@ -57,7 +57,7 @@
             return o;
         })());
     </script>
-<script type="text/javascript" src="{% media 'js/foobar-manager.js' %}"></script>
+    <script type="text/javascript" src="{% media 'js/foobar-manager.js' %}"></script>
 {% endblock %}
 
 {% block content %}
