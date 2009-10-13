@@ -12,7 +12,7 @@ from lib import DatetimeJSONEncoder
 from lib.decorators import render_to
 from forms import ScheduleForm
 
-from storage.models import Schedule, Course, Room
+from storage.models import Schedule, Course, Room, Group
 
 #@render_to('manager/index.html')
 @render_to('manager.html')
@@ -26,8 +26,8 @@ def index(request):
 
 @ajax_processor()
 def ajax_get_course_tree(request):
-    courses = Course.objects.all()
-    return [item.get_tree_node() for item in courses]
+    groups = Group.objects.all()
+    return [item.get_tree_node() for item in groups]
 
 @ajax_processor()
 def ajax_add_event(request, pk=None):

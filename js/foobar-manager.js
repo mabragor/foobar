@@ -50,8 +50,8 @@ Ext.onReady(function() {
                 border: false,
                 flex: 1,
                 tbar: [ {text: 'Client', iconCls: 'icon-info', handler: function() {}},
-			{text: 'Search', iconCls: 'icon-info', handler: function() {}},
-			{text: 'Add new',iconCls: 'icon-plus', handler: function() {}} ],
+                        {text: 'Search', iconCls: 'icon-info', handler: function() {}},
+                        {text: 'Add new',iconCls: 'icon-plus', handler: function() {}} ],
                 items: client_form
             },{
                 xtype: 'ext:ux:course-panel',
@@ -61,8 +61,7 @@ Ext.onReady(function() {
                     iconCls: 'icon-info',
                     handler: function() {}
                 }]
-            }
-        ]
+            }]
         }]
     });
 

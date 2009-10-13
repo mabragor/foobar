@@ -55,6 +55,15 @@ class Room(models.Model):
 class Group(models.Model):
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
 
+    def get_tree_node(self):
+        obj = {
+            'id': 'g_%s' % self.pk,
+            'text': self.title,
+            'cls': 'folder',
+            'children': [item.get_tree_node() for item in self.course_set.all()]
+        }
+        return obj
+
     class Meta:
         verbose_name = _(u'Style')
         verbose_name_plural = _(u'Styles')
