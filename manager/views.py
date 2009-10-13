@@ -6,6 +6,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
+from lib.decorators import ajax_processor
 
 from lib import DatetimeJSONEncoder
 from lib.decorators import render_to
@@ -23,10 +24,12 @@ def index(request):
         'options': simplejson.dumps(settings.CALENDAR_OPTIONS, cls=DatetimeJSONEncoder)
     }
 
+@ajax_processor()
 def ajax_get_course_tree(request):
     courses = Course.objects.all()
-    return HttpResponse(simplejson.dumps([item.get_tree_node() for item in courses], cls=DatetimeJSONEncoder))
+    return [item.get_tree_node() for item in courses]
 
+@ajax_processor()
 def ajax_add_event(request, pk=None):
     output = {}
     if request.method == 'POST':
@@ -42,20 +45,23 @@ def ajax_add_event(request, pk=None):
             output['error'] = u'Form isn\'t valid.'
     else:
         output['error'] = _(u'Incorrect request method.')
-    return HttpResponse(simplejson.dumps(output, cls=DatetimeJSONEncoder))
+    return output
 
+@ajax_processor()
 def ajax_del_event(request):
     if request.method == 'POST':
         Schedule.objects.get(pk=request.POST['id']).delete()
-    return HttpResponse('{}')
+    return {}
 
+@ajax_processor()
 def ajax_change_date(request):
     if request.method == 'POST':
         event = Schedule.objects.get(pk=request.POST['pk'])
         event.begin = datetime.fromtimestamp(int(request.POST['start']))
         event.save()
-    return HttpResponse('{}')
+    return {}
 
+@ajax_processor()
 def ajax_get_events(request):
     if request.method == 'POST':
         start = datetime.fromtimestamp(int(request.POST['start']))
@@ -66,5 +72,5 @@ def ajax_get_events(request):
         events = [item.get_calendar_obj() for item in schedules]
     else:
         events = []
-    return HttpResponse(simplejson.dumps(events, cls=DatetimeJSONEncoder))
+    return events
 
