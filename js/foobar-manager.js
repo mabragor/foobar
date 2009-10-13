@@ -5,42 +5,19 @@ Ext.onReady(function() {
     // client's data, add new courses to client account, take subcharge 
     // from him.
     var client_form = new Ext.form.FormPanel({
-        standardSubmit: true,
-        labelWidth: 100,
-        frame: false,
-        items:[
-            new Ext.form.TextField({
-                name: 'first_name',
-                fieldLabel: 'First name',
-                allowBlank: false
-            }),
-            new Ext.form.TextField({
-                name: 'last_name',
-                fieldLabel: 'Last name',
-                allowBlank: false
-            }),
-            new Ext.form.TextField({
-                name: 'email',
-                fieldLabel: 'E-mail',
-                allowBlank: false
-            })
-        ],
-        buttons: [
-        {
-            text: 'Surchange',
-            handler: function() {}
-        },
-
-        {
-            text: 'Apply',
-            handler: function() {}
-        },
-
-        {
-            text: 'Cancel',
-            handler: function() {}
-        }
-        ]
+	standardSubmit: true,
+	labelWidth: 100,
+	frame: false,
+	items:[
+	    new Ext.form.TextField({ name: 'first_name', fieldLabel: 'First name', allowBlank: false }), 
+	    new Ext.form.TextField({ name: 'last_name', fieldLabel: 'Last name', allowBlank: false }),
+	    new Ext.form.TextField({ name: 'email', fieldLabel: 'E-mail', allowBlank: false })
+	],
+	buttons: [
+	    { text: 'Surchange', handler: function() {} }, 
+	    { text: 'Assign', handler: function() {} }, 
+	    { text: 'Apply', handler: function() {} }, 
+	]
     });
 
     var panel = new Ext.Viewport({
@@ -51,8 +28,8 @@ Ext.onReady(function() {
         //height: 600,
         renderTo: Ext.getBody(),
         items: [{
-                xtype: 'ext:ui:schedule-panel'
-            },{
+            xtype: 'ext:ui:schedule-panel'
+        },{
             region: 'west',
             layout: 'vbox',
             frame: true,
@@ -72,19 +49,9 @@ Ext.onReady(function() {
                 frame: true,
                 border: false,
                 flex: 1,
-                tbar: [{
-                    text: 'Client',
-                    iconCls: 'icon-info',
-                    handler: function() {}
-                },{
-                    text: 'Search',
-                    iconCls: 'icon-info',
-                    handler: function() {}
-                },{
-                    text: 'Add new',
-                    iconCls: 'icon-plus',
-                    handler: function() {}
-                }],
+                tbar: [ {text: 'Client', iconCls: 'icon-info', handler: function() {}},
+			{text: 'Search', iconCls: 'icon-info', handler: function() {}},
+			{text: 'Add new',iconCls: 'icon-plus', handler: function() {}} ],
                 items: client_form
             },{
                 xtype: 'ext:ux:course-panel',
