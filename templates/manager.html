@@ -2,16 +2,72 @@
 {% load media %}
 
 {% block css %}
-  <link rel="stylesheet" href="{% media 'media/extjs/resources/css/ext-all.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% media 'media/extjs/resources/css/ext-all.css' %}" type="text/css"/>
+    <link rel='stylesheet' type='text/css' href='{% media "css/jquery-ui.css" %}' />
+    <link rel='stylesheet' type='text/css' href='{% media "css/jquery.weekcalendar.css" %}' />
 {% endblock %}
 
 {% block js %}
-  <script type="text/javascript" src="{% media 'js/jquery.js' %}"></script>
-  <script type="text/javascript" src="{% media 'media/extjs/adapter/jquery/ext-jquery-adapter.js' %}"></script>
-  <script type="text/javascript" src="{% media 'media/extjs/ext-all.js' %}"></script>
-  <script type="text/javascript" src="{% media 'js/foobar-manager.js' %}"></script>
+    <script type='text/javascript' src='{% media "js/jquery.min.js" %}'></script>
+    <script type='text/javascript' src='{% media "js/jquery-ui.min.js" %}'></script>
+    <script type='text/javascript' src='{% media "js/jquery.weekcalendar.js" %}'></script>
+    <script type='text/javascript' src='{% media "js/jquery.wtooltip.js" %}'></script>
+    <script type='text/javascript' src='{% media "js/calendar.js" %}'></script>
+
+  <script type="text/javascript" src="{% media 'media/extjs/adapter/jquery/ext-jquery-adapter-debug.js' %}"></script>
+  <script type="text/javascript" src="{% media 'media/extjs/ext-all-debug.js' %}"></script>
+    
+ <script type="text/javascript" src="{% media 'js/Ext.ux.SchedulePanel.js' %}"></script>
+  <script type="text/javascript" src="{% media 'js/Ext.ux.CoursePanel.js' %}"></script>
+ <script type='text/javascript'>
+        Ext.BLANK_IMAGE_URL = '{% media "media/extjs/resources/images/default/s.gif" %}';
+        var URLS = {
+            get_course_tree: '{% url manager:ajax_get_course_tree %}'
+        };
+        var calendar_options = {{ options|safe }};
+        calendar_options['urls'] = {
+            add_event: '{% url manager:ajax_add_event %}',
+            del_event: '{% url manager:ajax_del_event %}',
+            change_date: '{% url manager:ajax_change_date %}',
+            get_events: '{% url manager:ajax_get_events %}'
+        };
+        calendar_options['data'] = function(start, end, callback, rooms) {
+            var $options = this;
+            var data = {
+                'start': Math.round(start.getTime()/1000),
+                'end': Math.round(end.getTime()/1000)
+            };
+            if (rooms){
+                data['rooms'] = rooms;
+            }
+            jQuery.ajax({
+                type: 'POST',
+                url: $options.urls.get_events,
+                dataType: 'json',
+                data: data,
+                error: function(){
+                    alert('Ошибка сервера. Обновите страницу.')
+                },
+                success: callback
+            });
+        }
+/*
+        $(document).ready(function() {
+                $('#calendar').weekCalendar(jQuery.extend(options, calendar_options));
+                $('button').hover(
+			function(){
+				$(this).addClass("ui-state-hover");
+			},
+			function(){
+				$(this).removeClass("ui-state-hover");
+			}
+		);
+
+        });
+*/
+    </script>
+<script type="text/javascript" src="{% media 'js/foobar-manager.js' %}"></script>
 {% endblock %}
 
 {% block content %}
-
 {% endblock %}

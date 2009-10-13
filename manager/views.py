@@ -17,12 +17,15 @@ from storage.models import Schedule, Course, Room
 @render_to('manager.html')
 def index(request):
     form = ScheduleForm()
-    rooms = Room.objects.all()
+
     return {
         'form': form,
-        'rooms': simplejson.dumps([item.get_calendar_obj() for item in rooms], cls=DatetimeJSONEncoder),
         'options': simplejson.dumps(settings.CALENDAR_OPTIONS, cls=DatetimeJSONEncoder)
     }
+
+def ajax_get_course_tree(request):
+    courses = Course.objects.all()
+    return HttpResponse(simplejson.dumps([item.get_tree_node() for item in courses], cls=DatetimeJSONEncoder))
 
 def ajax_add_event(request, pk=None):
     output = {}

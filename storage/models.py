@@ -35,6 +35,16 @@ class Room(models.Model):
         }
         return obj
 
+    def get_tree_node(self):
+        obj = {
+            'id': self.pk,
+            'text': self.title,
+            'leaf': True,
+            'cls': 'file',
+            'color': self.color
+        }
+        return obj
+
     class Meta:
         verbose_name = _(u'Room')
         verbose_name_plural = _(u'Rooms')
@@ -58,6 +68,15 @@ class Course(models.Model):
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
     duration = models.FloatField()
     reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
+
+    def get_tree_node(self):
+        obj = {
+            'id': self.pk,
+            'text': self.title,
+            'leaf': True,
+            'cls': 'file'
+        }
+        return obj
 
     class Meta:
         verbose_name = _(u'Course')

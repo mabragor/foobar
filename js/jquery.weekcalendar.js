@@ -30,7 +30,7 @@
             self._loadCalEvents();
             self._resizeCalendar();
             //setTimeout(function() {
-                self._scrollToHour(self.options.date.getHours());
+                //self._scrollToHour(self.options.date.getHours());
             //}, 500);
             
             $(window).unbind("resize.weekcalendar");
@@ -559,8 +559,8 @@
             var self = this;
             var options = this.options;
             var eventsToRender;
-            
-            if($.isArray(events)) {
+
+            if(jQuery.isArray(events)) {
                 eventsToRender = self._cleanEvents(events);
             } else if(events.events) {
                  eventsToRender = self._cleanEvents(events.events);
@@ -701,6 +701,7 @@
             var self = this;
             var options = self.options;
             var $events = $weekDay.find(".cal-event");
+
             var sortedEvents = $events.sort(function(a, b){
                 return $(a).data("calEvent")[options.startParam].getTime() - $(b).data("calEvent")[options.startParam].getTime();
             });
@@ -954,18 +955,21 @@
                     var $weekDayColumns = self.element.find(".day-column-inner");
                     var $newEvent = self._renderEvent(newCalEvent, self._findWeekDayForEvent(newCalEvent, $weekDayColumns));
                     $calEvent.hide();
-                     
+
+
                     //trigger drop callback
                     options.eventDrop.call(self, newCalEvent, calEvent, $newEvent);
                     $calEvent.data("preventClick", true);
-                    setTimeout(function(){
-                        var $weekDayOld = self._findWeekDayForEvent($calEvent.data("calEvent"), self.element.find(".week-calendar-time-slots .day-column-inner"));
-                        $calEvent.remove();
-                        if ($weekDayOld.data("startDate") != $weekDay.data("startDate")) {
-                            self._adjustOverlappingEvents($weekDayOld);
-                        }
-                        self._adjustOverlappingEvents($weekDay);
-                    }, 500);
+
+                        setTimeout(function(){
+
+                            var $weekDayOld = self._findWeekDayForEvent($calEvent.data("calEvent"), self.element.find(".week-calendar-time-slots .day-column-inner"));
+                            $calEvent.remove();
+                            if ($weekDayOld.data("startDate") != $weekDay.data("startDate")) {
+                                self._adjustOverlappingEvents($weekDayOld);
+                            }
+                            self._adjustOverlappingEvents($weekDay);
+                        }, 500);
                                     
                 }
             });
@@ -1034,7 +1038,7 @@
                     slot = self.options.businessHours.end - self.options.businessHours.start - 1;
                }
             }
-            
+
             var $target = this.element.find(".grid-timeslot-header .hour-header:eq(" + slot + ")");
             
             $scrollable.animate({scrollTop: 0}, 0, function(){
