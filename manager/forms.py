@@ -4,7 +4,6 @@ from django import forms
 from storage.models import Schedule, Course
 
 class ScheduleForm(forms.ModelForm):
-    begin = forms.DateTimeField(widget=forms.Select())
 
     class Meta:
         model = Schedule

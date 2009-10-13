@@ -12,7 +12,9 @@ Ext.ux.CoursePanel = Ext.extend(Ext.tree.TreePanel, {
     margins: '5 0 0 0',
     rootVisible: false,
     lines: false,
-    autoScroll: true
+    autoScroll: true,
+    enableDrag: true,
+    ddGroup:'t2schedule'
     /*,
     initComponent: function(){
         Ext.apply(this, {

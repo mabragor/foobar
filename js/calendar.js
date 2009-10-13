@@ -1,22 +1,9 @@
-//var dialog = $("#event_edit_container");
-var options = {
+var schedule_options = {
     allowCalEventOverlap : true,
     firstDayOfWeek : 1,
-    startParam: 'start',
-    title: 'Schedule',
     region: 'center',
     buttons: false,
-    /*
-    form: {
-        dialog: dialog,
-        startField: dialog.find("select[name='begin']"),
-        roomField: dialog.find("select[name='room']"),
-        courseField: dialog.find("select[name='course']"),
-        formError: dialog.find('#form_error')
-    },*/
-    height : function(calendar) {
-        return $(window).height() - $("h1").outerHeight();
-    },
+
     resizable: function(calEvent, eventElement){
         return false;
     },
@@ -24,7 +11,8 @@ var options = {
         var options = this.options;
         $event.css("backgroundColor", "#"+calEvent.color);
         $event.find('.time').css("backgroundColor", "#"+calEvent.color);
-        var content = this._formatDate(calEvent.start, options.timeFormat) + options.timeSeparator + this._formatDate(calEvent.end, options.timeFormat);
+        //var content =  this._formatDate(calEvent.start, options.timeFormat) + options.timeSeparator + this._formatDate(calEvent.end, options.timeFormat);
+        var content = calEvent.start.format(options.timeFormat) + options.timeSeparator + calEvent.end.format(options.timeFormat);
         content += '<br/>'+calEvent.title;
         content += '<br/>'+calEvent.room_name;
 

@@ -18,11 +18,15 @@ from storage.models import Schedule, Course, Room, Group
 @render_to('manager.html')
 def index(request):
     form = ScheduleForm()
-
     return {
         'form': form,
         'options': simplejson.dumps(settings.CALENDAR_OPTIONS, cls=DatetimeJSONEncoder)
     }
+
+@ajax_processor()
+def ajax_get_rooms(request):
+    rooms = Room.objects.all()
+    return {'rows': [item.get_calendar_obj() for item in rooms]}
 
 @ajax_processor()
 def ajax_get_course_tree(request):
@@ -30,7 +34,7 @@ def ajax_get_course_tree(request):
     return [item.get_tree_node() for item in groups]
 
 @ajax_processor()
-def ajax_add_event(request, pk=None):
+def ajax_add_event1(request, pk=None):
     output = {}
     if request.method == 'POST':
         if pk:
@@ -44,6 +48,24 @@ def ajax_add_event(request, pk=None):
         else:
             output['error'] = u'Form isn\'t valid.'
     else:
+        output['error'] = _(u'Incorrect request method.')
+    return output
+
+@ajax_processor()
+def ajax_add_event(request, pk=None):
+    output = {}
+    if request.method == 'POST':
+        form = ScheduleForm(request.POST)
+        if form.is_valid():
+            obj = form.save()
+            output['success'] = True
+            output['msg'] = 'Save succesfull'
+            output['obj'] = obj.get_calendar_obj()
+        else:
+            output['success'] = False
+            output['error'] = u'Form isn\'t valid.'
+    else:
+        output['success'] = False
         output['error'] = _(u'Incorrect request method.')
     return output
 

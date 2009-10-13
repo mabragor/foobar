@@ -31,7 +31,7 @@ class Room(models.Model):
         obj = {
             'id': self.pk,
             'color': self.color,
-            'title': self.title
+            'text': self.title
         }
         return obj
 

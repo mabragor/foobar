@@ -5,19 +5,19 @@ Ext.onReady(function() {
     // client's data, add new courses to client account, take subcharge 
     // from him.
     var client_form = new Ext.form.FormPanel({
-	standardSubmit: true,
-	labelWidth: 100,
-	frame: false,
-	items:[
-	    new Ext.form.TextField({ name: 'first_name', fieldLabel: 'First name', allowBlank: false }), 
-	    new Ext.form.TextField({ name: 'last_name', fieldLabel: 'Last name', allowBlank: false }),
-	    new Ext.form.TextField({ name: 'email', fieldLabel: 'E-mail', allowBlank: false })
-	],
-	buttons: [
-	    { text: 'Surchange', handler: function() {} }, 
-	    { text: 'Assign', handler: function() {} }, 
-	    { text: 'Apply', handler: function() {} }, 
-	]
+        standardSubmit: true,
+        labelWidth: 100,
+        frame: false,
+        items:[
+            new Ext.form.TextField({ name: 'first_name', fieldLabel: 'First name', allowBlank: false }),
+            new Ext.form.TextField({ name: 'last_name', fieldLabel: 'Last name', allowBlank: false }),
+            new Ext.form.TextField({ name: 'email', fieldLabel: 'E-mail', allowBlank: false })
+        ],
+        buttons: [
+            { text: 'Surchange', handler: function() {} },
+            { text: 'Assign', handler: function() {} },
+            { text: 'Apply', handler: function() {} },
+        ]
     });
 
     var panel = new Ext.Viewport({
@@ -28,7 +28,8 @@ Ext.onReady(function() {
         //height: 600,
         renderTo: Ext.getBody(),
         items: [{
-            xtype: 'ext:ui:schedule-panel'
+            xtype: 'ext:ux:schedule-panel',
+            c_options: schedule_options
         },{
             region: 'west',
             layout: 'vbox',

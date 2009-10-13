@@ -158,10 +158,13 @@
                 var endMillis = startMillis + options.millisPerTimeslot;
                 times[i] = {
                     start: new Date(startMillis),
-                    startValue: this._formatDate(new Date(startMillis), 'Y-m-d H:i:s'),
-                    startFormatted: this._formatDate(new Date(startMillis), options.timeFormat),
+                    //startValue: this._formatDate(new Date(startMillis), 'Y-m-d H:i:s'),
+                    startValue: (new Date(startMillis)).format('Y-m-d H:i:s'),
+                    //startFormatted: this._formatDate(new Date(startMillis), options.timeFormat),
+                    startFormatted: (new Date(startMillis)).format(options.timeFormat),
                     end: new Date(endMillis),
-                    endFormatted: this._formatDate(new Date(endMillis), options.timeFormat)
+                    //endFormatted: this._formatDate(new Date(endMillis), options.timeFormat)
+                    endFormatted: (new Date(endMillis)).format(options.timeFormat)
                  };
                 startMillis = endMillis;
             }
@@ -170,17 +173,21 @@
         
         formatDate : function(date, format) {
            if(format) {
-                return this._formatDate(date, format);
+                //return this._formatDate(date, format);
+                return date.format(format);
            } else {
-                return this._formatDate(date, this.options.dateFormat);
+                //return this._formatDate(date, this.options.dateFormat);
+                return date.format(this.options.dateFormat);
            }
         },
         
         formatTime : function(date, format) {
            if(format) {
-                return this._formatDate(date, format);
+                //return this._formatDate(date, format);
+                return date.format(format);
            } else {
-                return this._formatDate(date, this.options.timeFormat);
+                //return this._formatDate(date, this.options.timeFormat);
+                return date.format(this.options.timeFormat);
            }
         },
         
@@ -525,7 +532,8 @@
                 
                     var dayName = options.useShortDayNames ? options.shortDays[currentDay.getDay()] : options.longDays[currentDay.getDay()];
                 
-                    $(this).html(dayName + "<br/>" + self._formatDate(currentDay, options.dateFormat));
+                    //$(this).html(dayName + "<br/>" + self._formatDate(currentDay, options.dateFormat));
+                    $(this).html(dayName + "<br/>" + currentDay.format(options.dateFormat));
                     if(self._isToday(currentDay)) {
                         $(this).addClass("today");
                     } else {
@@ -1010,8 +1018,7 @@
          */
         _refreshEventDetails : function(calEvent, $calEvent) {
             var self = this;
-            var options = this.options;
-            $calEvent.find(".time").text(self._formatDate(calEvent[options.startParam], options.timeFormat) + options.timeSeparator + self._formatDate(calEvent[options.endParam], options.timeFormat));
+            var options = this.options;            $calEvent.find(".time").text(calEvent[options.startParam].format(options.timeFormat) + options.timeSeparator + calEvent[options.endParam].format(options.timeFormat));
             $calEvent.find(".title").text(calEvent.title);
             $calEvent.data("calEvent", calEvent);
         },
@@ -1215,76 +1222,16 @@
             }
             return d;
         },
-        
-        /*
-         * date formatting is adapted from 
-         * http://jacwright.com/projects/javascript/date_format
-         */
-        _formatDate : function(date, format) {
-            var options = this.options;
-            var returnStr = '';
-            for (var i = 0; i < format.length; i++) {
-                var curChar = format.charAt(i);
-                if ($.isFunction(this._replaceChars[curChar])) {
-                    returnStr += this._replaceChars[curChar](date, options);
-                } else {
-                    returnStr += curChar;
-                }
-            }
-            return returnStr;
-        },
-        
-        _replaceChars : {
-           
-                // Day
-                d: function(date) { return (date.getDate() < 10 ? '0' : '') + date.getDate(); },
-                D: function(date, options) { return options.shortDays[date.getDay()]; },
-                j: function(date) { return date.getDate(); },
-                l: function(date, options) { return options.longDays[date.getDay()]; },
-                N: function(date) { return date.getDay() + 1; },
-                S: function(date) { return (date.getDate() % 10 == 1 && date.getDate() != 11 ? 'st' : (date.getDate() % 10 == 2 && date.getDate() != 12 ? 'nd' : (date.getDate() % 10 == 3 && date.getDate() != 13 ? 'rd' : 'th'))); },
-                w: function(date) { return date.getDay(); },
-                z: function(date) { return "Not Yet Supported"; },
-                // Week
-                W: function(date) { return "Not Yet Supported"; },
-                // Month
-                F: function(date, options) { return options.longMonths[date.getMonth()]; },
-                m: function(date) { return (date.getMonth() < 9 ? '0' : '') + (date.getMonth() + 1); },
-                M: function(date, options) { return options.shortMonths[date.getMonth()]; },
-                n: function(date) { return date.getMonth() + 1; },
-                t: function(date) { return "Not Yet Supported"; },
-                // Year
-                L: function(date) { return "Not Yet Supported"; },
-                o: function(date) { return "Not Supported"; },
-                Y: function(date) { return date.getFullYear(); },
-                y: function(date) { return ('' + date.getFullYear()).substr(2); },
-                // Time
-                a: function(date) { return date.getHours() < 12 ? 'am' : 'pm'; },
-                A: function(date) { return date.getHours() < 12 ? 'AM' : 'PM'; },
-                B: function(date) { return "Not Yet Supported"; },
-                g: function(date) { return date.getHours() % 12 || 12; },
-                G: function(date) { return date.getHours(); },
-                h: function(date) { return ((date.getHours() % 12 || 12) < 10 ? '0' : '') + (date.getHours() % 12 || 12); },
-                H: function(date) { return (date.getHours() < 10 ? '0' : '') + date.getHours(); },
-                i: function(date) { return (date.getMinutes() < 10 ? '0' : '') + date.getMinutes(); },
-                s: function(date) { return (date.getSeconds() < 10 ? '0' : '') + date.getSeconds(); },
-                // Timezone
-                e: function(date) { return "Not Yet Supported"; },
-                I: function(date) { return "Not Supported"; },
-                O: function(date) { return (date.getTimezoneOffset() < 0 ? '-' : '+') + (date.getTimezoneOffset() / 60 < 10 ? '0' : '') + (date.getTimezoneOffset() / 60) + '00'; },
-                T: function(date) { return "Not Yet Supported"; },
-                Z: function(date) { return date.getTimezoneOffset() * 60; },
-                // Full Date/Time
-                c: function(date) { return "Not Yet Supported"; },
-                r: function(date) { return date.toString(); },
-                U: function(date) { return date.getTime() / 1000; }
+
+        getDivDate: function(node){
+
+            return 'XYU';
         }
-        
     });
    
     $.extend($.ui.weekCalendar, {
         version: '1.2.1',
-        getter: ['getTimeslotTimes', 'getData', 'formatDate', 'formatTime'],
+        getter: ['getTimeslotTimes', 'getData', 'formatDate', 'formatTime', 'getDivDate'],
         defaults: {
             date: new Date(),
             timeFormat : "G:i",
