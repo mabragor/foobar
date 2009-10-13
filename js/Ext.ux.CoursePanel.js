@@ -9,6 +9,7 @@ Ext.ux.CoursePanel = Ext.extend(Ext.tree.TreePanel, {
         id: 'root',
         expanded: true
     },
+    margins: '5 0 0 0',
     rootVisible: false,
     lines: false,
     autoScroll: true
