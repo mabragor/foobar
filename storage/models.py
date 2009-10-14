@@ -78,15 +78,6 @@ class Course(models.Model):
     duration = models.FloatField()
     reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
 
-    def get_tree_node(self):
-        obj = {
-            'id': self.pk,
-            'text': self.title,
-            'leaf': True,
-            'cls': 'file'
-        }
-        return obj
-
     class Meta:
         verbose_name = _(u'Course')
         verbose_name_plural = _(u'Courses')
@@ -99,6 +90,15 @@ class Course(models.Model):
 
     def groups(self):
         return ','.join([unicode(a) for a in self.group.all()])
+
+    def get_tree_node(self):
+        coaches = ', '.join(unicode(coach) for coach in self.coach.all())
+        return {
+            'id': self.pk,
+            'text': '%s : %s' % (self.title, coaches),
+            'leaf': True,
+            'cls': 'file'
+            }
 
 class Card(models.Model):
     course = models.ForeignKey(Course)
