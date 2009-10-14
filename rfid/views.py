@@ -15,7 +15,7 @@ def rfid_reader():
         return codes[index][:8]
     else:
         # FIXME: real code to work with reader
-        pass
+        return '00000000'
 
 @ajax_processor(GetRfidCode)
 def info_by_rfid(request, form):
