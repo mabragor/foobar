@@ -53,7 +53,12 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
                             name: 'room_name'
                         }
                     ]
-                })//Ext.ux.CreateEventForm
+                }),//Ext.ux.CreateEventForm
+                listeners: {
+                    show: function(){
+                        this.get(0).getForm().reset();
+                    }
+                }
             });//Ext.Window
         }).call(this, this.c_options);
         //-----------------------------
@@ -67,8 +72,8 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
         };
         this.calendar = $(this.body.dom).weekCalendar(this.c_options);
         this.ce_window.get(0).getForm().on('actioncomplete', function(form, action){
+            this.ce_window.hide();
             this.calendar.weekCalendar("updateEvent", action.result.obj);
-            this.ce_window.close();
         }, this)
         var $self = this;
         //Add droping from course's tree'
