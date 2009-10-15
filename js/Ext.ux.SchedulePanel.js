@@ -20,8 +20,9 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
         this.ce_window = (function(options){
             return new Ext.Window({
                 closeAction: 'hide',
-                width: 500,
-                height: 300,
+                width: 400,
+                height: 250,
+                constrain: true,
                 title: 'Create event',
                 layout: 'fit',
                 items: new Ext.ux.CreateEventForm({
@@ -29,7 +30,11 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
                     items: [{
                             xtype: 'displayfield',
                             hideLabel: true,
-                            value: 'Some course'
+                            id: 'course_field'
+                        },{
+                            xtype: 'displayfield',
+                            hideLabel: true,
+                            id: 'day_field'
                         },{
                             id: 'time_field',
                             xtype: 'timefield',
@@ -89,6 +94,8 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
                     };
                     form.begin_day = $(this.getEl()).data("startDate");
                     $self.ce_window.show();
+                    form.findField('course_field').setValue(node.node.text);
+                    form.findField('day_field').setValue(form.begin_day.format('j.n.Y'));
                     return true;
                 }//notifyDrop
             });//Ext.dd.DropTarget
