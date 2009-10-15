@@ -10,7 +10,7 @@ from lib.decorators import ajax_processor
 
 from lib import DatetimeJSONEncoder
 from lib.decorators import render_to
-from forms import ScheduleForm
+from forms import ScheduleForm, UserRFID
 
 from storage.models import Schedule, Course, Room, Group
 
@@ -32,6 +32,15 @@ def ajax_get_rooms(request):
 def ajax_get_course_tree(request):
     groups = Group.objects.all()
     return [item.get_tree_node() for item in groups]
+
+@ajax_processor(UserRFID)
+def ajax_get_user_courses(request, form):
+    rfid = form.cleaned_data['rfid_code']
+    try:
+        user = Client.objects.get(rfid_code=rfid)
+        return {'courses': user.get_course_list()}
+    except Client.DoesNotExist:
+        return {'courses': []} # FIXME
 
 @ajax_processor()
 def ajax_add_event1(request, pk=None):

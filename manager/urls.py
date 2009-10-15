@@ -9,6 +9,7 @@ urlpatterns = patterns('manager.views',
     url(r'^del_event/$', 'ajax_del_event', name='ajax_del_event'),
     url(r'^change_date/$', 'ajax_change_date', name='ajax_change_date'),
     url(r'^get_events/$', 'ajax_get_events', name='ajax_get_events'),
+    url(r'^ajax_get_user_courses/$', 'ajax_get_user_courses', name='ajax_get_user_courses'),
     url(r'^get_course_tree/$', 'ajax_get_course_tree', name='ajax_get_course_tree'),
     url(r'^get_rooms/$', 'ajax_get_rooms', name='ajax_get_rooms')
 

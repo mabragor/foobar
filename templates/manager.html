@@ -23,6 +23,7 @@
         Ext.BLANK_IMAGE_URL = '{% media "media/extjs/resources/images/default/s.gif" %}';
         var URLS = {
             get_course_tree: '{% url manager:ajax_get_course_tree %}',
+            get_user_courses: '{% url manager:ajax_get_user_courses %}',
             add_event: '{% url manager:ajax_add_event %}'
         };
         schedule_options = Ext.apply(schedule_options, (function(){

@@ -21,7 +21,8 @@ class Coach(AbstractUser):
     pass
 
 class Client(AbstractUser):
-    pass
+    def get_course_list(self):
+        return [card.get_info() for card in self.card_set.all()]
 
 class Room(models.Model):
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
@@ -114,6 +115,15 @@ class Card(models.Model):
 
     def __unicode__(self):
         return self.course.title
+
+    def get_info(self):
+        return {
+            'id': self.pk,
+            'title': self.course.title,
+            'reg_date': self.reg_date,
+            'exp_date': self.exp_date,
+            'count': self.count
+            }
 
 class Schedule(models.Model):
     room = models.ForeignKey(Room)

@@ -24,3 +24,6 @@ class ScheduleForm(forms.ModelForm):
             if (begin < item.end < end) or (begin <= item.begin < end):
                 raise forms.ValidationError('Incorect begin date for this room')
         return self.cleaned_data
+
+class UserRFID(forms.Form):
+    rfid_code = forms.CharField(max_length=8)

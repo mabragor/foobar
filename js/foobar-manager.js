@@ -1,8 +1,8 @@
 Ext.onReady(function() {
     Ext.QuickTips.init();
 
-    // This form shows information about current client. Manager may check 
-    // client's data, add new courses to client account, take subcharge 
+    // This form shows information about current client. Manager may check
+    // client's data, add new courses to client account, take subcharge
     // from him.
     var client_form = new Ext.form.FormPanel({
         standardSubmit: true,
@@ -19,6 +19,20 @@ Ext.onReady(function() {
             { text: 'Apply', handler: function() {} },
         ]
     });
+
+    var course_store = new Ext.data.JsonStore({
+	url: URLS.get_user_courses,
+	storeId: 'UserCourses',
+	autoDestroy: true, // destroy store when the component the store is bound to is destroyed
+
+	root: 'courses', // get data from this key
+	fields: ['title',
+		 {name: 'reg_date', type: 'date'},
+		 {name: 'exp_date', type: 'date'},
+		 'count'
+		]
+    });
+    course_store.load();
 
     var panel = new Ext.Viewport({
         title: Ext.getDom('page-title').innerHTML,
@@ -54,8 +68,11 @@ Ext.onReady(function() {
                         {text: 'Add new',iconCls: 'icon-plus', handler: function() {}} ],
                 items: client_form
             },{
+                xtype: 'ext:ux:user-courses',
+		store: course_store,
+            },{
                 xtype: 'ext:ux:course-panel',
-                dataUrl: URLS.get_course_tree,
+		dataUrl: URLS.get_course_tree,
             }]
         }]
     });
