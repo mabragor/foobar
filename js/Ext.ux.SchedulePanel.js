@@ -68,7 +68,7 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
         this.calendar = $(this.body.dom).weekCalendar(this.c_options);
         this.ce_window.get(0).getForm().on('actioncomplete', function(form, action){
             this.calendar.weekCalendar("updateEvent", action.result.obj);
-            this.ce_window.hide();
+            this.ce_window.close();
         }, this)
         var $self = this;
         //Add droping from course's tree'
@@ -80,9 +80,9 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
                     var start_date = $(this.getEl()).data("startDate");
                     var form = $self.ce_window.get(0).getForm();
                     form.baseParams = {
-                        course: node.node.id,
-                        begin: $(this.getEl()).data("startDate")//.format('Y-m-d H:i:s');
+                        course: node.node.id
                     };
+                    form.begin_day = $(this.getEl()).data("startDate");
                     $self.ce_window.show();
                     return true;
                 }//notifyDrop
@@ -118,7 +118,7 @@ Ext.ux.CreateEventForm = Ext.extend(Ext.form.FormPanel, {
         if (form.isValid()){
             var time_field = form.findField('time_field');
             var time = Date.parseDate(time_field.getValue(), time_field.format);
-            form.baseParams.begin = form.baseParams.begin
+            form.baseParams.begin = form.begin_day
                 .add(Date.HOUR, time.getHours())
                 .add(Date.MINUTE, time.getMinutes())
                 .format('Y-m-d H:i:s');
@@ -126,11 +126,12 @@ Ext.ux.CreateEventForm = Ext.extend(Ext.form.FormPanel, {
                 url: this.url,
                 scope: this,
                 success: this.onSuccess,
+                failure: this.onFailure,
                 waitMsg:'Saving...'
             });
         }
     },//submit
     onSuccess: function(form, action){
-        Ext.Msg.alert('Success', action.result.msg);
     }//onSuccess
+
 });

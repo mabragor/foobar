@@ -63,10 +63,10 @@ def ajax_add_event(request, pk=None):
             output['obj'] = obj.get_calendar_obj()
         else:
             output['success'] = False
-            output['error'] = u'Form isn\'t valid.'
+            output['errors'] = {'time': form.non_field_errors()}
     else:
         output['success'] = False
-        output['error'] = _(u'Incorrect request method.')
+        output['errors'] = _(u'Incorrect request method.')
     return output
 
 @ajax_processor()

@@ -2,6 +2,7 @@
 
 from django import forms
 from storage.models import Schedule, Course
+from django.utils.translation import ugettext_lazy as _
 
 class ScheduleForm(forms.ModelForm):
 
@@ -11,7 +12,6 @@ class ScheduleForm(forms.ModelForm):
 
     def clean(self):
         from datetime import timedelta
-        from django.db.models import Q, F
 
         room = self.cleaned_data['room']
         begin = self.cleaned_data['begin']
@@ -22,5 +22,5 @@ class ScheduleForm(forms.ModelForm):
 
         for item in result:
             if (begin < item.end < end) or (begin <= item.begin < end):
-                raise forms.ValidationError('Incorect begin date')
+                raise forms.ValidationError('Incorect begin date for this room')
         return self.cleaned_data

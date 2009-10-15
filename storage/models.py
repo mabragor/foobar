@@ -60,7 +60,8 @@ class Group(models.Model):
             'id': 'g_%s' % self.pk,
             'text': self.title,
             'cls': 'folder',
-            'children': [item.get_tree_node() for item in self.course_set.all()]
+            'children': [item.get_tree_node() for item in self.course_set.all()],
+            'allowDrag': False
         }
         return obj
 
