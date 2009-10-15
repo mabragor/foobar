@@ -56,11 +56,6 @@ Ext.onReady(function() {
             },{
                 xtype: 'ext:ux:course-panel',
                 dataUrl: URLS.get_course_tree,
-                tbar: [{
-                    text: 'Search',
-                    iconCls: 'icon-info',
-                    handler: function() {}
-                }]
             }]
         }]
     });
