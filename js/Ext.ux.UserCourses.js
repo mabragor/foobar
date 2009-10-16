@@ -1,5 +1,5 @@
 Ext.ux.UserCourses = Ext.extend(Ext.ListView, {
-    emptyText: 'No courses',
+    emptyText: 'No courses assigned yet',
     frame: true,
     border: false,
     loadingText: 'loading',
@@ -9,13 +9,21 @@ Ext.ux.UserCourses = Ext.extend(Ext.ListView, {
         dataIndex: 'title'
     },{
         header: 'Count',
+        width: .1,
+	align: 'right',
         dataIndex: 'count'
     },{
-        header: 'RegDate',
+        header: 'Begins',
+        width: .2,
+	tpl: '{reg_date:date("M d")}',
+	align: 'right',
         dataIndex: 'reg_date'
     },{
-        header: 'ExtDate',
-        dataIndex: 'ext_date'
+        header: 'Expires',
+        width: .2,
+	tpl: '{exp_date:date("M d")}',
+	align: 'right',
+        dataIndex: 'exp_date'
     }],
     afterRender: function(){
         Ext.ux.UserCourses.superclass.afterRender.call(this);
@@ -23,7 +31,9 @@ Ext.ux.UserCourses = Ext.extend(Ext.ListView, {
             ddGroup:'t2schedule',
             notifyDrop:function(dd, e, node) {
                 var store = this.getStore();
-                var r = new store.recordType({title: node.node.text, count: 8, corse_id: node.node.id})
+                var r = new store.recordType(
+		    {title: node.node.text, count: 8, course_id: node.node.id}
+		);
                 store.insert(0, r);
                 return true;
             }.createDelegate(this)//notifyDrop

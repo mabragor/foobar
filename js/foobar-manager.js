@@ -32,7 +32,7 @@ Ext.onReady(function() {
              {name: 'reg_date', type: 'date'},
              {name: 'exp_date', type: 'date'},
              {name: 'count', type: 'int'},
-             {name: 'corse_id', type: 'int'}
+             {name: 'course_id', type: 'int'}
         ],
         proxy: new Ext.data.HttpProxy({
             method: 'POST',
