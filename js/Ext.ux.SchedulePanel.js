@@ -5,6 +5,14 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
     region: 'center',
     title: 'Schedule',
     initComponent: function(){
+        this.fbar = [
+            {text: '<<<', handler: function() {this.calendar.weekCalendar('prevWeek')}, scope: this},
+            {text: '<', handler: function() {this.calendar.weekCalendar('prevDay')}, scope: this},
+            {text: 'today',handler: function() {this.calendar.weekCalendar('today')}, scope: this},
+            {text: '>', handler: function() {this.calendar.weekCalendar('nextDay')}, scope: this},
+            {text: '>>>',handler: function() {this.calendar.weekCalendar('nextWeek')}, scope: this}
+        ];
+
         this.room_store = new Ext.data.JsonStore({
             id:'id',
             root: 'rows',

@@ -1231,7 +1231,7 @@
    
     $.extend($.ui.weekCalendar, {
         version: '1.2.1',
-        getter: ['getTimeslotTimes', 'getData', 'formatDate', 'formatTime', 'getDivDate'],
+        getter: ['getTimeslotTimes', 'getData', 'formatDate', 'formatTime', 'getDivDate', 'today', 'nextDay', 'prevDay', 'nextWeek', 'prevWeek'],
         defaults: {
             date: new Date(),
             timeFormat : "G:i",
