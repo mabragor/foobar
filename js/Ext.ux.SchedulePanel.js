@@ -4,7 +4,56 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
     border: false,
     region: 'center',
     title: 'Schedule',
+    addRoomFilterToolbar: function(store, records){
+        var $self = this;
+        var toolbar = this.getTopToolbar();
+        store.each(function(item){
+            this.addButton({
+                enableToggle: true,
+                hideLabel: true,
+                pressed: true,
+                text: item.data.text,
+                room_id: item.data.id,
+                handler: $self.filterRoomHandler,
+                scope: $self
+            });
+        }, toolbar);
+        toolbar.doLayout();
+    },
+    filterRoomHandler: function(button, event){
+        var toolbar = this.getTopToolbar();
+        var rooms = []
+        toolbar.items.each(function(item){
+            if(item.pressed){
+                rooms.push(item.room_id);
+            }
+        });
+        this.calendar.weekCalendar('filterByParam', {rooms: rooms});
+    },
     initComponent: function(){
+        this.room_store = new Ext.data.JsonStore({
+            id:'id',
+            root: 'rows',
+            autoLoad: true,
+            fields:[
+                {name:'id', type:'int'},
+                {name:'color', type:'string'},
+                {name:'text', type:'string'}
+            ],
+            //url:this.c_options.urls.get_rooms,
+            proxy: new Ext.data.HttpProxy({
+                method: 'POST',
+                url: this.c_options.urls.get_rooms
+            }),
+            listeners: {
+                load:{
+                    fn: this.addRoomFilterToolbar,
+                    single: true,
+                    scope: this
+                }
+            }
+        });
+        this.tbar = [];
         this.fbar = [
             {text: '<<<', handler: function() {this.calendar.weekCalendar('prevWeek')}, scope: this},
             {text: '<', handler: function() {this.calendar.weekCalendar('prevDay')}, scope: this},
@@ -13,17 +62,7 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
             {text: '>>>',handler: function() {this.calendar.weekCalendar('nextWeek')}, scope: this}
         ];
 
-        this.room_store = new Ext.data.JsonStore({
-            id:'id',
-            root: 'rows',
-            fields:[
-                {name:'id', type:'int'},
-                {name:'color', type:'string'},
-                {name:'text', type:'string'}
-            ],
-            url:this.c_options.urls.get_rooms
-        });
-
+        
         //-----Cerate event window-----
         this.ce_window = (function(options){
             return new Ext.Window({

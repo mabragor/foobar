@@ -99,7 +99,7 @@ def ajax_get_events(request):
         end = datetime.fromtimestamp(int(request.POST['end']))
         schedules = Schedule.objects.filter(begin__range=(start, end))
         if 'rooms' in request.POST:
-            schedules = schedules.filter(room__in=request.POST['rooms'])
+            schedules = schedules.filter(room__in=request.POST.getlist('rooms'))
         events = [item.get_calendar_obj() for item in schedules]
     else:
         events = []

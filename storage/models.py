@@ -120,10 +120,11 @@ class Card(models.Model):
         return {
             'id': self.pk,
             'title': self.course.title,
+            'course_id': self.course.pk,
             'reg_date': self.reg_date,
             'exp_date': self.exp_date,
             'count': self.count
-            }
+        }
 
 class Schedule(models.Model):
     room = models.ForeignKey(Room)

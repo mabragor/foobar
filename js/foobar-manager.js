@@ -31,7 +31,8 @@ Ext.onReady(function() {
         fields: ['title',
              {name: 'reg_date', type: 'date'},
              {name: 'exp_date', type: 'date'},
-             {name: 'count', type: 'int'}
+             {name: 'count', type: 'int'},
+             {name: 'corse_id', type: 'int'}
         ],
         proxy: new Ext.data.HttpProxy({
             method: 'POST',
@@ -73,11 +74,11 @@ Ext.onReady(function() {
                         {text: 'Add new',iconCls: 'icon-plus', handler: function() {}} ],
                 items: client_form
             },{
-                title: 'User\'s courses',
                 frame: true,
                 border: false,
                 flex: 1,
-                margins: '5 0 0 0',
+                margins: '1 0 0 0',
+                autoScroll: true,
                 items: {
                     xtype: 'ext:ux:user-courses',
                     store: course_store

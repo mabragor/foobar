@@ -39,7 +39,8 @@
             });
             
         }, 
-        
+
+        _filter: {},
         /********************
          * public functions *
          ********************/
@@ -101,6 +102,12 @@
             this._loadCalEvents(newDate); 
         },
 
+        filterByParam: function(param){
+            this.updateFilter(param);
+            this._clearCalendar();
+            this._loadCalEvents(this.element.data("startDate"));
+        },
+
         /*
          * Reload the calendar to whatever week the date passed in falls on.
          */
@@ -108,7 +115,11 @@
             this._clearCalendar();
             this._loadCalEvents(date);
         },
-        
+
+        updateFilter: function(param){
+            this._filter = $.extend(this.filter, param);
+        },
+
         /*
          * Remove an event based on it's id
          */
@@ -506,10 +517,10 @@
                 });
             }
             else if ($.isFunction(options.data)) {
-                options.data(weekStartDate, weekEndDate,
+                options.data.call(this, weekStartDate, weekEndDate,
                     function(data) {
                         self._renderEvents(data, $weekDayColumns);
-                    });
+                    }, this._filter);
             }
             else if (options.data) {
                 self._renderEvents(options.data, $weekDayColumns);
@@ -1231,7 +1242,7 @@
    
     $.extend($.ui.weekCalendar, {
         version: '1.2.1',
-        getter: ['getTimeslotTimes', 'getData', 'formatDate', 'formatTime', 'getDivDate', 'today', 'nextDay', 'prevDay', 'nextWeek', 'prevWeek'],
+        getter: ['getTimeslotTimes', 'getData', 'formatDate', 'formatTime', 'getDivDate', 'today', 'nextDay', 'prevDay', 'nextWeek', 'prevWeek', 'filterByParam'],
         defaults: {
             date: new Date(),
             timeFormat : "G:i",

@@ -36,15 +36,13 @@
                 get_events: '{% url manager:ajax_get_events %}',
                 get_rooms: '{% url manager:ajax_get_rooms%}'
             };
-            o['data'] = function(start, end, callback, rooms) {
-                var $options = this;
+            o['data'] = function(start, end, callback, extra_data) {
+                var $options = this.options;
                 var data = {
                     'start': Math.round(start.getTime()/1000),
                     'end': Math.round(end.getTime()/1000)
                 };
-                if (rooms){
-                    data['rooms'] = rooms;
-                }
+                data = jQuery.extend(data, extra_data);
                 jQuery.ajax({
                     type: 'POST',
                     url: $options.urls.get_events,
