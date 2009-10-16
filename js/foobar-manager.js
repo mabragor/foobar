@@ -20,20 +20,6 @@ Ext.onReady(function() {
         ]
     });
 
-    var course_store = new Ext.data.JsonStore({
-	url: URLS.get_user_courses,
-	storeId: 'UserCourses',
-	autoDestroy: true, // destroy store when the component the store is bound to is destroyed
-
-	root: 'courses', // get data from this key
-	fields: ['title',
-		 {name: 'reg_date', type: 'date'},
-		 {name: 'exp_date', type: 'date'},
-		 'count'
-		]
-    });
-    course_store.load();
-
     var panel = new Ext.Viewport({
         title: Ext.getDom('page-title').innerHTML,
         id: 'main',
@@ -59,7 +45,7 @@ Ext.onReady(function() {
             },
             items: [{
                 title: 'Information',
-                region: 'north',
+                //region: 'north',
                 frame: true,
                 border: false,
                 padding: 4,
@@ -69,10 +55,24 @@ Ext.onReady(function() {
                 items: client_form
             },{
                 xtype: 'ext:ux:user-courses',
-		store: course_store,
+                store: new Ext.data.JsonStore({
+                    storeId: 'UserCourses',
+                    autoLoad: true,
+                    autoDestroy: true, // destroy store when the component the store is bound to is destroyed
+                    root: 'courses', // get data from this key
+                    fields: ['title',
+                         {name: 'reg_date', type: 'date'},
+                         {name: 'exp_date', type: 'date'},
+                         {name: 'count', type: 'int'}
+                    ],
+                    proxy: new Ext.data.HttpProxy({
+                        method: 'POST',
+                        url: URLS.get_user_courses
+                    })
+                })
             },{
                 xtype: 'ext:ux:course-panel',
-		dataUrl: URLS.get_course_tree,
+                dataUrl: URLS.get_course_tree
             }]
         }]
     });
