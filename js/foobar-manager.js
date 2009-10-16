@@ -72,18 +72,22 @@ Ext.onReady(function() {
                 tbar: [ {text: 'Client', iconCls: 'icon-info', handler: function() {}},
                         {text: 'Search', iconCls: 'icon-info', handler: function() {}},
                         {text: 'Add new',iconCls: 'icon-plus', handler: function() {}} ],
-                items: client_form
-            },{
-                frame: true,
-                border: false,
-                flex: 1,
-                margins: '1 0 0 0',
-                autoScroll: true,
-                items: {
-                    xtype: 'ext:ux:user-courses',
-                    store: course_store
-                }
-            },{
+                items: [
+		    client_form,
+		    {
+			frame: false,
+			border: false,
+			height: 60,
+			flex: 1,
+			margins: '1 0 0 0',
+			autoScroll: true,
+			items: {
+			    xtype: 'ext:ux:user-courses',
+			    store: course_store
+			}
+		    }
+		],
+	    },{
                 xtype: 'ext:ux:course-panel',
                 dataUrl: URLS.get_course_tree
             }]
