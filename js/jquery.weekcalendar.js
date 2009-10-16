@@ -16,7 +16,10 @@
  */
 
 (function($) {
+    $.fn.sort = function() {
+            return this.pushStack( $.makeArray( [].sort.apply( this, arguments ) ) );
 
+    };
     $.widget("ui.weekCalendar", {
         
         /***********************
@@ -676,9 +679,11 @@
          */
         _adjustOverlappingEvents : function($weekDay) {
             var self = this;
+            
             if(self.options.allowCalEventOverlap) {
+
                 var groups = self._groupOverlappingEventElements($weekDay);
-                
+
                 $.each(groups, function(){
                     var groupAmount = this.length;
                     var curGroup = this;
