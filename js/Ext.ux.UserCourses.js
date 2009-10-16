@@ -1,10 +1,7 @@
 Ext.ux.UserCourses = Ext.extend(Ext.ListView, {
-    // set store in descendant code
-    title: 'Courses',
     emptyText: 'No images to display',
     frame: true,
     border: false,
-    flex: 1,
     loadingText: 'loading',
     columns: [{
         header: 'Title',
@@ -13,6 +10,12 @@ Ext.ux.UserCourses = Ext.extend(Ext.ListView, {
     },{
         header: 'Count',
         dataIndex: 'count'
+    },{
+        header: 'RegDate',
+        dataIndex: 'reg_date'
+    },{
+        header: 'ExtDate',
+        dataIndex: 'ext_date'
     }]
 });
 

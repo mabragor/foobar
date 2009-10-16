@@ -12,7 +12,7 @@ from lib import DatetimeJSONEncoder
 from lib.decorators import render_to
 from forms import ScheduleForm, UserRFID
 
-from storage.models import Schedule, Course, Room, Group
+from storage.models import Schedule, Course, Room, Group, Client
 
 #@render_to('manager/index.html')
 @render_to('manager.html')
