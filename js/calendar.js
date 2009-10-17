@@ -145,9 +145,9 @@ var schedule_options = {
         }).show();
         $(window).resize().resize(); //fixes a bug in modal overlay size ??
     },
-    eventDrop: function(calEvent, oldCalEvent, callback){
+    eventDrop: function(calEvent, callback, revert_callback){
         var $options = this.options;
-        jQuery.ajax({
+        $.ajax({
             type: 'POST',
             url: $options.urls.change_date,
             dataType: 'json',
@@ -157,7 +157,7 @@ var schedule_options = {
                 alert('Ошибка сервера. Обновите страницу.')
             },
             success: function(data){
-                //callback(data.result);
+                data.result && callback() || revert_callback();
             }
         });
     }

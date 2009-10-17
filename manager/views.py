@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
-
+from datetime import datetime, timedelta
 from django.conf import settings
-from django.http import HttpResponse
 from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from lib.decorators import ajax_processor
-
+from django.shortcuts import get_object_or_404
 from lib import DatetimeJSONEncoder
 from lib.decorators import render_to
 from forms import ScheduleForm, UserRFID
 
-from storage.models import Schedule, Course, Room, Group, Client
+from storage.models import Schedule, Room, Group, Client
 
 #@render_to('manager/index.html')
 @render_to('manager.html')
@@ -87,10 +85,19 @@ def ajax_del_event(request):
 @ajax_processor()
 def ajax_change_date(request):
     if request.method == 'POST':
-        event = Schedule.objects.get(pk=request.POST['pk'])
-        event.begin = datetime.fromtimestamp(int(request.POST['start']))
+        event = get_object_or_404(Schedule, pk=request.POST['pk'])
+        begin = datetime.fromtimestamp(int(request.POST['start']))
+        end = begin + timedelta(hours=event.course.duration),
+        end = end[0]
+        result = Schedule.objects.select_related().filter(room=event.room).filter(begin__day=begin.day).exclude(pk=event.pk)
+
+        for item in result:
+            if (begin < item.end < end) or (begin <= item.begin < end):
+                return {'result': False}
+        event.begin = begin
         event.save()
-    return {}
+        return {'result': True}
+    return {'result': False}
 
 @ajax_processor()
 def ajax_get_events(request):
