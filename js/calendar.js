@@ -11,16 +11,39 @@ var schedule_options = {
         var options = this.options;
         $event.css("backgroundColor", "#"+calEvent.color);
         $event.find('.time').css("backgroundColor", "#"+calEvent.color);
-        //var content =  this._formatDate(calEvent.start, options.timeFormat) + options.timeSeparator + this._formatDate(calEvent.end, options.timeFormat);
-        var content = calEvent.start.format(options.timeFormat) + options.timeSeparator + calEvent.end.format(options.timeFormat);
-        content += '<br/>'+calEvent.title;
-        content += '<br/>'+calEvent.room_name;
 
+        //var content =  this._formatDate(calEvent.start, options.timeFormat) + options.timeSeparator + this._formatDate(calEvent.end, options.timeFormat);
+
+
+/*
         $event.wTooltip({
             content: content,
             style: {
                 'borderColor': calEvent.color
             }
+        });*/
+        //$event.attr('id', 'event'+calEvent.id);
+
+
+
+    },
+    eventAfterRender: function(calEvent, $event){
+        var options = this.options;
+        var title = calEvent.start.format(options.timeFormat) + options.timeSeparator + calEvent.end.format(options.timeFormat);
+        var content = calEvent.title;
+        content += '<br/>'+calEvent.room_name;
+        Ext.QuickTips.register({
+            target: $event.find('div')[0],
+            title: title,
+            text: content,
+            showDelay: 50,
+            anchorToTarget: false
+        });
+        Ext.QuickTips.register({
+            target: $event.find('div')[1],
+            title: title,
+            text: content,
+            showDelay: 50
         });
     },
     eventNew : function(calEvent, $event) {

@@ -595,7 +595,7 @@
                 self._addDraggableToCalEvent(calEvent, $calEvent);
             } 
             
-            options.eventAfterRender(calEvent, $calEvent);
+            options.eventAfterRender.call(self, calEvent, $calEvent);
             
             return $calEvent;
             
