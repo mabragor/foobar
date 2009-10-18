@@ -86,18 +86,22 @@ def ajax_del_event(request):
 def ajax_change_date(request):
     if request.method == 'POST':
         event = get_object_or_404(Schedule, pk=request.POST['pk'])
+        if event.begin < datetime.now():
+            return {'result': False, 'msg': 'Cann\'t edit past event.'}
         begin = datetime.fromtimestamp(int(request.POST['start']))
+        if begin < datetime.now():
+            return {'result': False, 'msg': 'Cann\'t set event in the past.'}
         end = begin + timedelta(hours=event.course.duration),
         end = end[0]
         result = Schedule.objects.select_related().filter(room=event.room).filter(begin__day=begin.day).exclude(pk=event.pk)
 
         for item in result:
             if (begin < item.end < end) or (begin <= item.begin < end):
-                return {'result': False}
+                return {'result': False, 'msg': 'Two events in the same room.'}
         event.begin = begin
         event.save()
         return {'result': True}
-    return {'result': False}
+    return {'result': False, 'msg': 'Incorect request type.'}
 
 @ajax_processor()
 def ajax_get_events(request):

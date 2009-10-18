@@ -110,8 +110,12 @@ var schedule_options = {
                 alert('Ошибка сервера. Обновите страницу.')
             },
             success: function(data){
+                data.msg && Ext.ux.msg(data.msg, '', Ext.MessageBox.WARNING);
                 data.result && callback() || revert_callback();
             }
         });
+    },
+    draggable: function(calEvent, $calEvent){
+        return calEvent.start > new Date();
     }
 };

@@ -9,6 +9,7 @@
 #msg-div .ext-mb-icon {
     background: transparent none no-repeat scroll left top;
     padding-left: 35px;
+    min-height: 40px;
 }
 
 #msg-div .ext-mb-info {
