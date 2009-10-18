@@ -4,6 +4,7 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
     border: false,
     region: 'center',
     title: 'Schedule',
+    html: '<div id="calendar"></div>',
     addRoomFilterToolbar: function(store, records){
         var $self = this;
         var toolbar = this.getTopToolbar();
@@ -119,8 +120,9 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
     afterRender: function(){
         Ext.ux.SchedulePanel.superclass.afterRender.call(this);
         //FIXME: change options gathering for calendar
+        
         this.c_options.height = function(calendar) {
-            return $(window).height() - $("h1").outerHeight();
+            return calendar.height();
         };
         this.calendar = $(this.body.dom).weekCalendar(this.c_options);
         this.ce_window.get(0).getForm().on('actioncomplete', function(form, action){

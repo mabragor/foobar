@@ -3,7 +3,6 @@ var schedule_options = {
     firstDayOfWeek : 1,
     region: 'center',
     buttons: false,
-
     resizable: function(calEvent, eventElement){
         return false;
     },
@@ -11,21 +10,6 @@ var schedule_options = {
         var options = this.options;
         $event.css("backgroundColor", "#"+calEvent.color);
         $event.find('.time').css("backgroundColor", "#"+calEvent.color);
-
-        //var content =  this._formatDate(calEvent.start, options.timeFormat) + options.timeSeparator + this._formatDate(calEvent.end, options.timeFormat);
-
-
-/*
-        $event.wTooltip({
-            content: content,
-            style: {
-                'borderColor': calEvent.color
-            }
-        });*/
-        //$event.attr('id', 'event'+calEvent.id);
-
-
-
     },
     eventAfterRender: function(calEvent, $event){
         var options = this.options;
@@ -46,61 +30,7 @@ var schedule_options = {
             showDelay: 50
         });
     },
-    eventNew : function(calEvent, $event) {
-        var $self = this.element;
-        var $options = this.options;
-        var dialogContent = $("#event_edit_container");
-        resetForm(dialogContent);
-
-        var startField = dialogContent.find("select[name='begin']").val(calEvent.start);
-        var roomField = dialogContent.find("select[name='room']");
-        var courseField = dialogContent.find("select[name='course']");
-        var formError = dialogContent.find('#form_error');
-
-        dialogContent.dialog({
-            modal: true,
-            title: "New Calendar Event",
-            close: function() {
-                dialogContent.dialog("destroy");
-                dialogContent.hide();
-                $self.weekCalendar("removeUnsavedEvents");
-            },
-            buttons: {
-                save : function(){
-                    if (( ! roomField.val()) || ( ! courseField.val())){
-                        formError.html('Заполните все поля!');
-                    }else{
-                        jQuery.ajax({
-                            type: 'POST',
-                            url: $options.urls.add_event,
-                            dataType: 'json',
-                            data: dialogContent.find('form').serialize(),
-                            error: function(){
-                                formError.html('Ошибка сервера!');
-                            },
-                            success: function(data){
-                                if (data.error){
-                                    formError.html(data.error);
-                                }else{
-                                    $self.weekCalendar("removeUnsavedEvents");
-                                    $self.weekCalendar("updateEvent", data.obj);
-                                    dialogContent.dialog("close");
-                                }
-                            }
-                        });
-                    }
-                },
-                cancel : function(){
-                    dialogContent.dialog("close");
-                }
-            }
-        }).show();
-
-        dialogContent.find(".date_holder").text($self.weekCalendar("formatDate", calEvent.start));
-        setupStartAndEndTimeFields(startField, calEvent, $self.weekCalendar("getTimeslotTimes", calEvent.start));
-        $(window).resize().resize(); //fixes a bug in modal overlay size ??
-    },
-    
+  
     eventClick : function(calEvent, $event) {
         var $self = this.element;
         var $options = this.options;
@@ -185,27 +115,3 @@ var schedule_options = {
         });
     }
 };
-
-function resetForm(dialogContent) {
-    //FIXME
-    dialogContent.find("select[name='room']").val('');
-    dialogContent.find("select[name='course']").val('');
-    dialogContent.find('#form_error').html('');
-}
-
-/*
- * Sets up the start and end time fields in the calendar event
- * form for editing based on the calendar event being edited
- */
-function setupStartAndEndTimeFields($startTimeField, calEvent, timeslotTimes) {
-
-    for(var i=0; i<timeslotTimes.length; i++) {
-        var startTime = timeslotTimes[i].start;
-        var startSelected = "";
-        if(startTime.getTime() === calEvent.start.getTime()) {
-            startSelected = "selected=\"selected\"";
-        }
-
-        $startTimeField.append("<option value=\"" + timeslotTimes[i].startValue + "\" " + startSelected + ">" + timeslotTimes[i].startFormatted + "</option>");
-    }
-}

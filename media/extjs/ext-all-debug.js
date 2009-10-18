@@ -43768,11 +43768,13 @@ Ext.QuickTip = Ext.extend(Ext.ToolTip, {
         if(!t || t.nodeType !== 1 || t == document || t == document.body){
             return;
         }
+
         if(this.activeTarget && t == this.activeTarget.el){
             this.clearTimer('hide');
             this.show();
             return;
         }
+
         if(t && this.targets[t.id]){
             this.activeTarget = this.targets[t.id];
             this.activeTarget.el = t;
@@ -43783,7 +43785,7 @@ Ext.QuickTip = Ext.extend(Ext.ToolTip, {
             this.delayShow();
             return;
         }
-        
+      
         var ttp, et = Ext.fly(t), cfg = this.tagConfig;
         var ns = cfg.namespace;
         if(this.interceptTitles && t.title){
@@ -43812,6 +43814,7 @@ Ext.QuickTip = Ext.extend(Ext.ToolTip, {
             }
             this.delayShow();
         }
+
     },
 
     // private

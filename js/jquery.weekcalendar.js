@@ -232,13 +232,13 @@
          * Resize the calendar scrollable height based on the provided function in options.
          */
         _resizeCalendar : function () {
-            
             var options = this.options;
             if(options && $.isFunction(options.height)) {
                 var calendarHeight = options.height(this.element);
                 var headerHeight = this.element.find(".week-calendar-header").outerHeight();
                 var navHeight = this.element.find(".calendar-nav").outerHeight();
-                this.element.find(".calendar-scrollable-grid").height(calendarHeight - navHeight - headerHeight);
+                //this.element.find(".calendar-scrollable-grid").height(calendarHeight - navHeight - headerHeight);
+                this.element.find(".calendar-scrollable-grid").css('height', '90%');
             }
         },
         
@@ -294,55 +294,11 @@
          */
         _renderCalendar : function() {
             
-            var $calendarContainer, calendarNavHtml, calendarHeaderHtml, calendarBodyHtml, $weekDayColumns;
+            var $calendarContainer, calendarHeaderHtml, calendarBodyHtml, $weekDayColumns;
             var self = this;
             var options = this.options;
             
             $calendarContainer = $("<div class=\"week-calendar\">").appendTo(self.element);
-            
-            if(options.buttons) {
-                calendarNavHtml = "<div class=\"calendar-nav ui-widget-header\">\
-                    <div class=\"fg-buttonset fg-buttonset-single\" style='float: left'>\
-                    <button class=\"fg-button ui-state-default ui-priority-primary ui-corner-left\">Visual</button>\
-                    <button class=\"fg-button ui-state-default ui-priority-primary\">Code</button>\
-                    <button class=\"fg-button ui-state-default ui-priority-primary ui-state-active\">Split</button>\
-                    <button class=\"fg-button ui-state-default ui-priority-primary ui-corner-right\">Preview</button>\
-                    </div>\
-                    <button class=\"prev ui-state-default ui-corner-all\">" + options.buttonText.prevWeek + "</button>\
-                    <button class=\"prevDay ui-state-default ui-corner-all\">" + options.buttonText.prevDay + "</button>\
-                    <button class=\"today ui-state-default ui-corner-all\">" + options.buttonText.today + "</button>\
-                    <button class=\"nextDay ui-state-default ui-corner-all\">" + options.buttonText.nextDay + "</button>\
-                    <button class=\"next ui-state-default ui-corner-all\">" + options.buttonText.nextWeek + "</button>\
-                    </div>";
-                    
-                $(calendarNavHtml).appendTo($calendarContainer);
-                
-                $calendarContainer.find(".calendar-nav .today").click(function(){
-                    self.element.weekCalendar("today");
-                    return false;
-                });
-                
-                $calendarContainer.find(".calendar-nav .prev").click(function(){
-                    self.element.weekCalendar("prevWeek");
-                    return false;
-                });
-                
-                $calendarContainer.find(".calendar-nav .next").click(function(){
-                    self.element.weekCalendar("nextWeek");
-                    return false;
-                });
-
-                $calendarContainer.find(".calendar-nav .prevDay").click(function(){
-                    self.element.weekCalendar("prevDay");
-                    return false;
-                });
-
-                $calendarContainer.find(".calendar-nav .nextDay").click(function(){
-                    self.element.weekCalendar("nextDay");
-                    return false;
-                });
-
-            }
             
             //render calendar header
             calendarHeaderHtml = "<table class=\"week-calendar-header ui-widget-content\"><tbody><tr><td class=\"time-column-header\"></td>";
@@ -409,11 +365,8 @@
             $calendarContainer.find(".time-header-cell").css({
                     height :  (options.timeslotHeight * options.timeslotsPerHour) - 12,
                     padding: 5
-                    });
-    
-            
-            
-        },
+            });
+       },
         
         /*
          * load calendar events for the week based on the date provided
