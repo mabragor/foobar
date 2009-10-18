@@ -179,6 +179,11 @@ table.week-calendar-time-slots {
 	font-weight: bold;
 }
 
+.cal-event .hidden {
+    padding-left: 1000px;
+    overflow: hidden;
+}
+
 .ui-draggable .time {
 	cursor: move;
 }

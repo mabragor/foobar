@@ -10,9 +10,7 @@ var schedule_options = {
         var options = this.options;
         $event.css("backgroundColor", "#"+calEvent.color);
         $event.find('.time').css("backgroundColor", "#"+calEvent.color);
-    },
-    eventAfterRender: function(calEvent, $event){
-        var options = this.options;
+
         var title = calEvent.start.format(options.timeFormat) + options.timeSeparator + calEvent.end.format(options.timeFormat);
         var content = calEvent.title;
         content += '<br/>'+calEvent.room_name;
@@ -29,6 +27,25 @@ var schedule_options = {
             text: content,
             showDelay: 50
         });
+    },
+    eventAfterRender: function(calEvent, $event){/*
+        var options = this.options;
+        var title = calEvent.start.format(options.timeFormat) + options.timeSeparator + calEvent.end.format(options.timeFormat);
+        var content = calEvent.title;
+        content += '<br/>'+calEvent.room_name;
+        Ext.QuickTips.register({
+            target: $event.find('div')[0],
+            title: title,
+            text: content,
+            showDelay: 50,
+            anchorToTarget: false
+        });
+        Ext.QuickTips.register({
+            target: $event.find('div')[1],
+            title: title,
+            text: content,
+            showDelay: 50
+        });*/
     },
   
     eventClick : function(calEvent, $event) {

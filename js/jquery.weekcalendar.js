@@ -534,7 +534,6 @@
             $calEvent = $(eventHtml);
             $modifiedEvent = options.eventRender.call(self, calEvent, $calEvent);
             $calEvent = $modifiedEvent ? $modifiedEvent.appendTo($weekDay) : $calEvent.appendTo($weekDay);
-            //$calEvent.css({lineHeight: (options.timeslotHeight - 2) + "px", fontSize: (options.timeslotHeight / 2) + "px"});
             $calEvent.css({lineHeight: (options.timeslotHeight - 2) + "px", fontSize: (options.timeslotHeight / 2) + "px"});
             
             self._refreshEventDetails(calEvent, $calEvent);
@@ -578,10 +577,12 @@
                         var newLeftAdd = (100 - newWidth) / (groupAmount-1);
                     }
                     $.each(this, function(i){
+                        $(this).css({lineHeight: '10px'}).find('div').css({color: $(this).css('backgroundColor')});
                         var newLeft = (i * newLeftAdd); 
                         // bring mouseovered event to the front
+                        /*
                         $(this).css({'font-size': '10px',
-                                     'line-height': '15px'});
+                                     'line-height': '15px'});*/
                         //------------------------------------
                         if(!self.options.overlapEventsSeparate){
                             $(this).bind("mouseover.z-index",function(){
@@ -623,7 +624,7 @@
                 $curEvent = $(this);
                 currentGroupStartTime = $curEvent.data("calEvent")[options.startParam].getTime();
                 currentGroupEndTime = $curEvent.data("calEvent")[options.endParam].getTime();
-                $curEvent.css({width: "100%", left: "0%", right: "", "z-index": "1"});
+                $curEvent.css({width: "100%", left: "0%", right: "", "z-index": "1", lineHeight: (options.timeslotHeight - 2) + "px"}).find('div').css('color', '');
                 $curEvent.unbind("mouseover.z-index");
                 // if current start time is lower than current endtime time than either this event is earlier than the group, or already within the group   
                 if ($curEvent.data("calEvent")[options.startParam].getTime() < lastGroupEndTime) {
@@ -879,7 +880,7 @@
                         }, 500);
                     }
                     //trigger drop callback
-                    options.eventDrop.call(self, newCalEvent, move_event, function(){$calEvent.show(), console.log(11)});
+                    options.eventDrop.call(self, newCalEvent, move_event, function(){$calEvent.show()});
                     $calEvent.data("preventClick", true);
                     /*
                         setTimeout(function(){
