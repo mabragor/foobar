@@ -52,7 +52,7 @@ def ajax_add_event(request, pk=None):
             output['obj'] = obj.get_calendar_obj()
         else:
             output['success'] = False
-            output['errors'] = form.get_errors()#{'time': form.non_field_errors()}
+            output['errors'] = form.get_errors()
     else:
         output['success'] = False
         output['errors'] = _(u'Incorrect request method.')
@@ -61,8 +61,12 @@ def ajax_add_event(request, pk=None):
 @ajax_processor()
 def ajax_del_event(request):
     if request.method == 'POST':
-        Schedule.objects.get(pk=request.POST['id']).delete()
-    return {}
+        event = Schedule.objects.get(pk=request.POST['id'])
+        if event.begin < datetime.now():
+            return {'error': 'Event was in the past.'}
+        event.delete()
+        return {}
+    return {'error': 'Invalid request type.'}
 
 @ajax_processor()
 def ajax_change_date(request):

@@ -127,10 +127,13 @@
          * Remove an event based on it's id
          */
         removeEvent : function(eventId) {
+            var $self = this;
             this.element.find(".cal-event").each(function(){
                 if($(this).data("calEvent").id === eventId) {
                     $(this).fadeOut(function(){
+                        var $weekDay = $(this).parent();
                         $(this).remove();
+                        $self._adjustOverlappingEvents($weekDay);
                     });
                     return false;
                 }
@@ -238,7 +241,7 @@
                 var headerHeight = this.element.find(".week-calendar-header").outerHeight();
                 var navHeight = this.element.find(".calendar-nav").outerHeight();
                 //this.element.find(".calendar-scrollable-grid").height(calendarHeight - navHeight - headerHeight);
-                this.element.find(".calendar-scrollable-grid").css('height', '90%');
+                this.element.find(".calendar-scrollable-grid").css('height', '88%');
             }
         },
         
@@ -504,7 +507,7 @@
             $weekDayColumns.each(function(){
                 self._adjustOverlappingEvents($(this));
             });
-            
+            //self._addDeleteEvent();
             options.calendarAfterLoad(self.element);
             
             if(!eventsToRender.length) {
@@ -529,7 +532,7 @@
             eventClass = calEvent.id ? "cal-event" : "cal-event new-cal-event";
             eventHtml = "<div class=\"" + eventClass + " ui-corner-all\">\
                 <div class=\"time ui-corner-all\"></div>\
-                <div class=\"title\"></div></div>";
+                <div class=\"title\"></div><div class=\"delete-event\">&nbsp;</div></div>";
                 
             $calEvent = $(eventHtml);
             $modifiedEvent = options.eventRender.call(self, calEvent, $calEvent);
@@ -539,20 +542,22 @@
             self._refreshEventDetails(calEvent, $calEvent);
             self._positionEvent($weekDay, $calEvent);
             $calEvent.show();
-            
+            $calEvent.find('div.delete-event').bind("mousedown", function(){
+                var calEvent = $(this).parent().data("calEvent");
+                self.options.eventDelete.call(self, calEvent);
+            });
             if(!options.readonly && options.resizable(calEvent, $calEvent)) {
                 self._addResizableToCalEvent(calEvent, $calEvent, $weekDay)
             }
             if(!options.readonly && options.draggable(calEvent, $calEvent)) {
                 self._addDraggableToCalEvent(calEvent, $calEvent);
             } 
-            
             options.eventAfterRender.call(self, calEvent, $calEvent);
             
             return $calEvent;
             
         },
-        
+
         /*
          * If overlapping is allowed, check for overlapping events and format 
          * for greater readability
@@ -831,7 +836,8 @@
             var $weekDay = self._findWeekDayForEvent(calEvent, self.element.find(".week-calendar-time-slots .day-column-inner"));
             $calEvent.draggable({
                 handle : ".time",
-                containment: ".calendar-scrollable-grid",
+                //containment: ".calendar-scrollable-grid",
+                containment: ".week-calendar-time-slots",
                 //revert: 'valid',
                 opacity: 0.5,
                 helper: 'clone',
@@ -1148,7 +1154,7 @@
    
     $.extend($.ui.weekCalendar, {
         version: '1.2.1',
-        getter: ['getTimeslotTimes', 'getData', 'formatDate', 'formatTime', 'getClickTime', 'today', 'nextDay', 'prevDay', 'nextWeek', 'prevWeek', 'filterByParam'],
+        getter: ['getTimeslotTimes', 'getData', 'formatDate', 'formatTime', 'getClickTime', 'today', 'nextDay', 'prevDay', 'nextWeek', 'prevWeek', 'filterByParam', 'removeEvent'],
         defaults: {
             date: new Date(),
             timeFormat : "G:i",
@@ -1189,6 +1195,7 @@
             eventMouseout : function(calEvent, $event) {},
             calendarBeforeLoad : function(calendar) {},
             calendarAfterLoad : function(calendar) {},
+            eventDelete: function(){},
             noEvents : function() {},
             shortMonths : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             longMonths : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],

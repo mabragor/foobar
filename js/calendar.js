@@ -28,7 +28,26 @@ var schedule_options = {
             showDelay: 50
         });
     },
-
+    eventDelete: function(calEvent){
+        var $self = this;
+        Ext.MessageBox.confirm('Confirm', 'Are you sure you want to do that?', function(bt){
+            if (bt == 'yes'){
+                $.ajax({
+                    type: 'POST',
+                    url: $self.options.urls.del_event,
+                    dataType: 'json',
+                    data: {id: calEvent.id},
+                    error: function(){
+                        Ext.ux.msg('Failure', 'Ajax communication failed', Ext.Msg.ERROR);
+                    },
+                    success: function(data){
+                        data.error && Ext.ux.msg('Failure', data.error, Ext.Msg.WARNING);
+                        data.error || $self.removeEvent(calEvent.id);
+                    }
+                });
+            }
+        });
+    },
     eventDrop: function(calEvent, callback, revert_callback){
         var $options = this.options;
         $.ajax({
@@ -38,7 +57,7 @@ var schedule_options = {
             data: {'start': (calEvent.start.getTime()/1000),
                    'pk': calEvent.id},
             error: function(){
-                alert('Ошибка сервера. Обновите страницу.')
+                Ext.ux.msg('Failure', 'Ajax communication failed', Ext.Msg.ERROR);
             },
             success: function(data){
                 data.msg && Ext.ux.msg(data.msg, '', Ext.MessageBox.WARNING);

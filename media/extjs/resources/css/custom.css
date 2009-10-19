@@ -31,3 +31,13 @@
 .room-fieldset-body {
     margin-bottom: -20px;
 }
+
+.delete-event {
+    background: transparent none no-repeat scroll left bottom;
+    background-image: url(../images/default/delete.gif);
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    padding: 0;
+    margin: 10px 0 0 3px;
+}

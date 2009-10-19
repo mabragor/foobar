@@ -190,6 +190,7 @@ table.week-calendar-time-slots {
 
 .cal-event .title {
 	position: relative;
+    float: left;
 }
 
 .ui-resizable-s {
