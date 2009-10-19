@@ -41,24 +41,6 @@ def ajax_get_user_courses(request, form):
         return {'courses': []} # FIXME
 
 @ajax_processor()
-def ajax_add_event1(request, pk=None):
-    output = {}
-    if request.method == 'POST':
-        if pk:
-            event = Schedule.objects.get(pk=pk)
-            form = ScheduleForm(request.POST, instance=event)
-        else:
-            form = ScheduleForm(request.POST)
-        if form.is_valid():
-            obj = form.save()
-            output['obj'] = obj.get_calendar_obj()
-        else:
-            output['error'] = u'Form isn\'t valid.'
-    else:
-        output['error'] = _(u'Incorrect request method.')
-    return output
-
-@ajax_processor()
 def ajax_add_event(request, pk=None):
     output = {}
     if request.method == 'POST':
@@ -70,7 +52,7 @@ def ajax_add_event(request, pk=None):
             output['obj'] = obj.get_calendar_obj()
         else:
             output['success'] = False
-            output['errors'] = {'time': form.non_field_errors()}
+            output['errors'] = form.get_errors()#{'time': form.non_field_errors()}
     else:
         output['success'] = False
         output['errors'] = _(u'Incorrect request method.')

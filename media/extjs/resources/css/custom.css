@@ -27,3 +27,7 @@
 #msg-div .ext-mb-warning {
     background-image: url(../images/default/window/icon-warning.gif);
 }
+
+.room-fieldset-body {
+    margin-bottom: -20px;
+}

@@ -5,7 +5,7 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
     region: 'center',
     title: 'Schedule',
     html: '<div id="calendar"></div>',
-    addRoomFilterToolbar: function(store, records){
+    addRoomFilterToolbar: function(store){
         var $self = this;
         var toolbar = this.getTopToolbar();
         store.each(function(item){
@@ -20,6 +20,19 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
             });
         }, toolbar);
         toolbar.doLayout();
+    },
+    addRoomButtonsToForm: function(store){
+        var form = this.ce_window.get(0);
+        var button_group = this.ce_window.get(0).findById('rooms_group');
+        store.each(function(item){
+            this.addButton({
+                hideLabel: true,
+                text: item.data.text,
+                room_id: item.data.id,
+                handler: form.submit,
+                scope: form
+            });
+        }, button_group);
     },
     filterRoomHandler: function(button, event){
         var toolbar = this.getTopToolbar();
@@ -48,7 +61,7 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
             }),
             listeners: {
                 load:{
-                    fn: this.addRoomFilterToolbar,
+                    fn: function(s){this.addRoomFilterToolbar(s);this.addRoomButtonsToForm(s)},
                     single: true,
                     scope: this
                 }
@@ -76,36 +89,30 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
                 items: new Ext.ux.CreateEventForm({
                     url: options.urls.add_event,
                     items: [{
-                            xtype: 'displayfield',
-                            hideLabel: true,
-                            id: 'course_field'
+                            xtype: 'fieldset',
+                            id: 'rooms_group1',
+                            title: 'Event information',
+                            autoWidth: true,
+                            autoHeight: true,
+                            items: [{
+                                xtype: 'displayfield',
+                                hideLabel: true,
+                                id: 'course_field'
+                            },{
+                                xtype: 'displayfield',
+                                hideLabel: true,
+                                id: 'day_field'
+                            }]
                         },{
-                            xtype: 'displayfield',
-                            hideLabel: true,
-                            id: 'day_field'
-                        },{
-                            id: 'time_field',
-                            xtype: 'timefield',
-                            fieldLabel: 'Start',
-                            minValue: options.businessHours.start+':00',
-                            maxValue: options.businessHours.end+':00',
-                            increment: 60 / options.timeslotsPerHour,
-                            format: 'G:i',
-                            allowBlank:false,
-                            name: 'time'
-                        },{
-                            xtype: 'combo',
-                            fieldLabel: 'Room',
-                            triggerAction:'all',
-                            allowBlank:false,
-                            editable: false,
-                            store: this.room_store,
-                            valueField: 'id',
-                            displayField: 'text',
-                            hiddenName: 'room',
-                            name: 'room_name'
-                        }
-                    ]
+                            xtype: 'fieldset',
+                            id: 'rooms_group',
+                            title: 'Chose room',
+                            autoWidth: true,
+                            autoHeight: true,
+                            buttonAlign: 'center',
+                            html: '&nbsp;',
+                            bodyCssClass: 'room-fieldset-body'
+                        }]
                 }),//Ext.ux.CreateEventForm
                 listeners: {
                     show: function(){
@@ -132,19 +139,24 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
         var $self = this;
         //Add droping from course's tree'
         //FIXME: rewrite to Ext.each with scope=$self
+        var $calendar = this.calendar;
         this.calendar.find(".day-column-inner").each(function(i, dropTarget){
             new Ext.dd.DropTarget(dropTarget, {
                 ddGroup:'t2schedule',
                 notifyDrop:function(dd, e, node) {
-                    var start_date = $(this.getEl()).data("startDate");
+                    
+                    if($(this.getEl()).data("startDate") < (new Date()).add(Date.DAY, -1)){
+                        return false;
+                    }
+                    var start_date = $calendar.weekCalendar('getClickTime', e.getPageY() - this.el.getTop(), $(this.getEl()));
                     var form = $self.ce_window.get(0).getForm();
                     form.baseParams = {
-                        course: node.node.id
+                        course: node.node.id,
+                        begin: start_date.format('Y-m-d H:i:s')
                     };
-                    form.begin_day = $(this.getEl()).data("startDate");
                     $self.ce_window.show();
                     form.findField('course_field').setValue(node.node.text);
-                    form.findField('day_field').setValue(form.begin_day.format('j.n.Y'));
+                    form.findField('day_field').setValue(start_date.format('Y-m-d H:i:s'));
                     return true;
                 }//notifyDrop
             });//Ext.dd.DropTarget
@@ -158,41 +170,27 @@ Ext.reg('ext:ux:schedule-panel', Ext.ux.SchedulePanel);
 Ext.ux.CreateEventForm = Ext.extend(Ext.form.FormPanel, {
     labelWidth: 100,
     frame: true,
-    initComponent: function(){
-        var config = {
-            buttons:[{
-                text: 'Submit',
-                formBind:true,
-                scope:this,
-                handler:this.submit
-            }]
-        }
-        Ext.apply(this, Ext.apply(this.initialConfig, config));
-        Ext.ux.CreateEventForm.superclass.initComponent.call(this);
-    },//initComponent
     onRender: function() {
         Ext.ux.CreateEventForm.superclass.onRender.apply(this, arguments);
         this.getForm().waitMsgTarget = this.getEl();
     },//onRender
-    submit: function(){
+    submit: function(button){
         var form = this.getForm();
         if (form.isValid()){
-            var time_field = form.findField('time_field');
-            var time = Date.parseDate(time_field.getValue(), time_field.format);
-            form.baseParams.begin = form.begin_day
-                .add(Date.HOUR, time.getHours())
-                .add(Date.MINUTE, time.getMinutes())
-                .format('Y-m-d H:i:s');
             form.submit({
                 url: this.url,
                 scope: this,
                 success: this.onSuccess,
                 failure: this.onFailure,
-                waitMsg:'Saving...'
+                waitMsg:'Saving...',
+                params: {
+                    room: button.room_id
+                }
             });
         }
     },//submit
     onSuccess: function(form, action){
+        Ext.ux.msg(action.result.msg, '', Ext.MessageBox.INFO);
     }//onSuccess
 
 });

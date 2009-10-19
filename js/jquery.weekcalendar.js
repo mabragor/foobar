@@ -249,7 +249,7 @@
         _setupEventDelegation : function() {
             var self = this;
             var options = this.options;
-            this.element.click(function(event) {
+            this.element./*click(function(event) {
                 var $target = $(event.target);
                 if($target.data("preventClick")) {
                     return;
@@ -259,7 +259,7 @@
                 } else if($target.parent().hasClass("cal-event")) {
                     options.eventClick.call(self, $target.parent().data("calEvent"), $target.parent(), event);
                 }
-            }).mouseover(function(event){
+            }).*/mouseover(function(event){
                 var $target = $(event.target);
                 
                 if(self._isDraggingOrResizing($target)) {
@@ -1137,15 +1137,18 @@
             return d;
         },
 
-        getDivDate: function(node){
-
-            return 'XYU';
+        getClickTime: function(clickY, $weekDay){
+            var options = this.options;
+            var top = (clickY - (clickY % options.timeslotHeight)) / options.timeslotHeight * options.timeslotHeight;
+            var startOffsetMillis = options.businessHours.limitDisplay ? options.businessHours.start * 60 *60 * 1000 : 0;
+            var start = new Date($weekDay.data("startDate").getTime() + startOffsetMillis + Math.round(top / options.timeslotHeight) * options.millisPerTimeslot);
+            return start;
         }
     });
    
     $.extend($.ui.weekCalendar, {
         version: '1.2.1',
-        getter: ['getTimeslotTimes', 'getData', 'formatDate', 'formatTime', 'getDivDate', 'today', 'nextDay', 'prevDay', 'nextWeek', 'prevWeek', 'filterByParam'],
+        getter: ['getTimeslotTimes', 'getData', 'formatDate', 'formatTime', 'getClickTime', 'today', 'nextDay', 'prevDay', 'nextWeek', 'prevWeek', 'filterByParam'],
         defaults: {
             date: new Date(),
             timeFormat : "G:i",
