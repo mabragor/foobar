@@ -191,6 +191,15 @@ Ext.ux.CreateEventForm = Ext.extend(Ext.form.FormPanel, {
     },//submit
     onSuccess: function(form, action){
         Ext.ux.msg(action.result.msg, '', Ext.MessageBox.INFO);
-    }//onSuccess
+    },//onSuccess
+    onFailure: function(form, action){
+        switch (action.failureType) {
+            case Ext.form.Action.CONNECT_FAILURE:
+                Ext.ux.msg('Failure', 'Ajax communication failed', Ext.Msg.ERROR);
+                break;
+            case Ext.form.Action.SERVER_INVALID:
+                Ext.ux.msg('Failure', action.result.errors, Ext.Msg.ERROR);
+       }
+    }
 
 });

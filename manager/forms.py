@@ -31,7 +31,8 @@ class ScheduleForm(forms.ModelForm):
         return self.cleaned_data
 
     def get_errors(self):
-        return self._errors
+        from django.utils.encoding import force_unicode
+        return ''.join([force_unicode(v) for k, v in self.errors.items()])
 
 class UserRFID(forms.Form):
     rfid_code = forms.CharField(max_length=8)
