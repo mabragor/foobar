@@ -249,27 +249,17 @@
          * configure calendar interaction events that are able to use event 
          * delegation for greater efficiency 
          */
-        _setupEventDelegation : function() {
+        _setupEventDelegation: function() {
             var self = this;
             var options = this.options;
-            this.element./*click(function(event) {
-                var $target = $(event.target);
-                if($target.data("preventClick")) {
-                    return;
-                }
-                if($target.hasClass("cal-event")) {
-                    options.eventClick.call(self, $target.data("calEvent"), $target, event);
-                } else if($target.parent().hasClass("cal-event")) {
-                    options.eventClick.call(self, $target.parent().data("calEvent"), $target.parent(), event);
-                }
-            }).*/mouseover(function(event){
+            this.element.mouseover(function(event){
                 var $target = $(event.target);
                 
                 if(self._isDraggingOrResizing($target)) {
                     return;
                 }
-                
-                if($target.hasClass("cal-event") ) {
+
+                if($target.parent().hasClass("cal-event") ) {
                     options.eventMouseover($target.data("calEvent"), $target, event);
                 } 
             }).mouseout(function(event){
@@ -277,7 +267,7 @@
                 if(self._isDraggingOrResizing($target)) {
                     return;
                 }
-                if($target.hasClass("cal-event")) {
+                if($target.parent().hasClass("cal-event")) {
                     if($target.data("sizing")) return;
                     options.eventMouseout($target.data("calEvent"), $target, event);
                    
@@ -532,7 +522,11 @@
             eventClass = calEvent.id ? "cal-event" : "cal-event new-cal-event";
             eventHtml = "<div class=\"" + eventClass + " ui-corner-all\">\
                 <div class=\"time ui-corner-all\"></div>\
-                <div class=\"title\"></div><div class=\"delete-event\">&nbsp;</div></div>";
+                <div class=\"title\"></div>";
+            if(calEvent[options.startParam].getTime() > (new Date()).getTime()){
+                eventHtml += "<div class=\"delete-event\">&nbsp;</div>";
+            }
+            eventHtml += "</div>";
                 
             $calEvent = $(eventHtml);
             $modifiedEvent = options.eventRender.call(self, calEvent, $calEvent);
@@ -545,6 +539,11 @@
             $calEvent.find('div.delete-event').bind("mousedown", function(){
                 var calEvent = $(this).parent().data("calEvent");
                 self.options.eventDelete.call(self, calEvent);
+            });
+            $calEvent.mouseenter(function(event){
+                $(this).find(".delete-event").fadeIn('fast');
+            }).mouseleave(function(event){
+                $(this).find(".delete-event").fadeOut('fast');
             });
             if(!options.readonly && options.resizable(calEvent, $calEvent)) {
                 self._addResizableToCalEvent(calEvent, $calEvent, $weekDay)
