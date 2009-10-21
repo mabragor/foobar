@@ -42,3 +42,13 @@
     margin: 10px 0 0 3px;
     display: none;
 }
+
+.delete-user-course {
+    background: transparent none no-repeat scroll left bottom;
+    background-image: url(../images/default/delete.gif);
+    width: 16px;
+    height: 16px;
+    /*position: absolute;*/
+    padding: 0;
+    margin: 0;
+}

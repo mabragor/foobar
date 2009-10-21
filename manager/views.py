@@ -10,7 +10,7 @@ from lib import DatetimeJSONEncoder
 from lib.decorators import render_to
 from forms import ScheduleForm, UserRFID
 
-from storage.models import Schedule, Room, Group, Client
+from storage.models import Schedule, Room, Group, Client, Card
 
 #@render_to('manager/index.html')
 @render_to('manager.html')
@@ -102,3 +102,16 @@ def ajax_get_events(request):
         events = []
     return events
 
+@ajax_processor()
+def ajax_del_user_couse(request):
+    if request.method == 'POST':
+        try:
+            card = Card.objects.get(pk=request.POST.get('id'))
+        except Card.DoesNotExist:
+            return {'result': False, 'msg': 'Incorect course.'}
+        if card.deleteable():
+            card.delete()
+            return {'result': True, 'msg': 'Success.'}
+        else:
+            return {'result': False, 'msg': 'Course is undeleteable.'}
+    return {'result': False, 'msg': 'Incorect request type.'}

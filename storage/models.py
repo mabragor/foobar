@@ -2,7 +2,7 @@
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 class AbstractUser(models.Model):
     first_name = models.CharField(max_length=64)
@@ -116,6 +116,11 @@ class Card(models.Model):
     def __unicode__(self):
         return self.course.title
 
+    def deleteable(self):
+        if self.reg_date <= datetime.now():
+            return False
+        return True
+
     def get_info(self):
         return {
             'id': self.pk,
@@ -123,7 +128,8 @@ class Card(models.Model):
             'course_id': self.course.pk,
             'reg_date': self.reg_date,
             'exp_date': self.exp_date,
-            'count': self.count
+            'count': self.count,
+            'deleteable': self.deleteable()
         }
 
 class Schedule(models.Model):

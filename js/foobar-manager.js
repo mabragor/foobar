@@ -50,11 +50,15 @@ Ext.onReady(function() {
         //autoLoad: true,
         autoDestroy: true, // destroy store when the component the store is bound to is destroyed
         root: 'courses', // get data from this key
-        fields: ['title',
-             {name: 'reg_date', type: 'date'},
-             {name: 'exp_date', type: 'date'},
-             {name: 'count', type: 'int'},
-             {name: 'course_id', type: 'int'}
+        idProperty: 'id',
+        fields: [
+            {name: 'id', type: 'int'},
+            'title',
+            {name: 'reg_date', type: 'date'},
+            {name: 'exp_date', type: 'date'},
+            {name: 'count', type: 'int'},
+            {name: 'course_id', type: 'int'},
+            {name: 'deleteable', type: 'boolean'}
         ],
         proxy: new Ext.data.HttpProxy({
             method: 'POST',
@@ -95,21 +99,21 @@ Ext.onReady(function() {
                         {text: 'Search', iconCls: 'icon-info', handler: function() {}},
                         {text: 'Add new',iconCls: 'icon-plus', handler: function() {}} ],
                 items: [
-		    client_form,
-		    {
-			frame: false,
-			border: false,
-			height: 60,
-			flex: 1,
-			margins: '1 0 0 0',
-			autoScroll: true,
-			items: {
-			    xtype: 'ext:ux:user-courses',
-			    store: course_store
-			}
-		    }
-		],
-	    },{
+                client_form,
+                {
+                    frame: false,
+                    border: false,
+                    height: 60,
+                    flex: 1,
+                    margins: '1 0 0 0',
+                    autoScroll: true,
+                    items: {
+                        xtype: 'ext:ux:user-courses',
+                        store: course_store,
+                        del_course_url: URLS.del_user_course
+                    }
+                }]
+            },{
                 xtype: 'ext:ux:course-panel',
                 dataUrl: URLS.get_course_tree
             }]

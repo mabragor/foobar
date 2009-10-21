@@ -1148,12 +1148,19 @@
             var startOffsetMillis = options.businessHours.limitDisplay ? options.businessHours.start * 60 *60 * 1000 : 0;
             var start = new Date($weekDay.data("startDate").getTime() + startOffsetMillis + Math.round(top / options.timeslotHeight) * options.millisPerTimeslot);
             return start;
+        },
+
+        copyWeek: function(){
+            this.options.firstDayOfWeek = (this.options.firstDayOfWeek+1) % 7;
+            this._clearCalendar();
+            var newDate = new Date(this.element.data("startDate").getTime() + (MILLIS_IN_WEEK / 7));
+            this._loadCalEvents(newDate);
         }
     });
    
     $.extend($.ui.weekCalendar, {
         version: '1.2.1',
-        getter: ['getTimeslotTimes', 'getData', 'formatDate', 'formatTime', 'getClickTime', 'today', 'nextDay', 'prevDay', 'nextWeek', 'prevWeek', 'filterByParam', 'removeEvent'],
+        getter: ['getTimeslotTimes', 'getData', 'formatDate', 'formatTime', 'getClickTime', 'today', 'nextDay', 'prevDay', 'nextWeek', 'prevWeek', 'filterByParam', 'removeEvent', 'copyWeek'],
         defaults: {
             date: new Date(),
             timeFormat : "G:i",
