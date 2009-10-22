@@ -11,6 +11,6 @@ urlpatterns = patterns('manager.views',
     url(r'^get_events/$', 'ajax_get_events', name='ajax_get_events'),
     url(r'^ajax_get_user_courses/$', 'ajax_get_user_courses', name='ajax_get_user_courses'),
     url(r'^get_course_tree/$', 'ajax_get_course_tree', name='ajax_get_course_tree'),
-    url(r'^get_rooms/$', 'ajax_get_rooms', name='ajax_get_rooms')
-
+    url(r'^get_rooms/$', 'ajax_get_rooms', name='ajax_get_rooms'),
+    url(r'^del_user_course', 'ajax_del_user_couse', name='ajax_del_user_couse')
 )

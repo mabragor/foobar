@@ -69,6 +69,7 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
         });
         this.tbar = [];
         this.fbar = [
+            {text: 'Copy',handler: function() {}, scope: this},
             {text: '<<<', handler: function() {this.calendar.weekCalendar('prevWeek')}, scope: this},
             {text: '<', handler: function() {this.calendar.weekCalendar('prevDay')}, scope: this},
             {text: 'today',handler: function() {this.calendar.weekCalendar('today')}, scope: this},

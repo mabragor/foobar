@@ -26,7 +26,8 @@
         var URLS = {
             get_course_tree: '{% url manager:ajax_get_course_tree %}',
             get_user_courses: '{% url manager:ajax_get_user_courses %}',
-            add_event: '{% url manager:ajax_add_event %}'
+            add_event: '{% url manager:ajax_add_event %}',
+            del_user_course: '{% url manager:ajax_del_user_couse %}'
         };
         schedule_options = Ext.apply(schedule_options, (function(){
             var o = {{ options|safe }};

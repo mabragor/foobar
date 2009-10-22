@@ -30,7 +30,7 @@ var schedule_options = {
     },
     eventDelete: function(calEvent){
         var $self = this;
-        Ext.MessageBox.confirm('Confirm', 'Are you sure you want to do that?', function(bt){
+        Ext.MessageBox.confirm(calEvent.title, 'Are you sure you want to delete event?', function(bt){
             if (bt == 'yes'){
                 $.ajax({
                     type: 'POST',
