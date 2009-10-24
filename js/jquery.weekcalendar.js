@@ -1146,8 +1146,12 @@
             var options = this.options;
             var top = (clickY - (clickY % options.timeslotHeight)) / options.timeslotHeight * options.timeslotHeight;
             var startOffsetMillis = options.businessHours.limitDisplay ? options.businessHours.start * 60 *60 * 1000 : 0;
-            var start = new Date($weekDay.data("startDate").getTime() + startOffsetMillis + Math.round(top / options.timeslotHeight) * options.millisPerTimeslot);
+            //var timestamp = $weekDay.data("startDate").getTime() + startOffsetMillis + Math.round(top / options.timeslotHeight) * options.millisPerTimeslot;
+            var start = $weekDay.data("startDate").add(Date.HOUR, options.businessHours.limitDisplay ? options.businessHours.start : 0)
+                    .add(Date.HOUR, Math.round(top / options.timeslotHeight)/options.timeslotsPerHour);
+            console.log(start);
             return start;
+            return new Date(timestamp);
         },
 
         copyWeek: function(){
