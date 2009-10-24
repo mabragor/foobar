@@ -757,8 +757,9 @@
         _getEventDurationFromPositionedEventElement : function($weekDay, $calEvent, top) {
              var options = this.options;
              var startOffsetMillis = options.businessHours.limitDisplay ? options.businessHours.start * 60 *60 * 1000 : 0;
-             var start = new Date($weekDay.data("startDate").getTime() + startOffsetMillis + Math.round(top / options.timeslotHeight) * options.millisPerTimeslot);
-             var end = new Date(start.getTime() + ($calEvent.height() / options.timeslotHeight) * options.millisPerTimeslot);
+             var start = $weekDay.data("startDate").add(Date.HOUR, options.businessHours.limitDisplay ? options.businessHours.start : 0)
+                .add(Date.MINUTE, Math.round(top / options.timeslotHeight)/options.timeslotsPerHour*60);
+             var end = start.add(Date.HOUR, ($calEvent.height() / options.timeslotHeight) / options.timeslotsPerHour);
              return {start: start, end: end};
         },
         
@@ -1146,7 +1147,7 @@
             var options = this.options;
             var top = (clickY - (clickY % options.timeslotHeight)) / options.timeslotHeight * options.timeslotHeight;
             var start = $weekDay.data("startDate").add(Date.HOUR, options.businessHours.limitDisplay ? options.businessHours.start : 0)
-                    .add(Date.HOUR, Math.round(top / options.timeslotHeight)/options.timeslotsPerHour);
+                    .add(Date.MINUTE, Math.round(top / options.timeslotHeight)/options.timeslotsPerHour*60);
             return start;
         },
 
