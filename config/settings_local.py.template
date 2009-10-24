@@ -49,6 +49,7 @@ CALENDAR_OPTIONS = {
     },
     'timeslotHeight': 30
 }
+CHECK_STATUS_INTERVAL = 15  #minetes
 
 GOOGLE_ANALYTICS = """
 <script type="text/javascript">

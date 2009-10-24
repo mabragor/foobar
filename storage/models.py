@@ -3,6 +3,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from datetime import timedelta, datetime
+from django.conf import settings
 
 class AbstractUser(models.Model):
     first_name = models.CharField(max_length=64)
@@ -170,7 +171,7 @@ class Schedule(models.Model):
 
     @classmethod
     def get_unstatus_event(self):
-        d = datetime.now() - timedelta(hours=0.25)
+        d = datetime.now() - timedelta(minutes=settings.CHECK_STATUS_INTERVAL)
         try:
             event = self._default_manager.filter(begin__lte=d, status__isnull=True)[0]
             return {
