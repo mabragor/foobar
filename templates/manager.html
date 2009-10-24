@@ -18,16 +18,21 @@
     <script type="text/javascript" src="{% media 'media/extjs/adapter/jquery/ext-jquery-adapter-debug.js' %}"></script>
     <script type="text/javascript" src="{% media 'media/extjs/ext-all-debug.js' %}"></script>
     
+    <script type="text/javascript" src="{% media 'js/Ext.ux.ScheduleStatusWindow.js' %}"></script>
     <script type="text/javascript" src="{% media 'js/Ext.ux.SchedulePanel.js' %}"></script>
     <script type="text/javascript" src="{% media 'js/Ext.ux.CoursePanel.js' %}"></script>
     <script type="text/javascript" src="{% media 'js/Ext.ux.UserCourses.js' %}"></script>
+
     <script type="text/javascript">
         Ext.BLANK_IMAGE_URL = '{% media "media/extjs/resources/images/default/s.gif" %}';
         var URLS = {
             get_course_tree: '{% url manager:ajax_get_course_tree %}',
             get_user_courses: '{% url manager:ajax_get_user_courses %}',
             add_event: '{% url manager:ajax_add_event %}',
-            del_user_course: '{% url manager:ajax_del_user_couse %}'
+            del_user_course: '{% url manager:ajax_del_user_couse %}',
+            get_coach_list: '{% url manager:ajax_get_coach_list %}',
+            get_unstatus_event: '{% url manager:ajax_get_unstatus_event %}',
+            save_event_status: '{% url manager:ajax_save_event_status %}'
         };
         schedule_options = Ext.apply(schedule_options, (function(){
             var o = {{ options|safe }};

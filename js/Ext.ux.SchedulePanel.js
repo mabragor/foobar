@@ -69,7 +69,7 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
         });
         this.tbar = [];
         this.fbar = [
-            {text: 'Copy',handler: function() {}, scope: this},
+            {text: 'Copy',handler: function() {this.status_window.show()}, scope: this},
             {text: '<<<', handler: function() {this.calendar.weekCalendar('prevWeek')}, scope: this},
             {text: '<', handler: function() {this.calendar.weekCalendar('prevDay')}, scope: this},
             {text: 'today',handler: function() {this.calendar.weekCalendar('today')}, scope: this},
@@ -77,10 +77,142 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
             {text: '>>>',handler: function() {this.calendar.weekCalendar('nextWeek')}, scope: this}
         ];
 
-        
-        //-----Cerate event window-----
-        this.ce_window = (function(options){
-            return new Ext.Window({
+        Ext.ux.SchedulePanel.superclass.initComponent.call(this);
+        this.initCreateEventWindow();
+        this.initStatusWindow();
+    },
+    initStatusWindow: function(){
+        var coach_store = new Ext.data.JsonStore({
+            id:'id',
+            root: 'rows',
+            fields:[
+                {name:'id', type:'int'},
+                {name:'name', type:'string'}
+            ],
+            proxy: new Ext.data.HttpProxy({
+                method: 'POST',
+                url: this.urls.get_coach_list
+            }),
+            autoLoad: true
+        });
+        var form = new Ext.form.FormPanel({
+            urls: this.urls,
+            labelWidth: 100,
+            frame: true,
+            items: [{
+                    xtype: 'hidden',
+                    name: 'id'
+                },{
+                    xtype: 'displayfield',
+                    hideLabel: true,
+                    value: 'Course title',
+                    name: 'title'
+                },{
+                    xtype: 'displayfield',
+                    hideLabel: true,
+                    value: 'Course date',
+                    name: 'date'
+                },{
+                    xtype: 'radiogroup',
+                    fieldLabel: 'Status',
+                    items: [
+                        {boxLabel: 'Done', name: 'status', inputValue: 1, checked: true},
+                        {boxLabel: 'Canceled', name: 'status', inputValue: 2}
+                    ]
+                },{
+                    xtype:'fieldset',
+                    checkboxToggle:true,
+                    title: 'Change coach',
+                    autoHeight:true,
+                    defaults: {width: 210},
+                    defaultType: 'textfield',
+                    collapsed: true,
+                    checkboxName: 'change_flag',
+                    items :[{
+                        xtype: 'combo',
+                        fieldLabel: 'New coach',
+                        valueField:'id',
+                        hiddenName:'change',
+                        displayField:'name',
+                        store: coach_store,
+                        triggerAction:'all',
+                        minChars: 4,
+                        forceSelection:true,
+                        disableKeyFilter: true
+                    },{
+                        xtype: 'checkbox',
+                        fieldLabel: 'Outside change',
+                        name: 'outside',
+                        listeners: {
+                            check: function(checkbox, checked){
+                                if(checked){
+                                    checkbox.ownerCt.get(0).disable();
+                                }else{
+                                    checkbox.ownerCt.get(0).enable();
+                                }
+                            }
+                        }//listeners
+                  }]//fieldset items
+             }],//items
+             buttons: [{
+                 text: 'submit',
+                 handler: function(){
+                     var form = this.findParentByType('form');
+                     form.getForm().submit({
+                         url: form.urls.save_event_status,
+                         success: function(form, action){
+                            action.result.msg && Ext.ux.msg(action.result.msg, '', Ext.MessageBox.INFO);
+                            form.load_event()
+                        },
+                         failure: function(form, action){
+                            switch (action.failureType) {
+                                case Ext.form.Action.CONNECT_FAILURE:
+                                    Ext.ux.msg('Failure', 'Ajax communication failed', Ext.Msg.ERROR);
+                                    break;
+                                case Ext.form.Action.SERVER_INVALID:
+                                    Ext.ux.msg('Failure', action.result.errors, Ext.Msg.ERROR);
+                           }//failure
+                        }
+                     });
+                 }
+             }],//buttons
+             load_event: function(){
+                 this.load({
+                     url: this.urls.get_unstatus_event,
+                     failure: function(form, action) {
+                         switch (action.failureType) {
+                             case Ext.form.Action.CONNECT_FAILURE:
+                                 Ext.ux.msg('Failure', 'Ajax communication failed', Ext.Msg.ERROR);
+                                 break;
+                             case Ext.form.Action.SERVER_INVALID:
+                                 Ext.ux.msg('Failure', action.result.errors, Ext.Msg.ERROR);
+                                 action.result.end && form.hide();
+                        }
+                     }//failure
+                 });//form.load
+             }
+        });
+        this.status_window = new Ext.Window({
+            closeAction: 'hide',
+            width: 400,
+            height: 400,
+            draggable: false,
+            title: 'Event status',
+            layout: 'fit',
+            autoScroll: true,
+            modal: true,
+            items: form,//Ext.form.FormPanel
+            listeners: {
+                 beforeshow: function(window){
+                     var form = window.get(0);
+                     form.load_event();
+                 }
+            }//listeners
+        });//Ext.Window
+    },
+    initCreateEventWindow: function(){
+        var options = this.c_options;
+        this.ce_window = new Ext.Window({
                 closeAction: 'hide',
                 width: 400,
                 height: 250,
@@ -121,9 +253,6 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
                     }
                 }
             });//Ext.Window
-        }).call(this, this.c_options);
-        //-----------------------------
-        Ext.ux.SchedulePanel.superclass.initComponent.call(this);
     },
     afterRender: function(){
         Ext.ux.SchedulePanel.superclass.afterRender.call(this);
@@ -164,7 +293,7 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
             return true
         });//Ext.each
     }//afterRender
-})
+});
 
 Ext.reg('ext:ux:schedule-panel', Ext.ux.SchedulePanel);
 

@@ -75,7 +75,12 @@ Ext.onReady(function() {
         renderTo: Ext.getBody(),
         items: [{
             xtype: 'ext:ux:schedule-panel',
-            c_options: schedule_options
+            c_options: schedule_options,
+            urls: {
+                get_coach_list: URLS.get_coach_list,
+                get_unstatus_event: URLS.get_unstatus_event,
+                save_event_status: URLS.save_event_status
+            }
         },{
             region: 'west',
             layout: 'vbox',
@@ -134,6 +139,5 @@ Ext.onReady(function() {
             alert('RFID reading failed');
         }
     });
-
 
 });

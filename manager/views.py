@@ -8,23 +8,21 @@ from lib.decorators import ajax_processor
 from django.shortcuts import get_object_or_404
 from lib import DatetimeJSONEncoder
 from lib.decorators import render_to
-from forms import ScheduleForm, UserRFID
+from forms import ScheduleForm, UserRFID, StatusForm
 
-from storage.models import Schedule, Room, Group, Client, Card
+from storage.models import Schedule, Room, Group, Client, Card, Coach
 
 #@render_to('manager/index.html')
 @render_to('manager.html')
 def index(request):
-    form = ScheduleForm()
     return {
-        'form': form,
         'options': simplejson.dumps(settings.CALENDAR_OPTIONS, cls=DatetimeJSONEncoder)
     }
 
 @ajax_processor()
 def ajax_get_rooms(request):
     rooms = Room.objects.all()
-    return {'rows': [item.get_calendar_obj() for item in rooms]}
+    return {'rows': [item.get_store_obj() for item in rooms]}
 
 @ajax_processor()
 def ajax_get_course_tree(request):
@@ -61,7 +59,7 @@ def ajax_add_event(request, pk=None):
 @ajax_processor()
 def ajax_del_event(request):
     if request.method == 'POST':
-        event = Schedule.objects.get(pk=request.POST['id'])
+        event = get_object_or_404(Schedule, pk=request.POST['id'])
         if event.begin < datetime.now():
             return {'error': 'Event was in the past.'}
         event.delete()
@@ -115,3 +113,49 @@ def ajax_del_user_couse(request):
         else:
             return {'result': False, 'msg': 'Course is undeleteable.'}
     return {'result': False, 'msg': 'Incorect request type.'}
+
+@ajax_processor()
+def ajax_get_coach_list(request):
+    from django.db.models import Q
+    coaches = Coach.objects.all()
+    if 'query' in request.POST:
+        coaches = coaches.filter(Q(first_name__icontains=request.POST.get('query'))|Q(last_name__icontains=request.POST.get('query')))
+    return {'rows': [item.get_store_obj() for item in coaches]}
+
+@ajax_processor()
+def ajax_get_unstatus_event(request):
+    event = Schedule.get_unstatus_event()
+    if event:
+        output = {
+            'success': True,
+            'data': event
+        }
+    else:
+        output = {
+            'success': False,
+            'errors': 'There is not events without status.',
+            'end': True
+        }
+    return output
+
+@ajax_processor()
+def ajax_save_event_status(request):
+    output = {}
+    if request.method == 'POST':
+        try:
+            event = Schedule.objects.get(pk=request.POST.get('id'), status__isnull=True)
+            form = StatusForm(request.POST, instance=event)
+            if form.is_valid():
+                form.save()
+                output['success'] = True
+                output['msg'] = 'Saved success.'
+            else:
+                output['success'] = False
+                output['errors'] = form.get_errors()
+        except Schedule.DoesNotExist:
+            output['success'] = True
+            output['msg'] = 'Event has status.'
+    else:
+        output['success'] = False
+        output['errors'] = 'Invalid request type.'
+    return output

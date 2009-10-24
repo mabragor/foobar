@@ -18,7 +18,13 @@ class AbstractUser(models.Model):
         return unicode('%s %s' % (self.first_name, self.last_name))
 
 class Coach(AbstractUser):
-    pass
+
+    def get_store_obj(self):
+        obj = {
+            'id': self.pk,
+            'name': self.__unicode__()
+        }
+        return obj
 
 class Client(AbstractUser):
     def get_course_list(self):
@@ -28,7 +34,7 @@ class Room(models.Model):
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
     color = models.CharField(verbose_name=_(u'Color'), max_length=6)
 
-    def get_calendar_obj(self):
+    def get_store_obj(self):
         obj = {
             'id': self.pk,
             'color': self.color,
@@ -133,12 +139,18 @@ class Card(models.Model):
         }
 
 class Schedule(models.Model):
+    ACTION_STATUSES = (
+        ('1', _('Done')),
+        ('2', _('Cancel')),
+    )
     room = models.ForeignKey(Room)
     course = models.ForeignKey(Course)
     begin = models.DateTimeField(verbose_name=_(u'Begins'))
     looking = models.BooleanField(verbose_name=_(u'Is looking for members?'), default=True)
     places = models.BooleanField(verbose_name=_(u'Are there free places?'), default=True)
-
+    status = models.CharField(verbose_name=_(u'Status'), max_length=1, choices=ACTION_STATUSES, null=True)
+    change = models.ForeignKey(Coach, null=True, blank=True)
+    
     @property
     def end(self):
         return self.begin + timedelta(hours=self.course.duration)
@@ -147,7 +159,7 @@ class Schedule(models.Model):
         obj = {
             'id': self.pk,
             'start': self.begin,
-            'end': self.begin + timedelta(hours=self.course.duration),
+            'end': self.end,
             'room': self.room.pk,
             'color': self.room.color,
             'course': self.course.pk,
@@ -156,20 +168,27 @@ class Schedule(models.Model):
         }
         return obj
 
+    @classmethod
+    def get_unstatus_event(self):
+        d = datetime.now() - timedelta(hours=0.25)
+        try:
+            event = self._default_manager.filter(begin__lte=d, status__isnull=True)[0]
+            return {
+                'id': event.pk,
+                'title': '%s - %s' % (event.course.__unicode__(), event.room.__unicode__()),
+                'date': '%s - %s' % (event.begin, event.end)
+            }
+        except self.DoesNotExist:
+            return None
+
     class Meta:
         verbose_name = _(u'Schedule')
         verbose_name_plural = _(u'Schedules')
 
 class Action(models.Model):
-    ACTION_STATUSES = (
-        ('1', _('Done')),
-        ('2', _('Cancel')),
-        )
     schedule = models.ForeignKey(Schedule)
     card = models.ForeignKey(Card)
-    change = models.ForeignKey(Coach)
     when = models.DateTimeField(verbose_name=_(u'Registered'))
-    status = models.CharField(verbose_name=_(u'Status'), max_length=1, choices=ACTION_STATUSES)
 
     class Meta:
         verbose_name = _(u'Action')

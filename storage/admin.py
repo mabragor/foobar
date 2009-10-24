@@ -59,6 +59,6 @@ class ScheduleAdmin(admin.ModelAdmin):
 admin.site.register(models.Schedule, ScheduleAdmin)
 
 class ActionAdmin(admin.ModelAdmin):
-    list_display = ('schedule', 'card', 'change', 'when')
-    fieldsets = ((None, {'fields': ('schedule', 'card', 'change', 'when')}),)
+    list_display = ('schedule', 'card', 'when')
+    fieldsets = ((None, {'fields': ('schedule', 'card', 'when')}),)
 admin.site.register(models.Action, ActionAdmin)
