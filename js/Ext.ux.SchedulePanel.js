@@ -69,7 +69,7 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
         });
         this.tbar = [];
         this.fbar = [
-            {text: 'Copy',handler: function() {this.status_window.show()}, scope: this},
+            {text: 'Copy',handler: function() {}, scope: this},
             {text: '<<<', handler: function() {this.calendar.weekCalendar('prevWeek')}, scope: this},
             {text: '<', handler: function() {this.calendar.weekCalendar('prevDay')}, scope: this},
             {text: 'today',handler: function() {this.calendar.weekCalendar('today')}, scope: this},
@@ -162,8 +162,8 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
                          url: form.urls.save_event_status,
                          success: function(form, action){
                             action.result.msg && Ext.ux.msg(action.result.msg, '', Ext.MessageBox.INFO);
-                            form.load_event()
-                        },
+                            form.load_event(function(){}, Ext.getCmp('status_window'))
+                         },
                          failure: function(form, action){
                             switch (action.failureType) {
                                 case Ext.form.Action.CONNECT_FAILURE:
@@ -176,9 +176,10 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
                      });
                  }
              }],//buttons
-             load_event: function(){
+             load_event: function(callback, window){
                  this.load({
                      url: this.urls.get_unstatus_event,
+                     method: 'POST',
                      failure: function(form, action) {
                          switch (action.failureType) {
                              case Ext.form.Action.CONNECT_FAILURE:
@@ -186,12 +187,18 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
                                  break;
                              case Ext.form.Action.SERVER_INVALID:
                                  Ext.ux.msg('Failure', action.result.errors, Ext.Msg.ERROR);
-                                 action.result.end && form.hide();
+                                 break;
                         }
-                     }//failure
+                        window.hide();
+                     },//failure
+                     success: callback,
+                     scope: window
                  });//form.load
              }
         });
+        this.status_window = new Ext.ux.StatusWindow({
+            items: form//Ext.form.FormPanel
+        })/*
         this.status_window = new Ext.Window({
             closeAction: 'hide',
             width: 400,
@@ -201,14 +208,16 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
             layout: 'fit',
             autoScroll: true,
             modal: true,
+            id: 'status_window',
             items: form,//Ext.form.FormPanel
             listeners: {
                  beforeshow: function(window){
                      var form = window.get(0);
-                     form.load_event();
+                     form.load_event(window);
                  }
-            }//listeners
-        });//Ext.Window
+            },//listeners
+            show: function(){console.log('hello')}
+        });//Ext.Window*/
     },
     initCreateEventWindow: function(){
         var options = this.c_options;
@@ -333,3 +342,19 @@ Ext.ux.CreateEventForm = Ext.extend(Ext.form.FormPanel, {
     }
 
 });
+
+Ext.ux.StatusWindow = Ext.extend(Ext.Window, {
+    closeAction: 'hide',
+    width: 400,
+    height: 400,
+    draggable: false,
+    title: 'Event status',
+    layout: 'fit',
+    autoScroll: true,
+    modal: true,
+    id: 'status_window',
+    show: function(){
+        var form = this.get(0);
+        form.load_event(Ext.ux.StatusWindow.superclass.show, this);
+    }
+})

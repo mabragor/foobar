@@ -140,4 +140,10 @@ Ext.onReady(function() {
         }
     });
 
+    new Timer({
+        callback: function(){
+            Ext.getCmp('status_window').show();
+        },
+        url: URLS.get_status_timer
+    });
 });

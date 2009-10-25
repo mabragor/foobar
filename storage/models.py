@@ -173,7 +173,7 @@ class Schedule(models.Model):
     def get_unstatus_event(self):
         d = datetime.now() - timedelta(minutes=settings.CHECK_STATUS_INTERVAL)
         try:
-            event = self._default_manager.filter(begin__lte=d, status__isnull=True)[0]
+            event = self._default_manager.filter(begin__lte=d, status__isnull=True)[0:1].get()
             return {
                 'id': event.pk,
                 'title': '%s - %s' % (event.course.__unicode__(), event.room.__unicode__()),

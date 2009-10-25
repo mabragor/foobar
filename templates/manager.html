@@ -22,6 +22,7 @@
     <script type="text/javascript" src="{% media 'js/Ext.ux.SchedulePanel.js' %}"></script>
     <script type="text/javascript" src="{% media 'js/Ext.ux.CoursePanel.js' %}"></script>
     <script type="text/javascript" src="{% media 'js/Ext.ux.UserCourses.js' %}"></script>
+    <script type="text/javascript" src="{% media 'js/Timer.js' %}"></script>
 
     <script type="text/javascript">
         Ext.BLANK_IMAGE_URL = '{% media "media/extjs/resources/images/default/s.gif" %}';
@@ -32,7 +33,8 @@
             del_user_course: '{% url manager:ajax_del_user_couse %}',
             get_coach_list: '{% url manager:ajax_get_coach_list %}',
             get_unstatus_event: '{% url manager:ajax_get_unstatus_event %}',
-            save_event_status: '{% url manager:ajax_save_event_status %}'
+            save_event_status: '{% url manager:ajax_save_event_status %}',
+            get_status_timer: '{% url manager:ajax_get_status_timer %}'
         };
         schedule_options = Ext.apply(schedule_options, (function(){
             var o = {{ options|safe }};

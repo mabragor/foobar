@@ -159,3 +159,14 @@ def ajax_save_event_status(request):
         output['success'] = False
         output['errors'] = 'Invalid request type.'
     return output
+
+@ajax_processor()
+def ajax_get_status_timer(request):
+
+    def f(ph, cs):
+        import time
+        t = time.time() - cs*60
+        slot_length = 60*60/ph
+        dt = slot_length - (t % slot_length)
+        return dt
+    return f(settings.CALENDAR_OPTIONS['timeslotsPerHour'], settings.CHECK_STATUS_INTERVAL)
