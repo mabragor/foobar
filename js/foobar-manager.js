@@ -79,7 +79,8 @@ Ext.onReady(function() {
             urls: {
                 get_coach_list: URLS.get_coach_list,
                 get_unstatus_event: URLS.get_unstatus_event,
-                save_event_status: URLS.save_event_status
+                save_event_status: URLS.save_event_status,
+                copy_week: URLS.copy_week
             }
         },{
             region: 'west',

@@ -72,9 +72,18 @@
         },
 
         startWeek: function(callback){
-            this.options.firstDayOfWeek = 1;
-            this._clearCalendar();
-            this._loadCalEvents(this.element.data("startDate"), callback);
+            if (this.options.firstDayOfWeek != 1){
+                this.options.firstDayOfWeek = 1;
+                this._clearCalendar();
+                this._loadCalEvents(this.element.data("startDate"), callback);
+            }else{
+                var events = [];
+                this.element.find(".cal-event").each(function(){
+                    events.push($(this).data("calEvent"));
+                });
+                callback(events, this.element.data("startDate"), this.element.data("startDate").add(Date.DAY, 6));
+            }
+
         },
 
         prevDay: function(){
@@ -462,7 +471,6 @@
             var self = this;
             var options = this.options;
             var eventsToRender;
-
             if($.isArray(events)) {
                 eventsToRender = self._cleanEvents(events);
             } else if(events.events) {

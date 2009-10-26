@@ -152,6 +152,13 @@ class Schedule(models.Model):
     status = models.CharField(verbose_name=_(u'Status'), max_length=1, choices=ACTION_STATUSES, null=True)
     change = models.ForeignKey(Coach, null=True, blank=True)
     
+    class Meta:
+        verbose_name = _(u'Schedule')
+        verbose_name_plural = _(u'Schedules')
+
+    def __unicode__(self):
+        return u'%s(%s) %s' % (self.course, self.room, self.begin)
+
     @property
     def end(self):
         return self.begin + timedelta(hours=self.course.duration)
@@ -181,10 +188,6 @@ class Schedule(models.Model):
             }
         except self.DoesNotExist:
             return None
-
-    class Meta:
-        verbose_name = _(u'Schedule')
-        verbose_name_plural = _(u'Schedules')
 
 class Action(models.Model):
     schedule = models.ForeignKey(Schedule)

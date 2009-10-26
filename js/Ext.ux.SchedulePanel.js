@@ -303,7 +303,8 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
             return true
         });//Ext.each
         this.copy_handler = new Ext.ux.CopyHandler({
-            calendar: this.calendar
+            calendar: this.calendar,
+            url: this.urls.copy_week
         });
         Ext.getCmp('copy_button').setHandler(this.copy_handler.copyButtonHandler, this.copy_handler);
     }//afterRender
