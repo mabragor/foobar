@@ -71,6 +71,12 @@
             this._loadCalEvents(new Date()); 
         },
 
+        startWeek: function(callback){
+            this.options.firstDayOfWeek = 1;
+            this._clearCalendar();
+            this._loadCalEvents(this.element.data("startDate"), callback);
+        },
+
         prevDay: function(){
             this.options.firstDayOfWeek = (this.options.firstDayOfWeek-1) % 7;
             this._clearCalendar();
@@ -364,7 +370,7 @@
         /*
          * load calendar events for the week based on the date provided
          */
-        _loadCalEvents : function(dateWithinWeek) {
+        _loadCalEvents : function(dateWithinWeek, callback) {
             
             var date, weekStartDate, weekEndDate, $weekDayColumns;
             var self = this;
@@ -397,6 +403,7 @@
                 options.data.call(this, weekStartDate, weekEndDate,
                     function(data) {
                         self._renderEvents(data, $weekDayColumns);
+                        callback && callback(data, weekStartDate, weekEndDate);
                     }, this._filter);
             }
             else if (options.data) {
@@ -1161,7 +1168,7 @@
    
     $.extend($.ui.weekCalendar, {
         version: '1.2.1',
-        getter: ['getTimeslotTimes', 'getData', 'formatDate', 'formatTime', 'getClickTime', 'today', 'nextDay', 'prevDay', 'nextWeek', 'prevWeek', 'filterByParam', 'removeEvent', 'copyWeek'],
+        getter: ['getTimeslotTimes', 'getData', 'formatDate', 'formatTime', 'getClickTime', 'today', 'nextDay', 'prevDay', 'nextWeek', 'prevWeek', 'filterByParam', 'removeEvent', 'copyWeek', 'startWeek'],
         defaults: {
             date: new Date(),
             timeFormat : "G:i",
