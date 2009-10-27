@@ -119,12 +119,13 @@ class Card(models.Model):
     class Meta:
         verbose_name = _(u'Card')
         verbose_name_plural = _(u'Card')
+        ordering = ['-reg_date']
 
     def __unicode__(self):
         return self.course.title
 
     def deleteable(self):
-        if self.reg_date <= datetime.now():
+        if self.reg_date <= datetime.now() - timedelta(days=1):
             return False
         return True
 

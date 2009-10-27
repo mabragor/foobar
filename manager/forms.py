@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django import forms
-from storage.models import Schedule
+from storage.models import Schedule, Card, Client
 from django.utils.translation import ugettext_lazy as _
 from datetime import timedelta, datetime, date
 
@@ -63,6 +63,34 @@ class ScheduleForm(forms.ModelForm):
 
 class UserRFID(forms.Form):
     rfid_code = forms.CharField(max_length=8)
+
+class UserCardForm(forms.ModelForm):
+    rfid_code = forms.CharField(max_length=8)
+
+    class Meta:
+        model = Card
+        exclude = ('reg_date', 'exp_date', 'count', 'client')
+
+    def clean_rfid_code(self):
+        rfid = self.cleaned_data['rfid_code']
+        try:
+            user = Client.objects.get(rfid_code=rfid)
+            self.cleaned_data['client'] = user
+        except Client.DoesNotExist:
+            raise form.ValidationError('Undefined rfid code.')
+        return user
+
+    def save(self, commit=True):
+        obj = super(UserCardForm, self).save(commit=False)
+        obj.client = self.cleaned_data['client']
+        obj.exp_date = datetime.now() + timedelta(days=30)
+        obj.count = 8
+        obj.save(commit)
+        return obj
+
+    def get_errors(self):
+        from django.utils.encoding import force_unicode
+        return ''.join([force_unicode(v) for k, v in self.errors.items()])
 
 class CopyForm(forms.Form):
     from_date = forms.DateField()
