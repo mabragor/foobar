@@ -137,8 +137,12 @@ Ext.onReady(function() {
         success: function(response) {
             var json = Ext.util.JSON.decode(response.responseText);
             var form = client_form.getForm().setValues(json);
-            course_store.user_rfid_code = json.rfid_code;
-            course_store.load({params: {rfid_code: json.rfid_code}});
+	    var card = json.rfid_code;
+	    console.log(card)
+	    if (card != '00000000') {
+		course_store.user_rfid_code = card;
+		course_store.load({params: {rfid_code: card}});
+	    }
         },
         failure: function() {
             alert('RFID reading failed');

@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import operator, random
+from datetime import datetime, timedelta
 
 from django.conf import settings
 
 from lib.decorators import ajax_processor
-from rfid.forms import GetRfidCode
 from storage.models import Client
+from rfid.forms import GetRfidCode
+from rfid.models import Card
 
 def rfid_reader(): 
     if settings.DEBUG:
@@ -14,8 +16,12 @@ def rfid_reader():
         index = random.randint(0, len(codes) - 1)
         return codes[index][:8]
     else:
-        # FIXME: real code to work with reader
-        return '00000000'
+        last_card = Card.object.all()[:1]
+        print last_card
+        if datetime.now() - timedelta(seconds=3) < last_card.reg_date:
+            return last_card.code
+        else:
+            return '00000000'
 
 @ajax_processor(GetRfidCode)
 def info_by_rfid(request, form):
@@ -24,14 +30,16 @@ def info_by_rfid(request, form):
     @return Client object
     """
     rfid = rfid_reader()
-    user = Client.objects.get(rfid_code=rfid)
-
-    return {
-        'first_name': user.first_name,
-        'last_name': user.last_name,
-        'email': user.email,
-        'rfid_code': user.rfid_code
-    }
+    try:
+        user = Client.objects.get(rfid_code=rfid)
+        return {
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'rfid_code': user.rfid_code
+            }
+    except Client.DoesNotExist:
+        return {}
 
 def is_valid(rfid_response):
     """ 
