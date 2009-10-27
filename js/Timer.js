@@ -32,7 +32,7 @@ function Timer(options){
                 }
             },
             failure: function(){
-                Ext.ux.msg('Failure to get status timer.', '', Ext.Msg.ERROR);
+                Ext.ux.msg('Failure', 'Ajax communication failed', Ext.Msg.ERROR);
             }
         });
     };

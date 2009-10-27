@@ -8,7 +8,7 @@ from lib.decorators import ajax_processor
 from django.shortcuts import get_object_or_404
 from lib import DatetimeJSONEncoder
 from lib.decorators import render_to
-from forms import ScheduleForm, UserRFID, StatusForm
+from forms import ScheduleForm, UserRFID, StatusForm, CopyForm
 
 from storage.models import Schedule, Room, Group, Client, Card, Coach
 
@@ -155,9 +155,6 @@ def ajax_save_event_status(request):
         except Schedule.DoesNotExist:
             output['success'] = True
             output['msg'] = 'Event has status.'
-    else:
-        output['success'] = False
-        output['errors'] = 'Invalid request type.'
     return output
 
 @ajax_processor()
@@ -170,3 +167,16 @@ def ajax_get_status_timer(request):
         dt = slot_length - (t % slot_length)
         return dt
     return f(settings.CALENDAR_OPTIONS['timeslotsPerHour'], settings.CHECK_STATUS_INTERVAL)
+
+@ajax_processor()
+def ajax_copy_week(request):
+    output = {}
+    if request.method == 'POST':
+        form = CopyForm(request.POST)
+        if form.is_valid():
+            form.save()
+            output['success'] = True
+        else:
+            output['success'] = False
+            output['errors'] = form.get_errors()
+    return output

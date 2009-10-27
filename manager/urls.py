@@ -16,5 +16,6 @@ urlpatterns = patterns('manager.views',
     url(r'^get_coach_list/$', 'ajax_get_coach_list', name='ajax_get_coach_list'),
     url(r'^get_unstatus_event/$', 'ajax_get_unstatus_event', name='ajax_get_unstatus_event'),
     url(r'^save_event_status/$', 'ajax_save_event_status', name='ajax_save_event_status'),
-    url(r'^get_status_timer/$', 'ajax_get_status_timer', name='ajax_get_status_timer')
+    url(r'^get_status_timer/$', 'ajax_get_status_timer', name='ajax_get_status_timer'),
+    url(r'^copy_week/$', 'ajax_copy_week', name='ajax_copy_week')
 )

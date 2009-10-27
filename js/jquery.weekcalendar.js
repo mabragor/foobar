@@ -71,6 +71,21 @@
             this._loadCalEvents(new Date()); 
         },
 
+        startWeek: function(callback){
+            if (this.options.firstDayOfWeek != 1){
+                this.options.firstDayOfWeek = 1;
+                this._clearCalendar();
+                this._loadCalEvents(this.element.data("startDate"), callback);
+            }else{
+                var events = [];
+                this.element.find(".cal-event").each(function(){
+                    events.push($(this).data("calEvent"));
+                });
+                callback(events, this.element.data("startDate"), this.element.data("startDate").add(Date.DAY, 6));
+            }
+
+        },
+
         prevDay: function(){
             this.options.firstDayOfWeek = (this.options.firstDayOfWeek-1) % 7;
             this._clearCalendar();
@@ -364,7 +379,7 @@
         /*
          * load calendar events for the week based on the date provided
          */
-        _loadCalEvents : function(dateWithinWeek) {
+        _loadCalEvents : function(dateWithinWeek, callback) {
             
             var date, weekStartDate, weekEndDate, $weekDayColumns;
             var self = this;
@@ -397,6 +412,7 @@
                 options.data.call(this, weekStartDate, weekEndDate,
                     function(data) {
                         self._renderEvents(data, $weekDayColumns);
+                        callback && callback(data, weekStartDate, weekEndDate);
                     }, this._filter);
             }
             else if (options.data) {
@@ -455,7 +471,6 @@
             var self = this;
             var options = this.options;
             var eventsToRender;
-
             if($.isArray(events)) {
                 eventsToRender = self._cleanEvents(events);
             } else if(events.events) {
@@ -1161,7 +1176,7 @@
    
     $.extend($.ui.weekCalendar, {
         version: '1.2.1',
-        getter: ['getTimeslotTimes', 'getData', 'formatDate', 'formatTime', 'getClickTime', 'today', 'nextDay', 'prevDay', 'nextWeek', 'prevWeek', 'filterByParam', 'removeEvent', 'copyWeek'],
+        getter: ['getTimeslotTimes', 'getData', 'formatDate', 'formatTime', 'getClickTime', 'today', 'nextDay', 'prevDay', 'nextWeek', 'prevWeek', 'filterByParam', 'removeEvent', 'copyWeek', 'startWeek'],
         defaults: {
             date: new Date(),
             timeFormat : "G:i",

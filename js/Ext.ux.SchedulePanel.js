@@ -67,9 +67,10 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
                 }
             }
         });
+
         this.tbar = [];
         this.fbar = [
-            {text: 'Copy',handler: function() {}, scope: this},
+            {text: 'Copy',handler: function() {}, scope: this, id: 'copy_button'},
             {text: '<<<', handler: function() {this.calendar.weekCalendar('prevWeek')}, scope: this},
             {text: '<', handler: function() {this.calendar.weekCalendar('prevDay')}, scope: this},
             {text: 'today',handler: function() {this.calendar.weekCalendar('today')}, scope: this},
@@ -301,6 +302,11 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
             });//Ext.dd.DropTarget
             return true
         });//Ext.each
+        this.copy_handler = new Ext.ux.CopyHandler({
+            calendar: this.calendar,
+            url: this.urls.copy_week
+        });
+        Ext.getCmp('copy_button').setHandler(this.copy_handler.copyButtonHandler, this.copy_handler);
     }//afterRender
 });
 

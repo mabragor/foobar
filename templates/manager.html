@@ -22,6 +22,7 @@
     <script type="text/javascript" src="{% media 'js/Ext.ux.SchedulePanel.js' %}"></script>
     <script type="text/javascript" src="{% media 'js/Ext.ux.CoursePanel.js' %}"></script>
     <script type="text/javascript" src="{% media 'js/Ext.ux.UserCourses.js' %}"></script>
+    <script type="text/javascript" src="{% media 'js/Ext.ux.CopyHandler.js' %}"></script>
     <script type="text/javascript" src="{% media 'js/Timer.js' %}"></script>
 
     <script type="text/javascript">
@@ -34,7 +35,8 @@
             get_coach_list: '{% url manager:ajax_get_coach_list %}',
             get_unstatus_event: '{% url manager:ajax_get_unstatus_event %}',
             save_event_status: '{% url manager:ajax_save_event_status %}',
-            get_status_timer: '{% url manager:ajax_get_status_timer %}'
+            get_status_timer: '{% url manager:ajax_get_status_timer %}',
+            copy_week: '{% url manager:ajax_copy_week %}'
         };
         schedule_options = Ext.apply(schedule_options, (function(){
             var o = {{ options|safe }};
