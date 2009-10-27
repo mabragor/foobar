@@ -176,49 +176,12 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
                         }
                      });
                  }
-             }],//buttons
-             load_event: function(callback, window){
-                 this.load({
-                     url: this.urls.get_unstatus_event,
-                     method: 'POST',
-                     failure: function(form, action) {
-                         switch (action.failureType) {
-                             case Ext.form.Action.CONNECT_FAILURE:
-                                 Ext.ux.msg('Failure', 'Ajax communication failed', Ext.Msg.ERROR);
-                                 break;
-                             case Ext.form.Action.SERVER_INVALID:
-                                 Ext.ux.msg('Failure', action.result.errors, Ext.Msg.ERROR);
-                                 break;
-                        }
-                        window.hide();
-                     },//failure
-                     success: callback,
-                     scope: window
-                 });//form.load
-             }
+             }]//buttons
         });
         this.status_window = new Ext.ux.StatusWindow({
-            items: form//Ext.form.FormPanel
-        })/*
-        this.status_window = new Ext.Window({
-            closeAction: 'hide',
-            width: 400,
-            height: 400,
-            draggable: false,
-            title: 'Event status',
-            layout: 'fit',
-            autoScroll: true,
-            modal: true,
-            id: 'status_window',
-            items: form,//Ext.form.FormPanel
-            listeners: {
-                 beforeshow: function(window){
-                     var form = window.get(0);
-                     form.load_event(window);
-                 }
-            },//listeners
-            show: function(){console.log('hello')}
-        });//Ext.Window*/
+            items: form//Ext.form.FormPanel,
+        });
+
     },
     initCreateEventWindow: function(){
         var options = this.c_options;
@@ -266,6 +229,7 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
     },
     afterRender: function(){
         Ext.ux.SchedulePanel.superclass.afterRender.call(this);
+                
         //FIXME: change options gathering for calendar
         
         this.c_options.height = function(calendar) {
@@ -359,8 +323,31 @@ Ext.ux.StatusWindow = Ext.extend(Ext.Window, {
     autoScroll: true,
     modal: true,
     id: 'status_window',
-    show: function(){
+    hidden: true,
+    show_window:function(){
         var form = this.get(0);
-        form.load_event(Ext.ux.StatusWindow.superclass.show, this);
+        Ext.Ajax.request({
+             url: form.urls.get_unstatus_event,
+             method: 'POST',
+             failure: function(form, action) {
+                 switch (action.failureType) {
+                     case Ext.form.Action.CONNECT_FAILURE:
+                         Ext.ux.msg('Failure', 'Ajax communication failed', Ext.Msg.ERROR);
+                         break;
+                     case Ext.form.Action.SERVER_INVALID:
+                         Ext.ux.msg('Failure', action.result.errors, Ext.Msg.ERROR);
+                         break;
+                }
+                this.hide();
+             },//failure
+             success: function(response){
+                 var result = Ext.util.JSON.decode(response.responseText);
+                 if(result.success){
+                     this.show();
+                     this.get(0).getForm().setValues(result.data);
+                 }
+             },//success
+             scope: this
+        });
     }
 })

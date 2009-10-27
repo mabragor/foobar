@@ -143,7 +143,7 @@ Ext.onReady(function() {
 
     new Timer({
         callback: function(){
-            Ext.getCmp('status_window').show();
+            Ext.getCmp('status_window').show_window();
         },
         url: URLS.get_status_timer
     });
