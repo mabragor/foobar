@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os, sys, time, serial, operator
+from datetime import datetime, timedelta
 
 PORT = {
     'name': '/dev/ttyUSB0',
@@ -23,7 +24,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append('/home/rad/django.engine')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 from django.conf import settings
-#from rfid import models
+from rfid.models import Card
+from django import db
 
 import logging
 logging.basicConfig(level=logging.DEBUG,
@@ -56,6 +58,9 @@ class ReaderRFID:
     def is_open(self):
         return self.port.isOpen()
 
+    def close(self):
+        self.port.close()
+
     def hex(self, symbol):
         return '%02X' % ord(symbol)
 
@@ -69,6 +74,8 @@ class ReaderRFID:
         return res
 
     def wait(self):
+        cache = { 'card': None, 'time': datetime.now() }
+        period = timedelta(seconds=3)
         buffer = []
         while True:
             symbol = self.port.read(1)
@@ -77,13 +84,22 @@ class ReaderRFID:
             else:
                 if '0A' == self.hex(self.port.read(1)):
                     if len(buffer) == 9:
-                        logging.debug(
-                            'RFID is %s \t Dump is %s \t Checksum is %s' % (
-                                ''.join(buffer), 
-                                ' '.join([self.hex(s) for s in buffer]),
-                                self.checksum(buffer[1:])
-                                )
-                            )
+                        # use cache if possible
+                        if datetime.now() - period > cache['time']:
+                            record = Card(code=''.join(buffer[1:]))
+                            record.save()
+                            cache.update( { 'card': buffer[1:], 'time': datetime.now() } )
+                            if settings.DEBUG:
+                                logging.debug(
+                                    'RFID is %s \t Dump is %s \t Checksum is %s' % (
+                                        ''.join(buffer), 
+                                        ' '.join([self.hex(s) for s in buffer]),
+                                        self.checksum(buffer[1:])
+                                        )
+                                    )
+                        else:
+                            if settings.DEBUG:
+                                logging.debug('Use cache data.')
                     buffer = []
 
 if __name__ == '__main__':
@@ -94,7 +110,6 @@ if __name__ == '__main__':
         else:
             sys.exit(1)
     except KeyboardInterrupt:
-        # FIXME: close port
-        pass
+        reader.close()
 
 sys.exit(0)
