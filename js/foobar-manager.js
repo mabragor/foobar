@@ -22,7 +22,9 @@ Ext.onReady(function() {
             m.slideIn('t').pause(2).ghost("t", {remove:true});
         }
     }();
-
+    Ext.Ajax.on('requestexception', function(){
+        Ext.ux.msg('Failure', 'Ajax communication failed', Ext.Msg.ERROR);
+    }, this);
     // This form shows information about current client. Manager may check
     // client's data, add new courses to client account, take subcharge
     // from him.
@@ -116,7 +118,8 @@ Ext.onReady(function() {
                     items: {
                         xtype: 'ext:ux:user-courses',
                         store: course_store,
-                        del_course_url: URLS.del_user_course
+                        del_course_url: URLS.del_user_course,
+                        add_course_url: URLS.add_user_course
                     }
                 }]
             },{
@@ -134,6 +137,7 @@ Ext.onReady(function() {
         success: function(response) {
             var json = Ext.util.JSON.decode(response.responseText);
             var form = client_form.getForm().setValues(json);
+            course_store.user_rfid_code = json.rfid_code;
             course_store.load({params: {rfid_code: json.rfid_code}});
         },
         failure: function() {

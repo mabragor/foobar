@@ -30,9 +30,6 @@ function Timer(options){
                 }else{
                     self.updateTime(time);
                 }
-            },
-            failure: function(){
-                Ext.ux.msg('Failure', 'Ajax communication failed', Ext.Msg.ERROR);
             }
         });
     };

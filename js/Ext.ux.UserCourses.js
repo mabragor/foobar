@@ -34,15 +34,46 @@ Ext.ux.UserCourses = Ext.extend(Ext.ListView, {
         new Ext.dd.DropTarget(this.ownerCt.getEl(), {
             ddGroup:'t2schedule',
             notifyDrop:function(dd, e, node) {
+                this.addCourse(node.node);
+                /*
                 var store = this.getStore();
-                var r = new store.recordType({title: node.node.text, count: 8, course_id: node.node.id});
+                var r = new store.recordType({title: node.node.text, count: 8, course_id: node.node.id, deleteable: true});
                 store.insert(0, r);
+                this.addDeleteButtonHandler();*/
                 return true;
             }.createDelegate(this)//notifyDrop
         });//Ext.dd.DropTarget
     },
+    addCourse: function(course){
+        Ext.Ajax.request({
+            url: this.add_course_url,
+            method: 'POST',
+            params: {
+                rfid_code: this.getStore().user_rfid_code,
+                course: course.id
+            },
+            success: function(response){
+                var result = Ext.util.JSON.decode(response.responseText);
+                if (result.success){
+                    var store = this.getStore();
+                    var r = new store.recordType(result.data, result.data[store.idProperty]);
+                    store.insert(0, r);
+                    this.addDeleteButtonHandler();
+                }else{
+                    Ext.ux.msg(result.errors, '', Ext.Msg.WARNING);
+                }
+            },
+            scope: this
+        });
+    },
     refresh: function(){
         Ext.ux.UserCourses.superclass.refresh.call(this);
+        this.addDeleteButtonHandler();/*
+        Ext.each(Ext.DomQuery.select('div.delete-user-course'), function(item){
+             Ext.get(item).on('click', this.clickDelButton, this)
+        }, this);*/
+    },
+    addDeleteButtonHandler: function(){
         Ext.each(Ext.DomQuery.select('div.delete-user-course'), function(item){
              Ext.get(item).on('click', this.clickDelButton, this)
         }, this);
@@ -61,9 +92,6 @@ Ext.ux.UserCourses = Ext.extend(Ext.ListView, {
                        }else{
                            Ext.ux.msg('Failure', data.msg, Ext.Msg.WARNING);
                        }
-                   },
-                   failure: function(){
-                       Ext.ux.msg('Failure', 'Ajax communication failed', Ext.Msg.ERROR);
                    },
                    params: { id: $record.id }
                 });

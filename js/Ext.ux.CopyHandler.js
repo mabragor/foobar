@@ -93,10 +93,7 @@ Ext.ux.CopyHandler = Ext.extend(Ext.Window, {
                     }else{
                         Ext.ux.msg('Error.', result.errors, Ext.Msg.WARNING);
                     }
-                }).createDelegate(this),
-                failure: function(){
-                    Ext.ux.msg('Failure', 'Ajax communication failed', Ext.Msg.ERROR);
-                }
+                }).createDelegate(this)
             });
         }
     },

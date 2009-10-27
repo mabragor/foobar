@@ -329,22 +329,13 @@ Ext.ux.StatusWindow = Ext.extend(Ext.Window, {
         Ext.Ajax.request({
              url: form.urls.get_unstatus_event,
              method: 'POST',
-             failure: function(form, action) {
-                 switch (action.failureType) {
-                     case Ext.form.Action.CONNECT_FAILURE:
-                         Ext.ux.msg('Failure', 'Ajax communication failed', Ext.Msg.ERROR);
-                         break;
-                     case Ext.form.Action.SERVER_INVALID:
-                         Ext.ux.msg('Failure', action.result.errors, Ext.Msg.ERROR);
-                         break;
-                }
-                this.hide();
-             },//failure
              success: function(response){
                  var result = Ext.util.JSON.decode(response.responseText);
                  if(result.success){
                      this.show();
                      this.get(0).getForm().setValues(result.data);
+                 }else{
+                     this.hide();
                  }
              },//success
              scope: this

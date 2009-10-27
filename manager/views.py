@@ -8,7 +8,7 @@ from lib.decorators import ajax_processor
 from django.shortcuts import get_object_or_404
 from lib import DatetimeJSONEncoder
 from lib.decorators import render_to
-from forms import ScheduleForm, UserRFID, StatusForm, CopyForm
+from forms import ScheduleForm, UserRFID, StatusForm, CopyForm, UserCardForm
 
 from storage.models import Schedule, Room, Group, Client, Card, Coach
 
@@ -113,6 +113,20 @@ def ajax_del_user_couse(request):
         else:
             return {'result': False, 'msg': 'Course is undeleteable.'}
     return {'result': False, 'msg': 'Incorect request type.'}
+
+@ajax_processor()
+def ajax_add_user_course(request):
+    output = {}
+    if request.method == 'POST':
+        form = UserCardForm(request.POST)
+        if form.is_valid():
+            obj = form.save()
+            output['success'] = True
+            output['data'] = obj.get_info()
+        else:
+            output['success'] = False
+            output['errors'] = form.get_errors()
+    return output
 
 @ajax_processor()
 def ajax_get_coach_list(request):
