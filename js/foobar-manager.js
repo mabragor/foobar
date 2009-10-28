@@ -25,48 +25,6 @@ Ext.onReady(function() {
     Ext.Ajax.on('requestexception', function(){
         Ext.ux.msg('Failure', 'Ajax communication failed', Ext.Msg.ERROR);
     }, this);
-    // This form shows information about current client. Manager may check
-    // client's data, add new courses to client account, take subcharge
-    // from him.
-    var client_form = new Ext.form.FormPanel({
-        standardSubmit: true,
-        labelWidth: 100,
-        frame: false,
-        defaults: {
-            style: {width: '100%'}
-        },
-        items:[
-            new Ext.form.TextField({ name: 'first_name', fieldLabel: 'First name', allowBlank: false }),
-            new Ext.form.TextField({ name: 'last_name', fieldLabel: 'Last name', allowBlank: false }),
-            new Ext.form.TextField({ name: 'email', fieldLabel: 'E-mail', allowBlank: false })
-        ],
-        buttons: [
-            { text: 'Surchange', handler: function() {} },
-            { text: 'Assign', handler: function() {} },
-            { text: 'Apply', handler: function() {} },
-        ]
-    });
-
-    var course_store = new Ext.data.JsonStore({
-        storeId: 'UserCourses',
-        //autoLoad: true,
-        autoDestroy: true, // destroy store when the component the store is bound to is destroyed
-        root: 'courses', // get data from this key
-        idProperty: 'id',
-        fields: [
-            {name: 'id', type: 'int'},
-            'title',
-            {name: 'reg_date', type: 'date'},
-            {name: 'exp_date', type: 'date'},
-            {name: 'count', type: 'int'},
-            {name: 'course_id', type: 'int'},
-            {name: 'deleteable', type: 'boolean'}
-        ],
-        proxy: new Ext.data.HttpProxy({
-            method: 'POST',
-            url: URLS.get_user_courses
-        })
-    });
 
     var panel = new Ext.Viewport({
         title: Ext.getDom('page-title').innerHTML,
@@ -98,55 +56,18 @@ Ext.onReady(function() {
                 pack  : 'start'
             },
             items: [{
-                title: 'Information',
-                //region: 'north',
-                frame: true,
-                border: false,
-                padding: 4,
-                tbar: [ {text: 'Client', iconCls: 'icon-info', handler: function() {}},
-                        {text: 'Search', iconCls: 'icon-info', handler: function() {}},
-                        {text: 'Add new',iconCls: 'icon-plus', handler: function() {}} ],
-                items: [
-                client_form,
-                {
-                    frame: false,
-                    border: false,
-                    height: 60,
-                    flex: 1,
-                    margins: '1 0 0 0',
-                    autoScroll: true,
-                    items: {
-                        xtype: 'ext:ux:user-courses',
-                        store: course_store,
-                        del_course_url: URLS.del_user_course,
-                        add_course_url: URLS.add_user_course
-                    }
-                }]
+                xtype: 'ext:ux:user-panel',
+                URLS: {
+                    get_user_courses: URLS.get_user_courses,
+                    del_user_course: URLS.del_user_course,
+                    add_user_course: URLS.add_user_course,
+                    get_user_data: '/ajax/rfid/'
+                }
             },{
                 xtype: 'ext:ux:course-panel',
                 dataUrl: URLS.get_course_tree
             }]
         }]
-    });
-
-    var conn = new Ext.data.Connection();
-    conn.request({
-        url: '/ajax/rfid/',
-        method: 'POST',
-        params: {},
-        success: function(response) {
-            var json = Ext.util.JSON.decode(response.responseText);
-            var form = client_form.getForm().setValues(json);
-	    var card = json.rfid_code;
-	    console.log(card)
-	    if (card != '00000000') {
-		course_store.user_rfid_code = card;
-		course_store.load({params: {rfid_code: card}});
-	    }
-        },
-        failure: function() {
-            alert('RFID reading failed');
-        }
     });
 
     new Timer({
