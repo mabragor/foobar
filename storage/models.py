@@ -127,6 +127,8 @@ class Card(models.Model):
     def deleteable(self):
         if self.reg_date <= datetime.now() - timedelta(days=1):
             return False
+        if self.action_set.count():
+            return False
         return True
 
     def get_info(self):

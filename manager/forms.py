@@ -69,7 +69,7 @@ class UserCardForm(forms.ModelForm):
 
     class Meta:
         model = Card
-        exclude = ('reg_date', 'exp_date', 'count', 'client')
+        exclude = ('reg_date', 'exp_date', 'client')
 
     def clean_rfid_code(self):
         rfid = self.cleaned_data['rfid_code']
@@ -84,7 +84,6 @@ class UserCardForm(forms.ModelForm):
         obj = super(UserCardForm, self).save(commit=False)
         obj.client = self.cleaned_data['client']
         obj.exp_date = datetime.now() + timedelta(days=30)
-        obj.count = 8
         obj.save(commit)
         return obj
 
