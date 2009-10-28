@@ -29,30 +29,39 @@ Ext.ux.UserPanel = Ext.extend(Ext.Panel, {
         Ext.ux.UserPanel.superclass.afterRender.call(this);
         this.loadUserData();
     },
+    _initMonitoring: function(){
+
+    },
     loadUserData: function(){
         Ext.Ajax.request({
             url: this.URLS.get_user_data,
             method: 'POST',
             success: function(response) {
                 var json = Ext.util.JSON.decode(response.responseText);
-                this.client_form.getForm().setValues(json);
-                var card = json.rfid_code;
-                console.log(card)
-                if (card != '00000000') {
-                    this.course_store.user_rfid_code = card;
-                    this.course_store.load({params: {rfid_code: card}});
+                this.card = json.rfid_code;
+                if (this.card != '00000000') {
+                    this.client_form.getForm().setValues(json);
+                    this.course_store.user_rfid_code = this.card;
+                    this.course_store.setBaseParam('rfid_code', this.card);
+                    this.course_store.load();
+                }else{
+                    this.client_form.getForm().reset();
+                    this.course_store.user_rfid_code = null;
+                    this.course_store.baseParams = {};
+                    this.course_store.removeAll();
                 }
             },
             scope: this
         });
     },
-    getCourseStore: function(){
+    _createCourseStore: function(){
         this.course_store = new Ext.data.JsonStore({
             storeId: 'UserCourses',
             //autoLoad: true,
             autoDestroy: true, // destroy store when the component the store is bound to is destroyed
             root: 'courses', // get data from this key
             idProperty: 'id',
+            user_rfid_code: null,
             fields: [
                 {name: 'id', type: 'int'},
                 'title',
@@ -70,7 +79,7 @@ Ext.ux.UserPanel = Ext.extend(Ext.Panel, {
         return this.course_store;
     },
     _createUserCoursesPanel: function(){
-        return new Ext.Panel({
+        this.user_courses = new Ext.Panel({
             frame: false,
             border: false,
             height: 60,
@@ -79,11 +88,12 @@ Ext.ux.UserPanel = Ext.extend(Ext.Panel, {
             autoScroll: true,
             items: {
                 xtype: 'ext:ux:user-courses',
-                store: this.getCourseStore(),
+                store: this._createCourseStore(),
                 del_course_url: this.URLS.del_user_course,
                 add_course_url: this.URLS.add_user_course
             }
         });
+        return this.user_courses;
     },
     _createUserForm: function(){
         this.client_form = new Ext.form.FormPanel({

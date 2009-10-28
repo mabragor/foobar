@@ -78,16 +78,14 @@ Ext.ux.UserCourses = Ext.extend(Ext.ListView, {
         new Ext.dd.DropTarget(this.ownerCt.getEl(), {
             ddGroup:'t2schedule',
             notifyDrop:function(dd, e, node) {
-                this.add_window.node = node.node;
-                this.add_window.setTitle(node.node.text);
-                this.add_window.show();
-                //this.addCourse(node.node);
-                /*
-                var store = this.getStore();
-                var r = new store.recordType({title: node.node.text, count: 8, course_id: node.node.id, deleteable: true});
-                store.insert(0, r);
-                this.addDeleteButtonHandler();*/
-                return true;
+                if (this.getStore().user_rfid_code){
+                    this.add_window.node = node.node;
+                    this.add_window.setTitle(node.node.text);
+                    this.add_window.show();
+                    return true;
+                }else{
+                    return false;
+                }
             }.createDelegate(this)//notifyDrop
         });//Ext.dd.DropTarget
     },
