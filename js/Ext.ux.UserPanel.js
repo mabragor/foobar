@@ -9,7 +9,7 @@ Ext.ux.UserPanel = Ext.extend(Ext.Panel, {
         add_user_course: null,
         get_user_data: null
     },
-    interval: 5,
+    interval: 500,
     initComponent: function(){
 
         var config = {
@@ -72,7 +72,8 @@ Ext.ux.UserPanel = Ext.extend(Ext.Panel, {
                 {name: 'exp_date', type: 'date'},
                 {name: 'count', type: 'int'},
                 {name: 'course_id', type: 'int'},
-                {name: 'deleteable', type: 'boolean'}
+                {name: 'deleteable', type: 'boolean'},
+                {name: 'is_old', type: 'boolean'}
             ],
             proxy: new Ext.data.HttpProxy({
                 method: 'POST',

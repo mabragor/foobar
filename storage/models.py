@@ -131,6 +131,9 @@ class Card(models.Model):
             return False
         return True
 
+    def is_old(self):
+        return self.exp_date < datetime.now()
+
     def get_info(self):
         return {
             'id': self.pk,
@@ -139,7 +142,8 @@ class Card(models.Model):
             'reg_date': self.reg_date,
             'exp_date': self.exp_date,
             'count': self.count,
-            'deleteable': self.deleteable()
+            'deleteable': self.deleteable(),
+            'is_old': self.is_old()
         }
 
 class Schedule(models.Model):

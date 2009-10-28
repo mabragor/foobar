@@ -3,6 +3,18 @@ Ext.ux.UserCourses = Ext.extend(Ext.ListView, {
     frame: true,
     border: false,
     loadingText: 'loading',
+    tpl: new Ext.XTemplate(
+        '<tpl for="rows">',
+            '<dl <tpl if="is_old">class="old-user-course"</tpl>>',
+                '<tpl for="parent.columns">',
+                '<dt style="width:{width}%;text-align:{align};"><em unselectable="on">',
+                    '{[values.tpl.apply(parent)]}',
+                '</em></dt>',
+                '</tpl>',
+                '<div class="x-clear"></div>',
+            '</dl>',
+        '</tpl>'
+    ),
     columns: [{
         header: 'Title',
         width: .41,
