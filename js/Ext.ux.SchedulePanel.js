@@ -163,7 +163,7 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
                          url: form.urls.save_event_status,
                          success: function(form, action){
                             action.result.msg && Ext.ux.msg(action.result.msg, '', Ext.MessageBox.INFO);
-                            form.load_event(function(){}, Ext.getCmp('status_window'))
+                            Ext.getCmp('status_window').show_window();
                          },
                          failure: function(form, action){
                             switch (action.failureType) {
