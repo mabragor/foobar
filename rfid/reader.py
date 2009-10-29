@@ -77,6 +77,7 @@ class ReaderRFID:
         cache = { 'card': None, 'time': datetime.now() }
         period = timedelta(seconds=3)
         buffer = []
+        allow_cache_logging = True
         while True:
             symbol = self.port.read(1)
             if not self.hex(symbol) == '0D':
@@ -97,9 +98,11 @@ class ReaderRFID:
                                         self.checksum(buffer[1:])
                                         )
                                     )
+                                allow_cache_logging = True
                         else:
-                            if settings.DEBUG:
+                            if settings.DEBUG and allow_cache_logging:
                                 logging.debug('Use cache data.')
+                                allow_cache_logging = False
                     buffer = []
 
 if __name__ == '__main__':
