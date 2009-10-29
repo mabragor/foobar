@@ -10,19 +10,6 @@ from storage.models import Client
 from rfid.forms import GetRfidCode
 from rfid.models import Card
 
-def rfid_reader(): 
-    if settings.DEBUG:
-        codes = settings.DEMO_CODES
-        index = random.randint(0, len(codes) - 1)
-        return codes[index][:8]
-    else:
-        last_card = Card.object.all()[:1]
-        print last_card
-        if datetime.now() - timedelta(seconds=3) < last_card.reg_date:
-            return last_card.code
-        else:
-            return '00000000'
-
 @ajax_processor(GetRfidCode)
 def info_by_rfid(request, form):
     """
@@ -41,9 +28,21 @@ def info_by_rfid(request, form):
     except Client.DoesNotExist:
         return {}
 
+def rfid_reader():
+    if False: #settings.DEBUG:
+        codes = settings.DEMO_CODES
+        index = random.randint(0, len(codes) - 1)
+        return codes[index][:8]
+    else:
+        last_card = Card.objects.all().order_by('-reg_date')[0]
+        if datetime.now() - timedelta(seconds=5) < last_card.reg_date:
+            return last_card.code
+        else:
+            return '00000000'
+
 def is_valid(rfid_response):
-    """ 
-    This function is used to validate the RFID reader response. 
+    """
+    This function is used to validate the RFID reader response.
     @return: Boolean
     """
     code = rfid_response[:8]

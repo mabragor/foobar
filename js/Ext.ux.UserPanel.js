@@ -9,7 +9,7 @@ Ext.ux.UserPanel = Ext.extend(Ext.Panel, {
         add_user_course: null,
         get_user_data: null
     },
-    interval: 500,
+    interval: 5,
     initComponent: function(){
 
         var config = {
@@ -42,6 +42,7 @@ Ext.ux.UserPanel = Ext.extend(Ext.Panel, {
                 var json = Ext.util.JSON.decode(response.responseText);
                 if (json.rfid_code == this.card) return;
                 this.card = json.rfid_code;
+		if (! this.card) return; // dirty hack
                 if (this.card != '00000000') {
                     this.client_form.getForm().setValues(json);
                     this.course_store.user_rfid_code = this.card;
