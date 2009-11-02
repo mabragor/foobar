@@ -108,7 +108,8 @@ class QtSchedule(QtGui.QTableView):
             i += 2
 
     def datetime2rowcol(self, dt):
-        row = dt.hour - self.work_hours[0]
+        multiplier = timedelta(hours=1).seconds / self.quant.seconds
+        row = (dt.hour - self.work_hours[0]) * multiplier
         col = dt.weekday()
         return (row, col)
 
@@ -181,7 +182,7 @@ class MainWindow(QtGui.QMainWindow):
                                       timedelta(hours=1),
                                       'First'))
         self.schedule.set_event('blue',
-                                Event(datetime(2009,11,2,12),
+                                Event(datetime(2009,11,2,11),
                                       timedelta(hours=1, minutes=30),
                                       'Second'))
         self.schedule.set_event('green',
