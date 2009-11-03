@@ -33,6 +33,8 @@ class QtScheduleDelegate(QtGui.QItemDelegate):
         cells = self.parent.cells
         rooms = self.parent.rooms
         count = self.parent.room_count()
+        dx = self.parent.scrolledCellX
+        dy = self.parent.scrolledCellY
 
         row = index.row()
         col = index.column()
@@ -42,9 +44,9 @@ class QtScheduleDelegate(QtGui.QItemDelegate):
                 # заполняем тело события
                 w = option.rect.width() / count
                 h = option.rect.height()
-                x = col * (option.rect.width() + 1) + \
+                x = (dx + col) * (option.rect.width() + 1) + \
                     w * map(lambda x: x[0] == key, rooms).index(True)
-                y = row * (option.rect.height() + 1)
+                y = (dy + row) * (option.rect.height() + 1)
                 painter.fillRect(x, y, w, h, getattr(QtCore.Qt, key));
                 # готовимся рисовать границы
                 pen = QtGui.QPen(QtCore.Qt.black)
@@ -72,6 +74,8 @@ class QtSchedule(QtGui.QTableView):
 
         self.events = {}
         self.cells = {}
+        self.scrolledCellX = 0
+        self.scrolledCellY = 0
 
         self.rooms = [('red', '#ffaaaa'), ('green', '#aaffaa'), ('blue', '#aaaaff')]
 
@@ -156,7 +160,8 @@ class QtSchedule(QtGui.QTableView):
 
             if (cell_row, cell_col) not in self.cells:
                 # создаём
-                self.cells.update( { (cell_row, cell_col): { room: (event_id, cell_type) } } )
+                self.cells.update( { (cell_row, cell_col):
+                                     { room: (event_id, cell_type) } } )
             else:
                 # добавляем
                 eventdict = self.cells[ (cell_row, cell_col) ]
@@ -166,6 +171,15 @@ class QtSchedule(QtGui.QTableView):
     def get_events(self):
         return self.events
 
+    def scrollContentsBy(self, dx, dy):
+        """ Обработчик скроллинга, см. QAbstractScrollArea. Накапливаем
+        скроллинг по осям, в качестве единицы измерения используется
+        ячейка. """
+        if dx != 0:
+            self.scrolledCellX += dx
+        if dy != 0:
+            self.scrolledCellY += dy
+        QtGui.QTableView.scrollContentsBy(self, dx, dy)
 
 class MainWindow(QtGui.QMainWindow):
 
@@ -193,6 +207,10 @@ class MainWindow(QtGui.QMainWindow):
                                 Event(datetime(2009,11,3,12),
                                       timedelta(hours=1),
                                       'Third'))
+        self.schedule.set_event('red',
+                                Event(datetime(2009,11,2,16),
+                                      timedelta(hours=2),
+                                      'First'))
         print self.schedule.get_events()
 
     def setup_view(self):
