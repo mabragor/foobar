@@ -181,6 +181,11 @@ class QtSchedule(QtGui.QTableView):
             self.scrolledCellY += dy
         QtGui.QTableView.scrollContentsBy(self, dx, dy)
 
+    def setSelection(self, rect, flags):
+        """ Переопределяя этот метод базового класса, мы запрещаем выделение
+        ячеек таблицы. """
+        pass
+
 class MainWindow(QtGui.QMainWindow):
 
     def __init__(self, parent=None):
