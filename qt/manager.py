@@ -85,6 +85,9 @@ class QtSchedule(QtGui.QTableView):
         self.setup_model()
         self.setModel(self.model)
 
+        # Запрещаем выделение ячеек
+        self.setSelectionMode(QtGui.QAbstractItemView.NoSelection)
+
         self.viewport().setAttribute(QtCore.Qt.WA_Hover);
 
         delegate = QtScheduleDelegate(self)
@@ -180,11 +183,6 @@ class QtSchedule(QtGui.QTableView):
         if dy != 0:
             self.scrolledCellY += dy
         QtGui.QTableView.scrollContentsBy(self, dx, dy)
-
-    def setSelection(self, rect, flags):
-        """ Переопределяя этот метод базового класса, мы запрещаем выделение
-        ячеек таблицы. """
-        pass
 
 class MainWindow(QtGui.QMainWindow):
 
