@@ -85,6 +85,10 @@ class QtSchedule(QtGui.QTableView):
         self.setup_model()
         self.setModel(self.model)
 
+        # Запрещаем изменение размеров ячейки
+        self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
+        self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
+
         # Запрещаем выделение ячеек
         self.setSelectionMode(QtGui.QAbstractItemView.NoSelection)
 
