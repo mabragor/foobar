@@ -18,15 +18,6 @@ class Event(object):
     def __unicode__(self):
         return self.course
 
-class DragEvent(QtGui.QWidget):
-
-    def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
-
-    def mousePressEvent(self, event):
-        print 'drag event press', event
-
-
 class QtScheduleDelegate(QtGui.QItemDelegate):
 
     """ Делегат для ячеек расписания. """
@@ -34,9 +25,6 @@ class QtScheduleDelegate(QtGui.QItemDelegate):
     def __init__(self, parent=None):
         QtGui.QItemDelegate.__init__(self, parent)
         self.parent = parent
-
-    def mousePressEvent(self, event):
-        print 'mouse press', event
 
     def paint(self, painter, option, index):
         """ Метод для отрисовки ячейки. """
@@ -97,18 +85,19 @@ class QtSchedule(QtGui.QTableView):
         self.setup_model()
         self.setModel(self.model)
 
+        # Запрещаем выделение множества ячеек
+        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+
         # Разрешаем принимать DnD
-        self.setAcceptDrops(True)
+        self.setDragEnabled(True)
+        self.viewport().setAcceptDrops(True)
+        self.setDropIndicatorShown(True)
 
         # Запрещаем изменение размеров ячейки
         self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
         self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
 
-        # Запрещаем выделение ячеек
-        self.setSelectionMode(QtGui.QAbstractItemView.NoSelection)
-
-        self.viewport().setAttribute(QtCore.Qt.WA_Hover);
-
+        # Назначаем делегата для ячеек
         delegate = QtScheduleDelegate(self)
         self.setItemDelegate(delegate)
 
@@ -197,20 +186,12 @@ class QtSchedule(QtGui.QTableView):
         """ Обработчик скроллинга, см. QAbstractScrollArea. Накапливаем
         скроллинг по осям, в качестве единицы измерения используется
         ячейка. """
+        # см. QAbstractItemView.ScrollMode
         if dx != 0:
             self.scrolledCellX += dx
         if dy != 0:
             self.scrolledCellY += dy
         QtGui.QTableView.scrollContentsBy(self, dx, dy)
-
-    def dragEnterEvent(self, event):
-        print 'enter', event
-
-    def dragMoveEvent(self, event):
-        print 'move', event
-
-    def dragDropEvent(self, event):
-        print 'drop', event
 
 class MainWindow(QtGui.QMainWindow):
 
@@ -252,6 +233,14 @@ class MainWindow(QtGui.QMainWindow):
         splitter.addWidget(self.schedule)
 
         self.setCentralWidget(splitter)
+
+    # Drag'n'Drop section begins
+    def mousePressEvent(self, event):
+        print 'press event', event.button()
+
+    def mouseMoveEvent(self, event):
+        print 'move event', event.pos()
+    # Drag'n'Drop section ends
 
 if __name__=="__main__":
     app = QtGui.QApplication(sys.argv)
