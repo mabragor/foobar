@@ -18,6 +18,15 @@ class Event(object):
     def __unicode__(self):
         return self.course
 
+class DragEvent(QtGui.QWidget):
+
+    def __init__(self, parent=None):
+        QtGui.QWidget.__init__(self, parent)
+
+    def mousePressEvent(self, event):
+        print 'drag event press', event
+
+
 class QtScheduleDelegate(QtGui.QItemDelegate):
 
     """ Делегат для ячеек расписания. """
@@ -25,6 +34,9 @@ class QtScheduleDelegate(QtGui.QItemDelegate):
     def __init__(self, parent=None):
         QtGui.QItemDelegate.__init__(self, parent)
         self.parent = parent
+
+    def mousePressEvent(self, event):
+        print 'mouse press', event
 
     def paint(self, painter, option, index):
         """ Метод для отрисовки ячейки. """
@@ -84,6 +96,9 @@ class QtSchedule(QtGui.QTableView):
         self.quant = quant
         self.setup_model()
         self.setModel(self.model)
+
+        # Разрешаем принимать DnD
+        self.setAcceptDrops(True)
 
         # Запрещаем изменение размеров ячейки
         self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
@@ -187,6 +202,15 @@ class QtSchedule(QtGui.QTableView):
         if dy != 0:
             self.scrolledCellY += dy
         QtGui.QTableView.scrollContentsBy(self, dx, dy)
+
+    def dragEnterEvent(self, event):
+        print 'enter', event
+
+    def dragMoveEvent(self, event):
+        print 'move', event
+
+    def dragDropEvent(self, event):
+        print 'drop', event
 
 class MainWindow(QtGui.QMainWindow):
 
