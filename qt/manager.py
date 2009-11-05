@@ -32,7 +32,7 @@ class QtScheduleDelegate(QtGui.QItemDelegate):
         events = self.parent.events
         cells = self.parent.cells
         rooms = self.parent.rooms
-        count = self.parent.room_count()
+        count = len(self.rooms)
         dx = self.parent.scrolledCellX
         dy = self.parent.scrolledCellY
 
@@ -138,9 +138,6 @@ class QtSchedule(QtGui.QTableView):
     def room_color(self, room_name):
         return filter(lambda x: x[0].lower() == room_name.lower(),
                       self.rooms)[0][1]
-
-    def room_count(self):
-        return len(self.rooms)
 
     def fill_cells(self, row, col, cell_count):
         """ Метод генерирует список ячеек для события, указывая их тип. """
