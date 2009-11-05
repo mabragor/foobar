@@ -48,9 +48,12 @@ class ScheduleForm(forms.ModelForm):
         room = self.cleaned_data['room']
         begin = self.cleaned_data.get('begin')
         course = self.cleaned_data['course']
+
         if room and begin and course:
             end = begin + timedelta(hours=course.duration)
             result = Schedule.objects.select_related().filter(room=room).filter(begin__day=begin.day)
+            if self.instance.pk:
+                result = result.exclude(pk=self.instance.pk)
 
             for item in result:
                 if (begin < item.end < end) or (begin <= item.begin < end):
@@ -109,7 +112,6 @@ class CopyForm(forms.Form):
 
     def clean_to_date(self):
         to_date = self.validate_date(self.cleaned_data['to_date'])
-        print to_date
         if to_date < date.today():
             raise forms.ValidationError('Can not paste events into the past.')
         if Schedule.objects.filter(begin__range=(to_date, to_date+timedelta(days=7))).count():
