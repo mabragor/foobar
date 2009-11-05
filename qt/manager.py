@@ -202,10 +202,18 @@ class QtSchedule(QtGui.QTableView):
             mimeData = QtCore.QMimeData()
             mimeData.setText(plainText)
 
-            pixmap = QtGui.QPixmap(100, 100)
+            pixmap = QtGui.QPixmap(100, 60)
             pixmap.fill(QtCore.Qt.white)
             painter = QtGui.QPainter(pixmap)
-            painter.fillRect(10,10,90,90, QtCore.Qt.red)
+            painter.fillRect(2,2,96,56, QtCore.Qt.gray)
+
+            # готовимся рисовать границы
+            pen = QtGui.QPen(QtCore.Qt.black)
+            pen.setWidth(2)
+            painter.setPen(pen)
+            # отрисовываем элементы в зависимости от типа ячейки
+            painter.drawRect(0, 0, 100, 60)
+
             painter.end()
 
             drag = QtGui.QDrag(self)
