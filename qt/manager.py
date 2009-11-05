@@ -44,9 +44,9 @@ class QtScheduleDelegate(QtGui.QItemDelegate):
                 # заполняем тело события
                 w = option.rect.width() / count
                 h = option.rect.height()
-                x = (dx + col) * (option.rect.width() + 1) + \
+                x = dx + col * (option.rect.width() + 1) + \
                     w * map(lambda x: x[0] == key, rooms).index(True)
-                y = (dy + row) * (option.rect.height() + 1)
+                y = dy + row * (option.rect.height() + 1)
                 painter.fillRect(x, y, w, h, getattr(QtCore.Qt, key));
                 # готовимся рисовать границы
                 pen = QtGui.QPen(QtCore.Qt.black)
@@ -96,6 +96,10 @@ class QtSchedule(QtGui.QTableView):
         # Запрещаем изменение размеров ячейки
         self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
         self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
+
+        # Скроллинг
+        self.setHorizontalScrollMode(QtGui.QAbstractItemView.ScrollPerPixel)
+        self.setVerticalScrollMode(QtGui.QAbstractItemView.ScrollPerPixel)
 
         # Назначаем делегата для ячеек
         delegate = QtScheduleDelegate(self)
@@ -196,7 +200,12 @@ class QtSchedule(QtGui.QTableView):
     def mousePressEvent(self, event):
         """ Обработчик нажатия кнопки мыши. Отрабатываем здесь DnD. """
         if event.button() == QtCore.Qt.LeftButton:
-            print event.pos()
+
+            delegate = self.itemDelegate()
+
+            point = event.pos()
+            print 'x=%i, y=%i' % (point.x(), point.y())
+
             plainText = QtCore.QString('test')
 
             mimeData = QtCore.QMimeData()
