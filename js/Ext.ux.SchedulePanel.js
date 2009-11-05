@@ -235,6 +235,7 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
         this.c_options.height = function(calendar) {
             return calendar.height();
         };
+        this.c_options.panel = this;
         this.calendar = $(this.body.dom).weekCalendar(this.c_options);
         this.ce_window.get(0).getForm().on('actioncomplete', function(form, action){
             this.ce_window.hide();
@@ -253,14 +254,21 @@ Ext.ux.SchedulePanel = Ext.extend(Ext.Panel, {
                         return false;
                     }
                     var start_date = $calendar.weekCalendar('getClickTime', e.getPageY() - this.el.getTop(), $(this.getEl()));
-                    var form = $self.ce_window.get(0).getForm();
+                    $self.ce_window.show();
+                    $self.ce_window.get(0).setValues({
+                        course_id: node.node.id,
+                        start_date: start_date,
+                        course_name: node.node.text
+                    });
+                    /*var form = $self.ce_window.get(0).getForm();
                     form.baseParams = {
                         course: node.node.id,
                         begin: start_date.format('Y-m-d H:i:s')
                     };
                     $self.ce_window.show();
                     form.findField('course_field').setValue(node.node.text);
-                    form.findField('day_field').setValue(start_date.format('Y-m-d H:i:s'));
+                    form.findField('day_field').setValue(start_date.format('Y-m-d H:i:s'));*/
+                    
                     return true;
                 }//notifyDrop
             });//Ext.dd.DropTarget
@@ -309,6 +317,16 @@ Ext.ux.CreateEventForm = Ext.extend(Ext.form.FormPanel, {
             case Ext.form.Action.SERVER_INVALID:
                 Ext.ux.msg('Failure', action.result.errors, Ext.Msg.ERROR);
        }
+    },
+    setValues: function(data){
+        var form = this.getForm();
+        form.baseParams = {
+            course: data.course_id,
+            begin: data.start_date.format('Y-m-d H:i:s')
+        };
+        data.event_id && (form.baseParams.event_id = data.event_id);
+        form.findField('course_field').setValue(data.course_name);
+        form.findField('day_field').setValue(data.start_date.format('Y-m-d H:i:s'));
     }
 
 });

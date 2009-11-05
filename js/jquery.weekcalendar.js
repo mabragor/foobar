@@ -267,7 +267,17 @@
         _setupEventDelegation: function() {
             var self = this;
             var options = this.options;
-            this.element.mouseover(function(event){
+            this.element.click(function(event) {
+                var $target = $(event.target);
+                if($target.data("preventClick")) {
+                    return;
+                }
+                if($target.hasClass("cal-event")) {
+                    options.eventClick.call(self, $target.data("calEvent"), $target, event);
+                } else if($target.parent().hasClass("cal-event")) {
+                    options.eventClick.call(self, $target.parent().data("calEvent"), $target.parent(), event);
+                }
+            }).mouseover(function(event){
                 var $target = $(event.target);
                 
                 if(self._isDraggingOrResizing($target)) {

@@ -48,6 +48,16 @@ var schedule_options = {
             }
         });
     },
+    eventClick: function(calEvent, $calEvent, event){
+        var ce_window = this.options.panel.ce_window;
+        ce_window.show();
+        ce_window.get(0).setValues({
+            course_id: calEvent.course,
+            start_date: calEvent.start,
+            course_name: calEvent.title,
+            event_id: calEvent.id
+        });
+    },
     eventDrop: function(calEvent, callback, revert_callback){
         var $options = this.options;
         $.ajax({

@@ -42,7 +42,10 @@ def ajax_get_user_courses(request, form):
 def ajax_add_event(request, pk=None):
     output = {}
     if request.method == 'POST':
-        form = ScheduleForm(request.POST)
+        if request.POST.get('event_id', None):
+            form = ScheduleForm(request.POST, instance=Schedule.objects.get(pk=request.POST.get('event_id')))
+        else:
+            form = ScheduleForm(request.POST)
         if form.is_valid():
             obj = form.save()
             output['success'] = True
