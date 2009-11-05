@@ -194,9 +194,9 @@ class QtSchedule(QtGui.QTableView):
         QtGui.QTableView.scrollContentsBy(self, dx, dy)
 
     def mousePressEvent(self, event):
-        """ Обработчик нажатия кнопки мыши. """
-        print 'qtableview: press event', event.button()
+        """ Обработчик нажатия кнопки мыши. Отрабатываем здесь DnD. """
         if event.button() == QtCore.Qt.LeftButton:
+            print event.pos()
             plainText = QtCore.QString('test')
 
             mimeData = QtCore.QMimeData()
