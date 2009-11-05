@@ -193,6 +193,30 @@ class QtSchedule(QtGui.QTableView):
             self.scrolledCellY += dy
         QtGui.QTableView.scrollContentsBy(self, dx, dy)
 
+    def mousePressEvent(self, event):
+        """ Обработчик нажатия кнопки мыши. """
+        print 'qtableview: press event', event.button()
+        if event.button() == QtCore.Qt.LeftButton:
+            plainText = QtCore.QString('test')
+
+            mimeData = QtCore.QMimeData()
+            mimeData.setText(plainText)
+
+            pixmap = QtGui.QPixmap(100, 100)
+            pixmap.fill(QtCore.Qt.white)
+            painter = QtGui.QPainter(pixmap)
+            painter.fillRect(10,10,90,90, QtCore.Qt.red)
+            painter.end()
+
+            drag = QtGui.QDrag(self)
+            drag.setMimeData(mimeData)
+            drag.setPixmap(pixmap)
+
+            drag.start()
+
+    def mouseMoveEvent(self, event):
+        print 'qtableview: move event', event.pos()
+
 class MainWindow(QtGui.QMainWindow):
 
     def __init__(self, parent=None):
