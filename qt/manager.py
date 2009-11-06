@@ -4,7 +4,8 @@
 
 import sys
 from datetime import datetime, timedelta
-from PyQt4 import QtGui, QtCore
+from PyQt4.QtGui import *
+from PyQt4.QtCore import *
 
 class Event(object):
 
@@ -18,12 +19,12 @@ class Event(object):
     def __unicode__(self):
         return self.course
 
-class QtScheduleDelegate(QtGui.QItemDelegate):
+class QtScheduleDelegate(QItemDelegate):
 
     """ Делегат для ячеек расписания. """
 
     def __init__(self, parent=None):
-        QtGui.QItemDelegate.__init__(self, parent)
+        QItemDelegate.__init__(self, parent)
         self.parent = parent
 
     def paint(self, painter, option, index):
@@ -32,7 +33,7 @@ class QtScheduleDelegate(QtGui.QItemDelegate):
         events = self.parent.events
         cells = self.parent.cells
         rooms = self.parent.rooms
-        count = len(self.rooms)
+        count = len(rooms)
         dx = self.parent.scrolledCellX
         dy = self.parent.scrolledCellY
 
@@ -47,9 +48,9 @@ class QtScheduleDelegate(QtGui.QItemDelegate):
                 x = dx + col * (option.rect.width() + 1) + \
                     w * map(lambda x: x[0] == key, rooms).index(True)
                 y = dy + row * (option.rect.height() + 1)
-                painter.fillRect(x, y, w, h, getattr(QtCore.Qt, key));
+                painter.fillRect(x, y, w, h, getattr(Qt, key));
                 # готовимся рисовать границы
-                pen = QtGui.QPen(QtCore.Qt.black)
+                pen = QPen(Qt.black)
                 pen.setWidth(2)
                 painter.setPen(pen)
                 # отрисовываем элементы в зависимости от типа ячейки
@@ -63,14 +64,14 @@ class QtScheduleDelegate(QtGui.QItemDelegate):
                 else:
                     pass
         painter.restore()
-        QtGui.QItemDelegate.paint(self, painter, option, index)
+        QItemDelegate.paint(self, painter, option, index)
 
-class QtSchedule(QtGui.QTableView):
+class QtSchedule(QTableView):
 
     """ Класс календаря. """
 
     def __init__(self, *args):
-        QtGui.QTableView.__init__(self, *args)
+        QTableView.__init__(self, *args)
 
         self.events = {}
         self.cells = {}
@@ -86,7 +87,7 @@ class QtSchedule(QtGui.QTableView):
         self.setModel(self.model)
 
         # Запрещаем выделение множества ячеек
-        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
 
         # Разрешаем принимать DnD
         self.setDragEnabled(True)
@@ -94,19 +95,19 @@ class QtSchedule(QtGui.QTableView):
         self.setDropIndicatorShown(True)
 
         # Запрещаем изменение размеров ячейки
-        self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
-        self.verticalHeader().setResizeMode(QtGui.QHeaderView.Fixed)
+        self.horizontalHeader().setResizeMode(QHeaderView.Fixed)
+        self.verticalHeader().setResizeMode(QHeaderView.Fixed)
 
         # Скроллинг
-        self.setHorizontalScrollMode(QtGui.QAbstractItemView.ScrollPerPixel)
-        self.setVerticalScrollMode(QtGui.QAbstractItemView.ScrollPerPixel)
+        self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
 
         # Назначаем делегата для ячеек
         delegate = QtScheduleDelegate(self)
         self.setItemDelegate(delegate)
 
     def setup_model(self):
-        self.model = QtGui.QStandardItemModel(
+        self.model = QStandardItemModel(
             self.work_hours[1] - self.work_hours[0],
             7)
         # horizontal labels
@@ -114,14 +115,14 @@ class QtSchedule(QtGui.QTableView):
                       self.tr('Wednesday'), self.tr('Thursday'),
                       self.tr('Friday'), self.tr('Saturday'),
                       self.tr('Sunday') ]
-        self.model.setHorizontalHeaderLabels(QtCore.QStringList(week_days))
+        self.model.setHorizontalHeaderLabels(QStringList(week_days))
         # vertical labels
         i = 0
         for chunk in xrange(self.work_hours[0], (self.work_hours[1] + 1)):
-            item = QtGui.QStandardItem()
+            item = QStandardItem()
             item.setText('%i:00' % (chunk),)
             self.model.setVerticalHeaderItem(i, item)
-            item = QtGui.QStandardItem()
+            item = QStandardItem()
             item.setText('%i:30' % (chunk),)
             self.model.setVerticalHeaderItem(i+1, item)
             i += 2
@@ -180,41 +181,51 @@ class QtSchedule(QtGui.QTableView):
                 eventdict.update( { room: (event_id, cell_type) } )
                 self.cells.update( { (cell_row, cell_col): eventdict } )
 
-    def get_events(self):
+    def get_events(self, ):
         return self.events
 
     def scrollContentsBy(self, dx, dy):
         """ Обработчик скроллинга, см. QAbstractScrollArea. Накапливаем
         скроллинг по осям, в качестве единицы измерения используется
-        ячейка. """
+        пиксел. """
         # см. QAbstractItemView.ScrollMode
         if dx != 0:
             self.scrolledCellX += dx
         if dy != 0:
             self.scrolledCellY += dy
-        QtGui.QTableView.scrollContentsBy(self, dx, dy)
+        QTableView.scrollContentsBy(self, dx, dy)
 
     def mousePressEvent(self, event):
         """ Обработчик нажатия кнопки мыши. Отрабатываем здесь DnD. """
-        if event.button() == QtCore.Qt.LeftButton:
+        if event.button() == Qt.LeftButton:
 
             delegate = self.itemDelegate()
 
-            point = event.pos()
-            print 'x=%i, y=%i' % (point.x(), point.y())
+            index = self.indexAt(event.pos())
+            row = index.row()
+            col = index.column()
+            x = event.x() - self.scrolledCellX
+            y = event.y() - self.scrolledCellY
+            w = self.columnWidth(index.column())
 
-            plainText = QtCore.QString('test')
+            print 'x=%i, y=%i' % (x, y)
+            print 'column width is', w
+            print self.columnViewportPosition(col)
+            print self.rowViewportPosition(row) - self.scrolledCellY
 
-            mimeData = QtCore.QMimeData()
+
+            plainText = QString('test')
+
+            mimeData = QMimeData()
             mimeData.setText(plainText)
 
-            pixmap = QtGui.QPixmap(100, 60)
-            pixmap.fill(QtCore.Qt.white)
-            painter = QtGui.QPainter(pixmap)
-            painter.fillRect(2,2,96,56, QtCore.Qt.gray)
+            pixmap = QPixmap(100, 60)
+            pixmap.fill(Qt.white)
+            painter = QPainter(pixmap)
+            painter.fillRect(2,2,96,56, Qt.gray)
 
             # готовимся рисовать границы
-            pen = QtGui.QPen(QtCore.Qt.black)
+            pen = QPen(Qt.black)
             pen.setWidth(2)
             painter.setPen(pen)
             # отрисовываем элементы в зависимости от типа ячейки
@@ -222,7 +233,7 @@ class QtSchedule(QtGui.QTableView):
 
             painter.end()
 
-            drag = QtGui.QDrag(self)
+            drag = QDrag(self)
             drag.setMimeData(mimeData)
             drag.setPixmap(pixmap)
 
@@ -231,10 +242,10 @@ class QtSchedule(QtGui.QTableView):
     def mouseMoveEvent(self, event):
         print 'qtableview: move event', event.pos()
 
-class MainWindow(QtGui.QMainWindow):
+class MainWindow(QMainWindow):
 
     def __init__(self, parent=None):
-        QtGui.QMainWindow.__init__(self, parent)
+        QMainWindow.__init__(self, parent)
 
         self.setup_view()
 
@@ -264,7 +275,7 @@ class MainWindow(QtGui.QMainWindow):
         print self.schedule.get_events()
 
     def setup_view(self):
-        splitter = QtGui.QSplitter()
+        splitter = QSplitter()
         self.schedule = QtSchedule(self)
         self.schedule.setup((8, 23), timedelta(minutes=30))
 
@@ -281,7 +292,7 @@ class MainWindow(QtGui.QMainWindow):
     # Drag'n'Drop section ends
 
 if __name__=="__main__":
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
