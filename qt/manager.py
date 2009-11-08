@@ -199,20 +199,17 @@ class QtSchedule(QTableView):
         """ Обработчик нажатия кнопки мыши. Отрабатываем здесь DnD. """
         if event.button() == Qt.LeftButton:
 
-            delegate = self.itemDelegate()
-
             index = self.indexAt(event.pos())
             row = index.row()
             col = index.column()
             x = event.x() - self.scrolledCellX
             y = event.y() - self.scrolledCellY
             w = self.columnWidth(index.column())
+            cx = self.columnViewportPosition(col) - self.scrolledCellX
+            cy = self.rowViewportPosition(row) - self.scrolledCellY
 
-            print 'x=%i, y=%i' % (x, y)
-            print 'column width is', w
-            print self.columnViewportPosition(col)
-            print self.rowViewportPosition(row) - self.scrolledCellY
-
+            event_index = (x - cx) / (w / len(self.rooms))
+            event_color = self.rooms[event_index][0]
 
             plainText = QString('test')
 
@@ -222,7 +219,7 @@ class QtSchedule(QTableView):
             pixmap = QPixmap(100, 60)
             pixmap.fill(Qt.white)
             painter = QPainter(pixmap)
-            painter.fillRect(2,2,96,56, Qt.gray)
+            painter.fillRect(2,2,96,56, getattr(Qt, event_color))
 
             # готовимся рисовать границы
             pen = QPen(Qt.black)
