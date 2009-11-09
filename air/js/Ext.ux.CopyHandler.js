@@ -3,7 +3,7 @@ Ext.ux.CopyHandler = Ext.extend(Ext.Window, {
     html: 'Chose week to paste. Week should be empty and in the future.',
     hidden: true,
     width: 250,
-    height: 100,
+    height: 150,
     border: false,
     constrainHeader: true,
     plain: true,

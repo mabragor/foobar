@@ -7,24 +7,29 @@ var schedule_options = {
     "businessHours": {"start": 8, "end": 18, "limitDisplay": true},
     /******************************/
     urls: URLS,
-    data: function(start, end, callback, extra_data) {
-        var $options = this.options;
-        var data = {
-            'start': Math.round(start.getTime()/1000),
-            'end': Math.round(end.getTime()/1000)
-        };
-        data = jQuery.extend(data, extra_data);
-        jQuery.ajax({
-            type: 'POST',
-            url: $options.urls.get_events,
-            dataType: 'json',
-            data: data,
-            error: function(){
-                alert('Ошибка сервера. Обновите страницу.')
-            },
-            success: callback
-        });
-    },
+    data: function(){
+        //make request var in closure in local scope
+        var request;
+        return function(start, end, callback, extra_data) {
+            var $options = this.options;
+            var data = {
+                'start': Math.round(start.getTime()/1000),
+                'end': Math.round(end.getTime()/1000)
+            };
+            data = jQuery.extend(data, extra_data);
+            request && request.abort();
+            request = jQuery.ajax({
+                type: 'POST',
+                url: $options.urls.get_events,
+                dataType: 'json',
+                data: data,
+                error: function(){
+                    alert('Ошибка сервера. Обновите страницу.')
+                },
+                success: callback
+            });
+        }
+    }(),
     allowCalEventOverlap : true,
     firstDayOfWeek : 1,
     region: 'center',
@@ -75,7 +80,7 @@ var schedule_options = {
         });
     },
     eventClick: function(calEvent, $calEvent, event){
-        if (calEvent.start > new Date.now()){
+        if (calEvent.start > Date.now()){
             var ce_window = this.options.panel.ce_window;
             ce_window.show();
             ce_window.get(0).setValues({

@@ -129,8 +129,9 @@ class CopyForm(forms.Form):
         from_date = self.cleaned_data.get('from_date')
         to_date = self.cleaned_data.get('to_date')
         events = Schedule.objects.filter(begin__range=(from_date, from_date+timedelta(days=7)))
+        delta = to_date - from_date
         for e in events:
             ne = Schedule(room=e.room, course=e.course)
-            ne.begin = e.begin+timedelta(days=7)
+            ne.begin = e.begin+delta
             ne.save()
 
