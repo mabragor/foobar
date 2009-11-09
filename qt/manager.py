@@ -195,6 +195,14 @@ class QtSchedule(QTableView):
             self.scrolledCellY += dy
         QTableView.scrollContentsBy(self, dx, dy)
 
+    def eventPresent(self, row, col, room):
+        """ Проверка наличия события в указанном месте. """
+        try:
+            event = self.cells[ (row, col) ][ room ]
+            return True
+        except:
+            return False
+
     def mousePressEvent(self, event):
         """ Обработчик нажатия кнопки мыши. Отрабатываем здесь DnD. """
         if event.button() == Qt.LeftButton:
@@ -211,6 +219,9 @@ class QtSchedule(QTableView):
             event_index = (x - cx) / (w / len(self.rooms))
             event_color = self.rooms[event_index][0]
 
+            if not self.eventPresent(row, col, event_color):
+                return
+
             plainText = QString('test')
 
             mimeData = QMimeData()
@@ -221,7 +232,6 @@ class QtSchedule(QTableView):
             painter = QPainter(pixmap)
             painter.fillRect(2,2,96,56, getattr(Qt, event_color))
 
-            # готовимся рисовать границы
             pen = QPen(Qt.black)
             pen.setWidth(2)
             painter.setPen(pen)
