@@ -115,6 +115,7 @@ Ext.ux.UserCourses = Ext.extend(Ext.ListView, {
                 var result = Ext.util.JSON.decode(response.responseText);
                 if (result.success){
                     var store = this.getStore();
+                    result.data.deleteable = true;
                     var r = new store.recordType(result.data, result.data[store.idProperty]);
                     store.insert(0, r);
                     this.addDeleteButtonHandler();
@@ -127,10 +128,7 @@ Ext.ux.UserCourses = Ext.extend(Ext.ListView, {
     },
     refresh: function(){
         Ext.ux.UserCourses.superclass.refresh.call(this);
-        this.addDeleteButtonHandler();/*
-        Ext.each(Ext.DomQuery.select('div.delete-user-course'), function(item){
-             Ext.get(item).on('click', this.clickDelButton, this)
-        }, this);*/
+        this.addDeleteButtonHandler();
     },
     addDeleteButtonHandler: function(){
         Ext.each(Ext.DomQuery.select('div.delete-user-course'), function(item){
@@ -156,7 +154,6 @@ Ext.ux.UserCourses = Ext.extend(Ext.ListView, {
                 });
             }
         }).createDelegate(this));
-
     }
 });
 

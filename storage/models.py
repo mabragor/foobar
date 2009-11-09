@@ -125,7 +125,9 @@ class Card(models.Model):
         return self.course.title
 
     def deleteable(self):
-        if self.reg_date <= datetime.now() - timedelta(days=1):
+        #if self.reg_date <= datetime.now() - timedelta(days=1):
+        #    return False
+        if self.is_old():
             return False
         if self.action_set.count():
             return False
@@ -142,7 +144,7 @@ class Card(models.Model):
             'reg_date': self.reg_date,
             'exp_date': self.exp_date,
             'count': self.count,
-            'deleteable': self.deleteable(),
+            'deleteable': False,#self.deleteable(),
             'is_old': self.is_old()
         }
 

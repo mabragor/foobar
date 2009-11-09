@@ -41,9 +41,10 @@ Ext.ux.UserPanel = Ext.extend(Ext.Panel, {
             params: { foo: 'bar' },     //without params adobe air don't send POST
             success: function(response) {
                 var json = Ext.util.JSON.decode(response.responseText);
-                if (json.rfid_code == this.card) return;
+                if (this.card) return;
                 this.card = json.rfid_code;
-		if (! this.card) return; // dirty hack
+		if (! this.card) return;
+                // dirty hack
                 if (this.card != '00000000') {
                     this.client_form.getForm().setValues(json);
                     this.course_store.user_rfid_code = this.card;
@@ -117,10 +118,15 @@ Ext.ux.UserPanel = Ext.extend(Ext.Panel, {
             buttons: [
                 { text: 'Surchange', handler: function() {} },
                 { text: 'Assign', handler: function() {} },
-                { text: 'Apply', handler: function() {} },
+                { text: 'Apply', handler: this.saveUserData, scope: this },
             ]
         });
         return this.client_form;
+    },
+    saveUserData: function(){
+        this.card = null;
+        this.client_form.getForm().reset();
+        this.course_store.removeAll();
     }
 });
 
