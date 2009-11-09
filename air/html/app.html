@@ -1,0 +1,109 @@
+<html>
+    <head>
+        <title>Тестируем ExtJS</title>
+        <meta http-equiv="content-Type" content="text/html; charset=UTF-8" />
+
+        <link href="/lib/extjs/resources/css/ext-all.css" rel="stylesheet" type="text/css"/>
+        <link href="/lib/extjs/air/resources/ext-air.css" rel="stylesheet" type="text/css"/>
+        <link href="/lib/extjs/resources/css/custom.css" rel="stylesheet" type="text/css"/>
+        <link rel="stylesheet" type="text/css" href="/css/jquery-ui.css" />
+        <link rel="stylesheet" type="text/css" href="/css/jquery.weekcalendar.css" />
+
+        <script type="text/javascript" src="/lib/air/AIRAliases.js"></script>
+        <script type="text/javascript" src="/lib/air/AIRIntrospector.js"></script>
+
+        <script type="text/javascript" src="/lib/jquery/jquery-1.3.1.js"></script>
+        <script type="text/javascript" src="/lib/jquery/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="/lib/jquery/jquery.weekcalendar.js"></script>
+        <script type="text/javascript" src="/lib/extjs/adapter/jquery/ext-jquery-adapter.js"></script>
+        <script type="text/javascript" src="/lib/extjs/ext-all.js"></script>
+
+        <script type="text/javascript" src="/js/URLS.js"></script>
+        <script type="text/javascript" src="/js/calendar.js"></script>
+        <script type="text/javascript" src="/js/Ext.ux.ScheduleStatusWindow.js"></script>
+        <script type="text/javascript" src="/js/Ext.ux.SchedulePanel.js"></script>
+        <script type="text/javascript" src="/js/Ext.ux.CoursePanel.js"></script>
+
+        <script type="text/javascript" src="/js/Ext.ux.UserCourses.js"></script>
+        <script type="text/javascript" src="/js/Ext.ux.UserPanel.js"></script>
+        <script type="text/javascript" src="/js/Ext.ux.CopyHandler.js"></script>
+        <script type="text/javascript" src="/js/Timer.js"></script>
+        <script type="text/javascript" src="/js/Ext.ux.MainViewport.js"></script>
+        
+        <script type="text/javascript">
+            Ext.onReady(function() {
+                Ext.BLANK_IMAGE_URL = '/lib/extjs/resources/images/default/s.gif';
+                Ext.QuickTips.init();
+
+                Ext.ux.msg = function(){
+                    var msgCt;
+                    function createBox(title, text, type){
+                        return ['<div class="msg">',
+                                '<div class="x-box-tl"><div class="x-box-tr"><div class="x-box-tc"></div></div></div>',
+                                '<div class="x-box-ml"><div class="x-box-mr"><div class="x-box-mc">',
+                                '<div class="ext-mb-icon ', type ,'">',
+                                '<h3>', title, '</h3>', text,
+                                '</div></div></div></div>',
+                                '<div class="x-box-bl"><div class="x-box-br"><div class="x-box-bc"></div></div></div>',
+                                '</div>'].join('');
+                    }
+
+                    return function(title, text, type){
+                        if(!msgCt){
+                            msgCt = Ext.DomHelper.insertFirst(document.body, {id:'msg-div'}, true);
+                        }
+                        msgCt.alignTo(document, 't-t');
+                        var m = Ext.DomHelper.append(msgCt, {html:createBox(title, text, type)}, true);
+                        m.slideIn('t').pause(2).ghost("t", {remove:true});
+                    }
+                }();
+                Ext.Ajax.on('requestexception', function(){
+                    Ext.ux.msg('Failure', 'Ajax communication failed', Ext.Msg.ERROR);
+                }, this);
+
+                var vp = new Ext.ux.MainViewport({
+                    items: [{
+                        xtype: 'ext:ux:schedule-panel',
+                        c_options: schedule_options,
+                        urls: {
+                            get_coach_list: URLS.get_coach_list,
+                            get_unstatus_event: URLS.get_unstatus_event,
+                            save_event_status: URLS.save_event_status,
+                            copy_week: URLS.copy_week
+                        }
+                    },{
+                        region: 'west',
+                        layout: 'vbox',
+                        frame: true,
+                        border: false,
+                        width: '30%',
+                        split: true,
+                        collapsible: true,
+                        collapseMode: 'mini',
+                        layoutConfig: {
+                            align : 'stretch',
+                            pack  : 'start'
+                        },
+                        items: [{
+                            xtype: 'ext:ux:user-panel',
+                            URLS: URLS
+                        },{
+                            xtype: 'ext:ux:course-panel',
+                            dataUrl: URLS.get_course_tree
+                        }]
+                    }]
+                });
+            });
+
+            new Timer({
+                callback: function(){
+                    Ext.getCmp('status_window').show_window();
+                },
+                url: URLS.get_status_timer
+            });
+        </script>
+    </head>
+
+    <body>
+    </body>
+</html>
