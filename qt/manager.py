@@ -98,6 +98,11 @@ class EventStorage(QStandardItemModel):
         """ Получение всех ячеек события. """
         return self.e2rc.get( (event, room), None )
 
+    def datetime2rowcol(self, dt):
+        row = (dt.hour - self.work_hours[0]) * self.multiplier
+        col = dt.weekday()
+        return (row, col)
+
     def may_insert(self, event, row, col):
         """ Метод для проверки возможности размещения события по указанным
         координатам. Возвращает список залов, которые предоставляют такую
@@ -132,11 +137,6 @@ class EventStorage(QStandardItemModel):
         """ Метод перемещения события по координатной сетке. """
         self.remove(event, room)
         self.insert(row, col, room, event)
-
-    def datetime2rowcol(self, dt):
-        row = (dt.hour - self.work_hours[0]) * self.multiplier
-        col = dt.weekday()
-        return (row, col)
 
 class QtScheduleDelegate(QItemDelegate):
 
@@ -267,24 +267,6 @@ class QtSchedule(QTableView):
                           int(groups.group('blue_component'), 16))
         return None
 
-    def room_color(self, room_name):
-        return filter(lambda x: x[0].lower() == room_name.lower(),
-                      self.rooms)[0][1]
-
-    def fill_cells(self, row, col, cell_count):
-        """ Метод генерирует список ячеек для события, указывая их тип. """
-        result = []
-        rows_list = range(row, row+cell_count)
-        for i in rows_list:
-            if i == rows_list[0]: # первый элемент
-                cell_type = 'head'
-            elif i == rows_list[-1]: # последний элемент
-                cell_type = 'tail'
-            else: # остальные
-                cell_type = 'body'
-            result.append( (i, col, cell_type) )
-        return result
-
     def scrollContentsBy(self, dx, dy):
         """ Обработчик скроллинга, см. QAbstractScrollArea. Накапливаем
         скроллинг по осям, в качестве единицы измерения используется
@@ -356,7 +338,7 @@ class QtSchedule(QTableView):
             event.acceptProposedAction()
 
     def dragMoveEvent(self, event):
-        event.setDropAction(Qt. MoveAction)
+        event.setDropAction(Qt.MoveAction)
         event.accept()
 
     def dropEvent(self, event):
