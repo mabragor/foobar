@@ -309,6 +309,7 @@ class QtSchedule(QTableView):
 
     def mousePressEvent(self, event):
         """ Обработчик нажатия кнопки мыши. Отрабатываем здесь DnD. """
+        print 'mousePressEvent'
         if event.button() == Qt.LeftButton:
 
             index = self.indexAt(event.pos())
