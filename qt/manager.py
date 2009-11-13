@@ -146,16 +146,6 @@ class QtScheduleDelegate(QItemDelegate):
         QItemDelegate.__init__(self, parent)
         self.parent = parent
 
-    def string2color(self, color):
-        """ Метод для преобразования #RRGGBB в QColor. """
-        regexp = re.compile(r'#(?P<red_component>[0-9a-f]{2})(?P<green_component>[0-9a-f]{2})(?P<blue_component>[0-9a-f]{2})')
-        groups = re.match(regexp, color)
-        if groups:
-            return QColor(int(groups.group('red_component'), 16),
-                          int(groups.group('green_component'), 16),
-                          int(groups.group('blue_component'), 16))
-        return None
-
     def paint(self, painter, option, index):
         """ Метод для отрисовки ячейки. """
         painter.save()
@@ -179,7 +169,7 @@ class QtScheduleDelegate(QItemDelegate):
                 x = dx + col * (option.rect.width() + 1) + \
                     w * map(lambda x: x[2] == room_id, rooms).index(True)
                 y = dy + row * (option.rect.height() + 1)
-                painter.fillRect(x, y, w, h, self.string2color(room_color));
+                painter.fillRect(x, y, w, h, self.parent.string2color(room_color));
                 # готовимся рисовать границы
                 pen = QPen(Qt.black)
                 pen.setWidth(3)
@@ -267,6 +257,16 @@ class QtSchedule(QTableView):
         delegate = QtScheduleDelegate(self)
         self.setItemDelegate(delegate)
 
+    def string2color(self, color):
+        """ Метод для преобразования #RRGGBB в QColor. """
+        regexp = re.compile(r'#(?P<red_component>[0-9a-f]{2})(?P<green_component>[0-9a-f]{2})(?P<blue_component>[0-9a-f]{2})')
+        groups = re.match(regexp, color)
+        if groups:
+            return QColor(int(groups.group('red_component'), 16),
+                          int(groups.group('green_component'), 16),
+                          int(groups.group('blue_component'), 16))
+        return None
+
     def room_color(self, room_name):
         return filter(lambda x: x[0].lower() == room_name.lower(),
                       self.rooms)[0][1]
@@ -301,15 +301,11 @@ class QtSchedule(QTableView):
 
     def eventPresent(self, row, col, room):
         """ Проверка наличия события в указанном месте. """
-        try:
-            event = self.cells[ (row, col) ][ room ]
-            return True
-        except:
-            return False
+        event = self.model.get_event_by_cell(row, col, room)
+        return event is not None
 
     def mousePressEvent(self, event):
         """ Обработчик нажатия кнопки мыши. Отрабатываем здесь DnD. """
-        print 'mousePressEvent'
         if event.button() == Qt.LeftButton:
 
             index = self.indexAt(event.pos())
@@ -322,9 +318,9 @@ class QtSchedule(QTableView):
             cy = self.rowViewportPosition(row) - self.scrolledCellY
 
             event_index = (x - cx) / (w / len(self.rooms))
-            event_color = self.rooms[event_index][0]
+            room_name, room_color, room_role = self.rooms[event_index]
 
-            if not self.eventPresent(row, col, event_color):
+            if not self.eventPresent(row, col, room_role):
                 return
 
             plainText = QString('test')
@@ -335,7 +331,7 @@ class QtSchedule(QTableView):
             pixmap = QPixmap(100, 60)
             pixmap.fill(Qt.white)
             painter = QPainter(pixmap)
-            painter.fillRect(2,2,96,56, getattr(Qt, event_color))
+            painter.fillRect(2,2,96,56, self.string2color(room_color))
 
             pen = QPen(Qt.black)
             pen.setWidth(2)
@@ -352,7 +348,8 @@ class QtSchedule(QTableView):
             drag.start()
 
     def mouseMoveEvent(self, event):
-        print 'qtableview: move event', event.pos()
+        #print 'qtableview: move event', event.pos()
+        pass
 
     def dragEnterEvent(self, event):
         print 'dragEnterEvent'
