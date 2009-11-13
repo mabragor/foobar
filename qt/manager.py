@@ -285,9 +285,6 @@ class QtSchedule(QTableView):
             result.append( (i, col, cell_type) )
         return result
 
-    def get_events(self, ):
-        return self.events
-
     def scrollContentsBy(self, dx, dy):
         """ Обработчик скроллинга, см. QAbstractScrollArea. Накапливаем
         скроллинг по осям, в качестве единицы измерения используется
@@ -298,11 +295,6 @@ class QtSchedule(QTableView):
         if dy != 0:
             self.scrolledCellY += dy
         QTableView.scrollContentsBy(self, dx, dy)
-
-    def eventPresent(self, row, col, room):
-        """ Проверка наличия события в указанном месте. """
-        event = self.model.get_event_by_cell(row, col, room)
-        return event is not None
 
     def mousePressEvent(self, event):
         """ Обработчик нажатия кнопки мыши. Отрабатываем здесь DnD. """
@@ -320,7 +312,8 @@ class QtSchedule(QTableView):
             event_index = (x - cx) / (w / len(self.rooms))
             room_name, room_color, room_role = self.rooms[event_index]
 
-            if not self.eventPresent(row, col, room_role):
+            #Проверка наличия события в указанном месте.
+            if not self.model.get_event_by_cell(row, col, room_role):
                 return
 
             plainText = QString('test')
