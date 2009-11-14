@@ -21,6 +21,7 @@ class Event(object):
 
 class EventStorage(QStandardItemModel):
 
+
     def __init__(self, work_hours, week_days,
                  quant=timedelta(minutes=30),
                  room_list=tuple(), parent=None):
@@ -29,6 +30,8 @@ class EventStorage(QStandardItemModel):
         rows = end_hour - begin_hour
         cols = len(week_days)
         QStandardItemModel.__init__(self, rows, cols, parent)
+
+        self.event_mime = 'application/x-calendar-event'
 
         self.rc2e = {} # (row, col, room): event
         self.e2rc = {} # (event, room): [(row, col), (row, col), ...]
@@ -78,11 +81,11 @@ class EventStorage(QStandardItemModel):
             cells = self.get_cells_by_event(event, role)
             if cells:
                 if cells[0] == (index.row(), index.column()):
-                    event.role = 'head'
+                    event.type = 'head'
                 elif cells[-1] == (index.row(), index.column()):
-                    event.role = 'tail'
+                    event.type = 'tail'
                 else:
-                    event.role = 'body'
+                    event.type = 'body'
         return QVariant(event)
 
     def setData(self, index, value, role):
@@ -138,6 +141,70 @@ class EventStorage(QStandardItemModel):
         self.remove(event, room)
         self.insert(row, col, room, event)
 
+    # Поддержка Drag'n'Drop - начало секции
+
+    def supportedDropActions(self):
+        """ Метод для определения списка DnD действий, поддерживаемых
+        моделью. """
+        print 'EventStorage::supportedDropActions'
+        return Qt.CopyAction | Qt.MoveAction
+
+    def flags(self, index):
+        """ Метод для определения списка элементов, которые могут участвовать
+        в DnD операциях. """
+        #print 'EventStorage::flags'
+        default_flags = QStandardItemModel.flags(self, index)
+        if index.isValid(): # FIXME - сделать проверку
+            return Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled | default_flags
+        else:
+            return Qt.ItemIsDropEnabled | default_flags
+
+    def mimeTypes(self):
+        """ Метод для декларации MIME типов, поддерживаемых моделью. """
+        print 'EventStorage::mimeTypes'
+        types = QStringList()
+        types << self.event_mime
+        return types
+
+    def mimeData(self, indexes):
+        """ Метод для конвертации объектов в поддерживаемый MIME формат. """
+        print 'EventStorage::mimeData'
+        mimeData = QMimeData()
+        encodedData = QByteArray()
+
+        stream = QDataStream(encodedData, QIODevice.WriteOnly)
+
+        events = []
+
+        print indexes
+
+        for index in indexes:
+            if index.isValid():
+                print dir(index)
+
+    def dropMimeData(self, data, action, row, column, parent):
+        print 'EventStorage::dropMimeData'
+        if action == Qt.IgnoreAction:
+            return True
+        if not data.hasFormat(self.event_mime):
+            return False
+        if column > 0:
+            return False
+
+        itemData = data.data(self.event_mime)
+        dataStream = QDataStream(itemData, QIODevice.ReadOnly)
+
+        id = QString()
+        stream >> id
+
+        print id
+
+
+
+    #def removeRows()
+
+    # Поддержка Drag'n'Drop - конец секции
+
 class QtScheduleDelegate(QItemDelegate):
 
     """ Делегат для ячеек расписания. """
@@ -178,9 +245,9 @@ class QtScheduleDelegate(QItemDelegate):
                 # отрисовываем элементы в зависимости от типа ячейки
                 painter.drawLine(x, y+h, x, y)
                 painter.drawLine(x+w, y+h, x+w, y)
-                if event.role == 'head':
+                if event.type == 'head':
                     painter.drawLine(x, y, x+w, y)
-                elif event.role == 'tail':
+                elif event.type == 'tail':
                     painter.drawLine(x, y+h, x+w, y+h)
                 else:
                     pass
@@ -240,10 +307,9 @@ class QtSchedule(QTableView):
 
         # Разрешаем принимать DnD
         self.setDragEnabled(True)
-        self.setDragDropMode(QAbstractItemView.DragDrop)
-        #self.viewport().setAcceptDrops(True)
         self.setAcceptDrops(True)
         self.setDropIndicatorShown(True)
+        self.setDragDropMode(QAbstractItemView.DragDrop) #InternalMove
 
         # Запрещаем изменение размеров ячейки
         self.horizontalHeader().setResizeMode(QHeaderView.Fixed)
@@ -295,13 +361,9 @@ class QtSchedule(QTableView):
             room_name, room_color, room_role = self.rooms[event_index]
 
             #Проверка наличия события в указанном месте.
-            if not self.model.get_event_by_cell(row, col, room_role):
+            cal_event = self.model.get_event_by_cell(row, col, room_role)
+            if not cal_event:
                 return
-
-            plainText = QString('test')
-
-            mimeData = QMimeData()
-            mimeData.setText(plainText)
 
             pixmap = QPixmap(100, 60)
             pixmap.fill(Qt.white)
@@ -311,42 +373,60 @@ class QtSchedule(QTableView):
             pen = QPen(Qt.black)
             pen.setWidth(2)
             painter.setPen(pen)
-            # отрисовываем элементы в зависимости от типа ячейки
             painter.drawRect(0, 0, 100, 60)
 
             painter.end()
 
+            itemData = QByteArray()
+            dataStream = QDataStream(itemData, QIODevice.WriteOnly)
+            dataStream << QString('%i,%i,%i' % (row, col, room_role))
+            mimeData = QMimeData()
+            mimeData.setData(self.model.event_mime, itemData)
+
             drag = QDrag(self)
             drag.setMimeData(mimeData)
             drag.setPixmap(pixmap)
-
-            drag.start()
+            if drag.start(Qt.MoveAction) == 0:
+                print 'QtSchedule::mousePressEvent - DnD has ended successfully'
 
     def mouseMoveEvent(self, event):
-        #print 'qtableview: move event', event.pos()
-        pass
+        print 'QtSchedule::mouseMoveEvent'
 
     def dragEnterEvent(self, event):
-        print 'dragEnterEvent'
+        print 'QtSchedule::dragEnterEvent'
+        if event.mimeData().hasFormat(self.model.event_mime):
+            event.accept()
+        else:
+            event.ignore()
 
+    def dragLeaveEvent(self, event):
+        print 'QtSchedule::dragLeaveEvent'
         event.accept()
-#         event.setAccepted(True)
-#         self.dragOver = True
-#         self.update()
-
-        if event.mimeData().hasFormat('text/plain'):
-            event.acceptProposedAction()
 
     def dragMoveEvent(self, event):
-        event.setDropAction(Qt.MoveAction)
-        event.accept()
+        #print 'QtSchedule::dragMoveEvent'
+        if event.mimeData().hasFormat(self.model.event_mime):
+            event.setDropAction(Qt.MoveAction)
+            event.accept()
+        else:
+            event.ignore()
 
     def dropEvent(self, event):
-        print 'dropEvent'
-        event.setDropAction(Qt.CopyAction)
-        event.accept()
+        print 'QtSchedule::dropEvent'
+        if event.mimeData().hasFormat(self.model.event_mime):
+            itemData = event.mimeData().data(self.model.event_mime)
+            dataStream = QDataStream(itemData, QIODevice.ReadOnly)
+            coordinates = QString()
+            dataStream >> coordinates
+            (row, col, room_role) = [int(i) for i in coordinates.split(',')]
 
-        #event.acceptProposedAction()
+            event.setDropAction(Qt.MoveAction)
+            event.accept()
+            print 'format is', self.model.event_mime
+            print 'coordinates are', (row, col, room_role)
+        else:
+            event.ignore()
+            print 'unknown format'
 
 class MainWindow(QMainWindow):
 
