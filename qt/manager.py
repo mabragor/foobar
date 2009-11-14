@@ -19,60 +19,75 @@ class Event(object):
     def __unicode__(self):
         return self.course
 
-class EventStorage(QStandardItemModel):
+class EventStorage(QAbstractItemModel):
 
 
     def __init__(self, work_hours, week_days,
                  quant=timedelta(minutes=30),
                  room_list=tuple(), parent=None):
         self.work_hours = work_hours
+        self.week_days = week_days
+        self.quant = quant
+        self.rooms = room_list
+        self.multiplier = timedelta(hours=1).seconds / self.quant.seconds
+
         begin_hour, end_hour = work_hours
         self.rows_count = (end_hour - begin_hour) * timedelta(hours=1).seconds / quant.seconds
         self.cols_count = len(week_days)
 
-        QStandardItemModel.__init__(self, self.rows_count, self.cols_count, parent)
+        QAbstractItemModel.__init__(self, parent)
 
         self.event_mime = 'application/x-calendar-event'
 
         self.rc2e = {} # (row, col, room): event
         self.e2rc = {} # (event, room): [(row, col), (row, col), ...]
 
-        self.quant = quant
-        self.multiplier = timedelta(hours=1).seconds / self.quant.seconds
-        self.rooms = room_list
-
-        # Горизонтальные метки
-        self.setHorizontalHeaderLabels(QStringList(week_days))
-
-        # Вертикальные метки
-        i = 0
-        for chunk in xrange(begin_hour, end_hour + 1):
-            item = QStandardItem()
-            item.setText('%i:00' % (chunk),)
-            self.setVerticalHeaderItem(i, item)
-            item = QStandardItem()
-            item.setText('%i:30' % (chunk),)
-            self.setVerticalHeaderItem(i+1, item)
-            i += 2
-
-#     def index(self, row, col, parent):
-#         return None
-
-#     def parent(self, index):
-#         return index.parent
-
     def rowCount(self, parent):
-        #print 'EventStorage::rowCount'
         if parent.isValid():
             return 0
         else:
             return self.rows_count
 
-#     def columnCount(self, parent):
-#         if parent:
-#             return 0
-#         else:
-#             return None
+    def columnCount(self, parent):
+        if parent.isValid():
+            return 0
+        else:
+            return self.cols_count
+
+    def headerData(self, section, orientation, role):
+        """ Метод для определения вертикальных и горизонтальных меток для
+        рядов и колонок таблицы. """
+        #print 'EventStorage::headerData'
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return QVariant(self.week_days[section])
+        if orientation == Qt.Vertical and role == Qt.DisplayRole:
+            begin_hour, end_hour = self.work_hours
+            start = timedelta(hours=begin_hour)
+            step = timedelta(seconds=(self.quant.seconds * section))
+            return QVariant(str(start + step)[:-3])
+        return QVariant()
+
+    def index(self, row, col, parent):
+        if row < 0 or col < 0 or row >= self.rowCount(parent) or col >= self.columnCount(parent):
+            return QModelIndex()
+        return self.createIndex(row, col)
+
+    def data(self, index, role):
+        """ Перегруженный метод базового класса. Под ролью понимаем зал. """
+        print 'EventStorage::data'
+        if not index.isValid():
+            return QVariant()
+        event = self.get_event_by_cell(index.row(), index.column(), role)
+        if event:
+            cells = self.get_cells_by_event(event, role)
+            if cells:
+                if cells[0] == (index.row(), index.column()):
+                    event.type = 'head'
+                elif cells[-1] == (index.row(), index.column()):
+                    event.type = 'tail'
+                else:
+                    event.type = 'body'
+        return QVariant(event)
 
     def get_event_by_cell(self, row, col, room):
         """ Получение события по указанным координатам. """
@@ -136,12 +151,14 @@ class EventStorage(QStandardItemModel):
     def flags(self, index):
         """ Метод для определения списка элементов, которые могут участвовать
         в DnD операциях. """
+        print 'EventStorage::flags', index.row(), index.column(),
         if index.isValid():
-            return (Qt.ItemIsEnabled | Qt.ItemIsSelectable
-                  | Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled)
-
-        return (Qt.ItemIsEnabled | Qt.ItemIsDropEnabled)
-
+            res = (Qt.ItemIsEnabled | Qt.ItemIsSelectable
+                   | Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled)
+        else:
+            res = (Qt.ItemIsEnabled | Qt.ItemIsDropEnabled)
+        print str(res)
+        return res
 
         #f = QStandardItemModel.flags(self, index) | Qt.ItemIsDragEnabled
         f = Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
@@ -193,32 +210,29 @@ class EventStorage(QStandardItemModel):
         stream >> id
 
         print id
-
-    def data(self, index, role):
-        """ Перегруженный метод базового класса. Под ролью понимаем зал. """
-        if not index.isValid():
-            return QVariant()
-        event = self.get_event_by_cell(index.row(), index.column(), role)
-        if event:
-            cells = self.get_cells_by_event(event, role)
-            if cells:
-                if cells[0] == (index.row(), index.column()):
-                    event.type = 'head'
-                elif cells[-1] == (index.row(), index.column()):
-                    event.type = 'tail'
-                else:
-                    event.type = 'body'
-        return QVariant(event)
+        return True
 
     def setData(self, index, value, role):
         """ Перегруженный метод базового класса. Под ролью понимаем зал. """
         print 'EventStorage::setData'
+        return True
+
+    def setHeaderData(self, section, orientation, value, role):
+        print 'EventStorage::setHeaderData'
+        return True
 
     def removeRows(self, row, count, parent):
         print 'EventStorage::removeRows'
+        if parent.isValid():
+            return False
 
-    def insertRows(self, row, count, parent):
-        print 'EventStorage::insertRows'
+        self.beginRemoveRows(parent, row, row)
+        # remove here
+        self.endRemoveRows()
+        return True
+
+#     def insertRows(self, row, count, parent):
+#         print 'EventStorage::insertRows'
 
     # Поддержка Drag'n'Drop - конец секции
 
