@@ -68,7 +68,9 @@ class EventStorage(QAbstractItemModel):
         return QVariant()
 
     def index(self, row, col, parent):
-        if row < 0 or col < 0 or row >= self.rowCount(parent) or col >= self.columnCount(parent):
+        """ Реализация виртуального метода для генерации индекса. """
+        if row < 0 or col < 0 or row >= self.rowCount(parent) \
+                or col >= self.columnCount(parent):
             return QModelIndex()
         return self.createIndex(row, col)
 
