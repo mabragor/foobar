@@ -148,26 +148,18 @@ class EventStorage(QAbstractItemModel):
         """ Метод для определения списка DnD действий, поддерживаемых
         моделью. """
         print 'EventStorage::supportedDropActions'
-        return Qt.CopyAction | Qt.MoveAction
+        return (Qt.CopyAction | Qt.MoveAction)
 
     def flags(self, index):
         """ Метод для определения списка элементов, которые могут участвовать
         в DnD операциях. """
-        print 'EventStorage::flags', index.row(), index.column(),
+        print 'EventStorage::flags', index.row(), index.column()
         if index.isValid():
             res = (Qt.ItemIsEnabled | Qt.ItemIsSelectable
                    | Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled)
         else:
             res = (Qt.ItemIsEnabled | Qt.ItemIsDropEnabled)
-        print str(res)
         return res
-
-        #f = QStandardItemModel.flags(self, index) | Qt.ItemIsDragEnabled
-        f = Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
-        #if index.isValid(): # FIXME - сделать проверку
-        #    f |= Qt.ItemIsDropEnabled
-        #print 'EventStorage::flags', f
-        return f
 
     def mimeTypes(self):
         """ Метод для декларации MIME типов, поддерживаемых моделью. """
@@ -428,19 +420,16 @@ class QtSchedule(QTableView):
                 255: 'Qt::ActionMask',
                 }
 
-            if drag.start(Qt.MoveAction) == 0:
-                print 'QtSchedule::mousePressEvent - DnD has ended successfully'
+            res = drag.start(Qt.CopyAction|Qt.MoveAction)
+            print 'QtSchedule::mousePressEvent', drop_action[res]
 
     def mouseMoveEvent(self, event):
         print 'QtSchedule::mouseMoveEvent'
 
     def dragEnterEvent(self, event):
         print 'QtSchedule::dragEnterEvent'
-
-
         if event.mimeData().hasFormat(self.model.event_mime):
-            event.acceptProposedAction()
-            #event.accept()
+            event.accept()
         else:
             event.ignore()
 
@@ -450,9 +439,6 @@ class QtSchedule(QTableView):
 
     def dragMoveEvent(self, event):
         #print 'QtSchedule::dragMoveEvent'
-
-        event.acceptProposedAction()
-
         if event.mimeData().hasFormat(self.model.event_mime):
             event.setDropAction(Qt.MoveAction)
             event.accept()
@@ -460,9 +446,7 @@ class QtSchedule(QTableView):
             event.ignore()
 
     def dropEvent(self, event):
-        print 'QtSchedule::dropEvent'
-        event.acceptProposedAction()
-        return
+        print 'QtSchedule::dropEvent',
         if event.mimeData().hasFormat(self.model.event_mime):
             itemData = event.mimeData().data(self.model.event_mime)
             dataStream = QDataStream(itemData, QIODevice.ReadOnly)
@@ -472,8 +456,9 @@ class QtSchedule(QTableView):
 
             event.setDropAction(Qt.MoveAction)
             event.accept()
-            print 'format is', self.model.event_mime
-            print 'coordinates are', (row, col, room_role)
+
+            print self.model.event_mime, 'is dragged from', (row, col, room_role)
+
         else:
             event.ignore()
             print 'unknown format'
