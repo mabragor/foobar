@@ -153,11 +153,10 @@ class EventStorage(QStandardItemModel):
         """ Метод для определения списка элементов, которые могут участвовать
         в DnD операциях. """
         #print 'EventStorage::flags'
-        default_flags = QStandardItemModel.flags(self, index)
+        f = QStandardItemModel.flags(self, index) | Qt.ItemIsDragEnabled
         if index.isValid(): # FIXME - сделать проверку
-            return Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled | default_flags
-        else:
-            return Qt.ItemIsDropEnabled | default_flags
+            f |= Qt.ItemIsDropEnabled
+        return f
 
     def mimeTypes(self):
         """ Метод для декларации MIME типов, поддерживаемых моделью. """
@@ -201,7 +200,8 @@ class EventStorage(QStandardItemModel):
 
 
 
-    #def removeRows()
+    def removeRows(self, row, count, parent):
+        print 'EventStorage::removeRows'
 
     # Поддержка Drag'n'Drop - конец секции
 
@@ -386,8 +386,9 @@ class QtSchedule(QTableView):
             drag = QDrag(self)
             drag.setMimeData(mimeData)
             drag.setPixmap(pixmap)
-            if drag.start(Qt.MoveAction) == 0:
-                print 'QtSchedule::mousePressEvent - DnD has ended successfully'
+            drag.start()
+#             if drag.start(Qt.MoveAction) == 0:
+#                 print 'QtSchedule::mousePressEvent - DnD has ended successfully'
 
     def mouseMoveEvent(self, event):
         print 'QtSchedule::mouseMoveEvent'
