@@ -19,12 +19,13 @@ class Event(object):
     def __unicode__(self):
         return self.course
 
-class EventStorage(QAbstractItemModel):
-
+class EventStorage(QAbstractTableModel):
 
     def __init__(self, work_hours, week_days,
                  quant=timedelta(minutes=30),
                  room_list=tuple(), parent=None):
+        QAbstractTableModel.__init__(self, parent)
+
         self.work_hours = work_hours
         self.week_days = week_days
         self.quant = quant
@@ -34,8 +35,6 @@ class EventStorage(QAbstractItemModel):
         begin_hour, end_hour = work_hours
         self.rows_count = (end_hour - begin_hour) * timedelta(hours=1).seconds / quant.seconds
         self.cols_count = len(week_days)
-
-        QAbstractItemModel.__init__(self, parent)
 
         self.event_mime = 'application/x-calendar-event'
 
@@ -67,16 +66,9 @@ class EventStorage(QAbstractItemModel):
             return QVariant(str(start + step)[:-3])
         return QVariant()
 
-    def index(self, row, col, parent):
-        """ Реализация виртуального метода для генерации индекса. """
-        if row < 0 or col < 0 or row >= self.rowCount(parent) \
-                or col >= self.columnCount(parent):
-            return QModelIndex()
-        return self.createIndex(row, col)
-
     def data(self, index, role):
         """ Перегруженный метод базового класса. Под ролью понимаем зал. """
-        print 'EventStorage::data'
+        #print 'EventStorage::data'
         if not index.isValid():
             return QVariant()
         event = self.get_event_by_cell(index.row(), index.column(), role)
@@ -153,7 +145,7 @@ class EventStorage(QAbstractItemModel):
     def flags(self, index):
         """ Метод для определения списка элементов, которые могут участвовать
         в DnD операциях. """
-        print 'EventStorage::flags', index.row(), index.column()
+        #print 'EventStorage::flags', index.row(), index.column()
         if index.isValid():
             res = (Qt.ItemIsEnabled | Qt.ItemIsSelectable
                    | Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled)
@@ -215,15 +207,15 @@ class EventStorage(QAbstractItemModel):
         print 'EventStorage::setHeaderData'
         return True
 
-    def removeRows(self, row, count, parent):
-        print 'EventStorage::removeRows'
-        if parent.isValid():
-            return False
+#     def removeRows(self, row, count, parent):
+#         print 'EventStorage::removeRows'
+#         if parent.isValid():
+#             return False
 
-        self.beginRemoveRows(parent, row, row)
-        # remove here
-        self.endRemoveRows()
-        return True
+#         self.beginRemoveRows(parent, row, row)
+#         # remove here
+#         self.endRemoveRows()
+#         return True
 
 #     def insertRows(self, row, count, parent):
 #         print 'EventStorage::insertRows'
@@ -427,23 +419,13 @@ class QtSchedule(QTableView):
         print 'QtSchedule::mouseMoveEvent'
 
     def dragEnterEvent(self, event):
-        print 'QtSchedule::dragEnterEvent'
+        print 'QtSchedule::dragEnterEvent',
         if event.mimeData().hasFormat(self.model.event_mime):
-            event.accept()
+            event.acceptProposedAction()
+            print 'accept'
         else:
             event.ignore()
-
-    def dragLeaveEvent(self, event):
-        print 'QtSchedule::dragLeaveEvent'
-        event.accept()
-
-    def dragMoveEvent(self, event):
-        #print 'QtSchedule::dragMoveEvent'
-        if event.mimeData().hasFormat(self.model.event_mime):
-            event.setDropAction(Qt.MoveAction)
-            event.accept()
-        else:
-            event.ignore()
+            print 'ignore'
 
     def dropEvent(self, event):
         print 'QtSchedule::dropEvent',
@@ -454,9 +436,7 @@ class QtSchedule(QTableView):
             dataStream >> coordinates
             (row, col, room_role) = [int(i) for i in coordinates.split(',')]
 
-            event.setDropAction(Qt.MoveAction)
-            event.accept()
-
+            event.acceptProposedAction()
             print self.model.event_mime, 'is dragged from', (row, col, room_role)
 
         else:
