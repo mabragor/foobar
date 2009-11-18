@@ -350,6 +350,18 @@ class QtSchedule(QTableView):
                           int(groups.group('blue_component'), 16))
         return None
 
+    def get_scrolled_coords(self, rel_x, rel_y):
+        """ Метод вычисляет абсолютные координаты по относительным, учитываю
+        позицию скроллера. """
+        abs_x = rel_x - self.scrolledCellX
+        abs_y = rel_y - self.scrolledCellY
+        return (abs_x, abs_y)
+
+    def get_cell_coords(self, abs_x, abs_y):
+        """ Метод определяет какой ячейке (row, col) принадлежат
+        координаты. """
+        return (self.rowAt(abs_y), self.columnAt(abs_x))
+
     def scrollContentsBy(self, dx, dy):
         """ Обработчик скроллинга, см. QAbstractScrollArea. Накапливаем
         скроллинг по осям, в качестве единицы измерения используется
@@ -371,9 +383,8 @@ class QtSchedule(QTableView):
             x = event.x() - self.scrolledCellX
             y = event.y() - self.scrolledCellY
             w = self.columnWidth(index.column())
-            cx = self.columnViewportPosition(col) - self.scrolledCellX
-            cy = self.rowViewportPosition(row) - self.scrolledCellY
-
+            cx, cy = self.get_scrolled_coords(self.columnViewportPosition(col),
+                                              self.rowViewportPosition(row))
             event_index = (x - cx) / (w / len(self.rooms))
             room_name, room_color, room_role = self.rooms[event_index]
 
@@ -427,6 +438,11 @@ class QtSchedule(QTableView):
             event.ignore()
             print 'ignore'
 
+    def dragMoveEvent(self, event):
+        QTableView.dragMoveEvent(self, event)
+        if event.mimeData().hasFormat(self.model.event_mime):
+            event.acceptProposedAction()
+
     def dropEvent(self, event):
         print 'QtSchedule::dropEvent',
         if event.mimeData().hasFormat(self.model.event_mime):
@@ -438,6 +454,9 @@ class QtSchedule(QTableView):
 
             event.acceptProposedAction()
             print self.model.event_mime, 'is dragged from', (row, col, room_role)
+            x, y = drop_coords = self.get_scrolled_coords(event.pos().x(), event.pos().y())
+            drop_cell = self.get_cell_coords(x, y)
+            print drop_coords, drop_cell
 
         else:
             event.ignore()
