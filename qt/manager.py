@@ -362,6 +362,29 @@ class QtSchedule(QTableView):
         координаты. """
         return (self.rowAt(abs_y), self.columnAt(abs_x))
 
+    def cellRowColRelative(self, rel):
+        """ Метод определяет какой ячейке принадлежат переданные координаты,
+        принимая во внимание текущую позицию скроллера. """
+        if type(rel) is tuple:
+            rel_x, rel_y = rel
+            abs_x = rel_x - self.scrolledCellX
+            abs_y = rel_y - self.scrolledCellY
+        elif type(rel) is QPoint:
+            abs_x = rel.x() - self.scrolledCellX
+            abs_y = rel.y() - self.scrolledCellY
+        return (self.rowAt(abs_y), self.columnAt(abs_x))
+
+    def emptyRoomAt(self, (row_col)):
+        """ Метод возвращает список свободных залов в данной ячейке. """
+        row, col = row_col
+        free = []
+        for room in self.rooms:
+            room_name, room_color, room_role = room
+            event = self.model.get_event_by_cell(row, col, room_role)
+            if not event:
+                free.append(room)
+        return free
+
     def scrollContentsBy(self, dx, dy):
         """ Обработчик скроллинга, см. QAbstractScrollArea. Накапливаем
         скроллинг по осям, в качестве единицы измерения используется
@@ -439,9 +462,19 @@ class QtSchedule(QTableView):
             print 'ignore'
 
     def dragMoveEvent(self, event):
-        QTableView.dragMoveEvent(self, event)
-        if event.mimeData().hasFormat(self.model.event_mime):
-            event.acceptProposedAction()
+        """ Метод вызывается во время Drag'n'Drop. Здесь следует осуществлять
+        проверку возможности скидывания перетаскиваемого объекта на текущую
+        ячейку. """
+        #drop_cell = self.cellRowColRelative(event.pos().x(), event.pos().y())
+        drop_cell = self.cellRowColRelative(event.pos())
+        free_rooms = self.emptyRoomAt(drop_cell)
+
+        if len(free_rooms) > 0:
+            QTableView.dragMoveEvent(self, event)
+            if event.mimeData().hasFormat(self.model.event_mime):
+                event.acceptProposedAction()
+        else:
+            event.ignore()
 
     def dropEvent(self, event):
         print 'QtSchedule::dropEvent',
@@ -454,9 +487,8 @@ class QtSchedule(QTableView):
 
             event.acceptProposedAction()
             print self.model.event_mime, 'is dragged from', (row, col, room_role)
-            x, y = drop_coords = self.get_scrolled_coords(event.pos().x(), event.pos().y())
-            drop_cell = self.get_cell_coords(x, y)
-            print drop_coords, drop_cell
+            drop_cell = self.cellRowColRelative(event.pos())
+            print self.emptyRoomAt(drop_cell)
 
         else:
             event.ignore()
