@@ -494,25 +494,69 @@ class QtSchedule(QTableView):
             event.ignore()
             print 'unknown format'
 
-
 class MainWindow(QMainWindow):
 
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
 
-        self.setup_view()
+        self.createMenus()
+        self.setupViews()
 
         self.setWindowTitle(self.tr('Manager\'s interface'))
+        self.statusBar().showMessage(self.tr('Ready'))
         self.resize(640, 480)
 
-    def setup_view(self):
-        splitter = QSplitter()
+    def setupViews(self):
+        tree = self.initCourses()
+
         self.schedule = QtSchedule(self)
         self.schedule.setup((8, 23), timedelta(minutes=30))
 
+        splitter = QSplitter()
+        splitter.addWidget(tree)
         splitter.addWidget(self.schedule)
 
         self.setCentralWidget(splitter)
+
+    def initCourses(self):
+        model = QDirModel()
+        tree = QTreeView()
+        tree.setModel(model)
+        return tree
+
+    def createMenus(self):
+        """ Метод для генерации меню приложения. """
+        """ Использование: Описать меню со всеми действиями в блоке
+        data. Создать обработчики для каждого действия. """
+        data = [
+            (self.tr('&Tools'), [
+                    (self.tr('Network Setup'), self.tr('Ctrl+N'), 'networkSetup',
+                     self.tr('Manage your network connection.')),
+                    (self.tr('Test'), self.tr('Ctrl+T'), 'test',
+                     self.tr('Test')),
+                    ]
+             )
+            ]
+
+        for topic, info in data:
+            self.toolsMenu = self.menuBar().addMenu(topic)
+            for title, short, name, desc in info:
+                setattr(self, 'act_%s' % name, QAction(title, self))
+                action = getattr(self, 'act_%s' % name)
+                action.setShortcut(short)
+                action.setStatusTip(desc)
+                self.connect(action, SIGNAL('triggered()'), getattr(self, name))
+                self.toolsMenu.addAction(action)
+
+    # Обработчики меню: начало
+
+    def networkSetup(self):
+        print 'Показать диалог настройки соединения с сервером.'
+
+    def test(self):
+        print 'test test test'
+
+    # Обработчики меню: конец
 
     # Drag'n'Drop section begins
     def mousePressEvent(self, event):
