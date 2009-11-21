@@ -1,0 +1,118 @@
+{% load media %}
+<html>
+    <head>
+        <title>Тестируем ExtJS</title>
+        <meta http-equiv="content-Type" content="text/html; charset=UTF-8" />
+
+        <link rel="stylesheet" type="text/css" href="{% media 'media/extjs/resources/css/ext-all.css' %}"/>
+        <link rel="stylesheet" type="text/css" href="{% media 'media/extjs/resources/css/custom.css' %}"/>
+        <script type="text/javascript" src="{% media 'js/jquery-1.3.1.js' %}"></script>
+
+        <script type="text/javascript" src="{% media 'media/extjs/adapter/jquery/ext-jquery-adapter-debug.js' %}"></script>
+        <script type="text/javascript" src="{% media 'media/extjs/ext-all-debug.js' %}"></script>
+
+        <script type="text/javascript" src="{% media 'js/Ext.ux.msg.js' %}"></script>
+
+        <script type="text/javascript">
+            if (typeof(URLS) == 'undefined') URLS = {};
+            var root = 'http://127.0.0.1:8000';
+            URLS.get_client_courses = root+'/client/ajax/active_courses/';
+            Ext.onReady(function() {
+                Ext.BLANK_IMAGE_URL = '{% media "media/extjs/resources/images/default/s.gif" %}';
+                Ext.QuickTips.init();
+
+                Ext.Ajax.on('requestexception', function(){
+                    Ext.ux.msg('Failure', 'Ajax communication failed', Ext.Msg.ERROR);
+                }, this);
+
+                var course_store = new Ext.data.JsonStore({
+                    storeId: 'UserCourses',
+                    //autoLoad: true,
+                    autoDestroy: true, // destroy store when the component the store is bound to is destroyed
+                    root: 'courses', // get data from this key
+                    idProperty: 'id',
+                    user_rfid_code: null,
+                    fields: [
+                        {name: 'id', type: 'int'},
+                        'title', 
+                        'start',
+                        'type',
+                        'end',
+                        'room',
+                        'coach'
+                    ],
+                    proxy: new Ext.data.HttpProxy({
+                        method: 'POST',
+                        url: URLS.get_client_courses
+                    })
+                });//course_store
+                course_store.setBaseParam('rfid_code', 'FCFC408E');
+                course_store.load();
+
+                var courses = new Ext.ListView({
+                    emptyText: 'No courses for today',
+                    frame: true,
+                    border: false,
+                    loadingText: 'loading',
+                    tpl: new Ext.XTemplate(
+                        '<tpl for="rows">',
+                            '<dl class="{type}">',
+                                '<tpl for="parent.columns">',
+                                '<dt style="width:{width}%;text-align:{align};"><em unselectable="on">',
+                                    '{[values.tpl.apply(parent)]}',
+                                '</em></dt>',
+                                '</tpl>',
+                                '<div class="x-clear"></div>',
+                            '</dl>',
+                        '</tpl>'
+                    ),
+                    columns: [{
+                        header: 'Title',
+                        //width: .41,
+                        dataIndex: 'title'
+                    },{
+                        header: 'Coach',
+                        dataIndex: 'coach'
+                    },{
+                        header: 'Room',
+                        dataIndex: 'room'
+                    },{
+                        header: 'Start',
+                        dataIndex: 'start'
+                    },{
+                        header: 'End',
+                        dataIndex: 'end'
+                    }],
+                    store: course_store
+                });//courses
+
+                var vp = new Ext.Viewport({
+                    layout: 'border',
+                    title: 'Main window',
+                    items: [
+                        new Ext.Panel({
+                            frame: true,
+                            border: false,
+                            region: 'west',
+                            title: 'Information',
+                            html: '&nbsp;',
+                            width: '30%'
+                        }),
+
+                        new Ext.Panel({
+                            frame: true,
+                            border: false,
+                            region: 'center',
+                            title: 'List of courses',
+                            items: courses
+                        })
+                        
+                    ]
+                });//vp
+            });
+        </script>
+    </head>
+
+    <body>
+    </body>
+</html>

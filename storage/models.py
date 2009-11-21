@@ -185,6 +185,29 @@ class Schedule(models.Model):
         }
         return obj
 
+    def get_for_user(self, user):
+        type = None
+        if user is None or self.end < datetime.today():
+            type = 'unavailable'
+        else:
+            cards = Card.objects.filter(client=user, course=self.course, exp_date__gt=datetime.today())
+            for item in cards:
+                if item.count > 0:
+                    type = 'available'
+        if type is None:
+            type = 'posible'
+
+        obj = {
+            'id': self.pk,
+            'title': self.course.__unicode__(),
+            'room': self.room.__unicode__(),
+            'start': self.begin.strftime('%H:%M'),
+            'end': self.end.strftime('%H:%M'),
+            'coach': ' '.join([str(item) for item in self.course.coach.all()]),
+            'type': type
+        }
+        return obj
+
     @classmethod
     def get_unstatus_event(self):
         d = datetime.now() - timedelta(minutes=settings.CHECK_STATUS_INTERVAL)
