@@ -612,6 +612,18 @@ class TreeModel(QAbstractItemModel):
 
         return parentItem.childCount()
 
+class CoursesTree(QTreeView):
+
+    """ Класс дерева курсов. """
+
+    def __init__(self, parent=None):
+        QTreeView.__init__(self, parent)
+
+
+        tree.setAcceptDrops(False)
+        tree.setDragEnabled(True)
+        tree.setDropIndicatorShown(True)
+
 class HttpAjax(QObject):
 
     def __init__(self, host, port, url):
@@ -672,7 +684,7 @@ class MainWindow(QMainWindow):
             data = response.read()
             data = json.read(data)
             self.model = TreeModel(data)
-            tree = QTreeView()
+            tree = CoursesTree()
             tree.setModel(self.model)
             return tree
         else:
