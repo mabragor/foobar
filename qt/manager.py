@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
 
-import sys, re
+import sys, re, httplib, urllib, json
 from datetime import datetime, timedelta
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
+from PyQt4.QtNetwork import *
 
 class Event(object):
 
@@ -316,8 +317,8 @@ class QtSchedule(QTableView):
         for room, event in test_data:
             self.model.insert(room, event)
 
-        print self.model.rc2e
-        print self.model.e2rc
+        #print self.model.rc2e
+        #print self.model.e2rc
 
         # Запрещаем выделение множества ячеек
         self.setSelectionMode(QAbstractItemView.ExtendedSelection) #SingleSelection)
@@ -494,6 +495,151 @@ class QtSchedule(QTableView):
             event.ignore()
             print 'unknown format'
 
+class TreeItem:
+    def __init__(self, data, parent=None):
+        self.parentItem = parent
+        self.itemData = data
+        self.childItems = []
+
+    def appendChild(self, item):
+        self.childItems.append(item)
+
+    def child(self, row):
+        return self.childItems[row]
+
+    def childCount(self):
+        return len(self.childItems)
+
+    def columnCount(self):
+        return len(self.itemData)
+
+    def data(self, column):
+        return self.itemData[column]
+
+    def parent(self):
+        return self.parentItem
+
+    def row(self):
+        if self.parentItem:
+            return self.parentItem.childItems.index(self)
+
+        return 0
+
+class TreeModel(QAbstractItemModel):
+
+    def __init__(self, data, parent=None):
+        QAbstractItemModel.__init__(self, parent)
+
+        rootData = []
+        rootData.append(QVariant(self.tr('Courses')))
+        self.rootItem = TreeItem(rootData)
+
+        """
+        Формат полученных данных:
+        [ {id, text, cls='folder', allowDrag, text,
+           children: [{id, text, cls='file', leaf, text}, ..]
+          }, ...
+        ]
+        """
+        for i in data:
+            if i['cls'] == 'folder':
+                folder = TreeItem([ i['text'] ], self.rootItem)
+                self.rootItem.appendChild(folder)
+                for j in i['children']:
+                    child = TreeItem([ j['text'] ], folder)
+                    folder.appendChild(child)
+
+    def columnCount(self, parent):
+        if parent.isValid():
+            return parent.internalPointer().columnCount()
+        else:
+            return self.rootItem.columnCount()
+
+    def data(self, index, role):
+        if not index.isValid():
+            return QVariant()
+
+        if role != Qt.DisplayRole:
+            return QVariant()
+
+        item = index.internalPointer()
+
+        return QVariant(item.data(index.column()))
+
+    def flags(self, index):
+        if not index.isValid():
+            return Qt.ItemIsEnabled
+
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+
+    def headerData(self, section, orientation, role):
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return self.rootItem.data(section)
+
+        return QVariant()
+
+    def index(self, row, column, parent):
+        if row < 0 or column < 0 or row >= self.rowCount(parent) or column >= self.columnCount(parent):
+            return QModelIndex()
+
+        if not parent.isValid():
+            parentItem = self.rootItem
+        else:
+            parentItem = parent.internalPointer()
+
+        childItem = parentItem.child(row)
+        if childItem:
+            return self.createIndex(row, column, childItem)
+        else:
+            return QModelIndex()
+
+    def parent(self, index):
+        if not index.isValid():
+            return QModelIndex()
+
+        childItem = index.internalPointer()
+        parentItem = childItem.parent()
+
+        if parentItem == self.rootItem:
+            return QModelIndex()
+
+        return self.createIndex(parentItem.row(), 0, parentItem)
+
+    def rowCount(self, parent):
+        if parent.column() > 0:
+            return 0
+
+        if not parent.isValid():
+            parentItem = self.rootItem
+        else:
+            parentItem = parent.internalPointer()
+
+        return parentItem.childCount()
+
+class HttpAjax(QObject):
+
+    def __init__(self, host, port, url):
+        http = QHttp()
+        print http
+        http.setHost(host, port)
+
+        self.connect(http, SIGNAL('readyRead(QHttpResponseHeader)'), self.readyRead)
+
+        http.post(url, None)
+        print host, url
+
+    def readyRead(self, resp):
+        print 'ready'
+
+
+#         print 'URL is', url
+#         a = manager.get(QNetworkRequest(QUrl(url)))
+#         print 'requestdone', a
+#         print dir(a)
+#         print a.url()
+#         print a.error(),':',a.errorString()
+#         print
+
 class MainWindow(QMainWindow):
 
     def __init__(self, parent=None):
@@ -507,22 +653,36 @@ class MainWindow(QMainWindow):
         self.resize(640, 480)
 
     def setupViews(self):
-        tree = self.initCourses()
-
         self.schedule = QtSchedule(self)
         self.schedule.setup((8, 23), timedelta(minutes=30))
 
+        self.tree = self.initCourses()
+
         splitter = QSplitter()
-        splitter.addWidget(tree)
+        splitter.addWidget(self.tree)
         splitter.addWidget(self.schedule)
 
         self.setCentralWidget(splitter)
 
     def initCourses(self):
-        model = QDirModel()
-        tree = QTreeView()
-        tree.setModel(model)
-        return tree
+        params = urllib.urlencode({})
+        headers = {"Content-type": "application/x-www-form-urlencoded",
+                   "Accept": "text/plain"}
+        conn = httplib.HTTPConnection("127.0.0.1:8000")
+        conn.request("POST", "/manager/get_course_tree/", params, headers)
+        response = conn.getresponse()
+        conn.close()
+
+        if response.status == 200:
+            data = response.read()
+            data = json.read(data)
+            self.model = TreeModel(data)
+            tree = QTreeView()
+            tree.setModel(self.model)
+            return tree
+        else:
+            print 'error'
+            return None
 
     def createMenus(self):
         """ Метод для генерации меню приложения. """
@@ -530,10 +690,10 @@ class MainWindow(QMainWindow):
         data. Создать обработчики для каждого действия. """
         data = [
             (self.tr('&Tools'), [
-                    (self.tr('Network Setup'), self.tr('Ctrl+N'), 'networkSetup',
-                     self.tr('Manage your network connection.')),
-                    (self.tr('Test'), self.tr('Ctrl+T'), 'test',
-                     self.tr('Test')),
+                    (self.tr('Network Setup'), self.tr('Ctrl+N'),
+                     'networkSetup', self.tr('Manage your network connection.')),
+                    (self.tr('Test'), self.tr('Ctrl+T'),
+                     'test', self.tr('Test')),
                     ]
              )
             ]
