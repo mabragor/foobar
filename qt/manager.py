@@ -276,8 +276,8 @@ class QtSchedule(QTableView):
 
     """ Класс календаря. """
 
-    def __init__(self, *args):
-        QTableView.__init__(self, *args)
+    def __init__(self, work_hours, quant, parent=None):
+        QTableView.__init__(self, parent)
 
         self.events = {}
         self.cells = {}
@@ -288,7 +288,6 @@ class QtSchedule(QTableView):
                       ('green', '#aaffaa', 101),
                       ('blue', '#aaaaff', 102)]
 
-    def setup(self, work_hours, quant):
         self.work_hours = work_hours
         self.quant = quant
 
@@ -316,9 +315,6 @@ class QtSchedule(QTableView):
             ]
         for room, event in test_data:
             self.model.insert(room, event)
-
-        #print self.model.rc2e
-        #print self.model.e2rc
 
         # Запрещаем выделение множества ячеек
         self.setSelectionMode(QAbstractItemView.ExtendedSelection) #SingleSelection)
@@ -653,8 +649,7 @@ class MainWindow(QMainWindow):
         self.resize(640, 480)
 
     def setupViews(self):
-        self.schedule = QtSchedule(self)
-        self.schedule.setup((8, 23), timedelta(minutes=30))
+        self.schedule = QtSchedule((8, 23), timedelta(minutes=30))
 
         self.tree = self.initCourses()
 
