@@ -51,11 +51,13 @@ class ScheduleForm(forms.ModelForm):
 
         if room and begin and course:
             end = begin + timedelta(hours=course.duration)
-            result = Schedule.objects.select_related().filter(room=room).filter(begin__day=begin.day)
+            result = Schedule.objects.select_related().filter(room=room).filter(begin__range=(begin.date(), begin.date()+timedelta(days=1)))
+
             if self.instance.pk:
                 result = result.exclude(pk=self.instance.pk)
 
             for item in result:
+                print item.course.__unicode__()
                 if (begin < item.end < end) or (begin <= item.begin < end):
                     raise forms.ValidationError('Incorect begin date for this room')
         return self.cleaned_data

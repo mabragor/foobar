@@ -1,0 +1,91 @@
+<html>
+    <head>
+        <title>Тестируем ExtJS</title>
+        <meta http-equiv="content-Type" content="text/html; charset=UTF-8" />
+
+        <link href="/lib/extjs/resources/css/ext-all.css" rel="stylesheet" type="text/css"/>
+        <link href="/lib/extjs/air/resources/ext-air.css" rel="stylesheet" type="text/css"/>
+        <link href="/lib/extjs/resources/css/custom.css" rel="stylesheet" type="text/css"/>
+
+        <script type="text/javascript" src="/lib/air/AIRIntrospector.js"></script>
+        <script type="text/javascript" src="/lib/air/AIRAliases.js"></script>
+
+        <script type="text/javascript" src="/lib/jquery/jquery-1.3.1.js"></script>
+        <script type="text/javascript" src="/lib/extjs/adapter/jquery/ext-jquery-adapter.js"></script>
+        <script type="text/javascript" src="/lib/extjs/ext-all.js"></script>
+
+        <script type="text/javascript" src="/js/URLS.js"></script>
+        <script type="text/javascript" src="/js/Ext.ux.msg.js"></script>
+        
+        <script type="text/javascript">
+            console = air.Introspector.Console;
+            Ext.onReady(function() {
+                Ext.BLANK_IMAGE_URL = '/lib/extjs/resources/images/default/s.gif';
+                Ext.QuickTips.init();
+
+                Ext.Ajax.on('requestexception', function(){
+                    Ext.ux.msg('Failure', 'Ajax communication failed', Ext.Msg.ERROR);
+                }, this);
+
+                var course_store = new Ext.data.JsonStore({
+                    storeId: 'UserCourses',
+                    //autoLoad: true,
+                    autoDestroy: true, // destroy store when the component the store is bound to is destroyed
+                    root: 'courses', // get data from this key
+                    idProperty: 'id',
+                    user_rfid_code: null,
+                    fields: [
+                        {name: 'id', type: 'int'},
+                        'title', 'time', 'tipe'
+                    ],
+                    proxy: new Ext.data.HttpProxy({
+                        method: 'POST',
+                        url: URLS.get_client_courses
+                    })
+                });//course_store 
+                course_store.setBaseParam('rfid_code', '008365B0');
+                course_store.load();
+                
+                var courses = new Ext.ListView({
+                    emptyText: 'No courses for today',
+                    frame: true,
+                    border: false,
+                    region: 'center',
+                    loadingText: 'loading',
+                    tpl: new Ext.XTemplate(
+                        '<tpl for="rows">',
+                            '<dl class="{type}">',
+                                '<tpl for="parent.columns">',
+                                '<dt style="width:{width}%;text-align:{align};"><em unselectable="on">',
+                                    '{[values.tpl.apply(parent)]}',
+                                '</em></dt>',
+                                '</tpl>',
+                                '<div class="x-clear"></div>',
+                            '</dl>',
+                        '</tpl>'
+                    ),
+                    columns: [{
+                        header: 'Title',
+                        width: .41,
+                        dataIndex: 'title'
+                    },{
+                        header: 'Time',
+                        dataIndex: 'time'
+                    }],
+                    store: course_store
+                });//courses
+
+                var vp = new Ext.Viewport({
+                    layout: 'border',
+                    title: 'Main window',
+                    items: [
+                        courses
+                    ]
+                });//vp
+            });
+        </script>
+    </head>
+
+    <body>
+    </body>
+</html>
