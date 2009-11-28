@@ -20,6 +20,5 @@ def get_active_courses(request, form):
         user = None
     output = []
     for item in schedule:
-        print item
         output.append(item.get_for_user(user))
     return {'courses': output}
