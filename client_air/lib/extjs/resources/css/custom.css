@@ -56,3 +56,15 @@
 dl.old-user-course {
     color: gray;
 }
+
+dl.unavailable {
+    color: grey;
+}
+
+dl.available {
+    color: teal;
+}
+
+dl.posible {
+    color: orange;
+}

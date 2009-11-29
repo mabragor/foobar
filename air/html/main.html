@@ -3,6 +3,7 @@
     <!--
     <script type="text/javascript" src="/lib/air/AIRIntrospector.js"></script>
     -->
+    <script type="text/javascript" src="/js/URLS.js"></script>
     <script src="/swf/applicationupdater_ui.swf" type="application/x-shockwave-flash"/>
     <script>
         // instantiate an updater object
@@ -10,7 +11,7 @@
 
         function checkUpdate() {
                 // we set the URL for the update.xml file
-                appUpdater.updateURL = "http://127.0.0.1:8000/static/air/updater/update.xml";
+                appUpdater.updateURL = URLS.update_url;
                 //we set the event handlers for INITIALIZED nad ERROR
                 appUpdater.addEventListener(runtime.air.update.events.UpdateEvent.INITIALIZED, onUpdate);
                 appUpdater.addEventListener(runtime.flash.events.ErrorEvent.ERROR, onError);

@@ -1,5 +1,7 @@
 if (typeof(URLS) == 'undefined') URLS = {};
 var root = 'http://127.0.0.1:8000';
+URLS.update_url = root+'/static/air/updater/update.xml';
+
 URLS.get_course_tree = root+'/manager/get_course_tree/';
 URLS.get_user_courses = root+'/manager/ajax_get_user_courses/';
 URLS.add_event = root+'/manager/add_event/';

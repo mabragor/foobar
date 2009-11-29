@@ -1,3 +1,10 @@
+#Files where placed server url
+-js/URLS.js
+ var root = 'Http://...'
+
+-html/main.html
+ sandboxRoot attribute of sandbox iframe
+
 #Create serteficate. 321654 is password
 adt -certificate -cn ADigitalID 1024-RSA SigningCert.p12 321654
 
