@@ -28,6 +28,7 @@ class Coach(AbstractUser):
         return obj
 
 class Client(AbstractUser):
+
     def get_course_list(self):
         return [card.get_info() for card in self.card_set.all()]
 
@@ -160,7 +161,7 @@ class Schedule(models.Model):
     places = models.BooleanField(verbose_name=_(u'Are there free places?'), default=True)
     status = models.CharField(verbose_name=_(u'Status'), max_length=1, choices=ACTION_STATUSES, null=True)
     change = models.ForeignKey(Coach, null=True, blank=True)
-    
+
     class Meta:
         verbose_name = _(u'Schedule')
         verbose_name_plural = _(u'Schedules')

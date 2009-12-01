@@ -12,7 +12,8 @@ class CoachAdmin(admin.ModelAdmin):
 admin.site.register(models.Coach, CoachAdmin)
 
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'email', 'reg_date')
+    list_display = ('rfid_code', 'first_name', 'last_name', 'email', 'reg_date')
+    search_fields = ('rfid_code', 'first_name')
     fieldsets = ((None, {'fields': ('first_name', 'last_name',
                                     'email')}),)
 admin.site.register(models.Client, ClientAdmin)
