@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.template import RequestContext
 from django.utils import simplejson
 from django.utils.translation import ugettext as _
-from lib import DatetimeJSONEncoder
+from lib import DatetimeJSONEncoder, DatetimeJSONEncoderQt
 
 def render_to(template, processor=None):
     def renderer(func):
@@ -24,7 +24,7 @@ def render_to(template, processor=None):
         return wrapper
     return renderer
 
-def ajax_processor(form_object=None):
+def ajax_processor(form_object=None, javascript=True):
     def processor(func):
         def wrapper(request, *args, **kwargs):
             if request.method == 'POST':
@@ -44,7 +44,10 @@ def ajax_processor(form_object=None):
                     result = {'code': '401', 'desc': _(u'It must be POST')}
                 else:
                     result = {'code': '401', 'desc': _(u'Please, do not break our code :)')}
-            json = simplejson.dumps(result, cls=DatetimeJSONEncoder)
+            if javascript:
+                json = simplejson.dumps(result, cls=DatetimeJSONEncoder)
+            else:
+                json = simplejson.dumps(result, cls=DatetimeJSONEncoderQt)
             return HttpResponse(json, mimetype="application/json")
         return wrapper
     return processor
