@@ -8,8 +8,8 @@ from PyQt4.QtCore import *
 
 class HttpAjax(QObject):
 
-    def __init__(self, host, port, url):
-        params = urllib.urlencode({})
+    def __init__(self, host, port, url, params):
+        params = urllib.urlencode(params)
         headers = {'Content-type': 'application/x-www-form-urlencoded',
                    'Accept': 'text/plain'}
         conn = httplib.HTTPConnection('%s:%s' % (host, port))
@@ -22,5 +22,9 @@ class HttpAjax(QObject):
             data = self.response.read()
             return json.read(data)
         else:
+            print 'HTTP Error is [%s] %s' % (
+                self.response.status,
+                self.response.reason
+                )
             return None
 
