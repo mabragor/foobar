@@ -2,7 +2,8 @@
 
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns('manager.views',
+urlpatterns = patterns(
+    'manager.views',
     url(r'^$', 'index'),
     url(r'^add_event/$', 'ajax_add_event', name='ajax_add_event'),
     url(r'^add_event/(?P<pk>\d+)/$', 'ajax_add_event'),
@@ -19,4 +20,9 @@ urlpatterns = patterns('manager.views',
     url(r'^get_status_timer/$', 'ajax_get_status_timer', name='ajax_get_status_timer'),
     url(r'^copy_week/$', 'ajax_copy_week', name='ajax_copy_week'),
     url(r'^add_user_course/$', 'ajax_add_user_course', name='ajax_add_user_course')
-)
+    )
+
+urlpatterns += patterns(
+    'manager.ajax',
+    url(r'^user_info/$', 'user_info', name='ajax_add_user_course'),
+    )
