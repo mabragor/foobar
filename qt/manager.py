@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
 
-import sys, re
+import sys, re, time
 from datetime import datetime, timedelta
 
 from http_ajax import HttpAjax
+from rfid import WaitingRFID
 from event_storage import Event, EventStorage
 from qtschedule import QtScheduleDelegate, QtSchedule
 from courses_tree import TreeItem, TreeModel, CoursesTree
@@ -13,10 +14,18 @@ from courses_tree import TreeItem, TreeModel, CoursesTree
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
+waiting = True
+
 class MainWindow(QMainWindow):
 
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
+
+        self.rfidGot = QWaitCondition()
+        self.rfidMutex = QMutex()
+        self.callback = self.readedRFID
+        self.reader = WaitingRFID(self)
+        self.reader.start()
 
         self.createMenus()
         self.setupViews()
@@ -71,6 +80,11 @@ class MainWindow(QMainWindow):
                     (self.tr('Test'), self.tr('Ctrl+T'),
                      'test', self.tr('Test')),
                     ]
+             ),
+            (self.tr('&Mode'), [
+                    (self.tr('Wait for RFID'), self.tr('Ctrl+R'),
+                     'waitingRFID', self.tr('Waiting the RFID code.')),
+                    ]
              )
             ]
 
@@ -91,6 +105,15 @@ class MainWindow(QMainWindow):
 
     def test(self):
         print 'test test test'
+
+    def waitingRFID(self):
+        self.rfidGot.wakeAll()
+        # показать диалог
+
+    def readedRFID(self, rfid):
+        # спрятать диалог
+        self.rfid_id = rfid
+        print 'readedRFID:', rfid
 
     # Обработчики меню: конец
 
