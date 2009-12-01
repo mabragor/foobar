@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
 
-import serial
+import serial, random, time
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+DEBUG = False
 PORT = {
     'name': '/dev/ttyUSB0',
     'rate': 38400,
@@ -26,6 +27,15 @@ class WaitingRFID(QThread):
         return '%02X' % ord(symbol)
 
     def run(self):
+        if DEBUG:
+            # отладочный код, на случай отсутствия считывателя
+            demo_rfids = ['008365B0', '0083AD33', '00836012']
+            index = random.randint(0, len(demo_rfids) - 1)
+            rfid_code = demo_rfids[index]
+            time.sleep(3)
+            self.callback(rfid_code)
+            QCoreApplication.postEvent(self.dialog, QCloseEvent())
+
         rfid_code = ''
         # инициализация считывателя
         port = serial.Serial(PORT['name'], PORT['rate'],
