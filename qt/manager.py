@@ -11,6 +11,8 @@ from event_storage import Event, EventStorage
 from qtschedule import QtScheduleDelegate, QtSchedule
 from courses_tree import TreeItem, TreeModel, CoursesTree
 
+from dlg_waiting_rfid import DlgWaitingRFID
+
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
@@ -20,12 +22,6 @@ class MainWindow(QMainWindow):
 
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
-
-        self.rfidGot = QWaitCondition()
-        self.rfidMutex = QMutex()
-        self.callback = self.readedRFID
-        self.reader = WaitingRFID(self)
-        self.reader.start()
 
         self.createMenus()
         self.setupViews()
@@ -107,11 +103,25 @@ class MainWindow(QMainWindow):
         print 'test test test'
 
     def waitingRFID(self):
-        self.rfidGot.wakeAll()
         # показать диалог
+        print 'show dialog'
+        self.dlg = DlgWaitingRFID(self)
+        self.dlg.setModal(True)
+
+        # запустить чтение потока с RFID считывателя
+        self.rfidReader = QWaitCondition()
+        self.rfidWaiter = QWaitCondition()
+        self.rfidMutex = QMutex()
+        self.callback = self.readedRFID
+        self.reader = WaitingRFID(self)
+        self.reader.start()
+
+        time.sleep(1)
+        self.rfidReader.wakeAll()
+
+        self.dlg.exec_()
 
     def readedRFID(self, rfid):
-        # спрятать диалог
         self.rfid_id = rfid
         print 'readedRFID:', rfid
 
