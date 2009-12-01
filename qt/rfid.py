@@ -15,14 +15,10 @@ PORT = {
     'stop_bits': 2
     }
 
-rfid_code = ''
-
 class WaitingRFID(QThread):
     def __init__(self, parent):
-        self.dialog = parent.dlg
+        self.dialog = parent.dialog
         self.callback = parent.callback
-        self.mutex = parent.rfidMutex
-        self.condition = parent.rfidReader
 
         QThread.__init__(self)
 
@@ -30,6 +26,8 @@ class WaitingRFID(QThread):
         return '%02X' % ord(symbol)
 
     def run(self):
+        rfid_code = ''
+        # инициализация считывателя
         port = serial.Serial(PORT['name'], PORT['rate'],
                              bytesize = PORT['bits_in_byte'],
                              parity = PORT['parity'],
@@ -38,27 +36,26 @@ class WaitingRFID(QThread):
         port.setDTR(True)
         port.setRTS(True)
 
-        self.mutex.lock()
-        print 'lock'
-        self.condition.wait(self.mutex)
-        print 'condition'
-
         buffer = []
+        # бесконечный цикл, пока не получим идентификатор карты
+        # формат: =012345678<OD><OA>
         while True:
             symbol = port.read(1)
-            #print symbol
             if not self.hex(symbol) == '0D':
                 buffer.append(symbol)
             else:
                 if '0A' == self.hex(port.read(1)):
                     if len(buffer) == 9:
-                        rfid_code = ''.join(buffer[1:]) # see manager.py
+                        # первый символ нам не нужен
+                        rfid_code = ''.join(buffer[1:])
                         break
+                    # в любом случае буфер надо чистить, так как в нём
+                    # либо уже ненужный идентификатор, либо тестовый
+                    # символ
                     buffer = []
-        #print rfid_code
+
         self.callback(rfid_code)
-        self.mutex.unlock()
-
+        # закрываем окно диалога
         QCoreApplication.postEvent(self.dialog, QCloseEvent())
-
+        # закрываем порт
         port.close()

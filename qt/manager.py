@@ -45,7 +45,9 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(splitter)
 
     def initCourses(self):
-        ajax = HttpAjax('127.0.0.1', 8000, '/manager/get_course_tree/')
+        ajax = HttpAjax('127.0.0.1', 8000,
+                        '/manager/get_course_tree/',
+                        {})
         json_like = ajax.parse_json()
         self.model = TreeModel(json_like)
         tree = CoursesTree(self)
@@ -56,7 +58,9 @@ class MainWindow(QMainWindow):
         return self.mimes.get(name, None)
 
     def getRooms(self):
-        ajax = HttpAjax('127.0.0.1', 8000, '/manager/get_rooms/')
+        ajax = HttpAjax('127.0.0.1', 8000,
+                        '/manager/get_rooms/',
+                        {})
         json_like = ajax.parse_json()
         """
         {'rows': [{'color': 'FFAAAA', 'text': 'red', 'id': 1},
@@ -103,29 +107,38 @@ class MainWindow(QMainWindow):
         print 'test test test'
 
     def waitingRFID(self):
-        # показать диалог
-        print 'show dialog'
-        self.dlg = DlgWaitingRFID(self)
-        self.dlg.setModal(True)
+        """ Обработчик меню. Отображает диалог и запускает поток обработки
+        данных RFID считывателя. """
+        # подготовить диалог
+        self.dialog = DlgWaitingRFID(self)
+        self.dialog.setModal(True)
 
         # запустить чтение потока с RFID считывателя
-        self.rfidReader = QWaitCondition()
-        self.rfidWaiter = QWaitCondition()
-        self.rfidMutex = QMutex()
         self.callback = self.readedRFID
         self.reader = WaitingRFID(self)
         self.reader.start()
 
-        time.sleep(1)
-        self.rfidReader.wakeAll()
-
-        self.dlg.exec_()
+        # показать диалог
+        self.dialog.exec_()
 
     def readedRFID(self, rfid):
+        """ Callback функция, вызывается из потока RFID считывателя, получая
+        идентификатор карты. """
         self.rfid_id = rfid
         print 'readedRFID:', rfid
+        self.getUserInfo(rfid)
 
     # Обработчики меню: конец
+
+    def getUserInfo(self, rfid):
+        """ Метод для получения информации о пользователе по идентификатору
+        его карты. """
+        ajax = HttpAjax('127.0.0.1', 8000,
+                        '/manager/user_info/',
+                        {'rfid_code': rfid})
+        json_like = ajax.parse_json()
+        print 'USER INFO:', json_like
+        return json_like
 
     # Drag'n'Drop section begins
     def mousePressEvent(self, event):
