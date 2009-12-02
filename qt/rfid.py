@@ -21,10 +21,29 @@ class WaitingRFID(QThread):
         self.dialog = parent.dialog
         self.callback = parent.callback
 
+        self.disposed = False
+        self.die = False
+
         QThread.__init__(self)
+
+    def __del__(self):
+        self.dispose()
+
+    def timeToDie(self):
+        print 'thread prepare to die'
+        self.die = True
 
     def hex(self, symbol):
         return '%02X' % ord(symbol)
+
+    def dispose(self):
+        print 'dispose'
+        if not self.disposed:
+            self.disposed = True
+            # закрываем порт
+            self.port.setDTR(False)
+            self.port.setRTS(False)
+            self.port.close()
 
     def run(self):
         if DEBUG:
@@ -38,23 +57,23 @@ class WaitingRFID(QThread):
 
         rfid_code = ''
         # инициализация считывателя
-        port = serial.Serial(PORT['name'], PORT['rate'],
-                             bytesize = PORT['bits_in_byte'],
-                             parity = PORT['parity'],
-                             stopbits = PORT['stop_bits']
+        self.port = serial.Serial(PORT['name'], PORT['rate'],
+                                  bytesize = PORT['bits_in_byte'],
+                                  parity = PORT['parity'],
+                                  stopbits = PORT['stop_bits']
                              )
-        port.setDTR(True)
-        port.setRTS(True)
+        self.port.setDTR(True)
+        self.port.setRTS(True)
 
         buffer = []
         # бесконечный цикл, пока не получим идентификатор карты
         # формат: =012345678<OD><OA>
         while True:
-            symbol = port.read(1)
+            symbol = self.port.read(1)
             if not self.hex(symbol) == '0D':
                 buffer.append(symbol)
             else:
-                if '0A' == self.hex(port.read(1)):
+                if '0A' == self.hex(self.port.read(1)):
                     if len(buffer) == 9:
                         # первый символ нам не нужен
                         rfid_code = ''.join(buffer[1:])
@@ -64,8 +83,14 @@ class WaitingRFID(QThread):
                     # символ
                     buffer = []
 
-        self.callback(rfid_code)
-        # закрываем окно диалога
-        QCoreApplication.postEvent(self.dialog, QCloseEvent())
-        # закрываем порт
-        port.close()
+                    # пользователь закрыл диалог, надо завершить поток
+                    if self.die:
+                        break
+
+        if not self.die:
+            # передаём код
+            self.callback(rfid_code)
+            # закрываем окно диалога
+            QCoreApplication.postEvent(self.dialog, QCloseEvent())
+
+        self.dispose()

@@ -109,15 +109,10 @@ class MainWindow(QMainWindow):
     def waitingRFID(self):
         """ Обработчик меню. Отображает диалог и запускает поток обработки
         данных RFID считывателя. """
+        self.callback = self.readedRFID
         # подготовить диалог
         self.dialog = DlgWaitingRFID(self)
         self.dialog.setModal(True)
-
-        # запустить чтение потока с RFID считывателя
-        self.callback = self.readedRFID
-        self.reader = WaitingRFID(self)
-        self.reader.start()
-
         # показать диалог
         self.dialog.exec_()
 
