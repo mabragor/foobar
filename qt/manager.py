@@ -11,6 +11,7 @@ from event_storage import Event, EventStorage
 from qtschedule import QtScheduleDelegate, QtSchedule
 from courses_tree import TreeItem, TreeModel, CoursesTree
 
+from dlg_settings import DlgSettings
 from dlg_waiting_rfid import DlgWaitingRFID
 
 from PyQt4.QtGui import *
@@ -45,8 +46,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(splitter)
 
     def initCourses(self):
-        ajax = HttpAjax('127.0.0.1', 8000,
-                        '/manager/get_course_tree/',
+        ajax = HttpAjax('/manager/get_course_tree/',
                         {})
         json_like = ajax.parse_json()
         self.model = TreeModel(json_like)
@@ -58,8 +58,7 @@ class MainWindow(QMainWindow):
         return self.mimes.get(name, None)
 
     def getRooms(self):
-        ajax = HttpAjax('127.0.0.1', 8000,
-                        '/manager/get_rooms/',
+        ajax = HttpAjax('/manager/get_rooms/',
                         {})
         json_like = ajax.parse_json()
         """
@@ -75,15 +74,15 @@ class MainWindow(QMainWindow):
         data. Создать обработчики для каждого действия. """
         data = [
             (self.tr('&Tools'), [
-                    (self.tr('Network Setup'), self.tr('Ctrl+N'),
-                     'networkSetup', self.tr('Manage your network connection.')),
+                    (self.tr('Application settings'), self.tr('Ctrl+T'),
+                     'setupApp', self.tr('Manage the application settings.')),
                     (self.tr('Test'), self.tr('Ctrl+T'),
                      'test', self.tr('Test')),
                     ]
              ),
             (self.tr('&Mode'), [
                     (self.tr('Wait for RFID'), self.tr('Ctrl+R'),
-                     'waitingRFID', self.tr('Waiting the RFID code.')),
+                     'waitingRFID', self.tr('Enable RFID reader and wait for a RFID id.')),
                     ]
              )
             ]
@@ -100,8 +99,12 @@ class MainWindow(QMainWindow):
 
     # Обработчики меню: начало
 
-    def networkSetup(self):
-        print 'Показать диалог настройки соединения с сервером.'
+    def setupApp(self):
+        # подготовить диалог
+        self.dialog = DlgSettings(self)
+        self.dialog.setModal(True)
+        # показать диалог
+        self.dialog.exec_()
 
     def test(self):
         print 'test test test'
@@ -128,8 +131,7 @@ class MainWindow(QMainWindow):
     def getUserInfo(self, rfid):
         """ Метод для получения информации о пользователе по идентификатору
         его карты. """
-        ajax = HttpAjax('127.0.0.1', 8000,
-                        '/manager/user_info/',
+        ajax = HttpAjax('/manager/user_info/',
                         {'rfid_code': rfid})
         json_like = ajax.parse_json()
         print 'USER INFO:', json_like
@@ -143,7 +145,15 @@ class MainWindow(QMainWindow):
         print 'move event', event.pos()
     # Drag'n'Drop section ends
 
+
 if __name__=="__main__":
+
+    # глобальные параметры настроек приложения
+    QCoreApplication.setOrganizationName('Home, Sweet Home')
+    QCoreApplication.setOrganizationDomain('snegiri.dontexist.org')
+    QCoreApplication.setApplicationName('foobar')
+    QCoreApplication.setApplicationVersion('1.0')
+
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
