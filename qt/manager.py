@@ -77,6 +77,11 @@ class MainWindow(QMainWindow):
         """ Использование: Описать меню со всеми действиями в блоке
         data. Создать обработчики для каждого действия. """
         data = [
+            (self.tr('&File'), [
+                    (self.tr('Exit'), self.tr(''),
+                     'close', self.tr('Close the application.')),
+                    ]
+             ),
             (self.tr('&Tools'), [
                     (self.tr('Application settings'), self.tr('Ctrl+T'),
                      'setupApp', self.tr('Manage the application settings.')),
