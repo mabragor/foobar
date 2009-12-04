@@ -46,8 +46,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(splitter)
 
     def initCourses(self):
-        ajax = HttpAjax('/manager/get_course_tree/',
-                        {})
+        ajax = HttpAjax(self, '/manager/get_course_tree/', {})
         json_like = ajax.parse_json()
         self.model = TreeModel(json_like)
         tree = CoursesTree(self)
@@ -58,8 +57,7 @@ class MainWindow(QMainWindow):
         return self.mimes.get(name, None)
 
     def getRooms(self):
-        ajax = HttpAjax('/manager/get_rooms/',
-                        {})
+        ajax = HttpAjax(self, '/manager/get_rooms/', {})
         json_like = ajax.parse_json()
         """
         {'rows': [{'color': 'FFAAAA', 'text': 'red', 'id': 1},
@@ -131,8 +129,7 @@ class MainWindow(QMainWindow):
     def getUserInfo(self, rfid):
         """ Метод для получения информации о пользователе по идентификатору
         его карты. """
-        ajax = HttpAjax('/manager/user_info/',
-                        {'rfid_code': rfid})
+        ajax = HttpAjax(self, '/manager/user_info/', {'rfid_code': rfid})
         json_like = ajax.parse_json()
         print 'USER INFO:', json_like
         return json_like

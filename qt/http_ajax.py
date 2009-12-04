@@ -7,11 +7,14 @@ import httplib, urllib, json
 from dlg_settings import TabNetwork
 
 from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 class HttpAjax(QObject):
 
-    def __init__(self, url, params):
+    def __init__(self, parent, url, params):
         self.get_settings()
+
+        self.parent = parent
 
         params = urllib.urlencode(params)
         headers = {'Content-type': 'application/x-www-form-urlencoded',
@@ -37,9 +40,11 @@ class HttpAjax(QObject):
             data = self.response.read()
             return json.read(data)
         else:
-            print 'HTTP Error is [%s] %s' % (
-                self.response.status,
-                self.response.reason
+            QMessageBox.critical(
+                self.parent, self.parent.tr('HTTP Error'),
+                '[%s] %s' % (
+                    self.response.status,
+                    self.response.reason
+                    )
                 )
             return None
-
