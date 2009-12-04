@@ -47,8 +47,11 @@ class MainWindow(QMainWindow):
 
     def initCourses(self):
         ajax = HttpAjax(self, '/manager/get_course_tree/', {})
-        json_like = ajax.parse_json()
-        self.model = TreeModel(json_like)
+        if ajax:
+            json_like = ajax.parse_json()
+            self.model = TreeModel(json_like)
+        else:
+            self.model = TreeModel()
         tree = CoursesTree(self)
         tree.setModel(self.model)
         return tree
@@ -58,7 +61,10 @@ class MainWindow(QMainWindow):
 
     def getRooms(self):
         ajax = HttpAjax(self, '/manager/get_rooms/', {})
-        json_like = ajax.parse_json()
+        if ajax:
+            json_like = ajax.parse_json()
+        else:
+            json_like = {'rows': []}
         """
         {'rows': [{'color': 'FFAAAA', 'text': 'red', 'id': 1},
                   {'color': 'AAFFAA', 'text': 'green', 'id': 2},

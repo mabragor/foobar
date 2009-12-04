@@ -55,6 +55,8 @@ class TreeModel(QAbstractItemModel):
           }, ...
         ]
         """
+        if not data:
+            return
         for i in data:
             if i['cls'] == 'folder':
                 folder = TreeItem( [i['text']], self.rootItem)
@@ -143,7 +145,11 @@ class CoursesTree(QTreeView):
         self.setDragDropMode(QAbstractItemView.DragOnly)
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
-        self.rooms = parent.getRooms().get('rows')
+        rooms = parent.getRooms()
+        if rooms:
+            self.rooms = rooms.get('rows')
+        else:
+            self.rooms = []
 
         self.getMime = parent.getMime
 
