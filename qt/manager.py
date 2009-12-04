@@ -13,7 +13,6 @@ from courses_tree import TreeItem, TreeModel, CoursesTree
 
 from dlg_settings import DlgSettings
 from dlg_waiting_rfid import DlgWaitingRFID
-from dlg_user_info import DlgUserInfo
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -117,9 +116,7 @@ class MainWindow(QMainWindow):
         self.dialog.exec_()
 
     def test(self):
-        self.dialog = DlgUserInfo(self)
-        self.dialog.setModal(True)
-        self.dialog.exec_()
+        print 'test test test'
 
     def waitingRFID(self):
         """ Обработчик меню. Отображает диалог и запускает поток обработки
