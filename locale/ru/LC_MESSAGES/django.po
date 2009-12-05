@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-11 22:07+0400\n"
+"POT-Creation-Date: 2009-12-04 19:23+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,121 +36,149 @@ msgstr "Форма не проходит проверку"
 msgid "Probably you've made a mistake."
 msgstr "Возможно вы сделали ошибку"
 
-#: lib/decorators.py:36
+#: lib/decorators.py:37
 #, python-format
 msgid "Form is not valid : %s"
 msgstr "Форма не проходит проверку : %s"
 
-#: lib/decorators.py:38
+#: lib/decorators.py:39
 msgid "Service is temporary unavailable. We appologize for any inconvinience."
 msgstr "Сервис временно недоступен. Мы извиняемся за неудобство."
 
-#: lib/decorators.py:43
+#: lib/decorators.py:44
 msgid "It must be POST"
 msgstr "Используйте метод POST"
 
-#: lib/decorators.py:45
+#: lib/decorators.py:46
 msgid "Please, do not break our code :)"
 msgstr "Пожалуйста, не ломайте нас :)"
 
-#: manager/views.py:41
+#: manager/views.py:59
 msgid "Incorrect request method."
 msgstr "Неверный метод запроса."
 
-#: storage/admin.py:40
-msgid "Relation"
-msgstr "Взаимосвязь"
-
-#: storage/admin.py:50
-msgid "Links"
-msgstr "Ссылки"
-
-#: storage/models.py:12 storage/models.py:60 storage/models.py:78
-#: storage/models.py:125
+#: rfid/models.py:9 storage/models.py:13 storage/models.py:92
+#: storage/models.py:144 storage/models.py:256
 msgid "Registered"
 msgstr "Зарегистрирован"
 
-#: storage/models.py:27 storage/models.py:46 storage/models.py:58
+#: rfid/models.py:12
+msgid "Card's code"
+msgstr "Идентификатор карты"
+
+#: rfid/models.py:13
+msgid "Card codes"
+msgstr "Идентификаторы карт"
+
+#: storage/admin.py:41
+msgid "Relation"
+msgstr "Взаимосвязь"
+
+#: storage/admin.py:51
+msgid "Links"
+msgstr "Ссылки"
+
+#: storage/models.py:36 storage/models.py:65 storage/models.py:87
 msgid "Title"
 msgstr "Заголовок"
 
-#: storage/models.py:28
+#: storage/models.py:37
 msgid "Color"
 msgstr "Цвет"
 
-#: storage/models.py:39
+#: storage/models.py:58
 msgid "Room"
 msgstr "Зал"
 
-#: storage/models.py:40
+#: storage/models.py:59
 msgid "Rooms"
 msgstr "Залы"
 
-#: storage/models.py:49
+#: storage/models.py:78
 msgid "Style"
 msgstr "Стиль"
 
-#: storage/models.py:50
+#: storage/models.py:79
 msgid "Styles"
 msgstr "Стили"
 
-#: storage/models.py:63
+#: storage/models.py:89 storage/models.py:131 storage/models.py:135
+msgid "Price"
+msgstr "Цена"
+
+#: storage/models.py:90
+msgid "The price of the course."
+msgstr "Цена курса."
+
+#: storage/models.py:95 storage/models.py:130
 msgid "Course"
 msgstr "Курс"
 
-#: storage/models.py:64
+#: storage/models.py:96
 msgid "Courses"
 msgstr "Курсы"
 
-#: storage/models.py:79
+#: storage/models.py:132
+msgid "Applied"
+msgstr "Назначено"
+
+#: storage/models.py:136
+msgid "Prices"
+msgstr "Цены"
+
+#: storage/models.py:139
+msgid "costs"
+msgstr "стоит"
+
+#: storage/models.py:145
 msgid "Expired"
 msgstr "Окончено"
 
-#: storage/models.py:80
+#: storage/models.py:146
 msgid "Count"
 msgstr "Количество"
 
-#: storage/models.py:83 storage/models.py:84
+#: storage/models.py:149 storage/models.py:150
 msgid "Card"
 msgstr "Карта"
 
-#: storage/models.py:92
-msgid "Begins"
-msgstr "Начинается"
-
-#: storage/models.py:93
-msgid "Is looking for members?"
-msgstr "Идёт набор участников?"
-
-#: storage/models.py:94
-msgid "Are there free places?"
-msgstr "Есть свободные места?"
-
-#: storage/models.py:114
-msgid "Schedule"
-msgstr "Расписание"
-
-#: storage/models.py:115
-msgid "Schedules"
-msgstr "Расписания"
-
-#: storage/models.py:119
+#: storage/models.py:182
 msgid "Done"
 msgstr "Выполнено"
 
-#: storage/models.py:120
+#: storage/models.py:183
 msgid "Cancel"
 msgstr "Отмена"
 
-#: storage/models.py:126
+#: storage/models.py:187
+msgid "Begins"
+msgstr "Начинается"
+
+#: storage/models.py:188
+msgid "Is looking for members?"
+msgstr "Идёт набор участников?"
+
+#: storage/models.py:189
+msgid "Are there free places?"
+msgstr "Есть свободные места?"
+
+#: storage/models.py:190
 msgid "Status"
 msgstr "Статус"
 
-#: storage/models.py:129
+#: storage/models.py:194
+msgid "Schedule"
+msgstr "Расписание"
+
+#: storage/models.py:195
+msgid "Schedules"
+msgstr "Расписания"
+
+#: storage/models.py:259
 msgid "Action"
 msgstr "Действие"
 
-#: storage/models.py:130
+#: storage/models.py:260
 msgid "Actions"
 msgstr "Действия"
 
@@ -188,4 +216,3 @@ msgstr ""
 "минутами.</nobr> \n"
 "\t    По истечении данного времени потребуется повторная авторизация.\n"
 "\t    "
-
