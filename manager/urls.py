@@ -24,5 +24,6 @@ urlpatterns = patterns(
 
 urlpatterns += patterns(
     'manager.ajax',
-    url(r'^user_info/$', 'user_info', name='ajax_add_user_course'),
+    url(r'^user_info/$', 'user_info', name='user_info'),
+    url(r'^available_courses/$', 'available_courses', name='available_courses'),
     )

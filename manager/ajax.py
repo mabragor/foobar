@@ -9,7 +9,7 @@ from lib.decorators import ajax_processor, render_to
 
 from forms import UserRFID
 
-from storage.models import Client
+from storage.models import Client, Group
 
 isJavaScript = False
 
@@ -24,3 +24,8 @@ def user_info(request, form):
         'reg_date': user.reg_date,
         'course_list': user.get_course_list()
         }
+
+@ajax_processor(None, isJavaScript)
+def available_courses(request):
+    groups = Group.objects.all()
+    return [item.get_node() for item in groups]
