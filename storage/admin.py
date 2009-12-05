@@ -33,11 +33,11 @@ class GroupAdmin(admin.ModelAdmin):
 admin.site.register(models.Group, GroupAdmin)
 
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('title', 'coaches', 'groups', 'duration', 'reg_date')
+    list_display = ('title', 'coaches', 'groups', 'price', 'duration', 'reg_date')
     ordering = ('title', 'group')
     search_fields = ('title', 'group')
     fieldsets = (
-        (None, {'fields': ('title', 'duration')}),
+        (None, {'fields': ('title', 'duration', 'price')}),
         (_(u'Relation'), {'fields': ('group', 'coach')}),
         )
 

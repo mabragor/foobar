@@ -74,6 +74,13 @@ class Group(models.Model):
         }
         return obj
 
+    def get_node(self):
+        return {
+            'id': self.pk,
+            'title': self.title,
+            'children': [item.get_node() for item in self.course_set.all()]
+            }
+
     class Meta:
         verbose_name = _(u'Style')
         verbose_name_plural = _(u'Styles')
@@ -86,6 +93,10 @@ class Course(models.Model):
     coach = models.ManyToManyField(Coach)
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
     duration = models.FloatField()
+    count = models.IntegerField(verbose_name=_(u'Count'))
+    price = models.FloatField(verbose_name=_(u'Price'),
+                              help_text=_(u'The price of the course.'),
+                              default=float(0.00))
     reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
 
     class Meta:
@@ -108,6 +119,16 @@ class Course(models.Model):
             'text': '%s : %s' % (self.title, coaches),
             'leaf': True,
             'cls': 'file'
+            }
+
+    def get_node(self):
+        return {
+            'id': self.pk,
+            'title': self.title,
+            'coaches': ','.join([item.__unicode__() for item in self.coach.all()]),
+            'count': self.count,
+            'price': self.price,
+            'duration': self.duration
             }
 
 class Card(models.Model):
