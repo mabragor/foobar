@@ -9,10 +9,13 @@ from http_ajax import HttpAjax
 from rfid import WaitingRFID
 from event_storage import Event, EventStorage
 from qtschedule import QtScheduleDelegate, QtSchedule
-from courses_tree import TreeItem, TreeModel, CoursesTree
+
+#from tree_model import TreeItem
+from courses_tree import CoursesTree, TreeModel
 
 from dlg_settings import DlgSettings
 from dlg_waiting_rfid import DlgWaitingRFID
+from dlg_user_info import DlgUserInfo
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -49,6 +52,13 @@ class MainWindow(QMainWindow):
         ajax = HttpAjax(self, '/manager/get_course_tree/', {})
         if ajax:
             json_like = ajax.parse_json()
+            """
+            Формат полученных данных:
+            [ {id, text, cls='folder', allowDrag, text,
+               children: [{id, text, cls='file', leaf, text}, ..]
+              }, ...
+            ]
+            """
             self.model = TreeModel(json_like)
         else:
             self.model = TreeModel()
@@ -116,7 +126,9 @@ class MainWindow(QMainWindow):
         self.dialog.exec_()
 
     def test(self):
-        print 'test test test'
+        self.dialog = DlgUserInfo(self)
+        self.dialog.setModal(True)
+        self.dialog.exec_()
 
     def waitingRFID(self):
         """ Обработчик меню. Отображает диалог и запускает поток обработки

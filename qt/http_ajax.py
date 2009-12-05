@@ -47,4 +47,5 @@ class HttpAjax(QObject):
                     self.response.reason
                     )
                 )
+            open('./dump.html', 'w').write(self.response.read())
             return None
