@@ -92,6 +92,15 @@ class MainWindow(QMainWindow):
                      'close', self.tr('Close the application.')),
                     ]
              ),
+            (self.tr('C&lient'), [
+                    (self.tr('New'), self.tr('Ctrl+N'),
+                     'clientNew', self.tr('Register new client.')),
+                    (self.tr('Search by RFID'), self.tr(''),
+                     'clientSearchRFID', self.tr('Search a client with its RFID card.')),
+                    (self.tr('Search by name'), self.tr(''),
+                     'clientSearchName', self.tr('Search a client with its name.')),
+                    ]
+             ),
             (self.tr('&Tools'), [
                     (self.tr('Application settings'), self.tr('Ctrl+T'),
                      'setupApp', self.tr('Manage the application settings.')),
@@ -117,6 +126,24 @@ class MainWindow(QMainWindow):
                 self.toolsMenu.addAction(action)
 
     # Обработчики меню: начало
+
+    def clientNew(self):
+        print 'register new client'
+
+    def clientSearchRFID(self):
+        print 'search client by its rfid'
+        self.waitingRFID()
+        print 'rfid is', self.rfid_id
+        ajax = HttpAjax(self, '/manager/user_info/', {'rfid_code': self.rfid_id})
+        json_like = ajax.parse_json()
+        print json_like
+        self.dialog = DlgUserInfo('edit', self)
+        self.dialog.setModal(True)
+        self.dialog.setData(json_like)
+        self.dialog.exec_()
+
+    def clientSearchName(self):
+        print 'search client by its name'
 
     def setupApp(self):
         # подготовить диалог
@@ -144,8 +171,6 @@ class MainWindow(QMainWindow):
         """ Callback функция, вызывается из потока RFID считывателя, получая
         идентификатор карты. """
         self.rfid_id = rfid
-        print 'readedRFID:', rfid
-        self.getUserInfo(rfid)
 
     # Обработчики меню: конец
 

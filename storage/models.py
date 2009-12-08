@@ -136,7 +136,11 @@ class Card(models.Model):
     client = models.ForeignKey(Client)
     reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
     exp_date = models.DateTimeField(verbose_name=_(u'Expired'))
-    count = models.IntegerField(verbose_name=_(u'Count'))
+    count_sold = models.IntegerField(verbose_name=_(u'Exercises sold'))
+    count_used = models.IntegerField(verbose_name=_(u'Exercises used'))
+    price = models.FloatField(verbose_name=_(u'Price'),
+                              help_text=_(u'The price of the course.'),
+                              default=float(0.00))
 
     class Meta:
         verbose_name = _(u'Card')
@@ -145,6 +149,21 @@ class Card(models.Model):
 
     def __unicode__(self):
         return self.course.title
+
+    def get_info(self):
+        return {
+            'id': self.pk,
+            'course_id': self.course.pk,
+            'title': self.course.title,
+            'reg_date': self.reg_date,
+            'exp_date': self.exp_date,
+            'count_sold': self.count_sold,
+            'count_used': self.count_used,
+            'price': self.price,
+            # это надо будет удалить
+            'deleteable': False,#self.deleteable(),
+            'is_old': self.is_old()
+        }
 
     def deleteable(self):
         #if self.reg_date <= datetime.now() - timedelta(days=1):
@@ -157,18 +176,6 @@ class Card(models.Model):
 
     def is_old(self):
         return self.exp_date < datetime.now()
-
-    def get_info(self):
-        return {
-            'id': self.pk,
-            'title': self.course.title,
-            'course_id': self.course.pk,
-            'reg_date': self.reg_date,
-            'exp_date': self.exp_date,
-            'count': self.count,
-            'deleteable': False,#self.deleteable(),
-            'is_old': self.is_old()
-        }
 
 class Schedule(models.Model):
     ACTION_STATUSES = (
