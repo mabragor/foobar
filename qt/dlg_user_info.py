@@ -50,10 +50,11 @@ class DlgUserInfo(QDialog):
         groupUser.setLayout(layoutUser)
 
         # купленные курсы
-        self.cardinfo = QTableWidget(1, 6)
+        self.cardinfo = QTableWidget(1, 7)
         labels = [self.tr('Title'), self.tr('Assigned'),
                   self.tr('Used'), self.tr('Price'),
-                  self.tr('Bought'), self.tr('Expired')]
+                  self.tr('Bought'), self.tr('Expired'),
+                  self.tr('Action')]
         self.cardinfo.setHorizontalHeaderLabels(QStringList(labels))
 
         cardLayout = QVBoxLayout()
@@ -62,19 +63,18 @@ class DlgUserInfo(QDialog):
         groupCard = QGroupBox(self.tr('Course\'s history'))
         groupCard.setLayout(cardLayout)
 
-        # курсы, которые можно приобрести
-        self.coursesModel = TreeModel(self.getCourses())
-        courses = CoursesTree(self)
-        courses.setModel(self.coursesModel)
+#         # курсы, которые можно приобрести
+#         self.coursesModel = TreeModel(self.getCourses())
+#         courses = CoursesTree(self)
+#         courses.setModel(self.coursesModel)
 
-        courseLayout = QVBoxLayout()
-        courseLayout.addWidget(courses)
+#         courseLayout = QVBoxLayout()
+#         courseLayout.addWidget(courses)
 
-        groupCourses = QGroupBox(self.tr('Available courses'))
-        groupCourses.setLayout(courseLayout)
+#         groupCourses = QGroupBox(self.tr('Available courses'))
+#         groupCourses.setLayout(courseLayout)
 
-        self.assignButton = QPushButton(self.tr('Assign'))
-
+        assignButton = QPushButton(self.tr('Assign'))
         applyButton = QPushButton(self.tr('Apply'))
         cancelButton = QPushButton(self.tr('Cancel'))
 
@@ -85,14 +85,16 @@ class DlgUserInfo(QDialog):
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch(1)
+        buttonLayout.addWidget(assignButton)
+        buttonLayout.addStretch(20)
         buttonLayout.addWidget(applyButton)
         buttonLayout.addWidget(cancelButton)
 
         layout = QVBoxLayout()
         layout.addWidget(groupUser)
         layout.addWidget(groupCard)
-        layout.addWidget(self.assignButton)
-        layout.addWidget(groupCourses)
+        #layout.addWidget(assignButton)
+        #layout.addWidget(groupCourses)
         layout.addLayout(buttonLayout)
 
         self.setLayout(layout)
@@ -107,14 +109,23 @@ class DlgUserInfo(QDialog):
         for record in courses:
             row = self.cardinfo.rowCount()
             self.cardinfo.setRowCount(row+1)
-            print row, record['title'], record['count_sold'], record['price']
-            print record
+
+            cancelButton = QPushButton(self.tr('Cancel'))
+            self.connect(cancelButton, SIGNAL('clicked()'), self.cancelCourse)
+
             self.cardinfo.setItem(row-1, 0, QTableWidgetItem(record['title']))
             self.cardinfo.setItem(row-1, 1, QTableWidgetItem(str(record['count_sold'])))
             self.cardinfo.setItem(row-1, 2, QTableWidgetItem(str(record['count_used'])))
             self.cardinfo.setItem(row-1, 3, QTableWidgetItem(str(record['price'])))
             self.cardinfo.setItem(row-1, 4, QTableWidgetItem(record['reg_date']))
             self.cardinfo.setItem(row-1, 5, QTableWidgetItem(record['exp_date']))
+            self.cardinfo.setCellWidget(row-1, 6, cancelButton)
+
+    def cancelCourse(self):
+        print 'cancel course'
+        row = self.cardinfo.currentRow()
+        print row
+        self.cardinfo.removeRow(row)
 
     def applyDialog(self):
         """ Применить настройки. """

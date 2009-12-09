@@ -99,6 +99,8 @@ class MainWindow(QMainWindow):
                      'clientSearchRFID', self.tr('Search a client with its RFID card.')),
                     (self.tr('Search by name'), self.tr(''),
                      'clientSearchName', self.tr('Search a client with its name.')),
+                    (self.tr('One visit'), self.tr(''),
+                     'clientOneVisit', self.tr('One visit client.')),
                     ]
              ),
             (self.tr('&Tools'), [
@@ -144,6 +146,9 @@ class MainWindow(QMainWindow):
 
     def clientSearchName(self):
         print 'search client by its name'
+
+    def clientOneVisit(self):
+        print 'one visit client'
 
     def setupApp(self):
         # подготовить диалог
