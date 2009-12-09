@@ -30,7 +30,7 @@ class Coach(AbstractUser):
 class Client(AbstractUser):
 
     def get_course_list(self):
-        return [card.get_info() for card in self.card_set.all()]
+        return [card.get_info() for card in self.card_set.all().order_by('-reg_date')]
 
 class Room(models.Model):
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
