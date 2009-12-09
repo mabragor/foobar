@@ -7,7 +7,7 @@ import serial, random, time
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-DEBUG = False
+DEBUG = True
 PORT = {
     'name': '/dev/ttyUSB0',
     'rate': 38400,
@@ -48,12 +48,15 @@ class WaitingRFID(QThread):
     def run(self):
         if DEBUG:
             # отладочный код, на случай отсутствия считывателя
+            print 'debugging part of code, in case of RFID '\
+                'reader absence. See rfid.py\'s DEBUG variable'.
             demo_rfids = ['008365B0', '0083AD33', '00836012']
             index = random.randint(0, len(demo_rfids) - 1)
             rfid_code = demo_rfids[index]
             time.sleep(3)
             self.callback(rfid_code)
             QCoreApplication.postEvent(self.dialog, QCloseEvent())
+            return
 
         rfid_code = ''
         # инициализация считывателя
