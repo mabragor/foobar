@@ -1,0 +1,80 @@
+{% extends "admin/base_site.html" %}
+
+{% load adminmedia i18n %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/changelists.css" />
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block bodyclass %}change-list{% endblock %}
+
+{% block content_title %}<h1>{% trans 'Courses statistic' %}</h1>{% endblock %}
+
+{% block breadcrumbs %}
+  <div class="breadcrumbs">
+    <a href="{% url admin:index %}">
+      {% trans "Home" %}
+    </a>
+     &rsaquo; 
+     <a href="{% url statistic:index %}">
+       {% trans 'Statistic' %}
+    </a>
+    &rsaquo; 
+    {% trans 'Courses' %}
+  </div>
+{% endblock %}
+ 
+ {% block coltype %}flex{% endblock %}
+ 
+ {% block content %}
+  <div id="content-main">
+    {% block object-tools %}
+        <ul class="object-tools">
+          <li>
+              <a href="#" class="addlink">
+              {% trans 'Get PDF' %}
+            </a>
+          </li>
+        </ul>
+    {% endblock %}
+    <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+    
+<table cellspacing="0">
+<thead>
+<tr>
+<th>
+&nbsp;
+</th><th class="sorted ascending">
+<a href="?ot=desc&amp;o=1">
+Title
+</a></th><th>
+Coaches
+</th><th>
+Groups
+</th><th>
+<a href="?ot=asc&amp;o=4">
+Price
+</a></th><th>
+<a href="?ot=asc&amp;o=5">
+Duration
+</a></th><th>
+<a href="?ot=asc&amp;o=6">
+Registered
+</a></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row1"><td><input type="checkbox" class="action-select" value="9" name="_selected_action" /></td><th><a href="9/">Dance-latino-mix, фитнес, начинающие</a></th><td>Юля Уткина</td><td>Больше, чем танцы,Латиноамериканские танцы</td><td>0.0</td><td>1.0</td><td class="nowrap">06.10.2009 08:55</td></tr>
+<tr class="row2"><td><input type="checkbox" class="action-select" value="10" name="_selected_action" /></td><th><a href="10/">Dance-latino-mix, фитнес, продолжающие</a></th><td>Юля Уткина</td><td>Больше, чем танцы,Латиноамериканские танцы</td><td>0.0</td><td>1.0</td><td class="nowrap">06.10.2009 08:55</td></tr>
+</tbody>
+</table>
+        
+    </div>
+  </div>
+{% endblock %}
