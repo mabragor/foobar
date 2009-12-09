@@ -136,6 +136,7 @@ class Card(models.Model):
     client = models.ForeignKey(Client)
     reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
     exp_date = models.DateTimeField(verbose_name=_(u'Expired'))
+    cnl_date = models.DateTimeField(verbose_name=_(u'Cancelled'), null=True)
     count_sold = models.IntegerField(verbose_name=_(u'Exercises sold'))
     count_used = models.IntegerField(verbose_name=_(u'Exercises used'))
     price = models.FloatField(verbose_name=_(u'Price'),
@@ -157,6 +158,7 @@ class Card(models.Model):
             'title': self.course.title,
             'reg_date': self.reg_date,
             'exp_date': self.exp_date,
+            'cnl_date': self.cnl_date,
             'count_sold': self.count_sold,
             'count_used': self.count_used,
             'price': self.price,
