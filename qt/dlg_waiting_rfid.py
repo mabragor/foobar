@@ -15,7 +15,6 @@ class DlgWaitingRFID(QDialog):
         self.parent = parent
         self.parent.dialog = self
         self.reader = WaitingRFID(self.parent)
-        self.reader.setTerminationEnabled(True)
 
         self.layout = QVBoxLayout()
 
@@ -30,11 +29,14 @@ class DlgWaitingRFID(QDialog):
 
         self.connect(self.cancel, SIGNAL('clicked()'),
                      self.unlink)
-        self.connect(self.cancel, SIGNAL('clicked()'),
-                     self, SLOT('reject()'))
-
         self.reader.start()
 
+    def closeEvent(self, event):
+        self.accept()
+        event.accept()
+
     def unlink(self):
-        """ Посылаем потоку RFID считывателя команду тихо завершиться. """
+        #Посылаем потоку RFID считывателя команду тихо завершиться.
         self.reader.timeToDie()
+        # закрываем диалог
+        self.reject()

@@ -134,7 +134,7 @@ class MainWindow(QMainWindow):
 
     def clientSearchRFID(self):
         print 'search client by its rfid'
-        if self.waitingRFID() == QDialog.Accepted:
+        if QDialog.Accepted == self.waitingRFID():
             print 'rfid is', self.rfid_id
             ajax = HttpAjax(self, '/manager/user_info/',
                             {'rfid_code': self.rfid_id})
@@ -173,7 +173,9 @@ class MainWindow(QMainWindow):
         self.dialog = DlgWaitingRFID(self)
         self.dialog.setModal(True)
         # показать диалог
-        return self.dialog.exec_()
+        res = self.dialog.exec_()
+        print 'waitingRFID', res
+        return res
 
     def readedRFID(self, rfid):
         """ Callback функция, вызывается из потока RFID считывателя, получая
