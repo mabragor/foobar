@@ -48,30 +48,24 @@
 <table cellspacing="0">
 <thead>
 <tr>
-<th>
-&nbsp;
-</th><th class="sorted ascending">
-<a href="?ot=desc&amp;o=1">
-Title
-</a></th><th>
-Coaches
-</th><th>
-Groups
-</th><th>
-<a href="?ot=asc&amp;o=4">
-Price
-</a></th><th>
-<a href="?ot=asc&amp;o=5">
-Duration
-</a></th><th>
-<a href="?ot=asc&amp;o=6">
-Registered
-</a></th>
+    <th>{% trans 'Name' %}</th>
+    <th>{% trans 'Fee' %}</th>
+    <th>{% trans 'Count' %}</th>
+    <th>{% trans 'Hours' %}</th>
+    <th>{% trans 'Visitors' %}</th>
+    <th>{% trans 'Visitors by card' %}</th>
+    <th>{% trans 'Salary' %}</th>
+    <th>{% trans 'Income' %}</th>
 </tr>
 </thead>
 <tbody>
-<tr class="row1"><td><input type="checkbox" class="action-select" value="9" name="_selected_action" /></td><th><a href="9/">Dance-latino-mix, фитнес, начинающие</a></th><td>Юля Уткина</td><td>Больше, чем танцы,Латиноамериканские танцы</td><td>0.0</td><td>1.0</td><td class="nowrap">06.10.2009 08:55</td></tr>
-<tr class="row2"><td><input type="checkbox" class="action-select" value="10" name="_selected_action" /></td><th><a href="10/">Dance-latino-mix, фитнес, продолжающие</a></th><td>Юля Уткина</td><td>Больше, чем танцы,Латиноамериканские танцы</td><td>0.0</td><td>1.0</td><td class="nowrap">06.10.2009 08:55</td></tr>
+{% for row in rows %}
+    <tr class="{% cycle 'row1' 'row2' %}">
+        {% for value in row %}
+            <td>{{ value }}</td>
+        {% endfor %}
+    </tr>
+{% endfor %}
 </tbody>
 </table>
         
