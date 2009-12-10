@@ -1,0 +1,23 @@
+{% extends 'admin/index.html' %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs"><a href="{% url admin:index %}">
+{% trans "Home" %}</a> &rsaquo; {% trans 'Statistic' %}
+</div>{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <div class="module">
+        <table>
+        <caption>{% trans 'Statistic' %}</caption>
+          <tr>
+            <th scope="row"><a href="{% url statistic:courses %}">{% trans 'Courses' %}</a></th>
+            <td>&nbsp;</td>
+          </tr>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
