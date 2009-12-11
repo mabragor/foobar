@@ -98,7 +98,10 @@ class Course(models.Model):
                               help_text=_(u'The price of the course.'),
                               default=float(0.00))
     reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
-
+    salary = models.IntegerField(verbose_name=_(u'Salary'),
+                                 help_text=_(u'The salary for the course.'),
+                                 default=0)
+    
     class Meta:
         verbose_name = _(u'Course')
         verbose_name_plural = _(u'Courses')
