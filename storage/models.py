@@ -132,8 +132,13 @@ class Course(models.Model):
             }
 
 class Card(models.Model):
+    CARD_TYPE = ((1, _(u'Normal card')), (2, _(u'Club card')))
     course = models.ForeignKey(Course)
     client = models.ForeignKey(Client)
+    type = models.CharField(verbose_name=_(u'Type'),
+                            help_text=_(u'Type of client\'s card'),
+                            max_length=1, choices=CARD_TYPE,
+                            default=1)
     reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
     exp_date = models.DateTimeField(verbose_name=_(u'Expired'))
     cnl_date = models.DateTimeField(verbose_name=_(u'Cancelled'), null=True)

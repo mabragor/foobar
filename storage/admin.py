@@ -44,11 +44,11 @@ class CourseAdmin(admin.ModelAdmin):
 admin.site.register(models.Course, CourseAdmin)
 
 class CardAdmin(admin.ModelAdmin):
-    list_display = ('course', 'client', 'count_sold', 'count_used',
+    list_display = ('course', 'client', 'type', 'count_sold', 'count_used',
                     'price','reg_date', 'exp_date')
     ordering = ('reg_date', 'exp_date', 'count_sold', 'client')
     fieldsets = (
-        (None, {'fields': ('exp_date', 'count_sold', 'price')}),
+        (None, {'fields': ('type', 'exp_date', 'count_sold', 'price')}),
         (_('Links'), {'fields': ('course', 'client')}),
         )
 admin.site.register(models.Card, CardAdmin)
