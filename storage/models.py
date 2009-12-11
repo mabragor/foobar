@@ -135,7 +135,7 @@ class Course(models.Model):
             }
 
 class Card(models.Model):
-    CARD_TYPE = ((1, _(u'Normal card')), (2, _(u'Club card')))
+    CARD_TYPE = (('1', _(u'Normal card')), ('2', _(u'Club card')))
     course = models.ForeignKey(Course)
     client = models.ForeignKey(Client)
     type = models.CharField(verbose_name=_(u'Type'),
@@ -150,7 +150,7 @@ class Card(models.Model):
     price = models.FloatField(verbose_name=_(u'Price'),
                               help_text=_(u'The price of the course.'),
                               default=float(0.00))
-
+    
     class Meta:
         verbose_name = _(u'Card')
         verbose_name_plural = _(u'Card')
