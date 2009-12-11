@@ -2,41 +2,58 @@
 # -*- coding: utf-8 -*-
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
 
+from courses_tree import CoursesTree
+
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
 class DlgCourseAssign(QDialog):
 
-    def __init__(self, room_list, parent=None):
+    def __init__(self, parent=None):
         QDialog.__init__(self, parent)
 
-        self.room_list = room_list
-        print room_list
+        self.parent = parent
+        self.setMinimumWidth(800)
 
-        self.weekDayLabel = QLabel(self.tr('Day of week'))
-        self.weekDayList = QListView()
+        self.tree = CoursesTree(self)
 
-        self.dayTimeLabel = QLabel(self.tr('Time'))
-        self.dayTimeList = QListView()
+        courseLayout = QVBoxLayout()
+        courseLayout.addWidget(self.tree)
 
-        self.roomListLabel = QLabel(self.tr('Rooms'))
-        self.roomListList = QListWidget()
-        rooms = QStringList()
-        for data in room_list:
-            rooms.append(data['text'])
-        self.roomListList.insertItems(0, rooms)
+        groupCourses = QGroupBox(self.tr('Available courses'))
+        groupCourses.setLayout(courseLayout)
 
-        layout = QGridLayout()
-        layout.setColumnStretch(1, 1)
-        layout.setColumnMinimumWidth(1, 250)
+        buttonAssign = QPushButton(self.tr('Assign'))
+        buttonCancel = QPushButton(self.tr('Cancel'))
 
-        layout.addWidget(self.weekDayLabel, 0, 0)
-        layout.addWidget(self.weekDayList, 1, 0)
-        layout.addWidget(self.dayTimeLabel, 0, 1)
-        layout.addWidget(self.dayTimeList, 1, 1)
-        layout.addWidget(self.roomListLabel, 0, 2)
-        layout.addWidget(self.roomListList, 1, 2)
+        self.connect(buttonAssign, SIGNAL('clicked()'),
+                     self.applyDialog)
+        self.connect(buttonCancel, SIGNAL('clicked()'),
+                     self, SLOT('reject()'))
+
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch(1)
+        buttonLayout.addWidget(buttonAssign)
+        buttonLayout.addWidget(buttonCancel)
+
+        layout = QVBoxLayout()
+        layout.addWidget(groupCourses)
+        layout.addLayout(buttonLayout)
 
         self.setLayout(layout)
-        self.setWindowTitle(self.tr('Place the course'))
+        self.setWindowTitle(self.tr('Choose the course'))
+
+    def setModel(self, model):
+        self.tree.setModel(model)
+
+    def applyDialog(self):
+        """ Применить настройки. """
+        self.saveSettings()
+        self.accept()
+
+    def saveSettings(self):
+        index = self.tree.currentIndex()
+        print 'saveSettings'
+        print index.data(Qt.DisplayRole)
+
 

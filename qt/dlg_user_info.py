@@ -6,6 +6,7 @@ from http_ajax import HttpAjax
 from courses_list import CourseListModel, CoursesList
 from tree_model import TreeItem, AbstractTreeModel
 from dlg_waiting_rfid import DlgWaitingRFID
+from dlg_course_assign import DlgCourseAssign
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -83,16 +84,17 @@ class DlgUserInfo(QDialog):
 
         self.connect(buttonAssignRFID, SIGNAL('clicked()'),
                      self.assignRFID)
+        self.connect(buttonAssignCourse, SIGNAL('clicked()'),
+                     self.assignCourse)
         self.connect(buttonApplyDialog, SIGNAL('clicked()'),
                      self.applyDialog)
         self.connect(buttonCancelDialog, SIGNAL('clicked()'),
                      self, SLOT('reject()'))
 
         buttonLayout = QHBoxLayout()
-        buttonLayout.addStretch(1)
         buttonLayout.addWidget(buttonAssignRFID)
         buttonLayout.addWidget(buttonAssignCourse)
-        buttonLayout.addStretch(20)
+        buttonLayout.addStretch(1)
         buttonLayout.addWidget(buttonApplyDialog)
         buttonLayout.addWidget(buttonCancelDialog)
 
@@ -138,6 +140,13 @@ class DlgUserInfo(QDialog):
         else:
             print 'rejected'
 
+    def assignCourse(self):
+        model = self.parent.modelCoursesTree
+        dialog = DlgCourseAssign(self)
+        dialog.setModel(model)
+        dialog.setModal(True)
+        dlgStatus = dialog.exec_()
+
     def applyDialog(self):
         """ Применить настройки. """
         self.saveSettings()
@@ -171,7 +180,7 @@ class TreeModel(AbstractTreeModel):
     def __init__(self, data, parent=None):
         AbstractTreeModel.__init__(self, data, parent)
 
-    def processData(self, data):
+    def setData(self, data):
         """
         Формат полученных данных:
         [ {id, title,
