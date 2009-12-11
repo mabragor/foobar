@@ -110,11 +110,6 @@ class MainWindow(QMainWindow):
                      'test', self.tr('Test')),
                     ]
              ),
-            (self.tr('&Mode'), [
-                    (self.tr('Wait for RFID'), self.tr('Ctrl+R'),
-                     'waitingRFID', self.tr('Enable RFID reader and wait for a RFID id.')),
-                    ]
-             )
             ]
 
         for topic, info in data:
@@ -137,7 +132,15 @@ class MainWindow(QMainWindow):
 
     def clientSearchRFID(self):
         print 'search client by its rfid'
-        if QDialog.Accepted == self.waitingRFID():
+        def callback(rfid):
+            self.rfid_id = rfid
+
+        self.callback = callback
+        self.dialog = DlgWaitingRFID(self)
+        self.dialog.setModal(True)
+        dlgStatus = self.dialog.exec_()
+
+        if QDialog.Accepted == dlgStatus:
             print 'rfid is', self.rfid_id
             ajax = HttpAjax(self, '/manager/user_info/',
                             {'rfid_code': self.rfid_id})
@@ -167,23 +170,6 @@ class MainWindow(QMainWindow):
         self.dialog = DlgUserInfo(self)
         self.dialog.setModal(True)
         self.dialog.exec_()
-
-    def waitingRFID(self):
-        """ Обработчик меню. Отображает диалог и запускает поток обработки
-        данных RFID считывателя. """
-        self.callback = self.readedRFID
-        # подготовить диалог
-        self.dialog = DlgWaitingRFID(self)
-        self.dialog.setModal(True)
-        # показать диалог
-        res = self.dialog.exec_()
-        print 'waitingRFID', res
-        return res
-
-    def readedRFID(self, rfid):
-        """ Callback функция, вызывается из потока RFID считывателя, получая
-        идентификатор карты. """
-        self.rfid_id = rfid
 
     # Обработчики меню: конец
 
