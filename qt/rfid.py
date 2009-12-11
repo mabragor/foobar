@@ -53,7 +53,7 @@ class WaitingRFID(QThread):
             demo_rfids = ['008365B0', '0083AD33', '00836012']
             index = random.randint(0, len(demo_rfids) - 1)
             rfid_code = demo_rfids[index]
-            time.sleep(3)
+            time.sleep(1)
             self.callback(rfid_code)
             QCoreApplication.postEvent(self.dialog, QCloseEvent())
             return

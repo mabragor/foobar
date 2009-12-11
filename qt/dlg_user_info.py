@@ -3,7 +3,9 @@
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
 
 from http_ajax import HttpAjax
+from courses_list import CourseListModel, CoursesList
 from tree_model import TreeItem, AbstractTreeModel
+from dlg_waiting_rfid import DlgWaitingRFID
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -22,6 +24,7 @@ class DlgUserInfo(QDialog):
         labelEmail = QLabel(self.tr('Email'))
         labelYearBirth = QLabel(self.tr('Year of birth'))
         labelUserSex = QLabel(self.tr('Sex'))
+        labelRFID = QLabel(self.tr('RFID'))
 
         self.editFirstName = QLineEdit()
         self.editLastName = QLineEdit()
@@ -30,6 +33,8 @@ class DlgUserInfo(QDialog):
         self.editUserSex = QComboBox()
         self.editUserSex.addItem(self.tr('Male'))
         self.editUserSex.addItem(self.tr('Female'))
+        self.editRFID = QLineEdit()
+        self.editRFID.setReadOnly(True)
 
         layoutUser = QGridLayout()
         layoutUser.setColumnStretch(1, 1)
@@ -41,21 +46,18 @@ class DlgUserInfo(QDialog):
         layoutUser.addWidget(self.editLastName, 1, 1)
         layoutUser.addWidget(labelEmail, 2, 0)
         layoutUser.addWidget(self.editEmail, 2, 1)
-        layoutUser.addWidget(labelYearBirth, 3, 0)
-        layoutUser.addWidget(self.editYearBirth, 3, 1)
-        layoutUser.addWidget(labelUserSex, 4, 0)
-        layoutUser.addWidget(self.editUserSex, 4, 1)
+#         layoutUser.addWidget(labelYearBirth, 3, 0)
+#         layoutUser.addWidget(self.editYearBirth, 3, 1)
+#         layoutUser.addWidget(labelUserSex, 4, 0)
+#         layoutUser.addWidget(self.editUserSex, 4, 1)
+        layoutUser.addWidget(labelRFID, 3, 0)
+        layoutUser.addWidget(self.editRFID, 3, 1)
 
         groupUser = QGroupBox(self.tr('Base data'))
         groupUser.setLayout(layoutUser)
 
         # купленные курсы
-        self.cardinfo = QTableWidget(1, 7)
-        labels = [self.tr('Title'), self.tr('Assigned'),
-                  self.tr('Used'), self.tr('Price'),
-                  self.tr('Bought'), self.tr('Expired'),
-                  self.tr('Action')]
-        self.cardinfo.setHorizontalHeaderLabels(QStringList(labels))
+        self.cardinfo = CoursesList(self)
 
         cardLayout = QVBoxLayout()
         cardLayout.addWidget(self.cardinfo)
@@ -74,21 +76,25 @@ class DlgUserInfo(QDialog):
 #         groupCourses = QGroupBox(self.tr('Available courses'))
 #         groupCourses.setLayout(courseLayout)
 
-        assignButton = QPushButton(self.tr('Assign'))
-        applyButton = QPushButton(self.tr('Apply'))
-        cancelButton = QPushButton(self.tr('Cancel'))
+        buttonAssignRFID = QPushButton(self.tr('Assign RFID'))
+        buttonAssignCourse = QPushButton(self.tr('Assign course'))
+        buttonApplyDialog = QPushButton(self.tr('Apply'))
+        buttonCancelDialog = QPushButton(self.tr('Cancel'))
 
-        self.connect(applyButton, SIGNAL('clicked()'),
+        self.connect(buttonAssignRFID, SIGNAL('clicked()'),
+                     self.assignRFID)
+        self.connect(buttonApplyDialog, SIGNAL('clicked()'),
                      self.applyDialog)
-        self.connect(cancelButton, SIGNAL('clicked()'),
+        self.connect(buttonCancelDialog, SIGNAL('clicked()'),
                      self, SLOT('reject()'))
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch(1)
-        buttonLayout.addWidget(assignButton)
+        buttonLayout.addWidget(buttonAssignRFID)
+        buttonLayout.addWidget(buttonAssignCourse)
         buttonLayout.addStretch(20)
-        buttonLayout.addWidget(applyButton)
-        buttonLayout.addWidget(cancelButton)
+        buttonLayout.addWidget(buttonApplyDialog)
+        buttonLayout.addWidget(buttonCancelDialog)
 
         layout = QVBoxLayout()
         layout.addWidget(groupUser)
@@ -106,20 +112,9 @@ class DlgUserInfo(QDialog):
         self.editEmail.setText(data.get('email', ''))
 
         courses = data.get('course_list', [])
-        for record in courses:
-            row = self.cardinfo.rowCount()
-            self.cardinfo.setRowCount(row+1)
-
-            cancelButton = QPushButton(self.tr('Cancel'))
-            self.connect(cancelButton, SIGNAL('clicked()'), self.cancelCourse)
-
-            self.cardinfo.setItem(row-1, 0, QTableWidgetItem(record['title']))
-            self.cardinfo.setItem(row-1, 1, QTableWidgetItem(str(record['count_sold'])))
-            self.cardinfo.setItem(row-1, 2, QTableWidgetItem(str(record['count_used'])))
-            self.cardinfo.setItem(row-1, 3, QTableWidgetItem(str(record['price'])))
-            self.cardinfo.setItem(row-1, 4, QTableWidgetItem(record['reg_date']))
-            self.cardinfo.setItem(row-1, 5, QTableWidgetItem(record['exp_date']))
-            self.cardinfo.setCellWidget(row-1, 6, cancelButton)
+        self.coursesModel = CourseListModel(self)
+        self.coursesModel.setData(courses)
+        self.cardinfo.setModel(self.coursesModel)
 
     def cancelCourse(self):
         print 'cancel course'
@@ -127,10 +122,32 @@ class DlgUserInfo(QDialog):
         print row
         self.cardinfo.removeRow(row)
 
+    def assignRFID(self):
+        def callback(rfid):
+            self.rfid_id = rfid
+
+        self.callback = callback
+        self.dialog = DlgWaitingRFID(self)
+        self.dialog.setModal(True)
+        dlgStatus = self.dialog.exec_()
+
+        """ Назначить карту пользователю. """
+        if QDialog.Accepted == dlgStatus:
+            print self.rfid_id
+            self.editRFID.setText(self.rfid_id)
+        else:
+            print 'rejected'
+
     def applyDialog(self):
         """ Применить настройки. """
-        #self.saveSettings()
+        self.saveSettings()
         self.accept()
+
+    def saveSettings(self):
+        result = (self.editFirstName.text(),
+                  self.editLastName.text(),
+                  self.editEmail.text())
+        print result
 
     def getCourses(self):
         ajax = HttpAjax(self, '/manager/available_courses/', {})
@@ -148,7 +165,6 @@ class CoursesTree(QTreeView):
         QTreeView.__init__(self, parent)
 
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
-
 
 class TreeModel(AbstractTreeModel):
 

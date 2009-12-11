@@ -131,6 +131,9 @@ class MainWindow(QMainWindow):
 
     def clientNew(self):
         print 'register new client'
+        self.dialog = DlgUserInfo('create', self)
+        self.dialog.setModal(True)
+        self.dialog.exec_()
 
     def clientSearchRFID(self):
         print 'search client by its rfid'
