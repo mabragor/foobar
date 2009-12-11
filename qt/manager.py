@@ -10,7 +10,6 @@ from rfid import WaitingRFID
 from event_storage import Event, EventStorage
 from qtschedule import QtScheduleDelegate, QtSchedule
 
-#from tree_model import TreeItem
 from courses_tree import CoursesTree, TreeModel
 
 from dlg_settings import DlgSettings
@@ -59,11 +58,11 @@ class MainWindow(QMainWindow):
               }, ...
             ]
             """
-            self.model = TreeModel(json_like)
+            self.modelCoursesTree = TreeModel(json_like)
         else:
-            self.model = TreeModel()
+            self.modelCoursesTree = TreeModel()
         tree = CoursesTree(self)
-        tree.setModel(self.model)
+        tree.setModel(self.modelCoursesTree)
         return tree
 
     def getMime(self, name):

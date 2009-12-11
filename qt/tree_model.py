@@ -42,10 +42,10 @@ class AbstractTreeModel(QAbstractItemModel):
         rootData = []
         rootData.append(QVariant(self.tr('Courses')))
         self.rootItem = TreeItem(rootData)
-        self.processData(data)
+        self.setData(data)
 
-    def processData(self, data):
-        """ Этот метод надо переопределить. """
+    def setData(self, data):
+        """ Этот метод надо переопределить в производном классе. """
 
     def columnCount(self, parent):
         if parent.isValid():
@@ -56,9 +56,11 @@ class AbstractTreeModel(QAbstractItemModel):
     def data(self, index, role):
         if not index.isValid():
             return QVariant()
+        print 'index is valid'
 
         if role != Qt.DisplayRole:
             return QVariant()
+        print 'display'
 
         item = index.internalPointer()
 

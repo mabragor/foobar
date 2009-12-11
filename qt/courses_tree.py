@@ -4,7 +4,6 @@
 
 import sys, re
 
-#from dlg_course_assign import DlgCourseAssign
 from tree_model import TreeItem, AbstractTreeModel
 
 from PyQt4.QtGui import *
@@ -15,7 +14,7 @@ class TreeModel(AbstractTreeModel):
     def __init__(self, data, parent=None):
         AbstractTreeModel.__init__(self, data, parent)
 
-    def processData(self, data):
+    def setData(self, data):
         """
         Формат полученных данных:
         [ {id, text, cls='folder', allowDrag, text,
@@ -47,13 +46,13 @@ class CoursesTree(QTreeView):
         self.setDragDropMode(QAbstractItemView.DragOnly)
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
-        rooms = parent.getRooms()
-        if rooms:
-            self.rooms = rooms.get('rows')
-        else:
-            self.rooms = []
+#         rooms = parent.getRooms()
+#         if rooms:
+#             self.rooms = rooms.get('rows')
+#         else:
+#             self.rooms = []
 
-        self.getMime = parent.getMime
+#        self.getMime = parent.getMime
 
 #         self.connect(self, SIGNAL('doubleClicked(QModelIndex)'),
 #                      self.doubleClickedSignal)
@@ -68,31 +67,31 @@ class CoursesTree(QTreeView):
 #         dialog.exec_()
 
 
-    def mousePressEvent(self, event):
-        """ Обработчик нажатия кнопки мыши. Отрабатываем здесь DnD. """
-        if event.button() == Qt.LeftButton:
-            index = self.indexAt(event.pos())
+#     def mousePressEvent(self, event):
+#         """ Обработчик нажатия кнопки мыши. Отрабатываем здесь DnD. """
+#         if event.button() == Qt.LeftButton:
+#             index = self.indexAt(event.pos())
 
-            itemData = QByteArray()
-            dataStream = QDataStream(itemData, QIODevice.WriteOnly)
-            dataStream << self.model().data(index, Qt.DisplayRole)
-            mimeData = QMimeData()
-            mimeData.setData(self.getMime('course'), itemData)
+#             itemData = QByteArray()
+#             dataStream = QDataStream(itemData, QIODevice.WriteOnly)
+#             dataStream << self.model().data(index, Qt.DisplayRole)
+#             mimeData = QMimeData()
+#             mimeData.setData(self.getMime('course'), itemData)
 
-            drag = QDrag(self)
-            drag.setMimeData(mimeData)
-            #drag.setPixmap(pixmap)
+#             drag = QDrag(self)
+#             drag.setMimeData(mimeData)
+#             #drag.setPixmap(pixmap)
 
-            drop_action = {
-                0: 'Qt::IgnoreAction',
-                1: 'Qt::CopyAction',
-                2: 'Qt::MoveAction',
-                4: 'Qt::LinkAction',
-                255: 'Qt::ActionMask',
-                }
+#             drop_action = {
+#                 0: 'Qt::IgnoreAction',
+#                 1: 'Qt::CopyAction',
+#                 2: 'Qt::MoveAction',
+#                 4: 'Qt::LinkAction',
+#                 255: 'Qt::ActionMask',
+#                 }
 
-            res = drag.start(Qt.CopyAction)
-            print 'CoursesTree::mousePressEvent', drop_action[res]
+#             res = drag.start(Qt.CopyAction)
+#             print 'CoursesTree::mousePressEvent', drop_action[res]
 
-        QTreeView.mousePressEvent(self, event)
+#         QTreeView.mousePressEvent(self, event)
 
