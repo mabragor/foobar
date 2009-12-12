@@ -1,0 +1,102 @@
+digraph G {
+	graph [rankdir = "TB", compound=true, ratio=compress,
+		remincross=true, center=true];
+	node [shape=plaintext, fontname="Verdana", fontsize=8];
+	edge [arrowsize=1, color=blue, fontname="Verdana", fontsize=8];
+
+subgraph cluster_manager {label="manager.py"; labelloc="t"; fontname="Verdana"; fontsize=12;
+  MainWindow [shape=record, color=gray, label="MainWindow"];
+};
+
+subgraph cluster_http_ajax {label="http_ajax.py"; labelloc="t"; fontname="Verdana"; fontsize=12;
+  HttpAjax [shape=record, color=gray, label="HttpAjax"];
+};
+
+subgraph cluster_dlg_settings {label="dlg_settings.py"; labelloc="t"; fontname="Verdana"; fontsize=12;
+  DlgSettings [shape=record, color=gray, label="DlgSettings"];
+  TabAbstract [shape=record, color=gray, label="TabAbstract"];
+  TabGeneral [shape=record, color=gray, label="TabGeneral"];
+  TabNetwork [shape=record, color=gray, label="TabNetwork"];
+
+  TabAbstract -> TabGeneral -> DlgSettings;
+  TabAbstract -> TabNetwork -> DlgSettings;
+};
+
+subgraph cluster_event_storage {label="event_storage.py"; labelloc="t"; fontname="Verdana"; fontsize=12;
+  Event [shape=record, color=gray, label="Event"];
+  EventStorage [shape=record, color=gray, label="EventStorage"];
+};
+
+subgraph cluster_qtschedule {label="qtschedule.py"; labelloc="t"; fontname="Verdana"; fontsize=12;
+  QtScheduleDelegate [shape=record, color=gray, label="QtScheduleDelegate"];
+  QtSchedule [shape=record, color=gray, label="QtSchedule"];
+
+  QtScheduleDelegate -> QtSchedule;
+};
+
+subgraph cluster_dlg_waiting_rfid {label="dlg_waiting_rfid.py"; labelloc="t"; fontname="Verdana"; fontsize=12;
+  DlgWaitingRFID [shape=record, color=gray, label="DlgWaitingRFID"];
+  WaitingRFID [shape=record, color=gray, label="WaitingRFID"];
+
+  WaitingRFID -> DlgWaitingRFID;
+};
+
+subgraph cluster_dlg_user_info {label="dlg_user_info.py"; labelloc="t"; fontname="Verdana"; fontsize=12;
+  DlgUserInfo [shape=record, color=gray, label="DlgUserInfo"];
+};
+
+subgraph cluster_dlg_course_assign {label="dlg_course_assign.py"; labelloc="t"; fontname="Verdana"; fontsize=12;
+  DlgCourseAssign [shape=record, color=gray, label="DlgCourseAssign"];
+};
+
+subgraph cluster_courses_tree {label="courses_tree.py"; labelloc="t"; fontname="Verdana"; fontsize=12;
+  CoursesTree [shape=record, color=gray, label="CoursesTree"];
+  TreeModel [shape=record, color=gray, label="TreeModel"];
+};
+
+subgraph cluster_courses_list {label="courses_list.py"; labelloc="t"; fontname="Verdana"; fontsize=12;
+  CourseListModel [shape=record, color=gray, label="CourseListModel"];
+  CoursesList [shape=record, color=gray, label="CoursesList"];
+};
+
+subgraph cluster_model_sorting {label="model_sorting.py"; labelloc="t"; fontname="Verdana"; fontsize=12;
+  SortClientCourses [shape=record, color=gray, label="SortClientCourses"];
+};
+
+subgraph cluster_tree_model {label="tree_model.py"; labelloc="t"; fontname="Verdana"; fontsize=12;
+  TreeItem [shape=record, color=gray, label="TreeItem"];
+  AbstractTreeModel [shape=record, color=gray, label="AbstractTreeModel"];
+
+  TreeItem -> AbstractTreeModel;
+};
+
+subgraph cluster_settings {label="settings.py"; labelloc="t"; fontname="Verdana"; fontsize=12;
+  DEBUG [shape=record, color=gray, label="DEBUG"];
+  PORT [shape=record, color=gray, label="PORT"];
+  userRoles [shape=record, color=gray, label="userRoles"];
+};
+
+DEBUG -> WaitingRFID;
+PORT -> WaitingRFID;
+userRoles -> AbstractTreeModel;
+userRoles -> DlgCourseAssign;
+
+AbstractTreeModel -> TreeModel;
+TreeModel -> MainWindow;
+CoursesTree -> MainWindow;
+CoursesTree -> DlgCourseAssign;
+CourseListModel -> DlgUserInfo;
+CoursesList -> DlgUserInfo;
+DlgWaitingRFID -> DlgUserInfo;
+DlgWaitingRFID -> MainWindow;
+DlgUserInfo -> MainWindow;
+SortClientCourses -> DlgUserInfo;
+Event -> QtSchedule;
+EventStorage -> QtSchedule;
+QtSchedule -> MainWindow;
+TabNetwork -> HttpAjax;
+DlgSettings -> MainWindow;
+HttpAjax -> MainWindow;
+
+
+};
