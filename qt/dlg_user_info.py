@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
 
-from http_ajax import HttpAjax
 from model_sorting import SortClientCourses
 from courses_list import CourseListModel, CoursesList
 from tree_model import TreeItem, AbstractTreeModel

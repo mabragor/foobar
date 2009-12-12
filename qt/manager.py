@@ -6,7 +6,6 @@ import sys, re, time
 from datetime import datetime, timedelta
 
 from http_ajax import HttpAjax
-from rfid import WaitingRFID
 from event_storage import Event, EventStorage
 from qtschedule import QtScheduleDelegate, QtSchedule
 
