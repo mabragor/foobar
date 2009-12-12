@@ -1,6 +1,6 @@
 {% extends "admin/base_site.html" %}
 
-{% load adminmedia i18n %}
+{% load adminmedia i18n media %}
 
 {% block extrastyle %}
   {{ block.super }}
@@ -10,6 +10,8 @@
       #changelist table thead th:first-child {width: inherit}
     </style>
   {% endif %}
+    <script type="text/javascript" src="{% media 'js/jquery-1.3.1.js' %}"></script>
+  {{ form.media }}
 {% endblock %}
 
 {% block bodyclass %}change-list{% endblock %}
@@ -33,6 +35,11 @@
  {% block coltype %}flex{% endblock %}
  
  {% block content %}
+	<form action="." method="post" id="mounth-form">
+	    {{ form.month.errors }}
+	    {{ form.month }}
+	<input type="submit" value="Show" />
+	</form>
   <div id="content-main">
     {% block object-tools %}
         <ul class="object-tools">

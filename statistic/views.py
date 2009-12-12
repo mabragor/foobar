@@ -5,6 +5,7 @@ from lib.decorators import render_to
 from storage.models import Course, Action, Schedule
 from django.db.models import Count
 from datetime import datetime, timedelta
+from forms import MonthForm
 import calendar
 
 @render_to("statistic/index.html")
@@ -17,24 +18,29 @@ def index(request):
 def courses(request):
     courses = Course.objects.all()
     rows = []
-    today = datetime.today()
-    start = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    end = start + timedelta(days=calendar.monthrange(start.year, start.day)[1])
-
+    d = datetime.today()
+    if request.method == 'POST':
+        form = MonthForm(request.POST, start_year=d.year-2)
+        if form.is_valid():
+            d = form.cleaned_data['month']
+    else:
+         form = MonthForm(start_year=d.year-2)               
     for item in courses:
-        rows.append(_get_row(item, start, end))
+        rows.append(_get_row(item, d))
     
     return {
-        'rows': rows
+        'rows': rows,
+        'date': d,
+        'form': form
     }
     
-def _get_row(item, start, end):
+def _get_row(item, d):
     row = []
     row.append(item.title)
     row.append(item.price * item.count)
     row.append(item.count)
     row.append(item.count * item.duration)
-    r = Action.objects.filter(schedule__begin__range=(start, end))\
+    r = Action.objects.filter(schedule__begin__year=d.year, schedule__begin__month=d.month)\
         .filter(schedule__status=1)\
         .filter(schedule__course=item)\
         .aggregate(Count('pk'))
