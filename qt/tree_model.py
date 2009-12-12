@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
+
+from settings import userRoles
+
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
@@ -56,15 +59,14 @@ class AbstractTreeModel(QAbstractItemModel):
     def data(self, index, role):
         if not index.isValid():
             return QVariant()
-        print 'index is valid'
 
-        if role != Qt.DisplayRole:
+        if role == Qt.DisplayRole:
+            item = index.internalPointer()
+            return QVariant(item.data(index.column()))
+        elif role == userRoles['getObjectID']:
+            print 'get object id role'
+        else:
             return QVariant()
-        print 'display'
-
-        item = index.internalPointer()
-
-        return QVariant(item.data(index.column()))
 
     def flags(self, index):
         if not index.isValid():

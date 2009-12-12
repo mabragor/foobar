@@ -3,6 +3,7 @@
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
 
 from http_ajax import HttpAjax
+from model_sorting import SortClientCourses
 from courses_list import CourseListModel, CoursesList
 from tree_model import TreeItem, AbstractTreeModel
 from dlg_waiting_rfid import DlgWaitingRFID
@@ -66,17 +67,6 @@ class DlgUserInfo(QDialog):
         groupCard = QGroupBox(self.tr('Course\'s history'))
         groupCard.setLayout(cardLayout)
 
-#         # курсы, которые можно приобрести
-#         self.coursesModel = TreeModel(self.getCourses())
-#         courses = CoursesTree(self)
-#         courses.setModel(self.coursesModel)
-
-#         courseLayout = QVBoxLayout()
-#         courseLayout.addWidget(courses)
-
-#         groupCourses = QGroupBox(self.tr('Available courses'))
-#         groupCourses.setLayout(courseLayout)
-
         buttonAssignRFID = QPushButton(self.tr('Assign RFID'))
         buttonAssignCourse = QPushButton(self.tr('Assign course'))
         buttonApplyDialog = QPushButton(self.tr('Apply'))
@@ -101,8 +91,6 @@ class DlgUserInfo(QDialog):
         layout = QVBoxLayout()
         layout.addWidget(groupUser)
         layout.addWidget(groupCard)
-        #layout.addWidget(assignButton)
-        #layout.addWidget(groupCourses)
         layout.addLayout(buttonLayout)
 
         self.setLayout(layout)
@@ -114,9 +102,14 @@ class DlgUserInfo(QDialog):
         self.editEmail.setText(data.get('email', ''))
 
         courses = data.get('course_list', [])
+        # source model
         self.coursesModel = CourseListModel(self)
         self.coursesModel.setData(courses)
-        self.cardinfo.setModel(self.coursesModel)
+        # proxy model
+        self.proxyModel = SortClientCourses(self)
+        self.proxyModel.setSourceModel(self.coursesModel)
+        # use proxy model to change data representation
+        self.cardinfo.setModel(self.proxyModel)
 
     def cancelCourse(self):
         print 'cancel course'
@@ -157,14 +150,6 @@ class DlgUserInfo(QDialog):
                   self.editLastName.text(),
                   self.editEmail.text())
         print result
-
-    def getCourses(self):
-        ajax = HttpAjax(self, '/manager/available_courses/', {})
-        if ajax:
-            json_like = ajax.parse_json()
-        else:
-            json_like = None
-        return json_like
 
 class CoursesTree(QTreeView):
 

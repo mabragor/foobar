@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
 
+from settings import userRoles
 from courses_tree import CoursesTree
 
 from PyQt4.QtGui import *
@@ -54,6 +55,6 @@ class DlgCourseAssign(QDialog):
     def saveSettings(self):
         index = self.tree.currentIndex()
         print 'saveSettings'
-        print index.data(Qt.DisplayRole)
+        print index.data(userRoles['getObjectID'])
 
 

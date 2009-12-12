@@ -19,8 +19,6 @@ from dlg_user_info import DlgUserInfo
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
-waiting = True
-
 class MainWindow(QMainWindow):
 
     def __init__(self, parent=None):
