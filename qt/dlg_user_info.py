@@ -98,6 +98,7 @@ class DlgUserInfo(QDialog):
         self.editFirstName.setText(data.get('first_name', ''))
         self.editLastName.setText(data.get('last_name', ''))
         self.editEmail.setText(data.get('email', ''))
+        self.editRFID.setText(data.get('rfid_id', ''))
 
         courses = data.get('course_list', [])
         # source model
