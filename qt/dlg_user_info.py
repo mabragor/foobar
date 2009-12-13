@@ -4,7 +4,6 @@
 
 from model_sorting import SortClientCourses
 from courses_list import CourseListModel, CoursesList
-from tree_model import TreeItem, AbstractTreeModel
 from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_course_assign import DlgCourseAssign
 
@@ -133,9 +132,8 @@ class DlgUserInfo(QDialog):
             print 'rejected'
 
     def assignCourse(self):
-        model = self.parent.modelCoursesTree
         dialog = DlgCourseAssign(self)
-        dialog.setModel(model)
+        dialog.setModel(self.parent.modelCoursesTree)
         dialog.setModal(True)
         dlgStatus = dialog.exec_()
 
@@ -150,34 +148,3 @@ class DlgUserInfo(QDialog):
                   self.editEmail.text())
         print result
 
-class CoursesTree(QTreeView):
-
-    """ Класс дерева курсов. """
-
-    def __init__(self, parent=None):
-        QTreeView.__init__(self, parent)
-
-        self.setSelectionMode(QAbstractItemView.ExtendedSelection)
-
-class TreeModel(AbstractTreeModel):
-
-    def __init__(self, data, parent=None):
-        AbstractTreeModel.__init__(self, data, parent)
-
-    def setData(self, data):
-        """
-        Формат полученных данных:
-        [ {id, title,
-           children: [{id, count, title, price, coaches, duration}, ..]
-           }, ...
-        ]
-        """
-        if not data:
-            return
-        for i in data:
-            if 'children' in i:
-                folder = TreeItem( [i['title']], self.rootItem)
-                self.rootItem.appendChild(folder)
-                for j in i['children']:
-                    child = TreeItem( [j['title'], j['coaches'], j['count'], j['price']], folder)
-                    folder.appendChild(child)
