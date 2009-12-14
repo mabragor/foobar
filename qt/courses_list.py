@@ -65,7 +65,7 @@ class CourseListModel(QAbstractTableModel):
     def data(self, index, role): # base class method
         if not index.isValid():
             return QVariant()
-        if role == Qt.DisplayRole:
+        if role in (Qt.DisplayRole, Qt.ToolTipRole) :
             row = self.storage[index.row()]
             item = row[index.column()+2]
             return QVariant(item)
