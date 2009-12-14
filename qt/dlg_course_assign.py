@@ -44,17 +44,14 @@ class DlgCourseAssign(QDialog):
         self.setLayout(layout)
         self.setWindowTitle(self.tr('Choose the course'))
 
+    def setCallback(self, callback):
+        self.callback = callback
+
     def setModel(self, model):
         self.tree.setModel(model)
 
     def applyDialog(self):
-        """ Применить настройки. """
-        self.saveSettings()
-        self.accept()
-
-    def saveSettings(self):
         index = self.tree.currentIndex()
-        print 'saveSettings'
-        print index.data(userRoles['getObjectID'])
-
-
+        course_data = index.data(userRoles['getObjectID']).toPyObject()
+        self.callback(course_data)
+        self.accept()

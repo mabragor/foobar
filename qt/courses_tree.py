@@ -17,44 +17,25 @@ class TreeModel(AbstractTreeModel):
     def setData(self, data):
         """
         Формат полученных данных:
-        [ {id, text, cls='folder', allowDrag, text,
-           children: [{id, text, cls='file', leaf, text}, ..]
-          }, ...
+        [ {id, title,
+           children: [{id, count, title, price, coaches, duration}, ..]
+           }, ...
         ]
         """
         if not data:
             return
         for i in data:
-            if i['cls'] == 'folder':
-                folder = TreeItem( [i['text']], self.rootItem)
+            if 'children' in i:
+                folder = TreeItem( [i['title']], self.rootItem)
                 self.rootItem.appendChild(folder)
                 for j in i['children']:
-                    child = TreeItem( [j['text']], folder)
+                    order = ('title', 'id', 'count', 'price',
+                             'coaches', 'duration')
+                    itemData = []
+                    for param in order:
+                        itemData.append( j[param] )
+                    child = TreeItem(itemData, folder)
                     folder.appendChild(child)
-
-
-# class TreeModel(AbstractTreeModel):
-
-#     def __init__(self, data, parent=None):
-#         AbstractTreeModel.__init__(self, data, parent)
-
-#     def setData(self, data):
-#         """
-#         Формат полученных данных:
-#         [ {id, title,
-#            children: [{id, count, title, price, coaches, duration}, ..]
-#            }, ...
-#         ]
-#         """
-#         if not data:
-#             return
-#         for i in data:
-#             if 'children' in i:
-#                 folder = TreeItem( [i['title']], self.rootItem)
-#                 self.rootItem.appendChild(folder)
-#                 for j in i['children']:
-#                     child = TreeItem( [j['title'], j['coaches'], j['count'], j['price']], folder)
-#                     folder.appendChild(child)
 
 class CoursesTree(QTreeView):
 

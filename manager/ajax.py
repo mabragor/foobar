@@ -15,12 +15,13 @@ isJavaScript = False
 
 @ajax_processor(UserRFID, isJavaScript)
 def user_info(request, form):
-    rfid = form.cleaned_data['rfid_code']
-    user = get_object_or_404(Client, rfid_code=rfid)
+    rfid_id = form.cleaned_data['rfid_code']
+    user = get_object_or_404(Client, rfid_code=rfid_id)
     return {
         'first_name': user.first_name,
         'last_name': user.last_name,
         'email': user.email,
+        'rfid_id': rfid_id,
         'reg_date': user.reg_date,
         'course_list': user.get_course_list()
         }

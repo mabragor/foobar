@@ -10,14 +10,18 @@ class CourseListModel(QAbstractTableModel):
     def __init__(self, parent=None):
         QAbstractTableModel.__init__(self, parent)
 
+        # хранилище данных модели
         self.storage = []
+        # хранилище временных данных, т.е. назначенные, но ещё не
+        # подтверждённые курсы
+        self.temporary = []
 
         self.labels = [self.tr('Title'), self.tr('Price'),
                        self.tr('Assigned'), self.tr('Used'),
                        self.tr('Bought'), self.tr('State'),
                        self.tr('When')]
 
-    def setData(self, data):
+    def initData(self, data):
         """
         Формат полученных данных:
         [{id, course_id, title, price,
@@ -66,6 +70,44 @@ class CourseListModel(QAbstractTableModel):
             item = row[index.column()+2]
             return QVariant(item)
         return QVariant()
+
+    def flags(self, index):
+        if not index.isValid():
+            return Qt.ItemIsEnabled
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+
+    def setData(self, index, value, role):
+        if index.isValid() and role == Qt.EditRole:
+            from  datetime import datetime, timedelta
+            now = datetime.now()
+            day30 = timedelta(days=30)
+            print value
+            title, course_id, count, price, coaches, duration = value
+            # to: id, course_id, title, price, cnt1, cnt2, dates(3)
+            row = (0, course_id, title, price, count, 0, now, now+day30, None)
+            self.storage[-1] = row
+            self.temporary.append(row)
+            self.emit(SIGNAL('dataChanged(QModelIndex, QModelIndex)'),
+                      index, index)
+            return True
+        return False
+
+    def insertRows(self, position, rows, parent):
+        self.beginInsertRows(QModelIndex(), position, position+rows-1)
+        for i in xrange(rows):
+            print 'storage len is', len(self.storage)
+            self.storage.append( tuple() )
+            print 'storage len is', len(self.storage)
+
+        self.endInsertRows()
+        return True
+
+    def removeRows(self, position, rows, parent):
+        self.beginRemoveRows(QModelIndex(), position, position+rows-1)
+        for i in xrange(rows):
+            del(self.storage[position + i])
+        self.endRemoveRows()
+        return True
 
 class CoursesList(QTableView):
 

@@ -45,19 +45,9 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(splitter)
 
     def initCourses(self):
-        ajax = HttpAjax(self, '/manager/get_course_tree/', {})
-        if ajax:
-            json_like = ajax.parse_json()
-            """
-            Формат полученных данных:
-            [ {id, text, cls='folder', allowDrag, text,
-               children: [{id, text, cls='file', leaf, text}, ..]
-              }, ...
-            ]
-            """
-            self.modelCoursesTree = TreeModel(json_like)
-        else:
-            self.modelCoursesTree = TreeModel()
+        ajax = HttpAjax(self, '/manager/available_courses/', {})
+        json_like = ajax.parse_json() # see format at courses_tree.py
+        self.modelCoursesTree = TreeModel(json_like)
         tree = CoursesTree(self)
         tree.setModel(self.modelCoursesTree)
         return tree
@@ -144,7 +134,7 @@ class MainWindow(QMainWindow):
             print json_like
             self.dialog = DlgUserInfo('edit', self)
             self.dialog.setModal(True)
-            self.dialog.setData(json_like)
+            self.dialog.initData(json_like)
             self.dialog.exec_()
         else:
             print 'dialog was rejected'

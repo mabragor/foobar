@@ -73,7 +73,7 @@ class DlgUserInfo(QDialog):
         self.connect(buttonAssignRFID, SIGNAL('clicked()'),
                      self.assignRFID)
         self.connect(buttonAssignCourse, SIGNAL('clicked()'),
-                     self.assignCourse)
+                     self.showAssignCourseDlg)
         self.connect(buttonApplyDialog, SIGNAL('clicked()'),
                      self.applyDialog)
         self.connect(buttonCancelDialog, SIGNAL('clicked()'),
@@ -94,7 +94,10 @@ class DlgUserInfo(QDialog):
         self.setLayout(layout)
         self.setWindowTitle(self.tr('User\'s information'))
 
-    def setData(self, data):
+        # source model
+        self.coursesModel = CourseListModel(self)
+
+    def initData(self, data):
         self.editFirstName.setText(data.get('first_name', ''))
         self.editLastName.setText(data.get('last_name', ''))
         self.editEmail.setText(data.get('email', ''))
@@ -102,8 +105,8 @@ class DlgUserInfo(QDialog):
 
         courses = data.get('course_list', [])
         # source model
-        self.coursesModel = CourseListModel(self)
-        self.coursesModel.setData(courses)
+        #self.coursesModel = CourseListModel(self)
+        self.coursesModel.initData(courses)
         # proxy model
         self.proxyModel = SortClientCourses(self)
         self.proxyModel.setSourceModel(self.coursesModel)
@@ -132,11 +135,21 @@ class DlgUserInfo(QDialog):
         else:
             print 'rejected'
 
-    def assignCourse(self):
+    def showAssignCourseDlg(self):
         dialog = DlgCourseAssign(self)
+        dialog.setCallback(self.assignCourse)
         dialog.setModel(self.parent.modelCoursesTree)
         dialog.setModal(True)
         dlgStatus = dialog.exec_()
+
+    def assignCourse(self, data):
+        lastRow = self.coursesModel.rowCount(QModelIndex())
+        print 'DlgUserInfo::assignCourse:', lastRow
+        if self.coursesModel.insertRows(lastRow, 1, QModelIndex()):
+            print 'DlgUserInfo::assignCourse:', lastRow
+            index = self.coursesModel.index(lastRow, 0)
+            self.coursesModel.setData(index, data, Qt.EditRole)
+        print data
 
     def applyDialog(self):
         """ Применить настройки. """
