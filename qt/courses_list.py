@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
 
+import time
+from  datetime import datetime, timedelta
+
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
@@ -17,9 +20,12 @@ class CourseListModel(QAbstractTableModel):
         self.temporary = []
 
         self.labels = [self.tr('Title'), self.tr('Price'),
-                       self.tr('Assigned'), self.tr('Used'),
-                       self.tr('Bought'), self.tr('State'),
-                       self.tr('When')]
+                       self.tr('Sold'), self.tr('Used'),
+                       self.tr('Assigned'), self.tr('State'),
+                       self.tr('Till/When')]
+
+    def str2date(self, value):
+        return datetime(*time.strptime(value, '%Y-%m-%d %H:%M:%S')[:6])
 
     def initData(self, data):
         """
@@ -39,8 +45,7 @@ class CourseListModel(QAbstractTableModel):
             row = (rec['id'], rec['course_id'],
                    rec['title'], rec['price'],
                    rec['count_sold'], rec['count_used'],
-                   rec['reg_date'], rec['exp_date'],
-                   rec['cnl_date'])
+                   rec['reg_date'], rec['exp_date'], rec['cnl_date'])
             self.storage.append(row)
 
     def rowCount(self, parent): # base class method
@@ -66,8 +71,22 @@ class CourseListModel(QAbstractTableModel):
         if not index.isValid():
             return QVariant()
         if role in (Qt.DisplayRole, Qt.ToolTipRole) :
-            row = self.storage[index.row()]
-            item = row[index.column()+2]
+            # source data
+            id, course_id, title, price, sold, used, assign, expired, cancelled = self.storage[index.row()]
+
+            if cancelled is not None:
+                state = self.tr('Cancelled')
+                till_when = cancelled
+            elif self.str2date(expired) > datetime.now():
+                state = self.tr('Active')
+                till_when = None
+            else:
+                state = self.tr('Expired')
+                till_when = expired
+            # representation for widget
+            row = (title, price, sold, used, assign, state, till_when)
+
+            item = row[index.column()]
             return QVariant(item)
         return QVariant()
 
@@ -78,13 +97,11 @@ class CourseListModel(QAbstractTableModel):
 
     def setData(self, index, value, role):
         if index.isValid() and role == Qt.EditRole:
-            from  datetime import datetime, timedelta
             now = datetime.now()
-            day30 = timedelta(days=30)
-            print value
+            bought = now.strftime('%Y-%m-%d %H:%M:%S')
+            expired = (now + timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')
             title, course_id, count, price, coaches, duration = value
-            # to: id, course_id, title, price, cnt1, cnt2, dates(3)
-            row = (0, course_id, title, price, count, 0, now, now+day30, None)
+            row = (0, course_id, title, price, count, 0, bought, expired, None)
             self.storage[-1] = row
             self.temporary.append(row)
             self.emit(SIGNAL('dataChanged(QModelIndex, QModelIndex)'),
