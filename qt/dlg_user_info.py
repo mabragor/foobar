@@ -96,6 +96,11 @@ class DlgUserInfo(QDialog):
 
         # source model
         self.coursesModel = CourseListModel(self)
+        # proxy model
+        #self.proxyModel = SortClientCourses(self)
+        #self.proxyModel.setSourceModel(self.coursesModel)
+        # use proxy model to change data representation
+        self.cardinfo.setModel(self.coursesModel)
 
     def initData(self, data):
         self.editFirstName.setText(data.get('first_name', ''))
@@ -104,14 +109,7 @@ class DlgUserInfo(QDialog):
         self.editRFID.setText(data.get('rfid_id', ''))
 
         courses = data.get('course_list', [])
-        # source model
-        #self.coursesModel = CourseListModel(self)
         self.coursesModel.initData(courses)
-        # proxy model
-        self.proxyModel = SortClientCourses(self)
-        self.proxyModel.setSourceModel(self.coursesModel)
-        # use proxy model to change data representation
-        self.cardinfo.setModel(self.proxyModel)
 
     def cancelCourse(self):
         print 'cancel course'
@@ -130,10 +128,7 @@ class DlgUserInfo(QDialog):
 
         """ Назначить карту пользователю. """
         if QDialog.Accepted == dlgStatus:
-            print self.rfid_id
             self.editRFID.setText(self.rfid_id)
-        else:
-            print 'rejected'
 
     def showAssignCourseDlg(self):
         dialog = DlgCourseAssign(self)
@@ -146,9 +141,8 @@ class DlgUserInfo(QDialog):
         lastRow = self.coursesModel.rowCount(QModelIndex())
         print 'DlgUserInfo::assignCourse:', lastRow
         if self.coursesModel.insertRows(lastRow, 1, QModelIndex()):
-            print 'DlgUserInfo::assignCourse:', lastRow
             index = self.coursesModel.index(lastRow, 0)
-            self.coursesModel.setData(index, data, Qt.EditRole)
+            print self.coursesModel.setData(index, data, Qt.EditRole)
         print data
 
     def applyDialog(self):

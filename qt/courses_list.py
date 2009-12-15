@@ -36,9 +36,6 @@ class CourseListModel(QAbstractTableModel):
           ...
           ]
         """
-        order = ['id', 'course_id', 'title', 'price',
-                 'count_sold', 'count_used',
-                 'reg_date', 'exp_date', 'cnl_date']
         for rec in data:
             if type(rec) is not dict:
                 raise 'Check format'
@@ -48,14 +45,23 @@ class CourseListModel(QAbstractTableModel):
                    rec['reg_date'], rec['exp_date'], rec['cnl_date'])
             self.storage.append(row)
 
-    def rowCount(self, parent): # base class method
-        if parent.isValid():
+        self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
+                  QModelIndex(), 1, self.rowCount())
+
+#         self.emit(SIGNAL('columnsInserted(QModelIndex, int, int)'),
+#                   QModelIndex(), 1, cols)
+#         self.emit(SIGNAL('dataChanged(QModelIndex, QModelIndex)'),
+#                   self.createIndex(0, 0),
+#                   self.createIndex(self.rowCount(), self.columnCount()))
+
+    def rowCount(self, parent=None): # base class method
+        if parent and parent.isValid():
             return 0
         else:
             return len(self.storage)
 
-    def columnCount(self, parent):# base class method
-        if parent.isValid():
+    def columnCount(self, parent=None):# base class method
+        if parent and parent.isValid():
             return 0
         else:
             return len(self.labels)
@@ -102,7 +108,9 @@ class CourseListModel(QAbstractTableModel):
             expired = (now + timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')
             title, course_id, count, price, coaches, duration = value
             row = (0, course_id, title, price, count, 0, bought, expired, None)
+            print self.storage
             self.storage[-1] = row
+            print self.storage
             self.temporary.append(row)
             self.emit(SIGNAL('dataChanged(QModelIndex, QModelIndex)'),
                       index, index)
@@ -112,9 +120,7 @@ class CourseListModel(QAbstractTableModel):
     def insertRows(self, position, rows, parent):
         self.beginInsertRows(QModelIndex(), position, position+rows-1)
         for i in xrange(rows):
-            print 'storage len is', len(self.storage)
             self.storage.append( tuple() )
-            print 'storage len is', len(self.storage)
 
         self.endInsertRows()
         return True
