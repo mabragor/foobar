@@ -5,12 +5,23 @@ from django.utils.translation import ugettext_lazy as _
 from datetime import timedelta, datetime
 from django.conf import settings
 
+class AppliedPatch(models.Model):
+    name = models.CharField(verbose_name=_(u'Name of patch'), max_length=10)
+    applied = models.DateTimeField(verbose_name=_('Applied'), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _(u'Patch')
+        verbose_name_plural = _(u'Patches')
+
+    def __unicode__(self):
+        return self.name
+
 class AbstractUser(models.Model):
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
     email = models.EmailField(max_length=64, blank=True, null=True)
     rfid_code = models.CharField(max_length=8)
-    reg_date = models.DateTimeField(verbose_name=_('Registered'), auto_now_add=True)
+    reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
 
     class Meta:
         abstract = True
@@ -19,6 +30,10 @@ class AbstractUser(models.Model):
         return unicode('%s %s' % (self.first_name, self.last_name))
 
 class Coach(AbstractUser):
+
+    class Meta:
+        verbose_name = _(u'Coach')
+        verbose_name_plural = _(u'Coaches')
 
     def get_store_obj(self):
         obj = {
@@ -29,12 +44,23 @@ class Coach(AbstractUser):
 
 class Client(AbstractUser):
 
+    class Meta:
+        verbose_name = _(u'Client')
+        verbose_name_plural = _(u'Clients')
+
     def get_course_list(self):
         return [card.get_info() for card in self.card_set.all().order_by('-reg_date')]
 
 class Room(models.Model):
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
     color = models.CharField(verbose_name=_(u'Color'), max_length=6)
+
+    class Meta:
+        verbose_name = _(u'Room')
+        verbose_name_plural = _(u'Rooms')
+
+    def __unicode__(self):
+        return self.title
 
     def get_store_obj(self):
         obj = {
@@ -54,15 +80,15 @@ class Room(models.Model):
         }
         return obj
 
+class Group(models.Model):
+    title = models.CharField(verbose_name=_(u'Title'), max_length=64)
+
     class Meta:
-        verbose_name = _(u'Room')
-        verbose_name_plural = _(u'Rooms')
+        verbose_name = _(u'Style')
+        verbose_name_plural = _(u'Styles')
 
     def __unicode__(self):
         return self.title
-
-class Group(models.Model):
-    title = models.CharField(verbose_name=_(u'Title'), max_length=64)
 
     def get_tree_node(self):
         obj = {
@@ -81,13 +107,6 @@ class Group(models.Model):
             'children': [item.get_node() for item in self.course_set.all()]
             }
 
-    class Meta:
-        verbose_name = _(u'Style')
-        verbose_name_plural = _(u'Styles')
-
-    def __unicode__(self):
-        return self.title
-
 class Course(models.Model):
     group = models.ManyToManyField(Group)
     coach = models.ManyToManyField(Coach)
@@ -101,7 +120,7 @@ class Course(models.Model):
     salary = models.IntegerField(verbose_name=_(u'Salary'),
                                  help_text=_(u'The salary for the course.'),
                                  default=0)
-    
+
     class Meta:
         verbose_name = _(u'Course')
         verbose_name_plural = _(u'Courses')
@@ -143,6 +162,7 @@ class Card(models.Model):
                             max_length=1, choices=CARD_TYPE,
                             default=1)
     reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
+    bgn_date = models.DateTimeField(verbose_name=_(u'Begin'), auto_now_add=True)
     exp_date = models.DateTimeField(verbose_name=_(u'Expired'))
     cnl_date = models.DateTimeField(verbose_name=_(u'Cancelled'), null=True)
     count_sold = models.IntegerField(verbose_name=_(u'Exercises sold'))
@@ -150,7 +170,7 @@ class Card(models.Model):
     price = models.FloatField(verbose_name=_(u'Price'),
                               help_text=_(u'The price of the course.'),
                               default=float(0.00))
-    
+
     class Meta:
         verbose_name = _(u'Card')
         verbose_name_plural = _(u'Card')
