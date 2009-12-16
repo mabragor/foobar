@@ -2,11 +2,11 @@
 
 # Команда manage.py для наложения патчей на базу.
 
-from django.conf import settings
 from django.db import connection
+from django.conf import settings
 from django.core.management.base import NoArgsCommand
 
-from storage.models import AppliedPatch
+from patcher.models import Applied
 
 import os, glob
 
@@ -18,16 +18,16 @@ class Command(NoArgsCommand):
             print 'Go to project\'s root.'
             return
 
-        indir = os.path.join(os.path.curdir, 'storage', 'patches')
+        indir = os.path.join(os.path.curdir, 'patcher', 'patches')
         patch_list = glob.glob(os.path.join(indir, '*.sql'))
         patch_list.sort()
         for infile in patch_list:
             patch_name = os.path.basename(infile).split('.')[0]
             print 'Patch %s ...' % patch_name,
             try:
-                applied_patch = AppliedPatch.objects.get(name=patch_name)
+                applied_patch = Applied.objects.get(name=patch_name)
                 print 'applied already'
-            except AppliedPatch.DoesNotExist:
+            except Applied.DoesNotExist:
                 print 'applying now'
                 cursor = connection.cursor()
                 content = open(infile, 'r').readlines()
@@ -35,4 +35,4 @@ class Command(NoArgsCommand):
                     sql_line = line.strip()
                     print sql_line
                     cursor.execute(sql_line)
-                AppliedPatch(name=patch_name).save()
+                Applied(name=patch_name).save()
