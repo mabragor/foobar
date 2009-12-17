@@ -27,7 +27,6 @@ class DatetimeJSONEncoderQt(simplejson.JSONEncoder):
 
         if isinstance(o, datetime):
             d = o.strftime('%Y-%m-%d %H:%M:%S')
-            print d, type(d)
             return d
         else:
             return super(DatetimeJSONEncoder, self).default(o)

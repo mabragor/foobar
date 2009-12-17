@@ -9,7 +9,7 @@ from lib.decorators import ajax_processor, render_to
 
 from forms import UserRFID, UserInfo
 
-from storage.models import Client, Group
+from storage.models import Client, Card, Course, Group
 
 isJavaScript = False
 
@@ -36,6 +36,7 @@ def get_user_info(request, form):
 def set_user_info(request, form):
     data = form.cleaned_data
     user_id = data['user_id']; del(data['user_id'])
+    # save common data
     if 0 == int(user_id):
         user = Client(**data)
     else:
@@ -43,4 +44,12 @@ def set_user_info(request, form):
         for key, value in data.items():
             setattr(user, key, value)
     user.save()
+    # assigned courses
+    assigned = data['course_assigned']
+    if len(assigned) > 0:
+        for i in assigned:
+            course = Course.objects.get(id=i)
+            print course
+            #card = Card(course=course, client=user,type=1,
+
     return {'code': 200, 'desc': 'Ok'}

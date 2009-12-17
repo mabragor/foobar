@@ -66,19 +66,6 @@ class ScheduleForm(forms.ModelForm):
         from django.utils.encoding import force_unicode
         return ''.join([force_unicode(v) for k, v in self.errors.items()])
 
-class UserRFID(forms.Form):
-    rfid_code = forms.CharField(max_length=8)
-
-class UserInfo(forms.Form):
-    user_id = forms.IntegerField()
-    first_name = forms.CharField(max_length=64)
-    last_name = forms.CharField(max_length=64)
-    email = forms.EmailField(max_length=64)
-    rfid_code = forms.CharField(max_length=8)
-    #course_assigned = forms.MultiValueField(required=False)
-    #course_cancelled = forms.MultipleChoiceField(required=False)
-    #course_changed = forms.MultipleChoiceField(required=False)
-
 class UserCardForm(forms.ModelForm):
     rfid_code = forms.CharField(max_length=8)
 
@@ -146,4 +133,23 @@ class CopyForm(forms.Form):
             ne = Schedule(room=e.room, course=e.course)
             ne.begin = e.begin+delta
             ne.save()
+
+
+class UserRFID(forms.Form):
+    rfid_code = forms.CharField(max_length=8)
+
+# Create own field to process a list of ids.
+class ListField(forms.Field):
+    def clean(self, data):
+        return eval(data)
+
+class UserInfo(forms.Form):
+    user_id = forms.IntegerField()
+    first_name = forms.CharField(max_length=64)
+    last_name = forms.CharField(max_length=64)
+    email = forms.EmailField(max_length=64)
+    rfid_code = forms.CharField(max_length=8)
+    course_assigned = ListField(required=False)
+    course_cancelled = ListField(required=False)
+    course_changed = ListField(required=False)
 

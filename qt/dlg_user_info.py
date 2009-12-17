@@ -153,13 +153,10 @@ class DlgUserInfo(QDialog):
         self.accept()
 
     def saveSettings(self, course_changes):
-        result = (self.editFirstName.text(),
-                  self.editLastName.text(),
-                  self.editEmail.text(),
-                  course_changes)
-        #print result
-
         assigned, cancelled, changed = course_changes
+        print assigned
+        print cancelled
+        print changed
         ajax = HttpAjax(self, '/manager/set_user_info/',
                         {
                 'user_id': self.user_id,
@@ -167,14 +164,14 @@ class DlgUserInfo(QDialog):
                 'last_name': self.editLastName.text(),
                 'email': self.editEmail.text(),
                 'rfid_code': self.editRFID.text(),
-                #'course_assigned': assigned,
-                #'course_cancelled': cancelled,
-                #'course_changed': changed
+                'course_assigned': assigned,
+                'course_cancelled': cancelled,
+                'course_changed': changed
                 })
         json_like = ajax.parse_json()
         if 'code' in json_like:
-            print 'AJAX result: [%s] %s' % (json_like['code'], json_like['desc'])
+            print 'AJAX result: [%(code)s] %(desc)s' % json_like
         else:
-            print 'ok'
+            print 'Check response format!'
 
 
