@@ -17,7 +17,7 @@ class CourseListModel(QAbstractTableModel):
         self.storage = []
         # хранилище временных данных, т.е. назначенные, но ещё не
         # подтверждённые курсы
-        self.temporary = []
+        self.temporary_assigned = []
 
         self.labels = [self.tr('Title'), self.tr('Price'),
                        self.tr('Sold'), self.tr('Used'),
@@ -53,6 +53,16 @@ class CourseListModel(QAbstractTableModel):
 #         self.emit(SIGNAL('dataChanged(QModelIndex, QModelIndex)'),
 #                   self.createIndex(0, 0),
 #                   self.createIndex(self.rowCount(), self.columnCount()))
+
+    def get_changes_and_clean(self):
+        assigned = []
+        cancelled = []
+        changed = []
+        for i in self.temporary_assigned:
+            course_id = i[1]
+            assigned.append(course_id)
+        self.temporary_assigned = []
+        return (assigned, cancelled, changed)
 
     def rowCount(self, parent=None): # base class method
         if parent and parent.isValid():
@@ -108,10 +118,8 @@ class CourseListModel(QAbstractTableModel):
             expired = (now + timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')
             title, course_id, count, price, coaches, duration = value
             row = (0, course_id, title, price, count, 0, bought, expired, None)
-            print self.storage
             self.storage[-1] = row
-            print self.storage
-            self.temporary.append(row)
+            self.temporary_assigned.append(row)
             self.emit(SIGNAL('dataChanged(QModelIndex, QModelIndex)'),
                       index, index)
             return True

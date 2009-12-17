@@ -112,7 +112,7 @@ class MainWindow(QMainWindow):
 
     def clientNew(self):
         print 'register new client'
-        self.dialog = DlgUserInfo('create', self)
+        self.dialog = DlgUserInfo(self)
         self.dialog.setModal(True)
         self.dialog.exec_()
 
@@ -127,12 +127,10 @@ class MainWindow(QMainWindow):
         dlgStatus = self.dialog.exec_()
 
         if QDialog.Accepted == dlgStatus:
-            print 'rfid is', self.rfid_id
-            ajax = HttpAjax(self, '/manager/user_info/',
+            ajax = HttpAjax(self, '/manager/get_user_info/',
                             {'rfid_code': self.rfid_id})
             json_like = ajax.parse_json()
-            print json_like
-            self.dialog = DlgUserInfo('edit', self)
+            self.dialog = DlgUserInfo(self)
             self.dialog.setModal(True)
             self.dialog.initData(json_like)
             self.dialog.exec_()
@@ -162,7 +160,8 @@ class MainWindow(QMainWindow):
     def getUserInfo(self, rfid):
         """ Метод для получения информации о пользователе по идентификатору
         его карты. """
-        ajax = HttpAjax(self, '/manager/user_info/', {'rfid_code': rfid})
+        ajax = HttpAjax(self, '/manager/get_user_info/',
+                        {'rfid_code': rfid})
         json_like = ajax.parse_json()
         print 'USER INFO:', json_like
         return json_like

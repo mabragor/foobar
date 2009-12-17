@@ -7,17 +7,23 @@ from django.shortcuts import get_object_or_404
 
 from lib.decorators import ajax_processor, render_to
 
-from forms import UserRFID
+from forms import UserRFID, UserInfo
 
 from storage.models import Client, Group
 
 isJavaScript = False
 
+@ajax_processor(None, isJavaScript)
+def available_courses(request):
+    groups = Group.objects.all()
+    return [item.get_node() for item in groups]
+
 @ajax_processor(UserRFID, isJavaScript)
-def user_info(request, form):
+def get_user_info(request, form):
     rfid_id = form.cleaned_data['rfid_code']
     user = get_object_or_404(Client, rfid_code=rfid_id)
     return {
+        'user_id': user.id,
         'first_name': user.first_name,
         'last_name': user.last_name,
         'email': user.email,
@@ -26,7 +32,15 @@ def user_info(request, form):
         'course_list': user.get_course_list()
         }
 
-@ajax_processor(None, isJavaScript)
-def available_courses(request):
-    groups = Group.objects.all()
-    return [item.get_node() for item in groups]
+@ajax_processor(UserInfo, isJavaScript)
+def set_user_info(request, form):
+    data = form.cleaned_data
+    user_id = data['user_id']; del(data['user_id'])
+    if 0 == int(user_id):
+        user = Client(**data)
+    else:
+        user = Client.objects.get(id=user_id)
+        for key, value in data.items():
+            setattr(user, key, value)
+    user.save()
+    return {'code': 200, 'desc': 'Ok'}

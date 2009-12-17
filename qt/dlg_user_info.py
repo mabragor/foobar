@@ -4,6 +4,7 @@
 
 from model_sorting import SortClientCourses
 from courses_list import CourseListModel, CoursesList
+from http_ajax import HttpAjax
 from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_course_assign import DlgCourseAssign
 
@@ -12,10 +13,11 @@ from PyQt4.QtCore import *
 
 class DlgUserInfo(QDialog):
 
-    def __init__(self, mode, parent=None):
+    def __init__(self, parent=None):
         QDialog.__init__(self, parent)
 
         self.parent = parent
+        self.user_id = u'0'
         self.setMinimumWidth(800)
 
         # основные данные пользователя
@@ -103,6 +105,7 @@ class DlgUserInfo(QDialog):
         self.cardinfo.setModel(self.coursesModel)
 
     def initData(self, data):
+        self.user_id = data['user_id']
         self.editFirstName.setText(data.get('first_name', ''))
         self.editLastName.setText(data.get('last_name', ''))
         self.editEmail.setText(data.get('email', ''))
@@ -139,20 +142,39 @@ class DlgUserInfo(QDialog):
 
     def assignCourse(self, data):
         lastRow = self.coursesModel.rowCount(QModelIndex())
-        print 'DlgUserInfo::assignCourse:', lastRow
         if self.coursesModel.insertRows(lastRow, 1, QModelIndex()):
             index = self.coursesModel.index(lastRow, 0)
-            print self.coursesModel.setData(index, data, Qt.EditRole)
-        print data
+            self.coursesModel.setData(index, data, Qt.EditRole)
 
     def applyDialog(self):
         """ Применить настройки. """
-        self.saveSettings()
+        course_changes = self.coursesModel.get_changes_and_clean()
+        self.saveSettings(course_changes)
         self.accept()
 
-    def saveSettings(self):
+    def saveSettings(self, course_changes):
         result = (self.editFirstName.text(),
                   self.editLastName.text(),
-                  self.editEmail.text())
-        print result
+                  self.editEmail.text(),
+                  course_changes)
+        #print result
+
+        assigned, cancelled, changed = course_changes
+        ajax = HttpAjax(self, '/manager/set_user_info/',
+                        {
+                'user_id': self.user_id,
+                'first_name': self.editFirstName.text(),
+                'last_name': self.editLastName.text(),
+                'email': self.editEmail.text(),
+                'rfid_code': self.editRFID.text(),
+                #'course_assigned': assigned,
+                #'course_cancelled': cancelled,
+                #'course_changed': changed
+                })
+        json_like = ajax.parse_json()
+        if 'code' in json_like:
+            print 'AJAX result: [%s] %s' % (json_like['code'], json_like['desc'])
+        else:
+            print 'ok'
+
 

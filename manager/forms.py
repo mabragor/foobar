@@ -57,7 +57,7 @@ class ScheduleForm(forms.ModelForm):
                 result = result.exclude(pk=self.instance.pk)
 
             for item in result:
-                print item.course.__unicode__()
+                #print item.course.__unicode__()
                 if (begin < item.end < end) or (begin <= item.begin < end):
                     raise forms.ValidationError('Incorect begin date for this room')
         return self.cleaned_data
@@ -68,6 +68,16 @@ class ScheduleForm(forms.ModelForm):
 
 class UserRFID(forms.Form):
     rfid_code = forms.CharField(max_length=8)
+
+class UserInfo(forms.Form):
+    user_id = forms.IntegerField()
+    first_name = forms.CharField(max_length=64)
+    last_name = forms.CharField(max_length=64)
+    email = forms.EmailField(max_length=64)
+    rfid_code = forms.CharField(max_length=8)
+    #course_assigned = forms.MultiValueField(required=False)
+    #course_cancelled = forms.MultipleChoiceField(required=False)
+    #course_changed = forms.MultipleChoiceField(required=False)
 
 class UserCardForm(forms.ModelForm):
     rfid_code = forms.CharField(max_length=8)
