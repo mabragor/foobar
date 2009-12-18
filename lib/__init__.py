@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 from django.utils import simplejson
 
+import time
+from datetime import datetime
+
+def str2date(value):
+    return datetime(*time.strptime(value, '%Y-%m-%d %H:%M:%S')[:6])
+
 class DatetimeJSONEncoder(simplejson.JSONEncoder):
 
     class DateInt(int):
