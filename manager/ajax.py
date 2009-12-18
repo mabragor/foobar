@@ -5,6 +5,7 @@ from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 
+from lib import str2date
 from lib.decorators import ajax_processor, render_to
 
 from forms import UserRFID, UserInfo
@@ -47,9 +48,12 @@ def set_user_info(request, form):
     # assigned courses
     assigned = data['course_assigned']
     if len(assigned) > 0:
-        for i in assigned:
-            course = Course.objects.get(id=i)
-            print course
+        for id, bgn_date in assigned:
+            course = Course.objects.get(id=id)
+            print type(bgn_date)
+            d = str2date(bgn_date)
+            print type(d)
+            print course, d
             #card = Card(course=course, client=user,type=1,
 
     return {'code': 200, 'desc': 'Ok'}

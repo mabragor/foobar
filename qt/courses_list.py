@@ -62,8 +62,12 @@ class CourseListModel(QAbstractTableModel):
         cancelled = []
         changed = []
         for i in self.temporary_assigned:
-            course_id = i[1]
-            assigned.append(course_id)
+            obj = list(self.model_fields)
+            index_course_id = obj.index('course_id')
+            course_id = i[index_course_id]
+            index_bgn_date = obj.index('bgn_date')
+            bgn_date = i[index_bgn_date]
+            assigned.append( (course_id, bgn_date) )
         self.temporary_assigned = []
         return (assigned, cancelled, changed)
 
@@ -92,7 +96,10 @@ class CourseListModel(QAbstractTableModel):
     def flags(self, index):
         if not index.isValid():
             return Qt.ItemIsEnabled
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+        flagSet = Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        if index.column() == 5:
+            flagSet |= Qt.ItemIsEditable
+        return flagSet
 
     def data(self, index, role): # base class method
         if not index.isValid():
