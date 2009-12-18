@@ -220,7 +220,7 @@ class CoursesList(QTableView):
     def __init__(self, parent=None):
         QTableView.__init__(self, parent)
 
-        self.verticalHeader().stretchLastSection = True
+        self.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
 
         self.actionCourseCancel = QAction(self.tr('Cance&l course'), self)
         self.actionCourseCancel.setStatusTip(self.tr('Cancel current course.'))
