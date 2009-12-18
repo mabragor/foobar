@@ -37,7 +37,7 @@ class CourseAdmin(admin.ModelAdmin):
     ordering = ('title', 'group')
     search_fields = ('title', 'group')
     fieldsets = (
-        (None, {'fields': ('title', 'duration', 'price')}),
+        (None, {'fields': ('title', 'duration', 'count', 'price')}),
         (_(u'Relation'), {'fields': ('group', 'coach')}),
         )
 
