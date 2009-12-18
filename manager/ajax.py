@@ -5,6 +5,8 @@ from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 
+from datetime import timedelta
+
 from lib import str2date
 from lib.decorators import ajax_processor, render_to
 
@@ -50,10 +52,12 @@ def set_user_info(request, form):
     if len(assigned) > 0:
         for id, bgn_date in assigned:
             course = Course.objects.get(id=id)
-            print type(bgn_date)
-            d = str2date(bgn_date)
-            print type(d)
-            print course, d
-            #card = Card(course=course, client=user,type=1,
+            bgn_date = str2date(bgn_date)
+            card = Card(course=course, client=user,type=1,
+                        bgn_date=bgn_date,
+                        exp_date=bgn_date + timedelta(days=30),
+                        count_sold=course.count,
+                        price=course.price)
+            card.save()
 
     return {'code': 200, 'desc': 'Ok'}
