@@ -155,7 +155,7 @@ class Card(models.Model):
     exp_date = models.DateTimeField(verbose_name=_(u'Expired'))
     cnl_date = models.DateTimeField(verbose_name=_(u'Cancelled'), null=True)
     count_sold = models.IntegerField(verbose_name=_(u'Exercises sold'))
-    count_used = models.IntegerField(verbose_name=_(u'Exercises used'))
+    count_used = models.IntegerField(verbose_name=_(u'Exercises used'), default=0)
     price = models.FloatField(verbose_name=_(u'Price'),
                               help_text=_(u'The price of the course.'),
                               default=float(0.00))
