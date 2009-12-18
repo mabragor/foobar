@@ -3,7 +3,7 @@
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
 
 from model_sorting import SortClientCourses
-from courses_list import CourseListModel, CoursesList
+from courses_list import CourseListModel, CoursesListDelegate, CoursesList
 from http_ajax import HttpAjax
 from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_course_assign import DlgCourseAssign
@@ -103,6 +103,8 @@ class DlgUserInfo(QDialog):
         #self.proxyModel.setSourceModel(self.coursesModel)
         # use proxy model to change data representation
         self.cardinfo.setModel(self.coursesModel)
+        self.delegate = CoursesListDelegate()
+        #self.cardinfo.setItemDelegate(self.delegate)
 
     def initData(self, data):
         self.user_id = data['user_id']
@@ -144,7 +146,14 @@ class DlgUserInfo(QDialog):
         lastRow = self.coursesModel.rowCount(QModelIndex())
         if self.coursesModel.insertRows(lastRow, 1, QModelIndex()):
             index = self.coursesModel.index(lastRow, 0)
-            self.coursesModel.setData(index, data, Qt.EditRole)
+            self.coursesModel.setRow(index, data, Qt.EditRole)
+
+        print 'DlgUserInfo::assignCourse DUMP:'
+        for item in self.coursesModel.storage:
+            print '\t',
+            for col in item:
+                print col,
+            print
 
     def applyDialog(self):
         """ Применить настройки. """

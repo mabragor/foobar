@@ -174,6 +174,7 @@ class Card(models.Model):
             'course_id': self.course.pk,
             'title': self.course.title,
             'reg_date': self.reg_date,
+            'bgn_date': self.bgn_date,
             'exp_date': self.exp_date,
             'cnl_date': self.cnl_date,
             'count_sold': self.count_sold,
