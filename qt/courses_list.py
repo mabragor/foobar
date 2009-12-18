@@ -20,10 +20,11 @@ class CourseListModel(QAbstractTableModel):
         self.temporary_assigned = []
 
         self.labels = [self.tr('Title'), self.tr('Price'),
+                       self.tr('Card'),
                        self.tr('Sold'), self.tr('Used'),
                        self.tr('Assigned'), self.tr('Begin'),
                        self.tr('State'), self.tr('Till/When')]
-        self.view_fields = ['title', 'price', 'sold', 'used', 'assigned', 'begin', 'state', 'expired']
+        self.view_fields = ['title', 'price', 'card', 'sold', 'used', 'assigned', 'begin', 'state', 'expired']
         self.model_fields = ('title', 'price', 'count_sold', 'count_used',
                              'reg_date', 'bgn_date', 'exp_date', 'cnl_date',
                              'id', 'course_id')
@@ -34,7 +35,7 @@ class CourseListModel(QAbstractTableModel):
     def initData(self, data):
         """
         Формат полученных данных:
-        [{id, course_id, title, price,
+        [{id, course_id, title, price, card_type,
           count_sold, count_used,
           reg_date, exp_date, cnl_date},
           ...
