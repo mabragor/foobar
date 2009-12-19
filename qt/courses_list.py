@@ -3,7 +3,7 @@
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
 
 import time
-from  datetime import datetime, timedelta
+from  datetime import datetime, date, timedelta
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -24,13 +24,16 @@ class CourseListModel(QAbstractTableModel):
                        self.tr('Sold'), self.tr('Used'),
                        self.tr('Assigned'), self.tr('Begin'),
                        self.tr('State'), self.tr('Till/When')]
-        self.view_fields = ['title', 'price', 'card', 'sold', 'used', 'assigned', 'begin', 'state', 'expired']
-        self.model_fields = ('title', 'price', 'count_sold', 'count_used',
+        self.view_fields = ['title', 'price', 'card_type', 'sold', 'used', 'reg_date', 'bgn_date', 'state', 'exp_date']
+        self.model_fields = ('title', 'price', 'card_type', 'count_sold', 'count_used',
                              'reg_date', 'bgn_date', 'exp_date', 'cnl_date',
                              'id', 'course_id')
 
     def str2date(self, value):
-        return datetime(*time.strptime(value, '%Y-%m-%d %H:%M:%S')[:6])
+        if value is not None:
+            return datetime(*time.strptime(value, '%Y-%m-%d %H:%M:%S')[:6])
+        else:
+            return None
 
     def initData(self, data):
         """
@@ -68,7 +71,7 @@ class CourseListModel(QAbstractTableModel):
             course_id = i[index_course_id]
             index_bgn_date = obj.index('bgn_date')
             bgn_date = i[index_bgn_date]
-            assigned.append( (course_id, bgn_date) )
+            assigned.append( (course_id, unicode(bgn_date)) )
         self.temporary_assigned = []
         return (assigned, cancelled, changed)
 
@@ -98,48 +101,76 @@ class CourseListModel(QAbstractTableModel):
         if not index.isValid():
             return Qt.ItemIsEnabled
         flagSet = Qt.ItemIsEnabled | Qt.ItemIsSelectable
-        if index.column() == 5:
+        if index.column() in [
+            self.view_fields.index('card_type'),
+            self.view_fields.index('bgn_date')
+            ]:
             flagSet |= Qt.ItemIsEditable
         return flagSet
 
     def data(self, index, role): # base class method
         if not index.isValid():
             return QVariant()
+
+        def dtapply(value):
+            if value is not None:
+                if type(value) is date:
+                    return value
+                if type(value) is datetime:
+                    result = value
+                else:
+                    result = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+                return result.date()
+            else:
+                return None
+
         if role in (Qt.DisplayRole, Qt.ToolTipRole) :
             idx_row = index.row()
             idx_col = index.column()
             # source data
-            row = self.storage[idx_row]
-            title, price, sold, used, assigned, begin, expired, cancelled, id, course_id = row
+            record = self.storage[idx_row]
+            title, price, card_type, sold, used, reg_date, bgn_date, exp_date, cnl_date, id, course_id = record
+            reg_date = dtapply(reg_date)
+            bgn_date = dtapply(bgn_date)
+            exp_date = dtapply(exp_date)
+            cnl_date = dtapply(cnl_date)
+            record = title, price, card_type, sold, used, reg_date, bgn_date, exp_date, cnl_date, id, course_id
 
-            idx = lambda x: self.view_fields.index(x)
+            if record[idx_col] is None:
+                return QVariant()
 
-            if idx_col in [idx('state'), idx('expired')]:
-                if cancelled is not None:
+            # status and expiration date
+            if idx_col in [
+                self.view_fields.index('state'),
+                self.view_fields.index('exp_date')
+                ]:
+                if cnl_date is not None:
                     state = self.tr('Cancelled')
-                    till_when = cancelled
-                elif self.str2date(expired) > datetime.now():
+                    till_when = cnl_date
+                elif exp_date > date.today():
                     state = self.tr('Active')
-                    till_when = None
+                    till_when = reg_date + timedelta(days=30)
                 else:
                     state = self.tr('Expired')
-                    till_when = expired
-                if idx_col == idx('state'):
+                    till_when = exp_date
+                if idx_col == self.view_fields.index('state'):
                     item = state
                 else:
                     item = till_when
             else:
-                item = row[index.column()]
+                item = record[index.column()]
             return QVariant(item)
         return QVariant()
 
     def setRow(self, index, record, role):
         if index.isValid() and role == Qt.EditRole:
-            now = datetime.now()
-            reg_date = bgn_date = now.strftime('%Y-%m-%d %H:%M:%S')
-            exp_date = (now + timedelta(days=30)).strftime('%Y-%m-%d %H:%M:%S')
+            now = date.today()
+            reg_date = bgn_date = now #.strftime('%Y-%m-%d %H:%M:%S')
+            exp_date = now + timedelta(days=30) #.strftime('%Y-%m-%d %H:%M:%S')
             title, course_id, count, price, coaches, duration = record
-            record = [title, price, count, 0, reg_date, bgn_date, exp_date, None, 0, course_id]
+            record = [title, price, 1, count, 0, reg_date, bgn_date, exp_date, None, 0, course_id]
+
+            #print record
 
             idx_row = index.row()
             idx_col = 0
@@ -162,8 +193,16 @@ class CourseListModel(QAbstractTableModel):
                 v, ok = value.toInt()
             else:
                 v = value
+            #print type(value), value
             record[idx_col] = v
             self.storage[idx_row] = tuple(record)
+
+#             for item in self.storage:
+#                 print '\t',
+#                 for col in item:
+#                     print col,
+#                 print
+
             self.emit(SIGNAL('dataChanged(QModelIndex, QModelIndex)'),
                       index, index)
             return True
@@ -172,7 +211,7 @@ class CourseListModel(QAbstractTableModel):
     def insertRows(self, position, rows, parent):
         self.beginInsertRows(QModelIndex(), position, position+rows-1)
         for i in xrange(rows):
-            self.storage.append( tuple() )
+            self.storage.insert(0, tuple())
 
         self.endInsertRows()
         return True

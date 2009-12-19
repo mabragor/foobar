@@ -64,7 +64,7 @@ class DlgUserInfo(QDialog):
         cardLayout = QVBoxLayout()
         cardLayout.addWidget(self.cardinfo)
 
-        groupCard = QGroupBox(self.tr('Course\'s history'))
+        groupCard = QGroupBox(self.tr('Courses\' history'))
         groupCard.setLayout(cardLayout)
 
         buttonAssignRFID = QPushButton(self.tr('Assign RFID'))
@@ -145,15 +145,15 @@ class DlgUserInfo(QDialog):
     def assignCourse(self, data):
         lastRow = self.coursesModel.rowCount(QModelIndex())
         if self.coursesModel.insertRows(lastRow, 1, QModelIndex()):
-            index = self.coursesModel.index(lastRow, 0)
+            index = self.coursesModel.index(0, 0)
             self.coursesModel.setRow(index, data, Qt.EditRole)
 
-        print 'DlgUserInfo::assignCourse DUMP:'
-        for item in self.coursesModel.storage:
-            print '\t',
-            for col in item:
-                print col,
-            print
+#         print 'DlgUserInfo::assignCourse DUMP:'
+#         for item in self.coursesModel.storage:
+#             print '\t',
+#             for col in item:
+#                 print col,
+#             print
 
     def applyDialog(self):
         """ Применить настройки. """

@@ -180,6 +180,7 @@ class Card(models.Model):
             'count_sold': self.count_sold,
             'count_used': self.count_used,
             'price': self.price,
+            'card_type': self.type,
             # это надо будет удалить
             'deleteable': False,#self.deleteable(),
             'is_old': self.is_old()
