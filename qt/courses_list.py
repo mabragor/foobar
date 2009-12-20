@@ -24,7 +24,8 @@ class CourseListModel(QAbstractTableModel):
                        self.tr('Sold'), self.tr('Used'),
                        self.tr('Assigned'), self.tr('Begin'),
                        self.tr('State'), self.tr('Till/When')]
-        self.view_fields = ['title', 'price', 'card_type', 'sold', 'used', 'reg_date', 'bgn_date', 'state', 'exp_date']
+        self.view_fields = ['title', 'price', 'card_type', 'sold', 'used',
+                            'reg_date', 'bgn_date', 'state', 'exp_date']
         self.model_fields = ('title', 'price', 'card_type', 'count_sold', 'count_used',
                              'reg_date', 'bgn_date', 'exp_date', 'cnl_date',
                              'id', 'course_id')
@@ -69,9 +70,11 @@ class CourseListModel(QAbstractTableModel):
             obj = list(self.model_fields)
             index_course_id = obj.index('course_id')
             course_id = i[index_course_id]
+            index_card_type = obj.index('card_type')
+            card_type = i[index_card_type]
             index_bgn_date = obj.index('bgn_date')
             bgn_date = i[index_bgn_date]
-            assigned.append( (course_id, unicode(bgn_date)) )
+            assigned.append( (course_id, card_type, unicode(bgn_date)) )
         self.temporary_assigned = []
         return (assigned, cancelled, changed)
 
@@ -100,13 +103,7 @@ class CourseListModel(QAbstractTableModel):
     def flags(self, index):
         if not index.isValid():
             return Qt.ItemIsEnabled
-        flagSet = Qt.ItemIsEnabled | Qt.ItemIsSelectable
-        if index.column() in [
-            self.view_fields.index('card_type'),
-            self.view_fields.index('bgn_date')
-            ]:
-            flagSet |= Qt.ItemIsEditable
-        return flagSet
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
     def data(self, index, role): # base class method
         if not index.isValid():
@@ -129,46 +126,61 @@ class CourseListModel(QAbstractTableModel):
             idx_col = index.column()
             # source data
             record = self.storage[idx_row]
-            title, price, card_type, sold, used, reg_date, bgn_date, exp_date, cnl_date, id, course_id = record
+            try:
+                title, price, card_type, sold, used, reg_date, bgn_date, exp_date, cnl_date, id, course_id = record
+            except ValueError:
+                return QVariant()
             reg_date = dtapply(reg_date)
             bgn_date = dtapply(bgn_date)
             exp_date = dtapply(exp_date)
             cnl_date = dtapply(cnl_date)
             record = title, price, card_type, sold, used, reg_date, bgn_date, exp_date, cnl_date, id, course_id
 
-            if record[idx_col] is None:
-                return QVariant()
+            # card type
+            if idx_col == self.view_fields.index('card_type'):
+                try:
+                    card_index = int(card_type)
+                except ValueError:
+                    return QVariant()
+                values = [self.tr('Normal'), self.tr('Club')]
+                return QVariant(values[card_index])
 
             # status and expiration date
             if idx_col in [
                 self.view_fields.index('state'),
                 self.view_fields.index('exp_date')
                 ]:
+
                 if cnl_date is not None:
                     state = self.tr('Cancelled')
                     till_when = cnl_date
                 elif exp_date > date.today():
                     state = self.tr('Active')
-                    till_when = reg_date + timedelta(days=30)
+                    till_when = bgn_date + timedelta(days=30)
                 else:
                     state = self.tr('Expired')
                     till_when = exp_date
+
                 if idx_col == self.view_fields.index('state'):
                     item = state
                 else:
                     item = till_when
             else:
                 item = record[index.column()]
+
+            #print idx_row, idx_col, item
+
             return QVariant(item)
         return QVariant()
 
-    def setRow(self, index, record, role):
+    def setRow(self, index, record, role, card_type=1, bgn_date=date.today()):
+        print 'setRow:', card_type, bgn_date
         if index.isValid() and role == Qt.EditRole:
-            now = date.today()
-            reg_date = bgn_date = now #.strftime('%Y-%m-%d %H:%M:%S')
-            exp_date = now + timedelta(days=30) #.strftime('%Y-%m-%d %H:%M:%S')
+            today = date.today()
+            reg_date = today
+            exp_date = bgn_date + timedelta(days=30)
             title, course_id, count, price, coaches, duration = record
-            record = [title, price, 1, count, 0, reg_date, bgn_date, exp_date, None, 0, course_id]
+            record = [title, price, card_type, count, 0, reg_date, bgn_date, exp_date, None, 0, course_id]
 
             #print record
 

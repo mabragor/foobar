@@ -14,11 +14,33 @@ class DlgCourseAssign(QDialog):
         QDialog.__init__(self, parent)
 
         self.parent = parent
-        self.setMinimumWidth(800)
+        self.setMinimumWidth(600)
+
+        labelCardType = QLabel(self.tr('Type of card'))
+        self.comboCardType = QComboBox()
+        labelCardType.setBuddy(self.comboCardType)
+        self.comboCardType.addItem(self.tr('Normal'))
+        self.comboCardType.addItem(self.tr('Club'))
+
+        labelBeginning = QLabel(self.tr('Course starts'))
+        self.editBeginning = QDateEdit()
+        current = QDate.currentDate()
+        self.editBeginning.setDate(current)
+        self.editBeginning.setMinimumDate(current)
+
+        groupLayout = QGridLayout()
+        groupLayout.setColumnStretch(1, 1)
+        groupLayout.setColumnMinimumWidth(1, 250)
+
+        groupLayout.addWidget(labelCardType, 0, 0)
+        groupLayout.addWidget(self.comboCardType, 0, 1)
+        groupLayout.addWidget(labelBeginning, 1, 0)
+        groupLayout.addWidget(self.editBeginning, 1, 1)
 
         self.tree = CoursesTree(self)
 
         courseLayout = QVBoxLayout()
+        courseLayout.addLayout(groupLayout)
         courseLayout.addWidget(self.tree)
 
         groupCourses = QGroupBox(self.tr('Available courses'))
@@ -51,7 +73,9 @@ class DlgCourseAssign(QDialog):
         self.tree.setModel(model)
 
     def applyDialog(self):
+        card_type = self.comboCardType.currentIndex()
+        bgn_date = self.editBeginning.date().toPyDate()
         index = self.tree.currentIndex()
         course_data = index.data(userRoles['getObjectID']).toPyObject()
-        self.callback(course_data)
+        self.callback(card_type, bgn_date, course_data)
         self.accept()

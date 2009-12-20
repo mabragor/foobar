@@ -142,18 +142,18 @@ class DlgUserInfo(QDialog):
         dialog.setModal(True)
         dlgStatus = dialog.exec_()
 
-    def assignCourse(self, data):
+    def assignCourse(self, card_type, bgn_date, data):
         lastRow = self.coursesModel.rowCount(QModelIndex())
         if self.coursesModel.insertRows(lastRow, 1, QModelIndex()):
             index = self.coursesModel.index(0, 0)
-            self.coursesModel.setRow(index, data, Qt.EditRole)
+            self.coursesModel.setRow(index, data, Qt.EditRole, card_type, bgn_date)
 
-#         print 'DlgUserInfo::assignCourse DUMP:'
-#         for item in self.coursesModel.storage:
-#             print '\t',
-#             for col in item:
-#                 print col,
-#             print
+        print 'DlgUserInfo::assignCourse DUMP:'
+        for item in self.coursesModel.storage:
+            print '\t',
+            for col in item:
+                print col,
+            print
 
     def applyDialog(self):
         """ Применить настройки. """
