@@ -50,10 +50,10 @@ def set_user_info(request, form):
     # assigned courses
     assigned = data['course_assigned']
     if len(assigned) > 0:
-        for id, bgn_date in assigned:
+        for id, card_type, bgn_date in assigned:
             bgn_date = date(*[int(i) for i in bgn_date.split('-')])
             course = Course.objects.get(id=id)
-            card = Card(course=course, client=user,type=1,
+            card = Card(course=course, client=user,type=card_type,
                         bgn_date=bgn_date,
                         exp_date=bgn_date + timedelta(days=30),
                         count_sold=course.count,
