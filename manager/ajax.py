@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from datetime import date, timedelta
@@ -10,7 +11,7 @@ from datetime import date, timedelta
 from lib import str2date
 from lib.decorators import ajax_processor, render_to
 
-from forms import UserRFID, UserInfo
+from forms import UserRFID, UserName, UserInfo
 
 from storage.models import Client, Card, Course, Group
 
@@ -34,6 +35,16 @@ def get_user_info(request, form):
         'reg_date': user.reg_date,
         'course_list': user.get_course_list()
         }
+
+@ajax_processor(UserName, isJavaScript)
+def get_users_info_by_name(request, form):
+    name = form.cleaned_data['name']
+    user_list = Client.objects.filter(Q(first_name=name)|Q(last_name=name))
+    result = [(user.last_name, user.first_name, user.rfid_code) for user in user_list]
+    print result
+    return {'code': 200, 'desc': 'Ok',
+            'user_list': result,
+            }
 
 @ajax_processor(UserInfo, isJavaScript)
 def set_user_info(request, form):

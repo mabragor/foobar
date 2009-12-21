@@ -138,6 +138,9 @@ class CopyForm(forms.Form):
 class UserRFID(forms.Form):
     rfid_code = forms.CharField(max_length=8)
 
+class UserName(forms.Form):
+    name = forms.CharField(max_length=64)
+
 # Create own field to process a list of ids.
 class ListField(forms.Field):
     def clean(self, data):

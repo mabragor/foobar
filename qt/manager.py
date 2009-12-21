@@ -13,6 +13,7 @@ from courses_tree import CoursesTree, TreeModel
 
 from dlg_settings import DlgSettings
 from dlg_waiting_rfid import DlgWaitingRFID
+from dlg_searching import DlgSearchByName
 from dlg_user_info import DlgUserInfo
 
 from PyQt4.QtGui import *
@@ -81,9 +82,9 @@ class MainWindow(QMainWindow):
             (self.tr('C&lient'), [
                     (self.tr('New'), self.tr('Ctrl+N'),
                      'clientNew', self.tr('Register new client.')),
-                    (self.tr('Search by RFID'), self.tr(''),
+                    (self.tr('Search by RFID'), self.tr('Ctrl+R'),
                      'clientSearchRFID', self.tr('Search a client with its RFID card.')),
-                    (self.tr('Search by name'), self.tr(''),
+                    (self.tr('Search by name'), self.tr('Ctrl+F'),
                      'clientSearchName', self.tr('Search a client with its name.')),
                     (self.tr('One visit'), self.tr(''),
                      'clientOneVisit', self.tr('One visit client.')),
@@ -139,6 +140,24 @@ class MainWindow(QMainWindow):
 
     def clientSearchName(self):
         print 'search client by its name'
+        def callback(rfid):
+            self.rfid_id = rfid
+
+        self.dialog = DlgSearchByName(self)
+        self.dialog.setModal(True)
+        self.dialog.setCallback(callback)
+        dlgStatus = self.dialog.exec_()
+
+        if QDialog.Accepted == dlgStatus:
+            ajax = HttpAjax(self, '/manager/get_user_info/',
+                            {'rfid_code': self.rfid_id})
+            json_like = ajax.parse_json()
+            self.dialog = DlgUserInfo(self)
+            self.dialog.setModal(True)
+            self.dialog.initData(json_like)
+            self.dialog.exec_()
+        else:
+            print 'dialog was rejected'
 
     def clientOneVisit(self):
         print 'one visit client'
