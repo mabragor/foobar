@@ -4,6 +4,7 @@
 
 import time
 from  datetime import datetime, date, timedelta
+from dateutil.relativedelta import relativedelta
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -23,18 +24,11 @@ class CourseListModel(QAbstractTableModel):
                        self.tr('Card'),
                        self.tr('Sold'), self.tr('Used'),
                        self.tr('Assigned'), self.tr('Begin'),
-                       self.tr('State'), self.tr('Till/When')]
-        self.view_fields = ['title', 'price', 'card_type', 'sold', 'used',
-                            'reg_date', 'bgn_date', 'state', 'exp_date']
-        self.model_fields = ('title', 'price', 'card_type', 'count_sold', 'count_used',
+                       self.tr('Expired'), self.tr('Cancelled'),
+                       'id', 'course_id']
+        self.model_fields = ['title', 'price', 'card_type', 'count_sold', 'count_used',
                              'reg_date', 'bgn_date', 'exp_date', 'cnl_date',
-                             'id', 'course_id')
-
-    def str2date(self, value):
-        if value is not None:
-            return datetime(*time.strptime(value, '%Y-%m-%d %H:%M:%S')[:6])
-        else:
-            return None
+                             'id', 'course_id']
 
     def initData(self, data):
         """
@@ -67,7 +61,7 @@ class CourseListModel(QAbstractTableModel):
         cancelled = []
         changed = []
         for i in self.temporary_assigned:
-            obj = list(self.model_fields)
+            obj = self.model_fields
             index_course_id = obj.index('course_id')
             course_id = i[index_course_id]
             index_card_type = obj.index('card_type')
@@ -88,7 +82,7 @@ class CourseListModel(QAbstractTableModel):
         if parent and parent.isValid():
             return 0
         else:
-            return len(self.labels)
+            return len(self.labels) - 2
 
     def modelColumnCount(self):
         return len(self.model_fields)
@@ -105,84 +99,67 @@ class CourseListModel(QAbstractTableModel):
             return Qt.ItemIsEnabled
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
+    def _dtapply(self, value):
+        if value is not None:
+            if type(value) is date:
+                return value
+            if type(value) is datetime:
+                result = value
+            else:
+                result = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+                return result.date()
+        else:
+            return None
+
+    def _card_type(self, value):
+        return [self.tr('Normal'), self.tr('Club')][int(value)]
+
     def data(self, index, role): # base class method
         if not index.isValid():
             return QVariant()
+        if role not in (Qt.DisplayRole, Qt.ToolTipRole) :
+            return QVariant()
+        idx_row = index.row()
+        idx_col = index.column()
+        record = list(self.storage[idx_row])
 
-        def dtapply(value):
-            if value is not None:
-                if type(value) is date:
-                    return value
-                if type(value) is datetime:
-                    result = value
-                else:
-                    result = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
-                return result.date()
-            else:
-                return None
+        map = (unicode, float, self._card_type,
+               int, int,
+               self._dtapply, self._dtapply,
+               self._dtapply, self._dtapply,
+               int, int)
 
-        if role in (Qt.DisplayRole, Qt.ToolTipRole) :
-            idx_row = index.row()
-            idx_col = index.column()
-            # source data
-            record = self.storage[idx_row]
-            try:
-                title, price, card_type, sold, used, reg_date, bgn_date, exp_date, cnl_date, id, course_id = record
-            except ValueError:
-                return QVariant()
-            reg_date = dtapply(reg_date)
-            bgn_date = dtapply(bgn_date)
-            exp_date = dtapply(exp_date)
-            cnl_date = dtapply(cnl_date)
-            record = title, price, card_type, sold, used, reg_date, bgn_date, exp_date, cnl_date, id, course_id
+        meta_func = map[idx_col]
+        try:
+            value = record[idx_col]
+        except IndexError:
+            return QVariant() # запись в модели ещё не заполнена
 
-            # card type
-            if idx_col == self.view_fields.index('card_type'):
-                try:
-                    card_index = int(card_type)
-                except ValueError:
-                    return QVariant()
-                values = [self.tr('Normal'), self.tr('Club')]
-                return QVariant(values[card_index])
+        if value is None:
+            return QVariant() # пустое значение
+        else:
+            return QVariant(meta_func(value))
 
-            # status and expiration date
-            if idx_col in [
-                self.view_fields.index('state'),
-                self.view_fields.index('exp_date')
-                ]:
-
-                if cnl_date is not None:
-                    state = self.tr('Cancelled')
-                    till_when = cnl_date
-                elif exp_date > date.today():
-                    state = self.tr('Active')
-                    till_when = bgn_date + timedelta(days=30)
-                else:
-                    state = self.tr('Expired')
-                    till_when = exp_date
-
-                if idx_col == self.view_fields.index('state'):
-                    item = state
-                else:
-                    item = till_when
-            else:
-                item = record[index.column()]
-
-            #print idx_row, idx_col, item
-
-            return QVariant(item)
-        return QVariant()
-
-    def setRow(self, index, record, role, card_type=1, bgn_date=date.today()):
-        print 'setRow:', card_type, bgn_date
+    def setRow(self, index, record, role, card_type=1,
+               bgn_date=date.today(), duration_index=0):
+        print 'setRow:', card_type, duration_index
         if index.isValid() and role == Qt.EditRole:
             today = date.today()
             reg_date = today
-            exp_date = bgn_date + timedelta(days=30)
+            if card_type == 0:
+                exp_date = bgn_date + timedelta(days=30)
+            else:
+                deltas = (relativedelta(months=+3), #0
+                          relativedelta(months=+6), #1
+                          relativedelta(months=+9), #2
+                          relativedelta(months=+12), #3
+                      )
+                exp_date = bgn_date + deltas[duration_index]
+            print bgn_date, type(bgn_date)
+            print exp_date, type(exp_date)
             title, course_id, count, price, coaches, duration = record
-            record = [title, price, card_type, count, 0, reg_date, bgn_date, exp_date, None, 0, course_id]
-
-            #print record
+            record = [title, price, card_type, count, 0,
+                      reg_date, bgn_date, exp_date, None, 0, course_id]
 
             idx_row = index.row()
             idx_col = 0

@@ -24,9 +24,19 @@ class DlgCourseAssign(QDialog):
 
         labelBeginning = QLabel(self.tr('Course starts'))
         self.editBeginning = QDateEdit()
+        labelBeginning.setBuddy(self.editBeginning)
         current = QDate.currentDate()
         self.editBeginning.setDate(current)
         self.editBeginning.setMinimumDate(current)
+
+        labelFinish = QLabel(self.tr('Course ends after'))
+        self.comboDuration = QComboBox()
+        labelFinish.setBuddy(self.comboDuration)
+        self.comboDuration.addItem(self.tr('3 months'))
+        self.comboDuration.addItem(self.tr('6 months'))
+        self.comboDuration.addItem(self.tr('9 months'))
+        self.comboDuration.addItem(self.tr('12 months'))
+        self.comboDuration.setDisabled(True)
 
         groupLayout = QGridLayout()
         groupLayout.setColumnStretch(1, 1)
@@ -36,6 +46,8 @@ class DlgCourseAssign(QDialog):
         groupLayout.addWidget(self.comboCardType, 0, 1)
         groupLayout.addWidget(labelBeginning, 1, 0)
         groupLayout.addWidget(self.editBeginning, 1, 1)
+        groupLayout.addWidget(labelFinish, 2, 0)
+        groupLayout.addWidget(self.comboDuration, 2, 1)
 
         self.tree = CoursesTree(self)
 
@@ -46,18 +58,13 @@ class DlgCourseAssign(QDialog):
         groupCourses = QGroupBox(self.tr('Available courses'))
         groupCourses.setLayout(courseLayout)
 
-        buttonAssign = QPushButton(self.tr('Assign'))
-        buttonCancel = QPushButton(self.tr('Cancel'))
-
-        self.connect(buttonAssign, SIGNAL('clicked()'),
-                     self.applyDialog)
-        self.connect(buttonCancel, SIGNAL('clicked()'),
-                     self, SLOT('reject()'))
+        self.buttonAssign = QPushButton(self.tr('Assign'))
+        self.buttonCancel = QPushButton(self.tr('Cancel'))
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch(1)
-        buttonLayout.addWidget(buttonAssign)
-        buttonLayout.addWidget(buttonCancel)
+        buttonLayout.addWidget(self.buttonAssign)
+        buttonLayout.addWidget(self.buttonCancel)
 
         layout = QVBoxLayout()
         layout.addWidget(groupCourses)
@@ -65,6 +72,7 @@ class DlgCourseAssign(QDialog):
 
         self.setLayout(layout)
         self.setWindowTitle(self.tr('Choose the course'))
+        self.setSignals()
 
     def setCallback(self, callback):
         self.callback = callback
@@ -72,10 +80,22 @@ class DlgCourseAssign(QDialog):
     def setModel(self, model):
         self.tree.setModel(model)
 
+    def setSignals(self):
+        self.connect(self.buttonAssign, SIGNAL('clicked()'),
+                     self.applyDialog)
+        self.connect(self.buttonCancel, SIGNAL('clicked()'),
+                     self, SLOT('reject()'))
+        self.connect(self.comboCardType, SIGNAL('currentIndexChanged(int)'),
+                     self.changeDurationState)
+
+    def changeDurationState(self, index):
+        self.comboDuration.setDisabled(index == 0)
+
     def applyDialog(self):
         card_type = self.comboCardType.currentIndex()
         bgn_date = self.editBeginning.date().toPyDate()
+        duration = self.comboDuration.currentIndex()
         index = self.tree.currentIndex()
         course_data = index.data(userRoles['getObjectID']).toPyObject()
-        self.callback(card_type, bgn_date, course_data)
+        self.callback(card_type, bgn_date, duration, course_data)
         self.accept()

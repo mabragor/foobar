@@ -22,175 +22,175 @@ from PyQt4.QtCore import *
 class MainWindow(QMainWindow):
 
     def __init__(self, parent=None):
-        QMainWindow.__init__(self, parent)
+	QMainWindow.__init__(self, parent)
 
-        self.createMenus()
-        self.setupViews()
+	self.createMenus()
+	self.setupViews()
 
-        self.mimes = {'course': 'application/x-course-item',
-                      'event':  'application/x-calendar-event',
-                      }
+	self.mimes = {'course': 'application/x-course-item',
+		      'event':  'application/x-calendar-event',
+		      }
 
-        self.setWindowTitle(self.tr('Manager\'s interface'))
-        self.statusBar().showMessage(self.tr('Ready'))
-        self.resize(640, 480)
+	self.setWindowTitle(self.tr('Manager\'s interface'))
+	self.statusBar().showMessage(self.tr('Ready'))
+	self.resize(640, 480)
 
     def setupViews(self):
-        self.tree = self.initCourses()
-        self.schedule = QtSchedule((8, 23), timedelta(minutes=30), self)
+	self.tree = self.initCourses()
+	self.schedule = QtSchedule((8, 23), timedelta(minutes=30), self)
 
-        splitter = QSplitter()
-        splitter.addWidget(self.tree)
-        splitter.addWidget(self.schedule)
+	splitter = QSplitter()
+	splitter.addWidget(self.tree)
+	splitter.addWidget(self.schedule)
 
-        self.setCentralWidget(splitter)
+	self.setCentralWidget(splitter)
 
     def initCourses(self):
-        ajax = HttpAjax(self, '/manager/available_courses/', {})
-        json_like = ajax.parse_json() # see format at courses_tree.py
-        self.modelCoursesTree = TreeModel(json_like)
-        tree = CoursesTree(self)
-        tree.setModel(self.modelCoursesTree)
-        return tree
+	ajax = HttpAjax(self, '/manager/available_courses/', {})
+	json_like = ajax.parse_json() # see format at courses_tree.py
+	self.modelCoursesTree = TreeModel(json_like)
+	tree = CoursesTree(self)
+	tree.setModel(self.modelCoursesTree)
+	return tree
 
     def getMime(self, name):
-        return self.mimes.get(name, None)
+	return self.mimes.get(name, None)
 
     def getRooms(self):
-        ajax = HttpAjax(self, '/manager/get_rooms/', {})
-        if ajax:
-            json_like = ajax.parse_json()
-        else:
-            json_like = {'rows': []}
-        """
-        {'rows': [{'color': 'FFAAAA', 'text': 'red', 'id': 1},
-                  {'color': 'AAFFAA', 'text': 'green', 'id': 2},
-                  ...]}
-        """
-        return json_like
+	ajax = HttpAjax(self, '/manager/get_rooms/', {})
+	if ajax:
+	    json_like = ajax.parse_json()
+	else:
+	    json_like = {'rows': []}
+	"""
+	{'rows': [{'color': 'FFAAAA', 'text': 'red', 'id': 1},
+		  {'color': 'AAFFAA', 'text': 'green', 'id': 2},
+		  ...]}
+	"""
+	return json_like
 
     def createMenus(self):
-        """ Метод для генерации меню приложения. """
-        """ Использование: Описать меню со всеми действиями в блоке
-        data. Создать обработчики для каждого действия. """
-        data = [
-            (self.tr('&File'), [
-                    (self.tr('Exit'), self.tr(''),
-                     'close', self.tr('Close the application.')),
-                    ]
-             ),
-            (self.tr('C&lient'), [
-                    (self.tr('New'), self.tr('Ctrl+N'),
-                     'clientNew', self.tr('Register new client.')),
-                    (self.tr('Search by RFID'), self.tr('Ctrl+R'),
-                     'clientSearchRFID', self.tr('Search a client with its RFID card.')),
-                    (self.tr('Search by name'), self.tr('Ctrl+F'),
-                     'clientSearchName', self.tr('Search a client with its name.')),
-                    (self.tr('One visit'), self.tr(''),
-                     'clientOneVisit', self.tr('One visit client.')),
-                    ]
-             ),
-            (self.tr('&Tools'), [
-                    (self.tr('Application settings'), self.tr('Ctrl+T'),
-                     'setupApp', self.tr('Manage the application settings.')),
-                    (self.tr('Test'), self.tr('Ctrl+T'),
-                     'test', self.tr('Test')),
-                    ]
-             ),
-            ]
+	""" Метод для генерации меню приложения. """
+	""" Использование: Описать меню со всеми действиями в блоке
+	data. Создать обработчики для каждого действия. """
+	data = [
+	    (self.tr('&File'), [
+		    (self.tr('Exit'), self.tr(''),
+		     'close', self.tr('Close the application.')),
+		    ]
+	     ),
+	    (self.tr('C&lient'), [
+		    (self.tr('New'), self.tr('Ctrl+N'),
+		     'clientNew', self.tr('Register new client.')),
+		    (self.tr('Search by RFID'), self.tr('Ctrl+R'),
+		     'clientSearchRFID', self.tr('Search a client with its RFID card.')),
+		    (self.tr('Search by name'), self.tr('Ctrl+F'),
+		     'clientSearchName', self.tr('Search a client with its name.')),
+		    (self.tr('One visit'), self.tr(''),
+		     'clientOneVisit', self.tr('One visit client.')),
+		    ]
+	     ),
+	    (self.tr('&Tools'), [
+		    (self.tr('Application settings'), self.tr('Ctrl+T'),
+		     'setupApp', self.tr('Manage the application settings.')),
+		    (self.tr('Test'), self.tr('Ctrl+T'),
+		     'test', self.tr('Test')),
+		    ]
+	     ),
+	    ]
 
-        for topic, info in data:
-            self.toolsMenu = self.menuBar().addMenu(topic)
-            for title, short, name, desc in info:
-                setattr(self, 'act_%s' % name, QAction(title, self))
-                action = getattr(self, 'act_%s' % name)
-                action.setShortcut(short)
-                action.setStatusTip(desc)
-                self.connect(action, SIGNAL('triggered()'), getattr(self, name))
-                self.toolsMenu.addAction(action)
+	for topic, info in data:
+	    self.toolsMenu = self.menuBar().addMenu(topic)
+	    for title, short, name, desc in info:
+		setattr(self, 'act_%s' % name, QAction(title, self))
+		action = getattr(self, 'act_%s' % name)
+		action.setShortcut(short)
+		action.setStatusTip(desc)
+		self.connect(action, SIGNAL('triggered()'), getattr(self, name))
+		self.toolsMenu.addAction(action)
 
     # Обработчики меню: начало
 
     def clientNew(self):
-        print 'register new client'
-        self.dialog = DlgUserInfo(self)
-        self.dialog.setModal(True)
-        self.dialog.exec_()
+	print 'register new client'
+	self.dialog = DlgUserInfo(self)
+	self.dialog.setModal(True)
+	self.dialog.exec_()
 
     def clientSearchRFID(self):
-        print 'search client by its rfid'
-        def callback(rfid):
-            self.rfid_id = rfid
+	print 'search client by its rfid'
+	def callback(rfid):
+	    self.rfid_id = rfid
 
-        self.callback = callback
-        self.dialog = DlgWaitingRFID(self)
-        self.dialog.setModal(True)
-        dlgStatus = self.dialog.exec_()
+	self.callback = callback
+	self.dialog = DlgWaitingRFID(self)
+	self.dialog.setModal(True)
+	dlgStatus = self.dialog.exec_()
 
-        if QDialog.Accepted == dlgStatus:
-            ajax = HttpAjax(self, '/manager/get_user_info/',
-                            {'rfid_code': self.rfid_id})
-            json_like = ajax.parse_json()
-            self.dialog = DlgUserInfo(self)
-            self.dialog.setModal(True)
-            self.dialog.initData(json_like)
-            self.dialog.exec_()
-        else:
-            print 'dialog was rejected'
+	if QDialog.Accepted == dlgStatus:
+	    ajax = HttpAjax(self, '/manager/get_user_info/',
+			    {'rfid_code': self.rfid_id})
+	    json_like = ajax.parse_json()
+	    self.dialog = DlgUserInfo(self)
+	    self.dialog.setModal(True)
+	    self.dialog.initData(json_like)
+	    self.dialog.exec_()
+	else:
+	    print 'dialog was rejected'
 
     def clientSearchName(self):
-        print 'search client by its name'
-        def callback(rfid):
-            self.rfid_id = rfid
+	print 'search client by its name'
+	def callback(rfid):
+	    self.rfid_id = rfid
 
-        self.dialog = DlgSearchByName(self)
-        self.dialog.setModal(True)
-        self.dialog.setCallback(callback)
-        dlgStatus = self.dialog.exec_()
+	self.dialog = DlgSearchByName(self)
+	self.dialog.setModal(True)
+	self.dialog.setCallback(callback)
+	dlgStatus = self.dialog.exec_()
 
-        if QDialog.Accepted == dlgStatus:
-            ajax = HttpAjax(self, '/manager/get_user_info/',
-                            {'rfid_code': self.rfid_id})
-            json_like = ajax.parse_json()
-            self.dialog = DlgUserInfo(self)
-            self.dialog.setModal(True)
-            self.dialog.initData(json_like)
-            self.dialog.exec_()
-        else:
-            print 'dialog was rejected'
+	if QDialog.Accepted == dlgStatus:
+	    ajax = HttpAjax(self, '/manager/get_user_info/',
+			    {'rfid_code': self.rfid_id})
+	    json_like = ajax.parse_json()
+	    self.dialog = DlgUserInfo(self)
+	    self.dialog.setModal(True)
+	    self.dialog.initData(json_like)
+	    self.dialog.exec_()
+	else:
+	    print 'dialog was rejected'
 
     def clientOneVisit(self):
-        print 'one visit client'
+	print 'one visit client'
 
     def setupApp(self):
-        # подготовить диалог
-        self.dialog = DlgSettings(self)
-        self.dialog.setModal(True)
-        # показать диалог
-        self.dialog.exec_()
+	# подготовить диалог
+	self.dialog = DlgSettings(self)
+	self.dialog.setModal(True)
+	# показать диалог
+	self.dialog.exec_()
 
     def test(self):
-        self.dialog = DlgUserInfo(self)
-        self.dialog.setModal(True)
-        self.dialog.exec_()
+	self.dialog = DlgUserInfo(self)
+	self.dialog.setModal(True)
+	self.dialog.exec_()
 
     # Обработчики меню: конец
 
     def getUserInfo(self, rfid):
-        """ Метод для получения информации о пользователе по идентификатору
-        его карты. """
-        ajax = HttpAjax(self, '/manager/get_user_info/',
-                        {'rfid_code': rfid})
-        json_like = ajax.parse_json()
-        print 'USER INFO:', json_like
-        return json_like
+	""" Метод для получения информации о пользователе по идентификатору
+	его карты. """
+	ajax = HttpAjax(self, '/manager/get_user_info/',
+			{'rfid_code': rfid})
+	json_like = ajax.parse_json()
+	print 'USER INFO:', json_like
+	return json_like
 
     # Drag'n'Drop section begins
     def mousePressEvent(self, event):
-        print 'press event', event.button()
+	print 'press event', event.button()
 
     def mouseMoveEvent(self, event):
-        print 'move event', event.pos()
+	print 'move event', event.pos()
     # Drag'n'Drop section ends
 
 

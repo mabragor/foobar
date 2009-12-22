@@ -67,8 +67,8 @@ class DlgUserInfo(QDialog):
         groupCard = QGroupBox(self.tr('Courses\' history'))
         groupCard.setLayout(cardLayout)
 
-        buttonAssignRFID = QPushButton(self.tr('Assign RFID'))
-        buttonAssignCourse = QPushButton(self.tr('Assign course'))
+        buttonAssignRFID = QPushButton(self.tr('Assign &RFID'))
+        buttonAssignCourse = QPushButton(self.tr('Assign c&ourse'))
         buttonApplyDialog = QPushButton(self.tr('Apply'))
         buttonCancelDialog = QPushButton(self.tr('Cancel'))
 
@@ -142,11 +142,12 @@ class DlgUserInfo(QDialog):
         dialog.setModal(True)
         dlgStatus = dialog.exec_()
 
-    def assignCourse(self, card_type, bgn_date, data):
+    def assignCourse(self, card_type, bgn_date, duration_index, data):
+        # duration matters for club card only
         lastRow = self.coursesModel.rowCount(QModelIndex())
         if self.coursesModel.insertRows(lastRow, 1, QModelIndex()):
             index = self.coursesModel.index(0, 0)
-            self.coursesModel.setRow(index, data, Qt.EditRole, card_type, bgn_date)
+            self.coursesModel.setRow(index, data, Qt.EditRole, card_type, bgn_date, duration_index)
 
         print 'DlgUserInfo::assignCourse DUMP:'
         for item in self.coursesModel.storage:
