@@ -3,6 +3,11 @@
 
 from http_ajax import HttpAjax
 
+import gettext
+gettext.bindtextdomain('project', './locale/')
+gettext.textdomain('project')
+_ = lambda a: unicode(gettext.gettext(a), 'utf8')
+
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
@@ -13,7 +18,7 @@ class DlgSearchByName(QDialog):
 
         self.setMinimumWidth(500)
 
-        labelField = QLabel(self.tr('Search'))
+        labelField = QLabel(_('Search'))
         self.editField = QLineEdit()
         labelField.setBuddy(self.editField)
 
@@ -21,8 +26,8 @@ class DlgSearchByName(QDialog):
         fieldLayout.addWidget(labelField)
         fieldLayout.addWidget(self.editField)
 
-        buttonFind = QPushButton(self.tr('Find'))
-        buttonCancel = QPushButton(self.tr('Cancel'))
+        buttonFind = QPushButton(_('Find'))
+        buttonCancel = QPushButton(_('Cancel'))
 
         self.connect(buttonFind, SIGNAL('clicked()'),
                      self.searchFor)
@@ -34,9 +39,9 @@ class DlgSearchByName(QDialog):
         buttonLayout.addWidget(buttonFind)
         buttonLayout.addWidget(buttonCancel)
 
-        labels = QStringList([self.tr('Last name'),
-                              self.tr('First name'),
-                              self.tr('RFID code')])
+        labels = QStringList([_('Last name'),
+                              _('First name'),
+                              _('RFID code')])
 
         self.userTable = QTableWidget(0, 3)
         self.userTable.setHorizontalHeaderLabels(labels)
@@ -47,11 +52,11 @@ class DlgSearchByName(QDialog):
         resultLayout = QVBoxLayout()
         resultLayout.addWidget(self.userTable)
 
-        groupList = QGroupBox(self.tr('Results'))
+        groupList = QGroupBox(_('Results'))
         groupList.setObjectName(QString('SearchResults'))
         groupList.setLayout(resultLayout)
 
-        self.buttonShow = QPushButton(self.tr('Show'))
+        self.buttonShow = QPushButton(_('Show'))
 
         self.connect(self.buttonShow, SIGNAL('clicked()'),
                      self.applyDialog)
@@ -67,7 +72,7 @@ class DlgSearchByName(QDialog):
         self.mainLayout.addLayout(button2Layout)
 
         self.setLayout(self.mainLayout)
-        self.setWindowTitle(self.tr('Search client by name'))
+        self.setWindowTitle(_('Search client by name'))
 
     def setCallback(self, callback):
         self.callback = callback

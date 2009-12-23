@@ -7,6 +7,11 @@ from http_ajax import HttpAjax
 from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_course_assign import DlgCourseAssign
 
+import gettext
+gettext.bindtextdomain('project', './locale/')
+gettext.textdomain('project')
+_ = lambda a: unicode(gettext.gettext(a), 'utf8')
+
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
@@ -20,20 +25,20 @@ class DlgUserInfo(QDialog):
         self.setMinimumWidth(800)
 
         # основные данные пользователя
-        labelFirstName = QLabel(self.tr('First name'))
-        labelLastName = QLabel(self.tr('Last name'))
-        labelEmail = QLabel(self.tr('Email'))
-        labelYearBirth = QLabel(self.tr('Year of birth'))
-        labelUserSex = QLabel(self.tr('Sex'))
-        labelRFID = QLabel(self.tr('RFID'))
+        labelFirstName = QLabel(_('First name'))
+        labelLastName = QLabel(_('Last name'))
+        labelEmail = QLabel(_('Email'))
+        labelYearBirth = QLabel(_('Year of birth'))
+        labelUserSex = QLabel(_('Sex'))
+        labelRFID = QLabel(_('RFID'))
 
         self.editFirstName = QLineEdit()
         self.editLastName = QLineEdit()
         self.editEmail = QLineEdit()
         self.editYearBirth = QLineEdit()
         self.editUserSex = QComboBox()
-        self.editUserSex.addItem(self.tr('Male'))
-        self.editUserSex.addItem(self.tr('Female'))
+        self.editUserSex.addItem(_('Male'))
+        self.editUserSex.addItem(_('Female'))
         self.editRFID = QLineEdit()
         self.editRFID.setReadOnly(True)
 
@@ -54,7 +59,7 @@ class DlgUserInfo(QDialog):
         layoutUser.addWidget(labelRFID, 3, 0)
         layoutUser.addWidget(self.editRFID, 3, 1)
 
-        groupUser = QGroupBox(self.tr('Base data'))
+        groupUser = QGroupBox(_('Base data'))
         groupUser.setLayout(layoutUser)
 
         # купленные курсы
@@ -63,13 +68,13 @@ class DlgUserInfo(QDialog):
         cardLayout = QVBoxLayout()
         cardLayout.addWidget(self.cardinfo)
 
-        groupCard = QGroupBox(self.tr('Courses\' history'))
+        groupCard = QGroupBox(_('Courses\' history'))
         groupCard.setLayout(cardLayout)
 
-        buttonAssignRFID = QPushButton(self.tr('Assign &RFID'))
-        buttonAssignCourse = QPushButton(self.tr('Assign c&ourse'))
-        buttonApplyDialog = QPushButton(self.tr('Apply'))
-        buttonCancelDialog = QPushButton(self.tr('Cancel'))
+        buttonAssignRFID = QPushButton(_('Assign RFID'))
+        buttonAssignCourse = QPushButton(_('Assign course'))
+        buttonApplyDialog = QPushButton(_('Apply'))
+        buttonCancelDialog = QPushButton(_('Cancel'))
 
         self.connect(buttonAssignRFID, SIGNAL('clicked()'),
                      self.assignRFID)
@@ -93,7 +98,7 @@ class DlgUserInfo(QDialog):
         layout.addLayout(buttonLayout)
 
         self.setLayout(layout)
-        self.setWindowTitle(self.tr('User\'s information'))
+        self.setWindowTitle(_('User\'s information'))
 
         # source model
         self.coursesModel = CourseListModel(self)

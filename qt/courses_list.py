@@ -5,6 +5,11 @@ import time
 from  datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 
+import gettext
+gettext.bindtextdomain('project', './locale/')
+gettext.textdomain('project')
+_ = lambda a: unicode(gettext.gettext(a), 'utf8')
+
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
@@ -19,11 +24,11 @@ class CourseListModel(QAbstractTableModel):
         # подтверждённые курсы
         self.temporary_assigned = []
 
-        self.labels = [self.tr('Title'), self.tr('Price'),
-                       self.tr('Card'),
-                       self.tr('Sold'), self.tr('Used'),
-                       self.tr('Assigned'), self.tr('Begin'),
-                       self.tr('Expired'), self.tr('Cancelled'),
+        self.labels = [_('Title'), _('Price'),
+                       _('Card'),
+                       _('Sold'), _('Used'),
+                       _('Assigned'), _('Begin'),
+                       _('Expired'), _('Cancelled'),
                        'id', 'course_id']
         self.model_fields = ['title', 'price', 'card_type', 'count_sold', 'count_used',
                              'reg_date', 'bgn_date', 'exp_date', 'cnl_date',
@@ -111,7 +116,7 @@ class CourseListModel(QAbstractTableModel):
             return None
 
     def _card_type(self, value):
-        return [self.tr('Normal'), self.tr('Club')][int(value)]
+        return [_('Normal'), _('Club')][int(value)]
 
     def data(self, index, role): # base class method
         if not index.isValid():
@@ -250,8 +255,8 @@ class CoursesList(QTableView):
 
         self.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
 
-        self.actionCourseCancel = QAction(self.tr('Cance&l course'), self)
-        self.actionCourseCancel.setStatusTip(self.tr('Cancel current course.'))
+        self.actionCourseCancel = QAction(_('Cancel course'), self)
+        self.actionCourseCancel.setStatusTip(_('Cancel current course.'))
         self.connect(self.actionCourseCancel, SIGNAL('triggered()'), self.courseCancel)
 
 #     def mousePressEvent(self, event):

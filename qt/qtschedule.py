@@ -6,6 +6,11 @@ from datetime import datetime, timedelta
 
 from event_storage import Event, EventStorage
 
+import gettext
+gettext.bindtextdomain('project', './locale/')
+gettext.textdomain('project')
+_ = lambda a: unicode(gettext.gettext(a), 'utf8')
+
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
@@ -81,10 +86,10 @@ class QtSchedule(QTableView):
 
         self.model = EventStorage(
             self.work_hours,
-            [ self.tr('Monday'), self.tr('Tuesday'),
-              self.tr('Wednesday'), self.tr('Thursday'),
-              self.tr('Friday'), self.tr('Saturday'),
-              self.tr('Sunday') ],
+            [ _('Monday'), _('Tuesday'),
+              _('Wednesday'), _('Thursday'),
+              _('Friday'), _('Saturday'),
+              _('Sunday') ],
             quant, self.rooms, #[name for name, color, id in self.rooms],
             parent
             )
@@ -147,6 +152,10 @@ class QtSchedule(QTableView):
         """ Метод определяет какой ячейке (row, col) принадлежат
         координаты. """
         return (self.rowAt(abs_y), self.columnAt(abs_x))
+
+    def insertEvent(self, room, event):
+        shift_role = 100
+        self.model.insert(room + shift_role, event)
 
     def cellRowColRelative(self, rel):
         """ Метод определяет какой ячейке принадлежат переданные координаты,

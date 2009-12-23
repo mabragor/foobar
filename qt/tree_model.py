@@ -3,6 +3,11 @@
 
 from settings import userRoles
 
+import gettext
+gettext.bindtextdomain('project', './locale/')
+gettext.textdomain('project')
+_ = lambda a: unicode(gettext.gettext(a), 'utf8')
+
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
@@ -42,7 +47,7 @@ class AbstractTreeModel(QAbstractItemModel):
         QAbstractItemModel.__init__(self, parent)
 
         rootData = []
-        rootData.append(QVariant(self.tr('Courses')))
+        rootData.append(QVariant(_('Courses')))
         self.rootItem = TreeItem(rootData)
         self.setData(data)
 

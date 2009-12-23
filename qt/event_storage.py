@@ -4,6 +4,11 @@
 import sys, re, httplib, urllib, json
 from datetime import datetime, timedelta
 
+import gettext
+gettext.bindtextdomain('project', './locale/')
+gettext.textdomain('project')
+_ = lambda a: unicode(gettext.gettext(a), 'utf8')
+
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 

@@ -3,6 +3,11 @@
 
 import serial, random, time
 
+import gettext
+gettext.bindtextdomain('project', './locale/')
+gettext.textdomain('project')
+_ = lambda a: unicode(gettext.gettext(a), 'utf8')
+
 from settings import DEBUG, PORT
 
 from PyQt4.QtGui import *
@@ -19,14 +24,14 @@ class DlgWaitingRFID(QDialog):
 
         self.layout = QVBoxLayout()
 
-        self.label = QLabel(self.tr('Put the RFID label on to the RFID reader, please.'))
+        self.label = QLabel(_('Put the RFID label on to the RFID reader, please.'))
         self.layout.addWidget(self.label)
 
-        self.cancel = QPushButton(self.tr('&Cancel'), self)
+        self.cancel = QPushButton(_('Cancel'), self)
         self.layout.addWidget(self.cancel)
 
         self.setLayout(self.layout)
-        self.setWindowTitle(self.tr('RFID reader'))
+        self.setWindowTitle(_('RFID reader'))
 
         self.connect(self.cancel, SIGNAL('clicked()'),
                      self.unlink)

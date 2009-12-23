@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
 
+import gettext
+gettext.bindtextdomain('project', './locale/')
+gettext.textdomain('project')
+_ = lambda a: unicode(gettext.gettext(a), 'utf8')
+
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
@@ -12,13 +17,13 @@ class DlgSettings(QDialog):
         self.parent = parent
 
         self.tabWidget = QTabWidget()
-        self.tabWidget.addTab(TabGeneral(), self.tr('General'))
-        self.tabWidget.addTab(TabNetwork(), self.tr('Network'))
+        self.tabWidget.addTab(TabGeneral(), _('General'))
+        self.tabWidget.addTab(TabNetwork(), _('Network'))
 
         self.tabIndex = ['general', 'network']
 
-        applyButton = QPushButton(self.tr('Apply'))
-        cancelButton = QPushButton(self.tr('Cancel'))
+        applyButton = QPushButton(_('Apply'))
+        cancelButton = QPushButton(_('Cancel'))
 
         self.connect(applyButton, SIGNAL('clicked()'),
                      self.applyDialog)
@@ -35,7 +40,7 @@ class DlgSettings(QDialog):
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
 
-        self.setWindowTitle(self.tr('Settings'))
+        self.setWindowTitle(_('Settings'))
 
         # загрузка настроек
         self.settings = QSettings()
@@ -110,7 +115,7 @@ class TabNetwork(TabAbstract):
                          }
 
         # адрес и порт HTTP сервера
-        labelHttpServer = QLabel(self.tr('HTTP server (address/port)'))
+        labelHttpServer = QLabel(_('HTTP server (address/port)'))
         self.addressHttpServer = QLineEdit()
         self.portHttpServer = QLineEdit()
         boxHttpServer = QHBoxLayout()
@@ -119,19 +124,19 @@ class TabNetwork(TabAbstract):
         boxHttpServer.addWidget(self.portHttpServer)
 
         # галка включения HTTP прокси
-        self.useProxy = QCheckBox(self.tr('Use HTTP proxy'))
+        self.useProxy = QCheckBox(_('Use HTTP proxy'))
 
         # параметры HTTP прокси
-        groupHttpProxy = QGroupBox(self.tr('HTTP proxy settings'))
+        groupHttpProxy = QGroupBox(_('HTTP proxy settings'))
 
-        labelHttpProxy = QLabel(self.tr('Address and port'))
+        labelHttpProxy = QLabel(_('Address and port'))
         self.addressHttpProxy = QLineEdit()
         self.portHttpProxy = QLineEdit()
         boxHttpProxy = QHBoxLayout()
         boxHttpProxy.addWidget(self.addressHttpProxy)
         boxHttpProxy.addWidget(self.portHttpProxy)
 
-        labelProxyAuth = QLabel(self.tr('Login and password'))
+        labelProxyAuth = QLabel(_('Login and password'))
         self.loginProxyAuth = QLineEdit()
         self.passwordProxyAuth = QLineEdit()
         boxProxyAuth = QHBoxLayout()

@@ -5,6 +5,11 @@
 import sys, re, time
 from datetime import datetime, timedelta
 
+import gettext
+gettext.bindtextdomain('project', './locale/')
+gettext.textdomain('project')
+_ = lambda a: unicode(gettext.gettext(a), 'utf8')
+
 from http_ajax import HttpAjax
 from event_storage import Event, EventStorage
 from qtschedule import QtScheduleDelegate, QtSchedule
@@ -15,6 +20,7 @@ from dlg_settings import DlgSettings
 from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_searching import DlgSearchByName
 from dlg_user_info import DlgUserInfo
+from dlg_event_assign import DlgEventAssign
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -31,8 +37,8 @@ class MainWindow(QMainWindow):
 		      'event':  'application/x-calendar-event',
 		      }
 
-	self.setWindowTitle(self.tr('Manager\'s interface'))
-	self.statusBar().showMessage(self.tr('Ready'))
+	self.setWindowTitle(_('Manager\'s interface'))
+	self.statusBar().showMessage(_('Ready'))
 	self.resize(640, 480)
 
     def setupViews(self):
@@ -74,27 +80,32 @@ class MainWindow(QMainWindow):
 	""" Использование: Описать меню со всеми действиями в блоке
 	data. Создать обработчики для каждого действия. """
 	data = [
-	    (self.tr('&File'), [
-		    (self.tr('Exit'), self.tr(''),
-		     'close', self.tr('Close the application.')),
+	    (_('File'), [
+		    (_('Exit'), '',
+		     'close', _('Close the application.')),
 		    ]
 	     ),
-	    (self.tr('C&lient'), [
-		    (self.tr('New'), self.tr('Ctrl+N'),
-		     'clientNew', self.tr('Register new client.')),
-		    (self.tr('Search by RFID'), self.tr('Ctrl+R'),
-		     'clientSearchRFID', self.tr('Search a client with its RFID card.')),
-		    (self.tr('Search by name'), self.tr('Ctrl+F'),
-		     'clientSearchName', self.tr('Search a client with its name.')),
-		    (self.tr('One visit'), self.tr(''),
-		     'clientOneVisit', self.tr('One visit client.')),
+	    (_('Client'), [
+		    (_('New'), 'Ctrl+N',
+		     'clientNew', _('Register new client.')),
+		    (_('Search by RFID'), 'Ctrl+R',
+		     'clientSearchRFID', _('Search a client with its RFID card.')),
+		    (_('Search by name'), 'Ctrl+F',
+		     'clientSearchName', _('Search a client with its name.')),
+		    (_('One visit'), '',
+		     'clientOneVisit', _('One visit client.')),
 		    ]
 	     ),
-	    (self.tr('&Tools'), [
-		    (self.tr('Application settings'), self.tr('Ctrl+T'),
-		     'setupApp', self.tr('Manage the application settings.')),
-		    (self.tr('Test'), self.tr('Ctrl+T'),
-		     'test', self.tr('Test')),
+	    (_('Event'), [
+		    (_('Assign'), 'Ctrl+E',
+		     'eventAssign', _('Assign event.')),
+                    ]
+             ),
+	    (_('Tools'), [
+		    (_('Application settings'), 'Ctrl+T',
+		     'setupApp', _('Manage the application settings.')),
+		    (_('Test'), 'Ctrl+Z',
+		     'test', _('Test')),
 		    ]
 	     ),
 	    ]
@@ -161,6 +172,29 @@ class MainWindow(QMainWindow):
 
     def clientOneVisit(self):
 	print 'one visit client'
+
+    def eventAssign(self):
+        def callback(e_date, e_time, room_tuple, course):
+            print e_date, e_time, room, course
+            print type(e_date), type(e_time)
+            room, ok = room_tuple
+            title = course[0]
+            begin = datetime.combine(e_date, e_time)
+            duration = timedelta(minutes=int(course[5] * 60))
+            event = Event(begin, duration, title)
+            self.schedule.insertEvent(room, event)
+
+	self.dialog = DlgEventAssign(self)
+	self.dialog.setModal(True)
+        self.dialog.setCallback(callback)
+        self.dialog.setModel(self.modelCoursesTree)
+        self.dialog.setRooms(self.getRooms()['rows'])
+	dlgStatus = self.dialog.exec_()
+
+	if QDialog.Accepted == dlgStatus:
+            print 'accept'
+        else:
+            print 'reject'
 
     def setupApp(self):
 	# подготовить диалог

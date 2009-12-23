@@ -4,6 +4,11 @@
 from settings import userRoles
 from courses_tree import CoursesTree
 
+import gettext
+gettext.bindtextdomain('project', './locale/')
+gettext.textdomain('project')
+_ = lambda a: unicode(gettext.gettext(a), 'utf8')
+
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
@@ -15,26 +20,26 @@ class DlgCourseAssign(QDialog):
         self.parent = parent
         self.setMinimumWidth(600)
 
-        labelCardType = QLabel(self.tr('Type of card'))
+        labelCardType = QLabel(_('Type of card'))
         self.comboCardType = QComboBox()
         labelCardType.setBuddy(self.comboCardType)
-        self.comboCardType.addItem(self.tr('Normal'))
-        self.comboCardType.addItem(self.tr('Club'))
+        self.comboCardType.addItem(_('Normal'))
+        self.comboCardType.addItem(_('Club'))
 
-        labelBeginning = QLabel(self.tr('Course starts'))
+        labelBeginning = QLabel(_('Course starts'))
         self.editBeginning = QDateEdit()
         labelBeginning.setBuddy(self.editBeginning)
         current = QDate.currentDate()
         self.editBeginning.setDate(current)
         self.editBeginning.setMinimumDate(current)
 
-        labelFinish = QLabel(self.tr('Course ends after'))
+        labelFinish = QLabel(_('Course ends after'))
         self.comboDuration = QComboBox()
         labelFinish.setBuddy(self.comboDuration)
-        self.comboDuration.addItem(self.tr('3 months'))
-        self.comboDuration.addItem(self.tr('6 months'))
-        self.comboDuration.addItem(self.tr('9 months'))
-        self.comboDuration.addItem(self.tr('12 months'))
+        self.comboDuration.addItem(_('3 months'))
+        self.comboDuration.addItem(_('6 months'))
+        self.comboDuration.addItem(_('9 months'))
+        self.comboDuration.addItem(_('12 months'))
         self.comboDuration.setDisabled(True)
 
         groupLayout = QGridLayout()
@@ -51,26 +56,26 @@ class DlgCourseAssign(QDialog):
         self.tree = CoursesTree(self)
 
         courseLayout = QVBoxLayout()
-        courseLayout.addLayout(groupLayout)
         courseLayout.addWidget(self.tree)
 
-        groupCourses = QGroupBox(self.tr('Available courses'))
+        groupCourses = QGroupBox(_('Available courses'))
         groupCourses.setLayout(courseLayout)
 
-        self.buttonAssign = QPushButton(self.tr('Assign'))
-        self.buttonCancel = QPushButton(self.tr('Cancel'))
+        self.buttonAssign = QPushButton(_('Assign'))
+        self.buttonCancel = QPushButton(_('Cancel'))
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch(1)
         buttonLayout.addWidget(self.buttonAssign)
         buttonLayout.addWidget(self.buttonCancel)
 
-        layout = QVBoxLayout()
-        layout.addWidget(groupCourses)
-        layout.addLayout(buttonLayout)
+        mainLayout = QVBoxLayout()
+        mainLayout.addLayout(groupLayout)
+        mainLayout.addWidget(groupCourses)
+        mainLayout.addLayout(buttonLayout)
 
-        self.setLayout(layout)
-        self.setWindowTitle(self.tr('Choose the course'))
+        self.setLayout(mainLayout)
+        self.setWindowTitle(_('Choose the course'))
         self.setSignals()
 
     def setCallback(self, callback):
