@@ -1,0 +1,362 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-12-23 22:48+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: courses_list.py:27
+msgid "Title"
+msgstr ""
+
+#: courses_list.py:27
+msgid "Price"
+msgstr ""
+
+#: courses_list.py:28
+msgid "Card"
+msgstr ""
+
+#: courses_list.py:29
+msgid "Sold"
+msgstr ""
+
+#: courses_list.py:29
+msgid "Used"
+msgstr ""
+
+#: courses_list.py:30
+msgid "Assigned"
+msgstr ""
+
+#: courses_list.py:30
+msgid "Begin"
+msgstr ""
+
+#: courses_list.py:31
+msgid "Expired"
+msgstr ""
+
+#: courses_list.py:31
+msgid "Cancelled"
+msgstr ""
+
+#: courses_list.py:119 dlg_course_assign.py:26
+msgid "Normal"
+msgstr ""
+
+#: courses_list.py:119 dlg_course_assign.py:27
+msgid "Club"
+msgstr ""
+
+#: courses_list.py:258
+msgid "Cancel course"
+msgstr ""
+
+#: courses_list.py:259
+msgid "Cancel current course."
+msgstr ""
+
+#: dlg_course_assign.py:23
+msgid "Type of card"
+msgstr ""
+
+#: dlg_course_assign.py:29
+msgid "Course starts"
+msgstr ""
+
+#: dlg_course_assign.py:36
+msgid "Course ends after"
+msgstr ""
+
+#: dlg_course_assign.py:39
+msgid "3 months"
+msgstr ""
+
+#: dlg_course_assign.py:40
+msgid "6 months"
+msgstr ""
+
+#: dlg_course_assign.py:41
+msgid "9 months"
+msgstr ""
+
+#: dlg_course_assign.py:42
+msgid "12 months"
+msgstr ""
+
+#: dlg_course_assign.py:61 dlg_event_assign.py:57
+msgid "Available courses"
+msgstr ""
+
+#: dlg_course_assign.py:64 dlg_event_assign.py:60 manager.py:100
+msgid "Assign"
+msgstr ""
+
+#: dlg_course_assign.py:65 dlg_event_assign.py:61 dlg_searching.py:30
+#: dlg_settings.py:26 dlg_user_info.py:77 dlg_waiting_rfid.py:30
+msgid "Cancel"
+msgstr ""
+
+#: dlg_course_assign.py:78
+msgid "Choose the course"
+msgstr ""
+
+#: dlg_event_assign.py:23
+msgid "Date"
+msgstr ""
+
+#: dlg_event_assign.py:30
+msgid "Time"
+msgstr ""
+
+#: dlg_event_assign.py:37
+msgid "Room"
+msgstr ""
+
+#: dlg_event_assign.py:74
+msgid "Assign the event"
+msgstr ""
+
+#: dlg_searching.py:21
+msgid "Search"
+msgstr ""
+
+#: dlg_searching.py:29
+msgid "Find"
+msgstr ""
+
+#: dlg_searching.py:42 dlg_user_info.py:29
+msgid "Last name"
+msgstr ""
+
+#: dlg_searching.py:43 dlg_user_info.py:28
+msgid "First name"
+msgstr ""
+
+#: dlg_searching.py:44
+msgid "RFID code"
+msgstr ""
+
+#: dlg_searching.py:55
+msgid "Results"
+msgstr ""
+
+#: dlg_searching.py:59
+msgid "Show"
+msgstr ""
+
+#: dlg_searching.py:75
+msgid "Search client by name"
+msgstr ""
+
+#: dlg_settings.py:20
+msgid "General"
+msgstr ""
+
+#: dlg_settings.py:21
+msgid "Network"
+msgstr ""
+
+#: dlg_settings.py:25 dlg_user_info.py:76
+msgid "Apply"
+msgstr ""
+
+#: dlg_settings.py:43
+msgid "Settings"
+msgstr ""
+
+#: dlg_settings.py:118
+msgid "HTTP server (address/port)"
+msgstr ""
+
+#: dlg_settings.py:127
+msgid "Use HTTP proxy"
+msgstr ""
+
+#: dlg_settings.py:130
+msgid "HTTP proxy settings"
+msgstr ""
+
+#: dlg_settings.py:132
+msgid "Address and port"
+msgstr ""
+
+#: dlg_settings.py:139
+msgid "Login and password"
+msgstr ""
+
+#: dlg_user_info.py:30
+msgid "Email"
+msgstr ""
+
+#: dlg_user_info.py:31
+msgid "Year of birth"
+msgstr ""
+
+#: dlg_user_info.py:32
+msgid "Sex"
+msgstr ""
+
+#: dlg_user_info.py:33
+msgid "RFID"
+msgstr ""
+
+#: dlg_user_info.py:40
+msgid "Male"
+msgstr ""
+
+#: dlg_user_info.py:41
+msgid "Female"
+msgstr ""
+
+#: dlg_user_info.py:62
+msgid "Base data"
+msgstr ""
+
+#: dlg_user_info.py:71
+msgid "Courses' history"
+msgstr ""
+
+#: dlg_user_info.py:74
+msgid "Assign RFID"
+msgstr ""
+
+#: dlg_user_info.py:75
+msgid "Assign course"
+msgstr ""
+
+#: dlg_user_info.py:101
+msgid "User's information"
+msgstr ""
+
+#: dlg_waiting_rfid.py:27
+msgid "Put the RFID label on to the RFID reader, please."
+msgstr ""
+
+#: dlg_waiting_rfid.py:34
+msgid "RFID reader"
+msgstr ""
+
+#: manager.py:40
+msgid "Manager's interface"
+msgstr ""
+
+#: manager.py:41
+msgid "Ready"
+msgstr ""
+
+#: manager.py:83
+msgid "File"
+msgstr ""
+
+#: manager.py:84
+msgid "Exit"
+msgstr ""
+
+#: manager.py:85
+msgid "Close the application."
+msgstr ""
+
+#: manager.py:88
+msgid "Client"
+msgstr ""
+
+#: manager.py:89
+msgid "New"
+msgstr ""
+
+#: manager.py:90
+msgid "Register new client."
+msgstr ""
+
+#: manager.py:91
+msgid "Search by RFID"
+msgstr ""
+
+#: manager.py:92
+msgid "Search a client with its RFID card."
+msgstr ""
+
+#: manager.py:93
+msgid "Search by name"
+msgstr ""
+
+#: manager.py:94
+msgid "Search a client with its name."
+msgstr ""
+
+#: manager.py:95
+msgid "One visit"
+msgstr ""
+
+#: manager.py:96
+msgid "One visit client."
+msgstr ""
+
+#: manager.py:99
+msgid "Event"
+msgstr ""
+
+#: manager.py:101
+msgid "Assign event."
+msgstr ""
+
+#: manager.py:104
+msgid "Tools"
+msgstr ""
+
+#: manager.py:105
+msgid "Application settings"
+msgstr ""
+
+#: manager.py:106
+msgid "Manage the application settings."
+msgstr ""
+
+#: manager.py:107 manager.py:108
+msgid "Test"
+msgstr ""
+
+#: qtschedule.py:89
+msgid "Monday"
+msgstr ""
+
+#: qtschedule.py:89
+msgid "Tuesday"
+msgstr ""
+
+#: qtschedule.py:90
+msgid "Wednesday"
+msgstr ""
+
+#: qtschedule.py:90
+msgid "Thursday"
+msgstr ""
+
+#: qtschedule.py:91
+msgid "Friday"
+msgstr ""
+
+#: qtschedule.py:91
+msgid "Saturday"
+msgstr ""
+
+#: qtschedule.py:92
+msgid "Sunday"
+msgstr ""
+
+#: tree_model.py:50
+msgid "Courses"
+msgstr ""
