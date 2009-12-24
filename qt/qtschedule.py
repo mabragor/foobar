@@ -291,3 +291,21 @@ class QtSchedule(QTableView):
             event.ignore()
             print 'unknown format'
 
+    def viewportEvent(self, event):
+        """ Reimplement ToolTip Event. """
+        if event.type() == QEvent.ToolTip:
+            help = QHelpEvent(event)
+            index = self.indexAt(help.pos())
+            row = index.row()
+            col = index.column()
+            x = help.x() - self.scrolledCellX
+            y = help.y() - self.scrolledCellY
+            w = self.columnWidth(index.column())
+            cx, cy = self.get_scrolled_coords(self.columnViewportPosition(col),
+                                              self.rowViewportPosition(row))
+            event_index = (x - cx) / (w / len(self.rooms))
+            room_name, room_color, room_id = self.rooms[event_index]
+            title = self.model.data(self.model.index(row, col), Qt.ToolTipRole, room_id).toString()
+            if len(title) > 0:
+                QToolTip.showText(help.globalPos(), QString(title))
+        return QTableView.viewportEvent(self, event)
