@@ -204,7 +204,7 @@ class QtSchedule(QTableView):
             pixmap = QPixmap(100, 60)
             pixmap.fill(Qt.white)
             painter = QPainter(pixmap)
-            painter.fillRect(2,2,96,56, self.string2color(room_color))
+            painter.fillRect(2,2,96,56, self.string2color('#%s' % room_color))
 
             pen = QPen(Qt.black)
             pen.setWidth(2)
