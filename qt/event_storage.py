@@ -84,7 +84,6 @@ class EventStorage(QAbstractTableModel):
         event = self.get_event_by_cell(index.row(), index.column(), room_id)
         if event:
             if role == Qt.ToolTipRole:
-                print 'EventStorage::data(%s)' % event.course
                 return QVariant(event.course)
             if role == Qt.DisplayRole:
                 cells = self.get_cells_by_event(event, room_id)
