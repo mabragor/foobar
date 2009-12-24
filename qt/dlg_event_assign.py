@@ -103,6 +103,5 @@ class DlgEventAssign(QDialog):
                 '\n'.join([_('What course do you want to assign?'),
                            _('Choose the course on the course\'s tree.')]),
                 QMessageBox.Ok, QMessageBox.Ok)
-        #print course
         self.callback(e_date, e_time, room, course)
         self.accept()
