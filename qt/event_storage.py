@@ -26,22 +26,26 @@ class Event(object):
 
 class EventStorage(QAbstractTableModel):
 
-    def __init__(self, work_hours, week_days,
+    def __init__(self, work_hours,
                  quant=timedelta(minutes=30),
                  room_list=tuple(), parent=None):
         QAbstractTableModel.__init__(self, parent)
 
         self.work_hours = work_hours
-        self.week_days = week_days
         self.quant = quant
         self.rooms = room_list
         self.multiplier = timedelta(hours=1).seconds / self.quant.seconds
 
         self.getMime = parent.getMime
 
+        self.week_days = [ _('Monday'), _('Tuesday'),
+              _('Wednesday'), _('Thursday'),
+              _('Friday'), _('Saturday'),
+              _('Sunday') ]
+
         begin_hour, end_hour = work_hours
         self.rows_count = (end_hour - begin_hour) * timedelta(hours=1).seconds / quant.seconds
-        self.cols_count = len(week_days)
+        self.cols_count = len(self.week_days)
 
         self.rc2e = {} # (row, col, room): event
         self.e2rc = {} # (event, room): [(row, col), (row, col), ...]
@@ -71,22 +75,28 @@ class EventStorage(QAbstractTableModel):
             return QVariant(str(start + step)[:-3])
         return QVariant()
 
-    def data(self, index, role):
+    def data(self, index, role, room_id=0):
         """ Перегруженный метод базового класса. Под ролью понимаем зал. """
-        #print 'EventStorage::data'
         if not index.isValid():
             return QVariant()
-        event = self.get_event_by_cell(index.row(), index.column(), role)
+        if role not in (Qt.DisplayRole, Qt.ToolTipRole) :
+            return QVariant()
+        event = self.get_event_by_cell(index.row(), index.column(), room_id)
         if event:
-            cells = self.get_cells_by_event(event, role)
-            if cells:
-                if cells[0] == (index.row(), index.column()):
-                    event.type = 'head'
-                elif cells[-1] == (index.row(), index.column()):
-                    event.type = 'tail'
-                else:
-                    event.type = 'body'
-        return QVariant(event)
+            if role == Qt.ToolTipRole:
+                print 'EventStorage::data(%s)' % event.course
+                return QVariant(event.course)
+            if role == Qt.DisplayRole:
+                cells = self.get_cells_by_event(event, room_id)
+                if cells:
+                    if cells[0] == (index.row(), index.column()):
+                        event.type = 'head'
+                    elif cells[-1] == (index.row(), index.column()):
+                        event.type = 'tail'
+                    else:
+                        event.type = 'body'
+                return QVariant(event)
+        return QVariant()
 
     def get_event_by_cell(self, row, col, room):
         """ Получение события по указанным координатам. """
@@ -109,18 +119,17 @@ class EventStorage(QAbstractTableModel):
 
         Для каждого зала из списка проверить наличие свободных
         интервалов времени.
-
         """
         print 'EventStorage::may_insert'
         result = []
-        for room, color, id in self.rooms:
+        for room_name, room_color, room_id in self.rooms:
             free = []
             for i in xrange(event.duration.seconds / self.quant.seconds):
-                free.append( self.rc2e.get( (row + i, col, room), None ) is None )
+                free.append( self.rc2e.get( (row + i, col, room_id), None ) is None )
             print free
 
             if reduce( lambda x,y: x and y, free ):
-                result.append( room )
+                result.append(room_id)
         return result
 
     def insert(self, room, event):

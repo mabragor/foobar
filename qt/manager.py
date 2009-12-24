@@ -42,22 +42,19 @@ class MainWindow(QMainWindow):
 	self.resize(640, 480)
 
     def setupViews(self):
-	self.tree = self.initCourses()
-	self.schedule = QtSchedule((8, 23), timedelta(minutes=30), self)
+        self.tree = self.getCoursesTree()
+        self.rooms = tuple( [ (a['text'], a['color'], a['id'] + 100) for a in self.getRooms()['rows'] ] )
+	self.schedule = QtSchedule((8, 23), timedelta(minutes=30), self.rooms, self)
 
-	splitter = QSplitter()
-	splitter.addWidget(self.tree)
-	splitter.addWidget(self.schedule)
+        mainLayout = QVBoxLayout()
+        mainLayout.addWidget(QLabel(_('Filter panel here')))
+        mainLayout.addWidget(self.schedule)
+        mainLayout.addWidget(QLabel(_('Navigation panel here')))
 
-	self.setCentralWidget(splitter)
+        mainWidget = QWidget()
+        mainWidget.setLayout(mainLayout)
 
-    def initCourses(self):
-	ajax = HttpAjax(self, '/manager/available_courses/', {})
-	json_like = ajax.parse_json() # see format at courses_tree.py
-	self.modelCoursesTree = TreeModel(json_like)
-	tree = CoursesTree(self)
-	tree.setModel(self.modelCoursesTree)
-	return tree
+	self.setCentralWidget(mainWidget)
 
     def getMime(self, name):
 	return self.mimes.get(name, None)
@@ -74,6 +71,11 @@ class MainWindow(QMainWindow):
 		  ...]}
 	"""
 	return json_like
+
+    def getCoursesTree(self):
+	ajax = HttpAjax(self, '/manager/available_courses/', {})
+	response = ajax.parse_json() # see format at courses_tree.py
+	return TreeModel(response)
 
     def createMenus(self):
 	""" Метод для генерации меню приложения. """
@@ -175,7 +177,7 @@ class MainWindow(QMainWindow):
 
     def eventAssign(self):
         def callback(e_date, e_time, room_tuple, course):
-            print e_date, e_time, room, course
+            print e_date, e_time, room_tuple[0], course
             print type(e_date), type(e_time)
             room, ok = room_tuple
             title = course[0]
@@ -187,8 +189,8 @@ class MainWindow(QMainWindow):
 	self.dialog = DlgEventAssign(self)
 	self.dialog.setModal(True)
         self.dialog.setCallback(callback)
-        self.dialog.setModel(self.modelCoursesTree)
-        self.dialog.setRooms(self.getRooms()['rows'])
+        self.dialog.setModel(self.tree)
+        self.dialog.setRooms(self.rooms)
 	dlgStatus = self.dialog.exec_()
 
 	if QDialog.Accepted == dlgStatus:

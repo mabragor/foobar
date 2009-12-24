@@ -37,15 +37,15 @@ class QtScheduleDelegate(QItemDelegate):
         col = index.column()
 
         for room_name, room_color, room_id in rooms:
-            event = model.data(index, room_id).toPyObject()
-            if event:
+            event = model.data(index, Qt.DisplayRole, room_id).toPyObject()
+            if type(event) is Event:
                 # заполняем тело события
                 w = option.rect.width() / count
                 h = option.rect.height()
                 x = dx + col * (option.rect.width() + 1) + \
                     w * map(lambda x: x[2] == room_id, rooms).index(True)
                 y = dy + row * (option.rect.height() + 1)
-                painter.fillRect(x, y, w, h, self.parent.string2color(room_color));
+                painter.fillRect(x, y, w, h, self.parent.string2color('#%s' % room_color));
                 # готовимся рисовать границы
                 pen = QPen(Qt.black)
                 pen.setWidth(3)
@@ -67,31 +67,22 @@ class QtSchedule(QTableView):
 
     """ Класс календаря. """
 
-    def __init__(self, work_hours, quant, parent=None):
+    def __init__(self, work_hours, quant, rooms, parent=None):
         QTableView.__init__(self, parent)
 
         self.events = {}
         self.cells = {}
+        self.rooms = rooms
         self.scrolledCellX = 0
         self.scrolledCellY = 0
 
         self.getMime = parent.getMime
 
-        self.rooms = [('red', '#ffaaaa', 100),
-                      ('green', '#aaffaa', 101),
-                      ('blue', '#aaaaff', 102)]
-
         self.work_hours = work_hours
         self.quant = quant
 
         self.model = EventStorage(
-            self.work_hours,
-            [ _('Monday'), _('Tuesday'),
-              _('Wednesday'), _('Thursday'),
-              _('Friday'), _('Saturday'),
-              _('Sunday') ],
-            quant, self.rooms, #[name for name, color, id in self.rooms],
-            parent
+            self.work_hours, quant, self.rooms, parent
             )
         self.setModel(self.model)
 
@@ -101,22 +92,23 @@ class QtSchedule(QTableView):
         min120 = timedelta(hours=2)
 
         test_data = [
-            (100, Event(datetime(2009,11,2,12), min60, 'First')),
+            (101, Event(datetime(2009,11,2,12), min60, 'First')),
             (102, Event(datetime(2009,11,2,11), min90, 'Second')),
-            (101, Event(datetime(2009,11,2,12), min60, 'Third')),
-            (101, Event(datetime(2009,11,3,12), min60, 'Third')),
-            (100, Event(datetime(2009,11,2,16), min120, 'Long')),
+            (103, Event(datetime(2009,11,2,12), min60, 'Third')),
+            (103, Event(datetime(2009,11,3,12), min60, 'Third')),
+            (101, Event(datetime(2009,11,2,16), min120, 'Long')),
             ]
-        for room, event in test_data:
-            self.model.insert(room, event)
+        for room_id, event in test_data:
+            self.model.insert(room_id, event)
 
         # Запрещаем выделение множества ячеек
         self.setSelectionMode(QAbstractItemView.ExtendedSelection) #SingleSelection)
 
         # Разрешаем принимать DnD
-        self.setAcceptDrops(True)
-        self.setDragEnabled(True)
-        self.setDropIndicatorShown(True)
+#         self.setAcceptDrops(True)
+#         self.setDragEnabled(True)
+#         self.setDropIndicatorShown(True)
+
         #self.setDragDropMode(QAbstractItemView.DragDrop) #InternalMove
 
         # Запрещаем изменение размеров ячейки
@@ -133,7 +125,7 @@ class QtSchedule(QTableView):
 
     def string2color(self, color):
         """ Метод для преобразования #RRGGBB в QColor. """
-        regexp = re.compile(r'#(?P<red_component>[0-9a-f]{2})(?P<green_component>[0-9a-f]{2})(?P<blue_component>[0-9a-f]{2})')
+        regexp = re.compile(r'#(?P<red_component>[0-9a-fA-F]{2})(?P<green_component>[0-9a-fA-F]{2})(?P<blue_component>[0-9a-fA-F]{2})')
         groups = re.match(regexp, color)
         if groups:
             return QColor(int(groups.group('red_component'), 16),
@@ -153,9 +145,8 @@ class QtSchedule(QTableView):
         координаты. """
         return (self.rowAt(abs_y), self.columnAt(abs_x))
 
-    def insertEvent(self, room, event):
-        shift_role = 100
-        self.model.insert(room + shift_role, event)
+    def insertEvent(self, room_id, event):
+        self.model.insert(room_id, event)
 
     def cellRowColRelative(self, rel):
         """ Метод определяет какой ячейке принадлежат переданные координаты,
@@ -173,11 +164,10 @@ class QtSchedule(QTableView):
         """ Метод возвращает список свободных залов в данной ячейке. """
         row, col = row_col
         free = []
-        for room in self.rooms:
-            room_name, room_color, room_role = room
-            event = self.model.get_event_by_cell(row, col, room_role)
+        for room_name, room_color, room_id in self.rooms:
+            event = self.model.get_event_by_cell(row, col, room_id)
             if not event:
-                free.append(room)
+                free.append(id)
         return free
 
     def scrollContentsBy(self, dx, dy):
@@ -204,10 +194,10 @@ class QtSchedule(QTableView):
             cx, cy = self.get_scrolled_coords(self.columnViewportPosition(col),
                                               self.rowViewportPosition(row))
             event_index = (x - cx) / (w / len(self.rooms))
-            room_name, room_color, room_role = self.rooms[event_index]
+            room_name, room_color, room_id = self.rooms[event_index]
 
             #Проверка наличия события в указанном месте.
-            cal_event = self.model.get_event_by_cell(row, col, room_role)
+            cal_event = self.model.get_event_by_cell(row, col, room_id)
             if not cal_event:
                 return
 
@@ -225,7 +215,7 @@ class QtSchedule(QTableView):
 
             itemData = QByteArray()
             dataStream = QDataStream(itemData, QIODevice.WriteOnly)
-            dataStream << QString('%i,%i,%i' % (row, col, room_role))
+            dataStream << QString('%i,%i,%i' % (row, col, room_id))
             mimeData = QMimeData()
             mimeData.setData(self.getMime('event'), itemData)
 
@@ -281,10 +271,10 @@ class QtSchedule(QTableView):
             dataStream = QDataStream(itemData, QIODevice.ReadOnly)
             coordinates = QString()
             dataStream >> coordinates
-            (row, col, room_role) = [int(i) for i in coordinates.split(',')]
+            (row, col, room_id) = [int(i) for i in coordinates.split(',')]
 
             event.acceptProposedAction()
-            print event_mime, 'is dragged from', (row, col, room_role)
+            print event_mime, 'is dragged from', (row, col, room_id)
             drop_cell = self.cellRowColRelative(event.pos())
             print self.emptyRoomAt(drop_cell)
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-23 22:48+0300\n"
+"POT-Creation-Date: 2009-12-24 21:11+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Ruslan Popov <ruslan.popov@gmail.com>\n"
 "Language-Team: LANGUAGE <RU@li.org>\n"
@@ -96,15 +96,15 @@ msgstr "9 месяцев"
 msgid "12 months"
 msgstr "12 месяцев"
 
-#: dlg_course_assign.py:61 dlg_event_assign.py:57
+#: dlg_course_assign.py:61 dlg_event_assign.py:56
 msgid "Available courses"
 msgstr "Доступные курсы"
 
-#: dlg_course_assign.py:64 dlg_event_assign.py:60 manager.py:100
+#: dlg_course_assign.py:64 dlg_event_assign.py:59 manager.py:102
 msgid "Assign"
 msgstr "Назначить"
 
-#: dlg_course_assign.py:65 dlg_event_assign.py:61 dlg_searching.py:30
+#: dlg_course_assign.py:65 dlg_event_assign.py:60 dlg_searching.py:30
 #: dlg_settings.py:26 dlg_user_info.py:77 dlg_waiting_rfid.py:30
 msgid "Cancel"
 msgstr "Отмена"
@@ -121,13 +121,25 @@ msgstr "Дата"
 msgid "Time"
 msgstr "Время"
 
-#: dlg_event_assign.py:37
+#: dlg_event_assign.py:36
 msgid "Room"
 msgstr "Зал"
 
-#: dlg_event_assign.py:74
+#: dlg_event_assign.py:73
 msgid "Assign the event"
 msgstr "Назначить событие."
+
+#: dlg_event_assign.py:102
+msgid "Warning"
+msgstr "Внимание"
+
+#: dlg_event_assign.py:103
+msgid "What course do you want to assign?"
+msgstr "Какой курсы вы собирались назначить?"
+
+#: dlg_event_assign.py:104
+msgid "Choose the course on the course's tree."
+msgstr "Выберите курс на дереве курсов."
 
 #: dlg_searching.py:21
 msgid "Search"
@@ -249,6 +261,34 @@ msgstr "Приложите RFID метку к считывателю, пожал
 msgid "RFID reader"
 msgstr "RFID считыватель"
 
+#: event_storage.py:41
+msgid "Monday"
+msgstr "Понедельник"
+
+#: event_storage.py:41
+msgid "Tuesday"
+msgstr "Вторник"
+
+#: event_storage.py:42
+msgid "Wednesday"
+msgstr "Среда"
+
+#: event_storage.py:42
+msgid "Thursday"
+msgstr "Четверг"
+
+#: event_storage.py:43
+msgid "Friday"
+msgstr "Пятница"
+
+#: event_storage.py:43
+msgid "Saturday"
+msgstr "Суббота"
+
+#: event_storage.py:44
+msgid "Sunday"
+msgstr "Воскресенье"
+
 #: manager.py:40
 msgid "Manager's interface"
 msgstr "Интерфейс менеджера"
@@ -257,105 +297,85 @@ msgstr "Интерфейс менеджера"
 msgid "Ready"
 msgstr "Готовность"
 
-#: manager.py:83
+#: manager.py:50
+msgid "Filter panel here"
+msgstr ""
+
+#: manager.py:52
+msgid "Navigation panel here"
+msgstr ""
+
+#: manager.py:85
 msgid "File"
 msgstr "Файл"
 
-#: manager.py:84
+#: manager.py:86
 msgid "Exit"
 msgstr "Выход"
 
-#: manager.py:85
+#: manager.py:87
 msgid "Close the application."
 msgstr "Закрыть приложение"
 
-#: manager.py:88
+#: manager.py:90
 msgid "Client"
 msgstr "Клиент"
 
-#: manager.py:89
+#: manager.py:91
 msgid "New"
 msgstr "Новый"
 
-#: manager.py:90
+#: manager.py:92
 msgid "Register new client."
 msgstr "Регистрация нового клиента."
 
-#: manager.py:91
+#: manager.py:93
 msgid "Search by RFID"
 msgstr "Поиск по RFID"
 
-#: manager.py:92
+#: manager.py:94
 msgid "Search a client with its RFID card."
 msgstr "Поиск клиента по его RFID метке."
 
-#: manager.py:93
+#: manager.py:95
 msgid "Search by name"
 msgstr "Поиск по имени"
 
-#: manager.py:94
+#: manager.py:96
 msgid "Search a client with its name."
 msgstr "Найти клиента по его имени."
 
-#: manager.py:95
+#: manager.py:97
 msgid "One visit"
 msgstr "Одно посещение"
 
-#: manager.py:96
+#: manager.py:98
 msgid "One visit client."
 msgstr "Одноразовый клиент."
 
-#: manager.py:99
+#: manager.py:101
 msgid "Event"
 msgstr "Событие"
 
-#: manager.py:101
+#: manager.py:103
 msgid "Assign event."
 msgstr "Назначить событие."
 
-#: manager.py:104
+#: manager.py:106
 msgid "Tools"
 msgstr "Инструменты"
 
-#: manager.py:105
+#: manager.py:107
 msgid "Application settings"
 msgstr "Настройки приложения"
 
-#: manager.py:106
+#: manager.py:108
 msgid "Manage the application settings."
 msgstr "Управление настройками приложения."
 
-#: manager.py:107 manager.py:108
+#: manager.py:109 manager.py:110
 msgid "Test"
 msgstr "Тест"
-
-#: qtschedule.py:89
-msgid "Monday"
-msgstr "Понедельник"
-
-#: qtschedule.py:89
-msgid "Tuesday"
-msgstr "Вторник"
-
-#: qtschedule.py:90
-msgid "Wednesday"
-msgstr "Среда"
-
-#: qtschedule.py:90
-msgid "Thursday"
-msgstr "Четверг"
-
-#: qtschedule.py:91
-msgid "Friday"
-msgstr "Пятница"
-
-#: qtschedule.py:91
-msgid "Saturday"
-msgstr "Суббота"
-
-#: qtschedule.py:92
-msgid "Sunday"
-msgstr "Воскресенье"
 
 #: tree_model.py:50
 msgid "Courses"

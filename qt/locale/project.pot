@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-23 22:48+0300\n"
+"POT-Creation-Date: 2009-12-24 21:11+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -96,15 +96,15 @@ msgstr ""
 msgid "12 months"
 msgstr ""
 
-#: dlg_course_assign.py:61 dlg_event_assign.py:57
+#: dlg_course_assign.py:61 dlg_event_assign.py:56
 msgid "Available courses"
 msgstr ""
 
-#: dlg_course_assign.py:64 dlg_event_assign.py:60 manager.py:100
+#: dlg_course_assign.py:64 dlg_event_assign.py:59 manager.py:102
 msgid "Assign"
 msgstr ""
 
-#: dlg_course_assign.py:65 dlg_event_assign.py:61 dlg_searching.py:30
+#: dlg_course_assign.py:65 dlg_event_assign.py:60 dlg_searching.py:30
 #: dlg_settings.py:26 dlg_user_info.py:77 dlg_waiting_rfid.py:30
 msgid "Cancel"
 msgstr ""
@@ -121,12 +121,24 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: dlg_event_assign.py:37
+#: dlg_event_assign.py:36
 msgid "Room"
 msgstr ""
 
-#: dlg_event_assign.py:74
+#: dlg_event_assign.py:73
 msgid "Assign the event"
+msgstr ""
+
+#: dlg_event_assign.py:102
+msgid "Warning"
+msgstr ""
+
+#: dlg_event_assign.py:103
+msgid "What course do you want to assign?"
+msgstr ""
+
+#: dlg_event_assign.py:104
+msgid "Choose the course on the course's tree."
 msgstr ""
 
 #: dlg_searching.py:21
@@ -249,6 +261,34 @@ msgstr ""
 msgid "RFID reader"
 msgstr ""
 
+#: event_storage.py:41
+msgid "Monday"
+msgstr ""
+
+#: event_storage.py:41
+msgid "Tuesday"
+msgstr ""
+
+#: event_storage.py:42
+msgid "Wednesday"
+msgstr ""
+
+#: event_storage.py:42
+msgid "Thursday"
+msgstr ""
+
+#: event_storage.py:43
+msgid "Friday"
+msgstr ""
+
+#: event_storage.py:43
+msgid "Saturday"
+msgstr ""
+
+#: event_storage.py:44
+msgid "Sunday"
+msgstr ""
+
 #: manager.py:40
 msgid "Manager's interface"
 msgstr ""
@@ -257,104 +297,84 @@ msgstr ""
 msgid "Ready"
 msgstr ""
 
-#: manager.py:83
-msgid "File"
+#: manager.py:50
+msgid "Filter panel here"
 msgstr ""
 
-#: manager.py:84
-msgid "Exit"
+#: manager.py:52
+msgid "Navigation panel here"
 msgstr ""
 
 #: manager.py:85
+msgid "File"
+msgstr ""
+
+#: manager.py:86
+msgid "Exit"
+msgstr ""
+
+#: manager.py:87
 msgid "Close the application."
 msgstr ""
 
-#: manager.py:88
+#: manager.py:90
 msgid "Client"
 msgstr ""
 
-#: manager.py:89
+#: manager.py:91
 msgid "New"
 msgstr ""
 
-#: manager.py:90
+#: manager.py:92
 msgid "Register new client."
 msgstr ""
 
-#: manager.py:91
+#: manager.py:93
 msgid "Search by RFID"
 msgstr ""
 
-#: manager.py:92
+#: manager.py:94
 msgid "Search a client with its RFID card."
 msgstr ""
 
-#: manager.py:93
+#: manager.py:95
 msgid "Search by name"
 msgstr ""
 
-#: manager.py:94
+#: manager.py:96
 msgid "Search a client with its name."
 msgstr ""
 
-#: manager.py:95
+#: manager.py:97
 msgid "One visit"
 msgstr ""
 
-#: manager.py:96
+#: manager.py:98
 msgid "One visit client."
 msgstr ""
 
-#: manager.py:99
+#: manager.py:101
 msgid "Event"
 msgstr ""
 
-#: manager.py:101
+#: manager.py:103
 msgid "Assign event."
 msgstr ""
 
-#: manager.py:104
+#: manager.py:106
 msgid "Tools"
 msgstr ""
 
-#: manager.py:105
+#: manager.py:107
 msgid "Application settings"
 msgstr ""
 
-#: manager.py:106
+#: manager.py:108
 msgid "Manage the application settings."
 msgstr ""
 
-#: manager.py:107 manager.py:108
+#: manager.py:109 manager.py:110
 msgid "Test"
-msgstr ""
-
-#: qtschedule.py:89
-msgid "Monday"
-msgstr ""
-
-#: qtschedule.py:89
-msgid "Tuesday"
-msgstr ""
-
-#: qtschedule.py:90
-msgid "Wednesday"
-msgstr ""
-
-#: qtschedule.py:90
-msgid "Thursday"
-msgstr ""
-
-#: qtschedule.py:91
-msgid "Friday"
-msgstr ""
-
-#: qtschedule.py:91
-msgid "Saturday"
-msgstr ""
-
-#: qtschedule.py:92
-msgid "Sunday"
 msgstr ""
 
 #: tree_model.py:50
