@@ -97,9 +97,9 @@ class EventStorage(QAbstractTableModel):
                 return QVariant(event)
         return QVariant()
 
-    def get_event_by_cell(self, row, col, room):
+    def get_event_by_cell(self, row, col, room_id):
         """ Получение события по указанным координатам. """
-        event = self.rc2e.get( (row, col, room), None )
+        event = self.rc2e.get( (row, col, room_id), None )
         return event
 
     def get_cells_by_event(self, event, room):
