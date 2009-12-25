@@ -41,15 +41,49 @@ class MainWindow(QMainWindow):
 	self.statusBar().showMessage(_('Ready'))
 	self.resize(640, 480)
 
+    def prepareFilter(self, id, title):
+        def handler():
+            self.statusBar().showMessage(_('Filter: Room "%s" is changed its state') % title)
+        return handler
+
     def setupViews(self):
         self.tree = self.getCoursesTree()
         self.rooms = tuple( [ (a['text'], a['color'], a['id'] + 100) for a in self.getRooms()['rows'] ] )
+
+        self.scheduleModel = EventStorage(
+            (8, 23), timedelta(minutes=30), self.rooms, self
+            )
 	self.schedule = QtSchedule((8, 23), timedelta(minutes=30), self.rooms, self)
+        self.schedule.setModel(self.scheduleModel)
+
+        headerPanel = QHBoxLayout()
+        for title, color, id in self.rooms:
+            buttonFilter = QPushButton(title)
+            buttonFilter.setCheckable(True)
+            headerPanel.addWidget(buttonFilter)
+            self.connect(buttonFilter, SIGNAL('clicked()'),
+                         self.prepareFilter(id, title))
+
+        self.bpMonday = QLabel(self.scheduleModel.getMonday().strftime('%d/%m/%Y'))
+        self.bpSunday = QLabel(self.scheduleModel.getSunday().strftime('%d/%m/%Y'))
+        self.buttonPrev = QPushButton(_('<<'))
+        self.buttonNext = QPushButton(_('>>'))
+        self.buttonWeek = QPushButton(_('Week'))
+
+        bottomPanel = QHBoxLayout()
+        bottomPanel.addWidget(QLabel(_('Week:')))
+        bottomPanel.addWidget(self.bpMonday)
+        bottomPanel.addWidget(QLabel('-'))
+        bottomPanel.addWidget(self.bpSunday)
+        bottomPanel.addStretch(1)
+        bottomPanel.addWidget(self.buttonPrev)
+        bottomPanel.addWidget(self.buttonWeek)
+        bottomPanel.addWidget(self.buttonNext)
 
         mainLayout = QVBoxLayout()
-        mainLayout.addWidget(QLabel(_('Filter panel here')))
+        mainLayout.addLayout(headerPanel)
         mainLayout.addWidget(self.schedule)
-        mainLayout.addWidget(QLabel(_('Navigation panel here')))
+        mainLayout.addLayout(bottomPanel)
 
         mainWidget = QWidget()
         mainWidget.setLayout(mainLayout)

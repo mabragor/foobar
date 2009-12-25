@@ -28,4 +28,5 @@ urlpatterns += patterns(
     url(r'^get_users_info_by_name/$', 'get_users_info_by_name'),
     url(r'^set_user_info/$', 'set_user_info'),
     url(r'^available_courses/$', 'available_courses'),
+    url(r'^get_week/$', 'get_week'),
     )

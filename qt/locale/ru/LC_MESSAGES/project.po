@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-24 21:11+0300\n"
+"POT-Creation-Date: 2009-12-26 01:25+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Ruslan Popov <ruslan.popov@gmail.com>\n"
 "Language-Team: LANGUAGE <RU@li.org>\n"
@@ -100,7 +100,7 @@ msgstr "12 месяцев"
 msgid "Available courses"
 msgstr "Доступные курсы"
 
-#: dlg_course_assign.py:64 dlg_event_assign.py:59 manager.py:102
+#: dlg_course_assign.py:64 dlg_event_assign.py:59 manager.py:136
 msgid "Assign"
 msgstr "Назначить"
 
@@ -261,33 +261,41 @@ msgstr "Приложите RFID метку к считывателю, пожал
 msgid "RFID reader"
 msgstr "RFID считыватель"
 
-#: event_storage.py:41
+#: event_storage.py:43
 msgid "Monday"
 msgstr "Понедельник"
 
-#: event_storage.py:41
+#: event_storage.py:43
 msgid "Tuesday"
 msgstr "Вторник"
 
-#: event_storage.py:42
+#: event_storage.py:44
 msgid "Wednesday"
 msgstr "Среда"
 
-#: event_storage.py:42
+#: event_storage.py:44
 msgid "Thursday"
 msgstr "Четверг"
 
-#: event_storage.py:43
+#: event_storage.py:45
 msgid "Friday"
 msgstr "Пятница"
 
-#: event_storage.py:43
+#: event_storage.py:45
 msgid "Saturday"
 msgstr "Суббота"
 
-#: event_storage.py:44
+#: event_storage.py:46
 msgid "Sunday"
 msgstr "Воскресенье"
+
+#: event_storage.py:83
+msgid "Check response format!"
+msgstr "Проверьте формат отклика!"
+
+#: http_ajax.py:50
+msgid "HTTP Error"
+msgstr "Ошибка HTTP"
 
 #: manager.py:40
 msgid "Manager's interface"
@@ -297,83 +305,96 @@ msgstr "Интерфейс менеджера"
 msgid "Ready"
 msgstr "Готовность"
 
-#: manager.py:50
-msgid "Filter panel here"
+#: manager.py:46
+#, python-format
+msgid "Filter: Room \"%s\" is changed its state"
+msgstr "Фильтрация: Зал \"%s\" изменил своё состояние"
+
+#: manager.py:69
+msgid "<<"
 msgstr ""
 
-#: manager.py:52
-msgid "Navigation panel here"
+#: manager.py:70
+msgid ">>"
 msgstr ""
 
-#: manager.py:85
+#: manager.py:71
+msgid "Week"
+msgstr "Неделя"
+
+#: manager.py:74
+msgid "Week:"
+msgstr "Неделя:"
+
+#: manager.py:119
 msgid "File"
 msgstr "Файл"
 
-#: manager.py:86
+#: manager.py:120
 msgid "Exit"
 msgstr "Выход"
 
-#: manager.py:87
+#: manager.py:121
 msgid "Close the application."
 msgstr "Закрыть приложение"
 
-#: manager.py:90
+#: manager.py:124
 msgid "Client"
 msgstr "Клиент"
 
-#: manager.py:91
+#: manager.py:125
 msgid "New"
 msgstr "Новый"
 
-#: manager.py:92
+#: manager.py:126
 msgid "Register new client."
 msgstr "Регистрация нового клиента."
 
-#: manager.py:93
+#: manager.py:127
 msgid "Search by RFID"
 msgstr "Поиск по RFID"
 
-#: manager.py:94
+#: manager.py:128
 msgid "Search a client with its RFID card."
 msgstr "Поиск клиента по его RFID метке."
 
-#: manager.py:95
+#: manager.py:129
 msgid "Search by name"
 msgstr "Поиск по имени"
 
-#: manager.py:96
+#: manager.py:130
 msgid "Search a client with its name."
 msgstr "Найти клиента по его имени."
 
-#: manager.py:97
+#: manager.py:131
 msgid "One visit"
 msgstr "Одно посещение"
 
-#: manager.py:98
+#: manager.py:132
 msgid "One visit client."
 msgstr "Одноразовый клиент."
 
-#: manager.py:101
+#: manager.py:135
 msgid "Event"
 msgstr "Событие"
 
-#: manager.py:103
+#: manager.py:137
 msgid "Assign event."
 msgstr "Назначить событие."
 
-#: manager.py:106
+#: manager.py:140
 msgid "Tools"
 msgstr "Инструменты"
 
-#: manager.py:107
+#: manager.py:141
 msgid "Application settings"
 msgstr "Настройки приложения"
 
-#: manager.py:108
+#: manager.py:142
 msgid "Manage the application settings."
 msgstr "Управление настройками приложения."
 
-#: manager.py:109 manager.py:110
+#: manager.py:143 manager.py:144
 msgid "Test"
 msgstr "Тест"
 

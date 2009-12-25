@@ -44,12 +44,13 @@ class HttpAjax(QObject):
             data = self.response.read()
             return json.read(data)
         else:
+            print self.response.status
+            open('./dump.html', 'w').write(self.response.read())
             QMessageBox.critical(
-                self.parent, self.parent.tr('HTTP Error'),
+                self.parent, self.parent.tr(_('HTTP Error')),
                 '[%s] %s' % (
                     self.response.status,
                     self.response.reason
                     )
                 )
-            open('./dump.html', 'w').write(self.response.read())
             return None

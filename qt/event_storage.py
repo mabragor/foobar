@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
 
-import sys, re, httplib, urllib, json
+import sys, re, httplib, urllib, json, time
 from datetime import datetime, timedelta
 
 import gettext
 gettext.bindtextdomain('project', './locale/')
 gettext.textdomain('project')
 _ = lambda a: unicode(gettext.gettext(a), 'utf8')
+
+from http_ajax import HttpAjax
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -50,6 +52,11 @@ class EventStorage(QAbstractTableModel):
         self.rc2e = {} # (row, col, room): event
         self.e2rc = {} # (event, room): [(row, col), (row, col), ...]
 
+        # Отображаем текущую неделю
+        now = datetime.now()
+        self.weekRange = self.date2range(now)
+        self.loadData(now)
+
     def rowCount(self, parent):
         if parent.isValid():
             return 0
@@ -61,6 +68,23 @@ class EventStorage(QAbstractTableModel):
             return 0
         else:
             return self.cols_count
+
+    def loadData(self, d):
+        monday, sunday = self.date2range(d)
+	ajax = HttpAjax(self, '/manager/get_week/',
+                        {'monday': monday,
+                         'sunday': sunday,
+                         'filter': []})
+	if ajax:
+	    response = ajax.parse_json()
+            if 'code' in response:
+                print 'AJAX result: [%(code)s] %(desc)s' % response
+            else:
+                print _('Check response format!')
+            if response['code'] == 200:
+                print response['events']
+                return True
+	return False
 
     def headerData(self, section, orientation, role):
         """ Метод для определения вертикальных и горизонтальных меток для
@@ -97,6 +121,12 @@ class EventStorage(QAbstractTableModel):
                 return QVariant(event)
         return QVariant()
 
+    def getMonday(self):
+        return self.weekRange[0]
+
+    def getSunday(self):
+        return self.weekRange[1]
+
     def get_event_by_cell(self, row, col, room_id):
         """ Получение события по указанным координатам. """
         event = self.rc2e.get( (row, col, room_id), None )
@@ -105,6 +135,15 @@ class EventStorage(QAbstractTableModel):
     def get_cells_by_event(self, event, room):
         """ Получение всех ячеек события. """
         return self.e2rc.get( (event, room), None )
+
+    def date2range(self, dt):
+        """ Возвращаем диапазон недели для переданной даты. """
+        monday = dt.date() - timedelta(days=dt.weekday())
+        sunday = monday + timedelta(days=6)
+        return (monday, sunday)
+
+    def date2timestamp(self, d):
+        return int(time.mktime(d.timetuple()))
 
     def datetime2rowcol(self, dt):
         row = (dt.hour - self.work_hours[0]) * self.multiplier

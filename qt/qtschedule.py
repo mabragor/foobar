@@ -14,55 +14,6 @@ _ = lambda a: unicode(gettext.gettext(a), 'utf8')
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
-class QtScheduleDelegate(QItemDelegate):
-
-    """ Делегат для ячеек расписания. """
-
-    def __init__(self, parent=None):
-        QItemDelegate.__init__(self, parent)
-        self.parent = parent
-
-    def paint(self, painter, option, index):
-        """ Метод для отрисовки ячейки. """
-        painter.save()
-
-        model = index.model()
-        rooms = model.rooms
-        count = len(rooms)
-
-        dx = self.parent.scrolledCellX
-        dy = self.parent.scrolledCellY
-
-        row = index.row()
-        col = index.column()
-
-        for room_name, room_color, room_id in rooms:
-            event = model.data(index, Qt.DisplayRole, room_id).toPyObject()
-            if type(event) is Event:
-                # заполняем тело события
-                w = option.rect.width() / count
-                h = option.rect.height()
-                x = dx + col * (option.rect.width() + 1) + \
-                    w * map(lambda x: x[2] == room_id, rooms).index(True)
-                y = dy + row * (option.rect.height() + 1)
-                painter.fillRect(x, y, w, h, self.parent.string2color('#%s' % room_color));
-                # готовимся рисовать границы
-                pen = QPen(Qt.black)
-                pen.setWidth(3)
-                painter.setPen(pen)
-
-                # отрисовываем элементы в зависимости от типа ячейки
-                painter.drawLine(x, y+h, x, y)
-                painter.drawLine(x+w, y+h, x+w, y)
-                if event.type == 'head':
-                    painter.drawLine(x, y, x+w, y)
-                elif event.type == 'tail':
-                    painter.drawLine(x, y+h, x+w, y+h)
-                else:
-                    pass
-        painter.restore()
-        #QItemDelegate.paint(self, painter, option, index)
-
 class QtSchedule(QTableView):
 
     """ Класс календаря. """
@@ -81,25 +32,20 @@ class QtSchedule(QTableView):
         self.work_hours = work_hours
         self.quant = quant
 
-        self.model = EventStorage(
-            self.work_hours, quant, self.rooms, parent
-            )
-        self.setModel(self.model)
+#         # Тестовое заполнение модели
+#         min60 = timedelta(hours=1)
+#         min90 = timedelta(hours=1, minutes=30)
+#         min120 = timedelta(hours=2)
 
-        # Тестовое заполнение модели
-        min60 = timedelta(hours=1)
-        min90 = timedelta(hours=1, minutes=30)
-        min120 = timedelta(hours=2)
-
-        test_data = [
-            (101, Event(datetime(2009,11,2,12), min60, 'First')),
-            (102, Event(datetime(2009,11,2,11), min90, 'Second')),
-            (103, Event(datetime(2009,11,2,12), min60, 'Third')),
-            (103, Event(datetime(2009,11,3,12), min60, 'Third')),
-            (101, Event(datetime(2009,11,2,16), min120, 'Long')),
-            ]
-        for room_id, event in test_data:
-            self.model.insert(room_id, event)
+#         test_data = [
+#             (101, Event(datetime(2009,11,2,12), min60, 'First')),
+#             (102, Event(datetime(2009,11,2,11), min90, 'Second')),
+#             (103, Event(datetime(2009,11,2,12), min60, 'Third')),
+#             (103, Event(datetime(2009,11,3,12), min60, 'Third')),
+#             (101, Event(datetime(2009,11,2,16), min120, 'Long')),
+#             ]
+#         for room_id, event in test_data:
+#             self.model.insert(room_id, event)
 
         # Запрещаем выделение множества ячеек
         self.setSelectionMode(QAbstractItemView.ExtendedSelection) #SingleSelection)
@@ -146,7 +92,7 @@ class QtSchedule(QTableView):
         return (self.rowAt(abs_y), self.columnAt(abs_x))
 
     def insertEvent(self, room_id, event):
-        self.model.insert(room_id, event)
+        self.model().insert(room_id, event)
 
     def cellRowColRelative(self, rel):
         """ Метод определяет какой ячейке принадлежат переданные координаты,
@@ -165,7 +111,7 @@ class QtSchedule(QTableView):
         row, col = row_col
         free = []
         for room_name, room_color, room_id in self.rooms:
-            event = self.model.get_event_by_cell(row, col, room_id)
+            event = self.model().get_event_by_cell(row, col, room_id)
             if not event:
                 free.append(id)
         return free
@@ -197,7 +143,7 @@ class QtSchedule(QTableView):
             room_name, room_color, room_id = self.rooms[event_index]
 
             #Проверка наличия события в указанном месте.
-            cal_event = self.model.get_event_by_cell(row, col, room_id)
+            cal_event = self.model().get_event_by_cell(row, col, room_id)
             if not cal_event:
                 return
 
@@ -305,7 +251,57 @@ class QtSchedule(QTableView):
                                               self.rowViewportPosition(row))
             event_index = (x - cx) / (w / len(self.rooms))
             room_name, room_color, room_id = self.rooms[event_index]
-            title = self.model.data(self.model.index(row, col), Qt.ToolTipRole, room_id).toString()
+            model = self.model()
+            title = model.data(model.index(row, col), Qt.ToolTipRole, room_id).toString()
             if len(title) > 0:
                 QToolTip.showText(help.globalPos(), QString(title))
         return QTableView.viewportEvent(self, event)
+
+class QtScheduleDelegate(QItemDelegate):
+
+    """ Делегат для ячеек расписания. """
+
+    def __init__(self, parent=None):
+        QItemDelegate.__init__(self, parent)
+        self.parent = parent
+
+    def paint(self, painter, option, index):
+        """ Метод для отрисовки ячейки. """
+        painter.save()
+
+        model = index.model()
+        rooms = model.rooms
+        count = len(rooms)
+
+        dx = self.parent.scrolledCellX
+        dy = self.parent.scrolledCellY
+
+        row = index.row()
+        col = index.column()
+
+        for room_name, room_color, room_id in rooms:
+            event = model.data(index, Qt.DisplayRole, room_id).toPyObject()
+            if type(event) is Event:
+                # заполняем тело события
+                w = option.rect.width() / count
+                h = option.rect.height()
+                x = dx + col * (option.rect.width() + 1) + \
+                    w * map(lambda x: x[2] == room_id, rooms).index(True)
+                y = dy + row * (option.rect.height() + 1)
+                painter.fillRect(x, y, w, h, self.parent.string2color('#%s' % room_color));
+                # готовимся рисовать границы
+                pen = QPen(Qt.black)
+                pen.setWidth(3)
+                painter.setPen(pen)
+
+                # отрисовываем элементы в зависимости от типа ячейки
+                painter.drawLine(x, y+h, x, y)
+                painter.drawLine(x+w, y+h, x+w, y)
+                if event.type == 'head':
+                    painter.drawLine(x, y, x+w, y)
+                elif event.type == 'tail':
+                    painter.drawLine(x, y+h, x+w, y+h)
+                else:
+                    pass
+        painter.restore()
+        #QItemDelegate.paint(self, painter, option, index)

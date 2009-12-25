@@ -144,6 +144,8 @@ class UserName(forms.Form):
 # Create own field to process a list of ids.
 class ListField(forms.Field):
     def clean(self, data):
+        if data is None:
+            return []
         return eval(data)
 
 class UserInfo(forms.Form):
@@ -156,3 +158,7 @@ class UserInfo(forms.Form):
     course_cancelled = ListField(required=False)
     course_changed = ListField(required=False)
 
+class DateRange(forms.Form):
+    monday = forms.DateField()
+    sunday = forms.DateField()
+    filter = ListField(required=False)

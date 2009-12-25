@@ -6,14 +6,14 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
-from datetime import date, timedelta
+from datetime import datetime, date, timedelta
 
 from lib import str2date
 from lib.decorators import ajax_processor, render_to
 
-from forms import UserRFID, UserName, UserInfo
+from forms import UserRFID, UserName, UserInfo, DateRange
 
-from storage.models import Client, Card, Course, Group
+from storage.models import Client, Card, Course, Group, Schedule
 
 isJavaScript = False
 
@@ -72,3 +72,15 @@ def set_user_info(request, form):
             card.save()
 
     return {'code': 200, 'desc': 'Ok'}
+
+@ajax_processor(DateRange, isJavaScript)
+def get_week(request, form):
+    if request.method == 'POST':
+        c = form.cleaned_data
+        schedules = Schedule.objects.filter(begin__range=(c['monday'], c['sunday']))
+        if len(c['filter']) > 0:
+             schedules = schedules.filter(room__in=c['filter'])
+        events = [item.get_calendar_obj() for item in schedules]
+    else:
+        events = []
+    return {'code': 200, 'desc': 'Ok', 'events': events}
