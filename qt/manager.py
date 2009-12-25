@@ -266,6 +266,14 @@ class MainWindow(QMainWindow):
 
 if __name__=="__main__":
 
+    def readStyleSheet(fileName) :
+        css = QString()
+        file = QFile(fileName)
+        if file.open(QIODevice.ReadOnly) :
+                css = QString(file.readAll())
+                file.close()
+        return css
+
     # глобальные параметры настроек приложения
     QCoreApplication.setOrganizationName('Home, Sweet Home')
     QCoreApplication.setOrganizationDomain('snegiri.dontexist.org')
@@ -273,6 +281,7 @@ if __name__=="__main__":
     QCoreApplication.setApplicationVersion('1.0')
 
     app = QApplication(sys.argv)
+    app.setStyleSheet(readStyleSheet('manager.css'))
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
