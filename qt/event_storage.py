@@ -147,6 +147,8 @@ class EventStorage(QAbstractTableModel):
 
     def datetime2rowcol(self, dt):
         row = (dt.hour - self.work_hours[0]) * self.multiplier
+        if dt.minute >= 30:
+            row += 1
         col = dt.weekday()
         return (row, col)
 
