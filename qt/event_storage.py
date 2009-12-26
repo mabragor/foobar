@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
 
-import sys, re, httplib, urllib, json, time
+import sys, re, time
 from datetime import datetime, timedelta
 
 import gettext
 gettext.bindtextdomain('project', './locale/')
 gettext.textdomain('project')
 _ = lambda a: unicode(gettext.gettext(a), 'utf8')
+__ = lambda x: datetime(*time.strptime(str(x), '%Y-%m-%d %H:%M:%S')[:6])
 
 from http_ajax import HttpAjax
 
@@ -69,8 +70,20 @@ class EventStorage(QAbstractTableModel):
         else:
             return self.cols_count
 
+    def showPrevWeek(self):
+        current_monday, current_sunday = self.weekRange
+        prev_monday = current_monday - timedelta(days=7)
+        self.loadData(prev_monday)
+        return self.weekRange
+
+    def showNextWeek(self):
+        current_monday, current_sunday = self.weekRange
+        next_monday = current_monday + timedelta(days=7)
+        self.loadData(next_monday)
+        return self.weekRange
+
     def loadData(self, d):
-        monday, sunday = self.date2range(d)
+        monday, sunday = week_range = self.date2range(d)
 	ajax = HttpAjax(self, '/manager/get_week/',
                         {'monday': monday,
                          'sunday': sunday,
@@ -82,7 +95,16 @@ class EventStorage(QAbstractTableModel):
             else:
                 print _('Check response format!')
             if response['code'] == 200:
-                print response['events']
+                #print 'EventStorage::loadData\n', response['events']
+                #{id, course, title, room, color, room_name, start, end}
+                for e in response['events']:
+                    start = __(e['start'])
+                    end = __(e['end'])
+                    duration = end - start
+                    room = int(e['room']) + 100
+                    event = Event(start, duration, e['title'])
+                    self.insert(room, event)
+                self.weekRange = week_range
                 return True
 	return False
 
@@ -138,7 +160,9 @@ class EventStorage(QAbstractTableModel):
 
     def date2range(self, dt):
         """ Возвращаем диапазон недели для переданной даты. """
-        monday = dt.date() - timedelta(days=dt.weekday())
+        if type(dt) is datetime:
+            dt = dt.date()
+        monday = dt - timedelta(days=dt.weekday())
         sunday = monday + timedelta(days=6)
         return (monday, sunday)
 

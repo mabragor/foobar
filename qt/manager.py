@@ -70,6 +70,17 @@ class MainWindow(QMainWindow):
         self.buttonNext = QPushButton(_('>>'))
         self.buttonWeek = QPushButton(_('Week'))
 
+        def prev_week():
+            week_range = self.scheduleModel.showPrevWeek()
+            self.showWeekRange(week_range)
+
+        def next_week():
+            week_range = self.scheduleModel.showPrevWeek()
+            self.showWeekRange(week_range)
+
+        self.connect(self.buttonPrev, SIGNAL('clicked()'), prev_week)
+        self.connect(self.buttonNext, SIGNAL('clicked()'), next_week)
+
         bottomPanel = QHBoxLayout()
         bottomPanel.addWidget(QLabel(_('Week:')))
         bottomPanel.addWidget(self.bpMonday)
@@ -89,6 +100,11 @@ class MainWindow(QMainWindow):
         mainWidget.setLayout(mainLayout)
 
 	self.setCentralWidget(mainWidget)
+
+    def showWeekRange(self, week_range):
+        monday, sunday = week_range
+        self.bpMonday.setText(monday.strftime('%d/%m/%Y'))
+        self.bpSunday.setText(sunday.strftime('%d/%m/%Y'))
 
     def getMime(self, name):
 	return self.mimes.get(name, None)
