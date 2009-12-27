@@ -50,9 +50,7 @@ class EventStorage(QAbstractTableModel):
         self.rows_count = (end_hour - begin_hour) * timedelta(hours=1).seconds / quant.seconds
         self.cols_count = len(self.week_days)
 
-        self.rc2e = {} # (row, col, room): event
-        self.e2rc = {} # (event, room): [(row, col), (row, col), ...]
-
+        self.initModel()
         self.showCurrWeek()
 
     def rowCount(self, parent):
@@ -66,6 +64,10 @@ class EventStorage(QAbstractTableModel):
             return 0
         else:
             return self.cols_count
+
+    def initModel(self):
+        self.rc2e = {} # (row, col, room): event
+        self.e2rc = {} # (event, room): [(row, col), (row, col), ...]
 
     def showCurrWeek(self):
         now = datetime.now()
@@ -86,6 +88,7 @@ class EventStorage(QAbstractTableModel):
         return self.weekRange
 
     def loadData(self, d):
+        self.initModel()
         monday, sunday = week_range = self.date2range(d)
 	ajax = HttpAjax(self, '/manager/get_week/',
                         {'monday': monday,
@@ -108,6 +111,7 @@ class EventStorage(QAbstractTableModel):
                     event = Event(start, duration, e['title'])
                     self.insert(room, event)
                 self.weekRange = week_range
+                self.emit(SIGNAL('layoutChanged()'))
                 return True
 	return False
 
@@ -202,13 +206,13 @@ class EventStorage(QAbstractTableModel):
     def insert(self, room, event):
         """ Метод регистрации нового события. """
         row, col = self.datetime2rowcol(event.dt)
-        self.beginInsertRows(QModelIndex(), row, row)
+        #self.beginInsertRows(QModelIndex(), row, row)
         cells = []
         for i in xrange(event.duration.seconds / self.quant.seconds):
             cells.append( (row + i, col) )
             self.rc2e.update( { (row + i, col, room): event } )
         self.e2rc.update( { (event, room): cells } )
-        self.endInsertRows()
+        #self.endInsertRows()
 
     def remove(self, event, room):
         """ Метод удаления информации о событии. """

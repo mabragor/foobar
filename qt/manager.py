@@ -75,7 +75,7 @@ class MainWindow(QMainWindow):
             week_range = self.scheduleModel.showPrevWeek()
             self.showWeekRange(week_range)
         def next_week():
-            week_range = self.scheduleModel.showPrevWeek()
+            week_range = self.scheduleModel.showNextWeek()
             self.showWeekRange(week_range)
         def today():
             week_range = self.scheduleModel.showCurrWeek()
