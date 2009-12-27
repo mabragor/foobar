@@ -137,6 +137,9 @@ class MainWindow(QMainWindow):
 	data. Создать обработчики для каждого действия. """
 	data = [
 	    (_('File'), [
+		    (_('Application settings'), 'Ctrl+T',
+		     'setupApp', _('Manage the application settings.')),
+                    (None, None, None, None),
 		    (_('Exit'), '',
 		     'close', _('Close the application.')),
 		    ]
@@ -157,24 +160,20 @@ class MainWindow(QMainWindow):
 		     'eventAssign', _('Assign event.')),
                     ]
              ),
-	    (_('Tools'), [
-		    (_('Application settings'), 'Ctrl+T',
-		     'setupApp', _('Manage the application settings.')),
-		    (_('Test'), 'Ctrl+Z',
-		     'test', _('Test')),
-		    ]
-	     ),
 	    ]
 
 	for topic, info in data:
-	    self.toolsMenu = self.menuBar().addMenu(topic)
+	    self.menu = self.menuBar().addMenu(topic)
 	    for title, short, name, desc in info:
+                if not title:
+                    self.menu.addSeparator()
+                    continue
 		setattr(self, 'act_%s' % name, QAction(title, self))
 		action = getattr(self, 'act_%s' % name)
 		action.setShortcut(short)
 		action.setStatusTip(desc)
 		self.connect(action, SIGNAL('triggered()'), getattr(self, name))
-		self.toolsMenu.addAction(action)
+		self.menu.addAction(action)
 
     # Обработчики меню: начало
 
