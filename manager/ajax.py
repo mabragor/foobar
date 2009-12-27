@@ -11,7 +11,7 @@ from datetime import datetime, date, timedelta
 from lib import str2date
 from lib.decorators import ajax_processor, render_to
 
-from forms import UserRFID, UserName, UserInfo, DateRange
+from forms import UserRFID, UserName, UserInfo, DateRange, CopyWeek
 
 from storage.models import Client, Card, Course, Group, Schedule
 
@@ -75,12 +75,19 @@ def set_user_info(request, form):
 
 @ajax_processor(DateRange, isJavaScript)
 def get_week(request, form):
-    if request.method == 'POST':
-        c = form.cleaned_data
-        schedules = Schedule.objects.filter(begin__range=(c['monday'], c['sunday']))
-        if len(c['filter']) > 0:
-             schedules = schedules.filter(room__in=c['filter'])
-        events = [item.get_calendar_obj() for item in schedules]
-    else:
-        events = []
+    c = form.cleaned_data
+    schedules = Schedule.objects.filter(begin__range=(c['monday'], c['sunday']))
+    if len(c['filter']) > 0:
+        schedules = schedules.filter(room__in=c['filter'])
+    events = [item.get_calendar_obj() for item in schedules]
     return {'code': 200, 'desc': 'Ok', 'events': events}
+
+@ajax_processor(CopyWeek, isJavaScript)
+def copy_week(request, form):
+    c = form.cleaned_data
+    if form.is_valid():
+        form.save()
+    else:
+        return {'code': 404, 'desc': 'Form is not valid',
+                'errors': form.get_errors()}
+    return {'code': 200, 'desc': 'Ok'}

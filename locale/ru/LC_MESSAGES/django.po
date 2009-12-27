@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-04 19:23+0300\n"
+"POT-Creation-Date: 2009-12-27 15:30+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,12 +53,441 @@ msgstr "Используйте метод POST"
 msgid "Please, do not break our code :)"
 msgstr "Пожалуйста, не ломайте нас :)"
 
+#: manager/forms.py:175
+msgid "Date must be Monday."
+msgstr "Дата должна быть понедельником"
+
+#: manager/forms.py:184
+msgid "It is impossible to copy events to the past."
+msgstr "Нельзя копировать события в прошлое."
+
+#: manager/forms.py:193
+msgid "It is impossible to copy the week into itself."
+msgstr "Нельзя копировать неделю в саму себя."
+
 #: manager/views.py:59
 msgid "Incorrect request method."
 msgstr "Неверный метод запроса."
 
-#: rfid/models.py:9 storage/models.py:13 storage/models.py:92
-#: storage/models.py:144 storage/models.py:256
+#: patcher/models.py:8
+msgid "Name of patch"
+msgstr ""
+
+#: patcher/models.py:9
+msgid "Applied"
+msgstr "Назначено"
+
+#: patcher/models.py:12
+msgid "Patch"
+msgstr ""
+
+#: patcher/models.py:13
+msgid "Patches"
+msgstr ""
+
+#: qt/courses_list.py:27 storage/models.py:44 storage/models.py:73
+#: storage/models.py:102
+msgid "Title"
+msgstr "Заголовок"
+
+#: qt/courses_list.py:27 storage/models.py:105 storage/models.py:159
+msgid "Price"
+msgstr "Цена"
+
+#: qt/courses_list.py:28 storage/models.py:164 storage/models.py:165
+msgid "Card"
+msgstr "Карта"
+
+#: qt/courses_list.py:29
+msgid "Sold"
+msgstr ""
+
+#: qt/courses_list.py:29
+msgid "Used"
+msgstr ""
+
+#: qt/courses_list.py:30
+msgid "Assigned"
+msgstr ""
+
+#: qt/courses_list.py:30 storage/models.py:154
+msgid "Begin"
+msgstr ""
+
+#: qt/courses_list.py:31 storage/models.py:155
+msgid "Expired"
+msgstr "Окончено"
+
+#: qt/courses_list.py:31 storage/models.py:156
+msgid "Cancelled"
+msgstr ""
+
+#: qt/courses_list.py:119 qt/dlg_course_assign.py:26
+msgid "Normal"
+msgstr ""
+
+#: qt/courses_list.py:119 qt/dlg_course_assign.py:27
+msgid "Club"
+msgstr ""
+
+#: qt/courses_list.py:258
+msgid "Cancel course"
+msgstr ""
+
+#: qt/courses_list.py:259
+msgid "Cancel current course."
+msgstr ""
+
+#: qt/dlg_copy_week.py:26 qt/dlg_settings.py:25 qt/dlg_user_info.py:76
+msgid "Apply"
+msgstr ""
+
+#: qt/dlg_copy_week.py:27 qt/dlg_course_assign.py:65 qt/dlg_event_assign.py:60
+#: qt/dlg_searching.py:30 qt/dlg_settings.py:26 qt/dlg_user_info.py:77
+#: qt/dlg_waiting_rfid.py:30 storage/models.py:204
+msgid "Cancel"
+msgstr "Отмена"
+
+#: qt/dlg_copy_week.py:44
+msgid "Choose a week to copy to"
+msgstr ""
+
+#: qt/dlg_course_assign.py:23
+msgid "Type of card"
+msgstr ""
+
+#: qt/dlg_course_assign.py:29
+msgid "Course starts"
+msgstr ""
+
+#: qt/dlg_course_assign.py:36
+msgid "Course ends after"
+msgstr ""
+
+#: qt/dlg_course_assign.py:39
+msgid "3 months"
+msgstr ""
+
+#: qt/dlg_course_assign.py:40
+msgid "6 months"
+msgstr ""
+
+#: qt/dlg_course_assign.py:41
+msgid "9 months"
+msgstr ""
+
+#: qt/dlg_course_assign.py:42
+msgid "12 months"
+msgstr ""
+
+#: qt/dlg_course_assign.py:61 qt/dlg_event_assign.py:56
+msgid "Available courses"
+msgstr ""
+
+#: qt/dlg_course_assign.py:64 qt/dlg_event_assign.py:59 qt/manager.py:160
+msgid "Assign"
+msgstr ""
+
+#: qt/dlg_course_assign.py:78
+msgid "Choose the course"
+msgstr ""
+
+#: qt/dlg_event_assign.py:23
+msgid "Date"
+msgstr ""
+
+#: qt/dlg_event_assign.py:30
+msgid "Time"
+msgstr ""
+
+#: qt/dlg_event_assign.py:36 storage/models.py:48
+msgid "Room"
+msgstr "Зал"
+
+#: qt/dlg_event_assign.py:73
+msgid "Assign the event"
+msgstr ""
+
+#: qt/dlg_event_assign.py:102 qt/manager.py:279
+msgid "Warning"
+msgstr ""
+
+#: qt/dlg_event_assign.py:103
+msgid "What course do you want to assign?"
+msgstr ""
+
+#: qt/dlg_event_assign.py:104
+msgid "Choose the course on the course's tree."
+msgstr ""
+
+#: qt/dlg_searching.py:21
+msgid "Search"
+msgstr ""
+
+#: qt/dlg_searching.py:29
+msgid "Find"
+msgstr ""
+
+#: qt/dlg_searching.py:42 qt/dlg_user_info.py:29
+msgid "Last name"
+msgstr ""
+
+#: qt/dlg_searching.py:43 qt/dlg_user_info.py:28
+msgid "First name"
+msgstr ""
+
+#: qt/dlg_searching.py:44
+msgid "RFID code"
+msgstr ""
+
+#: qt/dlg_searching.py:55
+msgid "Results"
+msgstr ""
+
+#: qt/dlg_searching.py:59
+msgid "Show"
+msgstr ""
+
+#: qt/dlg_searching.py:75
+msgid "Search client by name"
+msgstr ""
+
+#: qt/dlg_settings.py:20
+msgid "General"
+msgstr ""
+
+#: qt/dlg_settings.py:21
+msgid "Network"
+msgstr ""
+
+#: qt/dlg_settings.py:43
+msgid "Settings"
+msgstr ""
+
+#: qt/dlg_settings.py:118
+msgid "HTTP server (address/port)"
+msgstr ""
+
+#: qt/dlg_settings.py:127
+msgid "Use HTTP proxy"
+msgstr ""
+
+#: qt/dlg_settings.py:130
+msgid "HTTP proxy settings"
+msgstr ""
+
+#: qt/dlg_settings.py:132
+msgid "Address and port"
+msgstr ""
+
+#: qt/dlg_settings.py:139
+msgid "Login and password"
+msgstr ""
+
+#: qt/dlg_user_info.py:30
+msgid "Email"
+msgstr ""
+
+#: qt/dlg_user_info.py:31
+msgid "Year of birth"
+msgstr ""
+
+#: qt/dlg_user_info.py:32
+msgid "Sex"
+msgstr ""
+
+#: qt/dlg_user_info.py:33
+msgid "RFID"
+msgstr ""
+
+#: qt/dlg_user_info.py:40
+msgid "Male"
+msgstr ""
+
+#: qt/dlg_user_info.py:41
+msgid "Female"
+msgstr ""
+
+#: qt/dlg_user_info.py:62
+msgid "Base data"
+msgstr ""
+
+#: qt/dlg_user_info.py:71
+msgid "Courses' history"
+msgstr ""
+
+#: qt/dlg_user_info.py:74
+msgid "Assign RFID"
+msgstr ""
+
+#: qt/dlg_user_info.py:75
+msgid "Assign course"
+msgstr ""
+
+#: qt/dlg_user_info.py:101
+msgid "User's information"
+msgstr ""
+
+#: qt/dlg_waiting_rfid.py:27
+msgid "Put the RFID label on to the RFID reader, please."
+msgstr ""
+
+#: qt/dlg_waiting_rfid.py:34
+msgid "RFID reader"
+msgstr ""
+
+#: qt/event_storage.py:44
+msgid "Monday"
+msgstr ""
+
+#: qt/event_storage.py:44
+msgid "Tuesday"
+msgstr ""
+
+#: qt/event_storage.py:45
+msgid "Wednesday"
+msgstr ""
+
+#: qt/event_storage.py:45
+msgid "Thursday"
+msgstr ""
+
+#: qt/event_storage.py:46
+msgid "Friday"
+msgstr ""
+
+#: qt/event_storage.py:46
+msgid "Saturday"
+msgstr ""
+
+#: qt/event_storage.py:47
+msgid "Sunday"
+msgstr ""
+
+#: qt/event_storage.py:102
+msgid "Check response format!"
+msgstr ""
+
+#: qt/http_ajax.py:50
+msgid "HTTP Error"
+msgstr "Ошибка"
+
+#: qt/manager.py:41
+msgid "Manager's interface"
+msgstr ""
+
+#: qt/manager.py:42
+msgid "Ready"
+msgstr ""
+
+#: qt/manager.py:47
+#, python-format
+msgid "Filter: Room \"%s\" is changed its state"
+msgstr ""
+
+#: qt/manager.py:70
+msgid "<<"
+msgstr ""
+
+#: qt/manager.py:71
+msgid ">>"
+msgstr ""
+
+#: qt/manager.py:72
+msgid "Today"
+msgstr ""
+
+#: qt/manager.py:90
+msgid "Week:"
+msgstr ""
+
+#: qt/manager.py:140
+msgid "File"
+msgstr ""
+
+#: qt/manager.py:141
+msgid "Application settings"
+msgstr ""
+
+#: qt/manager.py:142
+msgid "Manage the application settings."
+msgstr ""
+
+#: qt/manager.py:144
+msgid "Exit"
+msgstr ""
+
+#: qt/manager.py:145
+msgid "Close the application."
+msgstr ""
+
+#: qt/manager.py:148 storage/models.py:37
+msgid "Client"
+msgstr ""
+
+#: qt/manager.py:149
+msgid "New"
+msgstr ""
+
+#: qt/manager.py:150
+msgid "Register new client."
+msgstr ""
+
+#: qt/manager.py:151
+msgid "Search by RFID"
+msgstr ""
+
+#: qt/manager.py:152
+msgid "Search a client with its RFID card."
+msgstr ""
+
+#: qt/manager.py:153
+msgid "Search by name"
+msgstr ""
+
+#: qt/manager.py:154
+msgid "Search a client with its name."
+msgstr ""
+
+#: qt/manager.py:155
+msgid "One visit"
+msgstr ""
+
+#: qt/manager.py:156
+msgid "One visit client."
+msgstr ""
+
+#: qt/manager.py:159
+msgid "Event"
+msgstr ""
+
+#: qt/manager.py:161
+msgid "Assign event."
+msgstr ""
+
+#: qt/manager.py:164
+msgid "Calendar"
+msgstr ""
+
+#: qt/manager.py:165
+msgid "Copy week"
+msgstr ""
+
+#: qt/manager.py:166
+msgid "Copy current week into other."
+msgstr ""
+
+#: qt/manager.py:275
+msgid "The week has been copied sucessfully."
+msgstr ""
+
+#: qt/tree_model.py:50 storage/models.py:115
+#: templates/statistic/courses.html:31 templates/statistic/index.html:15
+msgid "Courses"
+msgstr "Курсы"
+
+#: rfid/models.py:9 storage/models.py:13 storage/models.py:108
+#: storage/models.py:153 storage/models.py:277
 msgid "Registered"
 msgstr "Зарегистрирован"
 
@@ -74,111 +503,115 @@ msgstr "Идентификаторы карт"
 msgid "Relation"
 msgstr "Взаимосвязь"
 
-#: storage/admin.py:51
+#: storage/admin.py:52
 msgid "Links"
 msgstr "Ссылки"
 
-#: storage/models.py:36 storage/models.py:65 storage/models.py:87
-msgid "Title"
-msgstr "Заголовок"
+#: storage/models.py:24
+msgid "Coach"
+msgstr "Тренер"
 
-#: storage/models.py:37
+#: storage/models.py:25
+msgid "Coaches"
+msgstr "Тренеры"
+
+#: storage/models.py:38
+msgid "Clients"
+msgstr "Клиенты"
+
+#: storage/models.py:45
 msgid "Color"
 msgstr "Цвет"
 
-#: storage/models.py:58
-msgid "Room"
-msgstr "Зал"
-
-#: storage/models.py:59
+#: storage/models.py:49
 msgid "Rooms"
 msgstr "Залы"
 
-#: storage/models.py:78
+#: storage/models.py:76
 msgid "Style"
 msgstr "Стиль"
 
-#: storage/models.py:79
+#: storage/models.py:77
 msgid "Styles"
 msgstr "Стили"
 
-#: storage/models.py:89 storage/models.py:131 storage/models.py:135
-msgid "Price"
-msgstr "Цена"
-
-#: storage/models.py:90
-msgid "The price of the course."
-msgstr "Цена курса."
-
-#: storage/models.py:95 storage/models.py:130
-msgid "Course"
-msgstr "Курс"
-
-#: storage/models.py:96
-msgid "Courses"
-msgstr "Курсы"
-
-#: storage/models.py:132
-msgid "Applied"
-msgstr "Назначено"
-
-#: storage/models.py:136
-msgid "Prices"
-msgstr "Цены"
-
-#: storage/models.py:139
-msgid "costs"
-msgstr "стоит"
-
-#: storage/models.py:145
-msgid "Expired"
-msgstr "Окончено"
-
-#: storage/models.py:146
+#: storage/models.py:104 templates/statistic/courses.html:60
 msgid "Count"
 msgstr "Количество"
 
-#: storage/models.py:149 storage/models.py:150
-msgid "Card"
-msgstr "Карта"
+#: storage/models.py:106 storage/models.py:160
+msgid "The price of the course."
+msgstr "Цена курса."
 
-#: storage/models.py:182
+#: storage/models.py:109 templates/statistic/courses.html:64
+msgid "Salary"
+msgstr "Зарплата"
+
+#: storage/models.py:110
+msgid "The salary for the course."
+msgstr "Зарплата за занятие."
+
+#: storage/models.py:114
+msgid "Course"
+msgstr "Курс"
+
+#: storage/models.py:146
+msgid "Normal card"
+msgstr "Обычная карта"
+
+#: storage/models.py:146
+msgid "Club card"
+msgstr "Клубная карта"
+
+#: storage/models.py:149
+msgid "Type"
+msgstr "Тип"
+
+#: storage/models.py:150
+msgid "Type of client's card"
+msgstr "Тип карты клиента"
+
+#: storage/models.py:157
+msgid "Exercises sold"
+msgstr "Продано тренировок"
+
+#: storage/models.py:158
+msgid "Exercises used"
+msgstr "Использовано тренировок"
+
+#: storage/models.py:203
 msgid "Done"
 msgstr "Выполнено"
 
-#: storage/models.py:183
-msgid "Cancel"
-msgstr "Отмена"
-
-#: storage/models.py:187
+#: storage/models.py:208
 msgid "Begins"
 msgstr "Начинается"
 
-#: storage/models.py:188
+#: storage/models.py:209
 msgid "Is looking for members?"
 msgstr "Идёт набор участников?"
 
-#: storage/models.py:189
+#: storage/models.py:210
 msgid "Are there free places?"
 msgstr "Есть свободные места?"
 
-#: storage/models.py:190
+#: storage/models.py:211
 msgid "Status"
 msgstr "Статус"
 
-#: storage/models.py:194
+#: storage/models.py:215
 msgid "Schedule"
 msgstr "Расписание"
 
-#: storage/models.py:195
+#: storage/models.py:216
 msgid "Schedules"
 msgstr "Расписания"
 
-#: storage/models.py:259
+#: storage/models.py:280
 msgid "Action"
 msgstr "Действие"
 
-#: storage/models.py:260
+#: storage/models.py:281
 msgid "Actions"
 msgstr "Действия"
 
@@ -216,3 +649,53 @@ msgstr ""
 "минутами.</nobr> \n"
 "\t    По истечении данного времени потребуется повторная авторизация.\n"
 "\t    "
+
+#: templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr ""
+
+#: templates/admin/base_site.html:7 templates/statistic/courses.html:28
+#: templates/statistic/index.html:6 templates/statistic/index.html.py:13
+msgid "Statistic"
+msgstr "Статистика"
+
+#: templates/admin/base_site.html:12
+msgid "Django administration"
+msgstr ""
+
+#: templates/statistic/courses.html:19
+msgid "Courses statistic"
+msgstr "Статистика курсов"
+
+#: templates/statistic/courses.html:24 templates/statistic/index.html:6
+msgid "Home"
+msgstr "Домой"
+
+#: templates/statistic/courses.html:48
+msgid "Get PDF"
+msgstr "Получить PDF"
+
+#: templates/statistic/courses.html:58
+msgid "Name"
+msgstr "Имя"
+
+#: templates/statistic/courses.html:59
+msgid "Fee"
+msgstr "Стоимость"
+
+#: templates/statistic/courses.html:61
+msgid "Hours"
+msgstr "Часы"
+
+#: templates/statistic/courses.html:62
+msgid "Visitors"
+msgstr "Посетители"
+
+#: templates/statistic/courses.html:63
+msgid "Visitors by card"
+msgstr "Посетители по карте"
+
+#: templates/statistic/courses.html:65
+msgid "Income"
+msgstr ""
+

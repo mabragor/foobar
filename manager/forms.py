@@ -134,7 +134,6 @@ class CopyForm(forms.Form):
             ne.begin = e.begin+delta
             ne.save()
 
-
 class UserRFID(forms.Form):
     rfid_code = forms.CharField(max_length=8)
 
@@ -162,3 +161,44 @@ class DateRange(forms.Form):
     monday = forms.DateField()
     sunday = forms.DateField()
     filter = ListField(required=False)
+
+class CopyWeek(forms.Form):
+    from_date = forms.DateField()
+    to_date = forms.DateField()
+
+    def get_errors(self):
+        from django.utils.encoding import force_unicode
+        return ''.join([force_unicode(v) for k, v in self.errors.items()])
+
+    def validate_date(self, date):
+        if not date.weekday() ==  0:
+            raise forms.ValidationError(_('Date must be Monday.'))
+        return date
+
+    def clean_from_date(self):
+        return self.validate_date(self.cleaned_data['from_date'])
+
+    def clean_to_date(self):
+        to_date = self.validate_date(self.cleaned_data['to_date'])
+        if to_date < date.today():
+            raise forms.ValidationError(_('It is impossible to copy events to the past.'))
+        if Schedule.objects.filter(begin__range=(to_date, to_date+timedelta(days=7))).count():
+            raise forms.ValidationError('Week must be empty to paste events.')
+        return to_date
+
+    def clean(self):
+        from_date = self.cleaned_data.get('from_date', None)
+        to_date = self.cleaned_data.get('to_date', None)
+        if from_date and to_date and from_date == to_date:
+            raise forms.ValidationError(_('It is impossible to copy the week into itself.'))
+        return self.cleaned_data
+
+    def save(self):
+        from_date = self.cleaned_data.get('from_date')
+        to_date = self.cleaned_data.get('to_date')
+        events = Schedule.objects.filter(begin__range=(from_date, from_date+timedelta(days=7)))
+        delta = to_date - from_date
+        for e in events:
+            ne = Schedule(room=e.room, course=e.course)
+            ne.begin = e.begin+delta
+            ne.save()

@@ -18,7 +18,7 @@ urlpatterns = patterns(
     url(r'^get_unstatus_event/$', 'ajax_get_unstatus_event', name='ajax_get_unstatus_event'),
     url(r'^save_event_status/$', 'ajax_save_event_status', name='ajax_save_event_status'),
     url(r'^get_status_timer/$', 'ajax_get_status_timer', name='ajax_get_status_timer'),
-    url(r'^copy_week/$', 'ajax_copy_week', name='ajax_copy_week'),
+    #url(r'^copy_week/$', 'ajax_copy_week', name='ajax_copy_week'),
     url(r'^add_user_course/$', 'ajax_add_user_course', name='ajax_add_user_course')
     )
 
@@ -29,4 +29,5 @@ urlpatterns += patterns(
     url(r'^set_user_info/$', 'set_user_info'),
     url(r'^available_courses/$', 'available_courses'),
     url(r'^get_week/$', 'get_week'),
+    url(r'^copy_week/$', 'copy_week'),
     )

@@ -21,6 +21,7 @@ from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_searching import DlgSearchByName
 from dlg_user_info import DlgUserInfo
 from dlg_event_assign import DlgEventAssign
+from dlg_copy_week import DlgCopyWeek
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -160,6 +161,11 @@ class MainWindow(QMainWindow):
 		     'eventAssign', _('Assign event.')),
                     ]
              ),
+	    (_('Calendar'), [
+		    (_('Copy week'), 'Ctrl+W',
+		     'copyWeek', _('Copy current week into other.')),
+                    ]
+             ),
 	    ]
 
 	for topic, info in data:
@@ -176,6 +182,11 @@ class MainWindow(QMainWindow):
 		self.menu.addAction(action)
 
     # Обработчики меню: начало
+
+    def setupApp(self):
+	self.dialog = DlgSettings(self)
+	self.dialog.setModal(True)
+	self.dialog.exec_()
 
     def clientNew(self):
 	print 'register new client'
@@ -251,16 +262,28 @@ class MainWindow(QMainWindow):
         else:
             print 'reject'
 
-    def setupApp(self):
-	# подготовить диалог
-	self.dialog = DlgSettings(self)
-	self.dialog.setModal(True)
-	# показать диалог
-	self.dialog.exec_()
+    def copyWeek(self):
+        def callback(selected_date):
+            model = self.scheduleModel
+            from_range = model.weekRange
+            to_range = model.date2range(selected_date)
+            ajax = HttpAjax(self, '/manager/copy_week/',
+                            {'from_date': from_range[0],
+                             'to_date': to_range[0]})
+            response = ajax.parse_json()
+            if response['code'] == 200:
+                self.statusBar().showMessage(_('The week has been copied sucessfully.'))
+            else:
+                return QMessageBox.warning(
+                    self,
+                    _('Warning'),
+                    '[%(code)s] %(desc)s' % response,
+                    QMessageBox.Ok, QMessageBox.Ok)
+                print 'AJAX copyWeek(): [%(code)s] %(desc)s' % response
 
-    def test(self):
-	self.dialog = DlgUserInfo(self)
+	self.dialog = DlgCopyWeek(self)
 	self.dialog.setModal(True)
+        self.dialog.setCallback(callback)
 	self.dialog.exec_()
 
     # Обработчики меню: конец

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-26 01:25+0300\n"
+"POT-Creation-Date: 2009-12-27 15:28+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,6 +68,20 @@ msgstr ""
 msgid "Cancel current course."
 msgstr ""
 
+#: dlg_copy_week.py:26 dlg_settings.py:25 dlg_user_info.py:76
+msgid "Apply"
+msgstr ""
+
+#: dlg_copy_week.py:27 dlg_course_assign.py:65 dlg_event_assign.py:60
+#: dlg_searching.py:30 dlg_settings.py:26 dlg_user_info.py:77
+#: dlg_waiting_rfid.py:30
+msgid "Cancel"
+msgstr ""
+
+#: dlg_copy_week.py:44
+msgid "Choose a week to copy to"
+msgstr ""
+
 #: dlg_course_assign.py:23
 msgid "Type of card"
 msgstr ""
@@ -100,13 +114,8 @@ msgstr ""
 msgid "Available courses"
 msgstr ""
 
-#: dlg_course_assign.py:64 dlg_event_assign.py:59 manager.py:136
+#: dlg_course_assign.py:64 dlg_event_assign.py:59 manager.py:160
 msgid "Assign"
-msgstr ""
-
-#: dlg_course_assign.py:65 dlg_event_assign.py:60 dlg_searching.py:30
-#: dlg_settings.py:26 dlg_user_info.py:77 dlg_waiting_rfid.py:30
-msgid "Cancel"
 msgstr ""
 
 #: dlg_course_assign.py:78
@@ -129,7 +138,7 @@ msgstr ""
 msgid "Assign the event"
 msgstr ""
 
-#: dlg_event_assign.py:102
+#: dlg_event_assign.py:102 manager.py:279
 msgid "Warning"
 msgstr ""
 
@@ -179,10 +188,6 @@ msgstr ""
 
 #: dlg_settings.py:21
 msgid "Network"
-msgstr ""
-
-#: dlg_settings.py:25 dlg_user_info.py:76
-msgid "Apply"
 msgstr ""
 
 #: dlg_settings.py:43
@@ -261,35 +266,35 @@ msgstr ""
 msgid "RFID reader"
 msgstr ""
 
-#: event_storage.py:43
+#: event_storage.py:44
 msgid "Monday"
 msgstr ""
 
-#: event_storage.py:43
+#: event_storage.py:44
 msgid "Tuesday"
 msgstr ""
 
-#: event_storage.py:44
+#: event_storage.py:45
 msgid "Wednesday"
 msgstr ""
 
-#: event_storage.py:44
+#: event_storage.py:45
 msgid "Thursday"
 msgstr ""
 
-#: event_storage.py:45
+#: event_storage.py:46
 msgid "Friday"
 msgstr ""
 
-#: event_storage.py:45
+#: event_storage.py:46
 msgid "Saturday"
 msgstr ""
 
-#: event_storage.py:46
+#: event_storage.py:47
 msgid "Sunday"
 msgstr ""
 
-#: event_storage.py:83
+#: event_storage.py:102
 msgid "Check response format!"
 msgstr ""
 
@@ -297,93 +302,37 @@ msgstr ""
 msgid "HTTP Error"
 msgstr ""
 
-#: manager.py:40
+#: manager.py:41
 msgid "Manager's interface"
 msgstr ""
 
-#: manager.py:41
+#: manager.py:42
 msgid "Ready"
 msgstr ""
 
-#: manager.py:46
+#: manager.py:47
 #, python-format
 msgid "Filter: Room \"%s\" is changed its state"
 msgstr ""
 
-#: manager.py:69
+#: manager.py:70
 msgid "<<"
 msgstr ""
 
-#: manager.py:70
+#: manager.py:71
 msgid ">>"
 msgstr ""
 
-#: manager.py:71
-msgid "Week"
+#: manager.py:72
+msgid "Today"
 msgstr ""
 
-#: manager.py:74
+#: manager.py:90
 msgid "Week:"
 msgstr ""
 
-#: manager.py:119
-msgid "File"
-msgstr ""
-
-#: manager.py:120
-msgid "Exit"
-msgstr ""
-
-#: manager.py:121
-msgid "Close the application."
-msgstr ""
-
-#: manager.py:124
-msgid "Client"
-msgstr ""
-
-#: manager.py:125
-msgid "New"
-msgstr ""
-
-#: manager.py:126
-msgid "Register new client."
-msgstr ""
-
-#: manager.py:127
-msgid "Search by RFID"
-msgstr ""
-
-#: manager.py:128
-msgid "Search a client with its RFID card."
-msgstr ""
-
-#: manager.py:129
-msgid "Search by name"
-msgstr ""
-
-#: manager.py:130
-msgid "Search a client with its name."
-msgstr ""
-
-#: manager.py:131
-msgid "One visit"
-msgstr ""
-
-#: manager.py:132
-msgid "One visit client."
-msgstr ""
-
-#: manager.py:135
-msgid "Event"
-msgstr ""
-
-#: manager.py:137
-msgid "Assign event."
-msgstr ""
-
 #: manager.py:140
-msgid "Tools"
+msgid "File"
 msgstr ""
 
 #: manager.py:141
@@ -394,8 +343,72 @@ msgstr ""
 msgid "Manage the application settings."
 msgstr ""
 
-#: manager.py:143 manager.py:144
-msgid "Test"
+#: manager.py:144
+msgid "Exit"
+msgstr ""
+
+#: manager.py:145
+msgid "Close the application."
+msgstr ""
+
+#: manager.py:148
+msgid "Client"
+msgstr ""
+
+#: manager.py:149
+msgid "New"
+msgstr ""
+
+#: manager.py:150
+msgid "Register new client."
+msgstr ""
+
+#: manager.py:151
+msgid "Search by RFID"
+msgstr ""
+
+#: manager.py:152
+msgid "Search a client with its RFID card."
+msgstr ""
+
+#: manager.py:153
+msgid "Search by name"
+msgstr ""
+
+#: manager.py:154
+msgid "Search a client with its name."
+msgstr ""
+
+#: manager.py:155
+msgid "One visit"
+msgstr ""
+
+#: manager.py:156
+msgid "One visit client."
+msgstr ""
+
+#: manager.py:159
+msgid "Event"
+msgstr ""
+
+#: manager.py:161
+msgid "Assign event."
+msgstr ""
+
+#: manager.py:164
+msgid "Calendar"
+msgstr ""
+
+#: manager.py:165
+msgid "Copy week"
+msgstr ""
+
+#: manager.py:166
+msgid "Copy current week into other."
+msgstr ""
+
+#: manager.py:275
+msgid "The week has been copied sucessfully."
 msgstr ""
 
 #: tree_model.py:50
