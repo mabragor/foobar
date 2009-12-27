@@ -53,10 +53,7 @@ class EventStorage(QAbstractTableModel):
         self.rc2e = {} # (row, col, room): event
         self.e2rc = {} # (event, room): [(row, col), (row, col), ...]
 
-        # Отображаем текущую неделю
-        now = datetime.now()
-        self.weekRange = self.date2range(now)
-        self.loadData(now)
+        self.showCurrWeek()
 
     def rowCount(self, parent):
         if parent.isValid():
@@ -69,6 +66,12 @@ class EventStorage(QAbstractTableModel):
             return 0
         else:
             return self.cols_count
+
+    def showCurrWeek(self):
+        now = datetime.now()
+        self.weekRange = self.date2range(now)
+        self.loadData(now)
+        return self.weekRange
 
     def showPrevWeek(self):
         current_monday, current_sunday = self.weekRange

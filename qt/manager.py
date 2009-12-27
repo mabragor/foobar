@@ -68,18 +68,22 @@ class MainWindow(QMainWindow):
         self.bpSunday = QLabel(self.scheduleModel.getSunday().strftime('%d/%m/%Y'))
         self.buttonPrev = QPushButton(_('<<'))
         self.buttonNext = QPushButton(_('>>'))
-        self.buttonWeek = QPushButton(_('Week'))
+        self.buttonToday = QPushButton(_('Today'))
 
+        # callback helper function
         def prev_week():
             week_range = self.scheduleModel.showPrevWeek()
             self.showWeekRange(week_range)
-
         def next_week():
             week_range = self.scheduleModel.showPrevWeek()
+            self.showWeekRange(week_range)
+        def today():
+            week_range = self.scheduleModel.showCurrWeek()
             self.showWeekRange(week_range)
 
         self.connect(self.buttonPrev, SIGNAL('clicked()'), prev_week)
         self.connect(self.buttonNext, SIGNAL('clicked()'), next_week)
+        self.connect(self.buttonToday, SIGNAL('clicked()'), today)
 
         bottomPanel = QHBoxLayout()
         bottomPanel.addWidget(QLabel(_('Week:')))
@@ -88,7 +92,7 @@ class MainWindow(QMainWindow):
         bottomPanel.addWidget(self.bpSunday)
         bottomPanel.addStretch(1)
         bottomPanel.addWidget(self.buttonPrev)
-        bottomPanel.addWidget(self.buttonWeek)
+        bottomPanel.addWidget(self.buttonToday)
         bottomPanel.addWidget(self.buttonNext)
 
         mainLayout = QVBoxLayout()
