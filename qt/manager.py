@@ -157,8 +157,8 @@ class MainWindow(QMainWindow):
 		    ]
 	     ),
 	    (_('Event'), [
-		    (_('Assign'), 'Ctrl+E',
-		     'eventAssign', _('Assign event.')),
+		    (_('Assign training'), 'Ctrl+E',
+		     'eventAssignTraining', _('Assign training.')),
                     ]
              ),
 	    (_('Calendar'), [
@@ -239,7 +239,7 @@ class MainWindow(QMainWindow):
     def clientOneVisit(self):
 	print 'one visit client'
 
-    def eventAssign(self):
+    def eventAssignTraining(self):
         def callback(e_date, e_time, room_tuple, course):
             print e_date, e_time, room_tuple[0], course
             print type(e_date), type(e_time)

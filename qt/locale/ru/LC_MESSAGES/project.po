@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-27 15:28+0300\n"
+"POT-Creation-Date: 2009-12-27 15:41+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Ruslan Popov <ruslan.popov@gmail.com>\n"
 "Language-Team: LANGUAGE <RU@li.org>\n"
@@ -114,7 +114,7 @@ msgstr "12 месяцев"
 msgid "Available courses"
 msgstr "Доступные курсы"
 
-#: dlg_course_assign.py:64 dlg_event_assign.py:59 manager.py:160
+#: dlg_course_assign.py:64 dlg_event_assign.py:59
 msgid "Assign"
 msgstr "Назначить"
 
@@ -391,9 +391,13 @@ msgstr "Одноразовый клиент."
 msgid "Event"
 msgstr "Событие"
 
+#: manager.py:160
+msgid "Assign training"
+msgstr "Назначить тренировку"
+
 #: manager.py:161
-msgid "Assign event."
-msgstr "Назначить событие."
+msgid "Assign training."
+msgstr "Назначить тренировку."
 
 #: manager.py:164
 msgid "Calendar"
