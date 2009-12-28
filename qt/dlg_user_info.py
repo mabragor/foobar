@@ -168,9 +168,6 @@ class DlgUserInfo(QDialog):
 
     def saveSettings(self, course_changes):
         assigned, cancelled, changed = course_changes
-        print assigned
-        print cancelled
-        print changed
         ajax = HttpAjax(self, '/manager/set_user_info/',
                         {
                 'user_id': self.user_id,

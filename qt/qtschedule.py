@@ -32,21 +32,6 @@ class QtSchedule(QTableView):
         self.work_hours = work_hours
         self.quant = quant
 
-#         # Тестовое заполнение модели
-#         min60 = timedelta(hours=1)
-#         min90 = timedelta(hours=1, minutes=30)
-#         min120 = timedelta(hours=2)
-
-#         test_data = [
-#             (101, Event(datetime(2009,11,2,12), min60, 'First')),
-#             (102, Event(datetime(2009,11,2,11), min90, 'Second')),
-#             (103, Event(datetime(2009,11,2,12), min60, 'Third')),
-#             (103, Event(datetime(2009,11,3,12), min60, 'Third')),
-#             (101, Event(datetime(2009,11,2,16), min120, 'Long')),
-#             ]
-#         for room_id, event in test_data:
-#             self.model.insert(room_id, event)
-
         # Запрещаем выделение множества ячеек
         self.setSelectionMode(QAbstractItemView.ExtendedSelection) #SingleSelection)
 
