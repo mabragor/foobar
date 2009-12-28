@@ -142,7 +142,7 @@ class DlgUserInfo(QDialog):
     def showAssignCourseDlg(self):
         dialog = DlgCourseAssign(self)
         dialog.setCallback(self.assignCourse)
-        dialog.setModel(self.parent.modelCoursesTree)
+        dialog.setModel(self.parent.tree)
         dialog.setModal(True)
         dlgStatus = dialog.exec_()
 

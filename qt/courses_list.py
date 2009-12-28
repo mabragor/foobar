@@ -72,7 +72,11 @@ class CourseListModel(QAbstractTableModel):
             card_type = i[index_card_type]
             index_bgn_date = obj.index('bgn_date')
             bgn_date = i[index_bgn_date]
-            assigned.append( (course_id, card_type, unicode(bgn_date)) )
+            index_exp_date = obj.index('exp_date')
+            exp_date = i[index_exp_date]
+            assigned.append( (course_id, card_type,
+                              unicode(bgn_date),
+                              unicode(exp_date)) )
         self.temporary_assigned = []
         return (assigned, cancelled, changed)
 

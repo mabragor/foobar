@@ -61,12 +61,13 @@ def set_user_info(request, form):
     # assigned courses
     assigned = data['course_assigned']
     if len(assigned) > 0:
-        for id, card_type, bgn_date in assigned:
+        for id, card_type, bgn_date, exp_date in assigned:
             bgn_date = date(*[int(i) for i in bgn_date.split('-')])
+            exp_date = date(*[int(i) for i in exp_date.split('-')])
             course = Course.objects.get(id=id)
             card = Card(course=course, client=user,type=card_type,
                         bgn_date=bgn_date,
-                        exp_date=bgn_date + timedelta(days=30),
+                        exp_date=exp_date,
                         count_sold=course.count,
                         price=course.price)
             card.save()
