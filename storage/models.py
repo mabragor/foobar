@@ -200,13 +200,16 @@ class Card(models.Model):
 
 class Schedule(models.Model):
     ACTION_STATUSES = (
+        ('0', _('Waiting')),
         ('1', _('Done')),
-        ('2', _('Cancel')),
+        ('2', _('Cancelled')),
     )
     room = models.ForeignKey(Room)
     course = models.ForeignKey(Course)
     begin = models.DateTimeField(verbose_name=_(u'Begins'))
+    # НЕ НУЖНО
     looking = models.BooleanField(verbose_name=_(u'Is looking for members?'), default=True)
+    # НЕ НУЖНО
     places = models.BooleanField(verbose_name=_(u'Are there free places?'), default=True)
     status = models.CharField(verbose_name=_(u'Status'), max_length=1, choices=ACTION_STATUSES, null=True)
     change = models.ForeignKey(Coach, null=True, blank=True)

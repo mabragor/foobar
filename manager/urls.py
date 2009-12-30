@@ -30,4 +30,5 @@ urlpatterns += patterns(
     url(r'^available_courses/$', 'available_courses'),
     url(r'^get_week/$', 'get_week'),
     url(r'^copy_week/$', 'copy_week'),
+    url(r'^cal_event_add/$', 'cal_event_add'),
     )

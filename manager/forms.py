@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django import forms
-from storage.models import Schedule, Card, Client
+from storage.models import Schedule, Card, Client, Course, Room
 from django.utils.translation import ugettext_lazy as _
 from datetime import timedelta, datetime, date
 
@@ -134,6 +134,29 @@ class CopyForm(forms.Form):
             ne.begin = e.begin+delta
             ne.save()
 
+
+
+
+
+class AjaxForm(forms.Form):
+    def get_errors(self):
+        from django.utils.encoding import force_unicode
+        return ''.join([force_unicode(v) for k, v in self.errors.items()])
+
+    def check_obj_existence(self, model, field_name):
+        value = self.cleaned_data[field_name]
+        try:
+            model.objects.get(id=value)
+        except model.DoesNotExist:
+            raise forms.ValidationError(_('Wrong ID of %s.') % unicode(model))
+        return value
+
+    def check_future(self,field_name):
+        value = self.cleaned_data[field_name]
+        if value <= datetime.now():
+            raise forms.ValidationError(_('Date has to be in the future.'))
+        return value
+
 class UserRFID(forms.Form):
     rfid_code = forms.CharField(max_length=8)
 
@@ -162,13 +185,32 @@ class DateRange(forms.Form):
     sunday = forms.DateField()
     filter = ListField(required=False)
 
-class CopyWeek(forms.Form):
+class CalendarEventAdd(AjaxForm):
+    course_id = forms.IntegerField()
+    room_id = forms.IntegerField()
+    begin = forms.DateTimeField()
+    ev_type = forms.IntegerField()
+
+    def clean_course_id(self):
+        return self.check_obj_existence(Course, 'course_id')
+
+    def clean_room_id(self):
+        return self.check_obj_existence(Room, 'room_id')
+
+    def clean_begin(self):
+        return self.check_future('begin')
+
+    def save(self):
+        c = self.cleaned_data
+        course = Course.objects.get(id=c['course_id'])
+        room = Room.objects.get(id=c['room_id'])
+        begin = c['begin']
+        ev_type = c['ev_type']
+        Schedule(course=course, room=room, begin=begin, status=0).save()
+
+class CopyWeek(AjaxForm):
     from_date = forms.DateField()
     to_date = forms.DateField()
-
-    def get_errors(self):
-        from django.utils.encoding import force_unicode
-        return ''.join([force_unicode(v) for k, v in self.errors.items()])
 
     def validate_date(self, date):
         if not date.weekday() ==  0:

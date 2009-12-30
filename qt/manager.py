@@ -138,7 +138,7 @@ class MainWindow(QMainWindow):
 	data. Создать обработчики для каждого действия. """
 	data = [
 	    (_('File'), [
-		    (_('Application settings'), 'Ctrl+T',
+		    (_('Application settings'), 'Ctrl+G',
 		     'setupApp', _('Manage the application settings.')),
                     (None, None, None, None),
 		    (_('Exit'), '',
@@ -148,7 +148,7 @@ class MainWindow(QMainWindow):
 	    (_('Client'), [
 		    (_('New'), 'Ctrl+N',
 		     'clientNew', _('Register new client.')),
-		    (_('Search by RFID'), 'Ctrl+R',
+		    (_('Search by RFID'), 'Ctrl+D',
 		     'clientSearchRFID', _('Search a client with its RFID card.')),
 		    (_('Search by name'), 'Ctrl+F',
 		     'clientSearchName', _('Search a client with its name.')),
@@ -157,8 +157,10 @@ class MainWindow(QMainWindow):
 		    ]
 	     ),
 	    (_('Event'), [
-		    (_('Assign training'), 'Ctrl+E',
-		     'eventAssignTraining', _('Assign training.')),
+		    (_('Training'), 'Ctrl+T',
+		     'eventTraining', _('Assign a training event.')),
+		    (_('Rent'), 'Ctrl+R',
+		     'eventRent', _('Assign a rent event.')),
                     ]
              ),
 	    (_('Calendar'), [
@@ -239,16 +241,29 @@ class MainWindow(QMainWindow):
     def clientOneVisit(self):
 	print 'one visit client'
 
-    def eventAssignTraining(self):
+    def eventTraining(self):
         def callback(e_date, e_time, room_tuple, course):
-            print e_date, e_time, room_tuple[0], course
-            print type(e_date), type(e_time)
             room, ok = room_tuple
-            title = course[0]
+            title, id, count, price, coaches, duration = course
             begin = datetime.combine(e_date, e_time)
-            duration = timedelta(minutes=int(course[5] * 60))
-            event = Event(begin, duration, title)
+            duration = timedelta(minutes=int(duration * 60))
+            event = Event(id, begin, duration, title)
             self.schedule.insertEvent(room, event)
+
+            ajax = HttpAjax(self, '/manager/cal_event_add/',
+                            {'course_id': id,
+                             'room_id': room - 100,
+                             'begin': begin,
+                             'ev_type': 0})
+            response = ajax.parse_json()
+            if response['code'] != 200:
+                return QMessageBox.warning(
+                    self,
+                    _('Warning'),
+                    '[%(code)s] %(desc)s' % response,
+                    QMessageBox.Ok, QMessageBox.Ok)
+                print 'AJAX eventTraining(): [%(code)s] %(desc)s' % response
+
 
 	self.dialog = DlgEventAssign(self)
 	self.dialog.setModal(True)
@@ -261,6 +276,9 @@ class MainWindow(QMainWindow):
             print 'accept'
         else:
             print 'reject'
+
+    def eventRent(self):
+        print 'rent action'
 
     def copyWeek(self):
         def callback(selected_date):

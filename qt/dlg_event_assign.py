@@ -31,7 +31,8 @@ class DlgEventAssign(QDialog):
         self.editTime = QTimeEdit()
         labelTime.setBuddy(self.editTime)
         current = QTime.currentTime()
-        self.editTime.setTime(current)
+        time = QTime(current.hour(), current.minute())
+        self.editTime.setTime(time)
 
         labelRoom = QLabel(_('Room'))
         self.comboRoom = QComboBox()

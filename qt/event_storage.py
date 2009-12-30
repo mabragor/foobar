@@ -19,7 +19,8 @@ class Event(object):
 
     """ Класс события. """
 
-    def __init__(self, dt, duration, course, *args, **kwargs):
+    def __init__(self, id, dt, duration, course, *args, **kwargs):
+        self.id = id
         self.dt = dt
         self.duration = duration
         self.course = course
@@ -108,7 +109,7 @@ class EventStorage(QAbstractTableModel):
                     end = __(e['end'])
                     duration = end - start
                     room = int(e['room']) + 100
-                    event = Event(start, duration, e['title'])
+                    event = Event(e['id'], start, duration, e['title'])
                     self.insert(room, event)
                 self.weekRange = week_range
                 self.emit(SIGNAL('layoutChanged()'))
