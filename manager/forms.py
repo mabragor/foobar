@@ -153,8 +153,14 @@ class AjaxForm(forms.Form):
 
     def check_future(self,field_name):
         value = self.cleaned_data[field_name]
-        if value <= datetime.now():
-            raise forms.ValidationError(_('Date has to be in the future.'))
+        if type(value) is date:
+            if value <= date.today():
+                raise forms.ValidationError(_('Date has to be in the future.'))
+        elif type(value) is datetime:
+            if value <= datetime.now():
+                raise forms.ValidationError(_('Date has to be in the future.'))
+        else:
+            raise forms.ValidationError(_('Unsupported type.'))
         return value
 
 class UserRFID(forms.Form):
@@ -180,10 +186,19 @@ class UserInfo(forms.Form):
     course_cancelled = ListField(required=False)
     course_changed = ListField(required=False)
 
-class DateRange(forms.Form):
+class DateRange(AjaxForm):
     monday = forms.DateField()
-    sunday = forms.DateField()
     filter = ListField(required=False)
+
+    def query(self):
+        filter = self.cleaned_data['filter']
+        monday = self.cleaned_data['monday']
+        limit = monday + timedelta(days=7)
+        schedules = Schedule.objects.filter(begin__range=(monday, limit))
+        if len(filter) > 0:
+            schedules = schedules.filter(room__in=c['filter'])
+        events = [item.get_calendar_obj() for item in schedules]
+        return events
 
 class CalendarEventAdd(AjaxForm):
     course_id = forms.IntegerField()

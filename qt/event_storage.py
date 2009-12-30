@@ -93,7 +93,6 @@ class EventStorage(QAbstractTableModel):
         monday, sunday = week_range = self.date2range(d)
 	ajax = HttpAjax(self, '/manager/get_week/',
                         {'monday': monday,
-                         'sunday': sunday,
                          'filter': []})
 	if ajax:
 	    response = ajax.parse_json()

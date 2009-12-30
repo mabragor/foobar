@@ -75,14 +75,19 @@ def set_user_info(request, form):
 
     return {'code': 200, 'desc': 'Ok'}
 
+def abstract_request(request, form):
+    if form.is_valid():
+        result = form.query()
+    else:
+        return {'code': 404, 'desc': 'Form is not valid',
+                'errors': form.get_errors()}
+    return ({'code': 200, 'desc': 'Ok'}, result)
+
 @ajax_processor(DateRange, isJavaScript)
 def get_week(request, form):
-    c = form.cleaned_data
-    schedules = Schedule.objects.filter(begin__range=(c['monday'], c['sunday']))
-    if len(c['filter']) > 0:
-        schedules = schedules.filter(room__in=c['filter'])
-    events = [item.get_calendar_obj() for item in schedules]
-    return {'code': 200, 'desc': 'Ok', 'events': events}
+    response, events = abstract_request(request, form)
+    response.update( {'events': events} )
+    return response
 
 def abstract_response(request, form):
     if form.is_valid():
