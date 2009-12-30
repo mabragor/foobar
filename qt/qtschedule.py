@@ -50,6 +50,10 @@ class QtSchedule(QTableView):
         self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
 
+        self.setGridStyle(Qt.DotLine)
+        self.resizeColumnsToContents()
+        self.verticalHeader().setStretchLastSection(True)
+
         # Назначаем делегата для ячеек
         delegate = QtScheduleDelegate(self)
         self.setItemDelegate(delegate)
