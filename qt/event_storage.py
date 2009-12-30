@@ -10,6 +10,7 @@ gettext.textdomain('project')
 _ = lambda a: unicode(gettext.gettext(a), 'utf8')
 __ = lambda x: datetime(*time.strptime(str(x), '%Y-%m-%d %H:%M:%S')[:6])
 
+from settings import userRoles
 from http_ajax import HttpAjax
 
 from PyQt4.QtGui import *
@@ -137,7 +138,7 @@ class EventStorage(QAbstractTableModel):
         """ Перегруженный метод базового класса. Под ролью понимаем зал. """
         if not index.isValid():
             return QVariant()
-        if role not in (Qt.DisplayRole, Qt.ToolTipRole) :
+        if role not in (Qt.DisplayRole, Qt.ToolTipRole):
             return QVariant()
         event = self.get_event_by_cell(index.row(), index.column(), room_id)
         if event:

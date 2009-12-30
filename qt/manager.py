@@ -21,6 +21,7 @@ from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_searching import DlgSearchByName
 from dlg_user_info import DlgUserInfo
 from dlg_event_assign import DlgEventAssign
+from dlg_event_info import DlgEventInfo
 from dlg_copy_week import DlgCopyWeek
 
 from PyQt4.QtGui import *
@@ -315,6 +316,15 @@ class MainWindow(QMainWindow):
 	json_like = ajax.parse_json()
 	print 'USER INFO:', json_like
 	return json_like
+
+    def showEventProperties(self, event_id):
+        def callback():
+            print 'showEventProperties callback'
+	self.dialog = DlgEventInfo(self)
+	self.dialog.setModal(True)
+        self.dialog.setCallback(callback)
+        self.dialog.initData(event_id, self.rooms)
+	self.dialog.exec_()
 
     # Drag'n'Drop section begins
     def mousePressEvent(self, event):

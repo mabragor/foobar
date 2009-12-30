@@ -21,6 +21,7 @@ class QtSchedule(QTableView):
     def __init__(self, work_hours, quant, rooms, parent=None):
         QTableView.__init__(self, parent)
 
+        self.parent = parent
         self.events = {}
         self.cells = {}
         self.rooms = rooms
@@ -169,6 +170,25 @@ class QtSchedule(QTableView):
             res = drag.start(Qt.CopyAction|Qt.MoveAction)
             print 'QtSchedule::mousePressEvent', drop_action[res]
 
+    def mouseDoubleClickEvent(self, event):
+        index = self.indexAt(event.pos())
+        row = index.row()
+        col = index.column()
+        x = event.x() - self.scrolledCellX
+        y = event.y() - self.scrolledCellY
+        w = self.columnWidth(col)
+        cx, cy = self.get_scrolled_coords(self.columnViewportPosition(col),
+                                          self.rowViewportPosition(row))
+        event_index = (x - cx) / (w / len(self.rooms))
+        room_name, room_color, room_id = self.rooms[event_index]
+        model = self.model()
+        variant = model.data(model.index(row, col), Qt.DisplayRole, room_id)
+        if not variant.isValid():
+            return
+        cal_event = variant.toPyObject()
+        self.parent.showEventProperties(cal_event.id)
+        event.accept()
+
     def mouseMoveEvent(self, event):
         print 'QtSchedule::mouseMoveEvent'
 
@@ -235,7 +255,7 @@ class QtSchedule(QTableView):
             col = index.column()
             x = help.x() - self.scrolledCellX
             y = help.y() - self.scrolledCellY
-            w = self.columnWidth(index.column())
+            w = self.columnWidth(col)
             cx, cy = self.get_scrolled_coords(self.columnViewportPosition(col),
                                               self.rowViewportPosition(row))
             event_index = (x - cx) / (w / len(self.rooms))

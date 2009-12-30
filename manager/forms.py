@@ -163,6 +163,15 @@ class AjaxForm(forms.Form):
             raise forms.ValidationError(_('Unsupported type.'))
         return value
 
+class OnlyID(AjaxForm):
+    id = forms.IntegerField()
+
+    def query(self):
+        id = self.cleaned_data['id']
+        event = Schedule.objects.get(id=id)
+        info = event.get_calendar_obj()
+        return info
+
 class UserRFID(forms.Form):
     rfid_code = forms.CharField(max_length=8)
 

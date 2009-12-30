@@ -233,6 +233,7 @@ class Schedule(models.Model):
             'room': self.room.pk,
             'color': self.room.color,
             'course': self.course.pk,
+            'coach': ' '.join([unicode(item) for item in self.course.coach.all()]),
             'room_name': self.room.__unicode__(),
             'title': self.course.__unicode__()
         }

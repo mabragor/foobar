@@ -28,6 +28,7 @@ urlpatterns += patterns(
     url(r'^get_users_info_by_name/$', 'get_users_info_by_name'),
     url(r'^set_user_info/$', 'set_user_info'),
     url(r'^available_courses/$', 'available_courses'),
+    url(r'^get_course_info/$', 'get_course_info'),
     url(r'^get_week/$', 'get_week'),
     url(r'^copy_week/$', 'copy_week'),
     url(r'^cal_event_add/$', 'cal_event_add'),

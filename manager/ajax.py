@@ -11,7 +11,7 @@ from datetime import datetime, date, timedelta
 from lib import str2date
 from lib.decorators import ajax_processor, render_to
 
-from forms import UserRFID, UserName, UserInfo, DateRange, \
+from forms import OnlyID, UserRFID, UserName, UserInfo, DateRange, \
     CopyWeek, CalendarEventAdd
 
 from storage.models import Client, Card, Course, Group, Schedule
@@ -82,6 +82,12 @@ def abstract_request(request, form):
         return {'code': 404, 'desc': 'Form is not valid',
                 'errors': form.get_errors()}
     return ({'code': 200, 'desc': 'Ok'}, result)
+
+@ajax_processor(OnlyID, isJavaScript)
+def get_course_info(request, form):
+    response, result = abstract_request(request, form)
+    response.update( {'info': result} )
+    return response
 
 @ajax_processor(DateRange, isJavaScript)
 def get_week(request, form):
