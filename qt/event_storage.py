@@ -35,6 +35,7 @@ class EventStorage(QAbstractTableModel):
                  room_list=tuple(), parent=None):
         QAbstractTableModel.__init__(self, parent)
 
+        self.parent = parent
         self.work_hours = work_hours
         self.quant = quant
         self.rooms = room_list
@@ -90,17 +91,20 @@ class EventStorage(QAbstractTableModel):
 
     def loadData(self, d):
         self.initModel()
+        self.parent.statusBar().showMessage(_('Request information for the calendar.'))
         monday, sunday = week_range = self.date2range(d)
 	ajax = HttpAjax(self, '/manager/get_week/',
                         {'monday': monday,
                          'filter': []})
 	if ajax:
+            self.parent.statusBar().showMessage(_('Parsing the response...'))
 	    response = ajax.parse_json()
             if 'code' in response:
                 print 'AJAX result: [%(code)s] %(desc)s' % response
             else:
                 print _('Check response format!')
             if response['code'] == 200:
+                self.parent.statusBar().showMessage(_('Filling the calendar...'))
                 #print 'EventStorage::loadData\n', response['events']
                 #{id, course, title, room, color, room_name, start, end}
                 for e in response['events']:
@@ -112,6 +116,7 @@ class EventStorage(QAbstractTableModel):
                     self.insert(room, event)
                 self.weekRange = week_range
                 self.emit(SIGNAL('layoutChanged()'))
+                self.parent.statusBar().showMessage(_('Done'), 2000)
                 return True
 	return False
 

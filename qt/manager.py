@@ -39,8 +39,9 @@ class MainWindow(QMainWindow):
 		      }
 
 	self.setWindowTitle(_('Manager\'s interface'))
-	self.statusBar().showMessage(_('Ready'))
+	self.statusBar().showMessage(_('Ready'), 2000)
 	self.resize(640, 480)
+        # start here event loading thread
 
     def prepareFilter(self, id, title):
         def handler():
