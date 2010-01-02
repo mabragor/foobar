@@ -186,7 +186,7 @@ class QtSchedule(QTableView):
         if not variant.isValid():
             return
         cal_event = variant.toPyObject()
-        self.parent.showEventProperties(cal_event.id)
+        self.parent.showEventProperties(cal_event, room_id)
         event.accept()
 
     def mouseMoveEvent(self, event):

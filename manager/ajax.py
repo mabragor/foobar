@@ -11,8 +11,8 @@ from datetime import datetime, date, timedelta
 from lib import str2date
 from lib.decorators import ajax_processor, render_to
 
-from forms import OnlyID, UserRFID, UserName, UserInfo, DateRange, \
-    CopyWeek, CalendarEventAdd
+from forms import UserRFID, UserName, UserInfo, DateRange, \
+    CopyWeek, GetScheduleInfo, CalendarEventAdd, CalendarEventDel
 
 from storage.models import Client, Card, Course, Group, Schedule
 
@@ -83,7 +83,23 @@ def abstract_request(request, form):
                 'errors': form.get_errors()}
     return ({'code': 200, 'desc': 'Ok'}, result)
 
-@ajax_processor(OnlyID, isJavaScript)
+def abstract_response(request, form):
+    if form.is_valid():
+        id = form.save()
+    else:
+        return {'code': 404, 'desc': 'Form is not valid',
+                'errors': form.get_errors()}
+    return {'code': 200, 'desc': 'Ok', 'saved_id': id}
+
+def abstract_remove(request, form):
+    if form.is_valid():
+        form.remove()
+    else:
+        return {'code': 404, 'desc': 'Form is not valid',
+                'errors': form.get_errors()}
+    return {'code': 200, 'desc': 'Ok'}
+
+@ajax_processor(GetScheduleInfo, isJavaScript)
 def get_course_info(request, form):
     response, result = abstract_request(request, form)
     response.update( {'info': result} )
@@ -95,14 +111,6 @@ def get_week(request, form):
     response.update( {'events': events} )
     return response
 
-def abstract_response(request, form):
-    if form.is_valid():
-        form.save()
-    else:
-        return {'code': 404, 'desc': 'Form is not valid',
-                'errors': form.get_errors()}
-    return {'code': 200, 'desc': 'Ok'}
-
 @ajax_processor(CopyWeek, isJavaScript)
 def copy_week(request, form):
     return abstract_response(request, form)
@@ -110,4 +118,8 @@ def copy_week(request, form):
 @ajax_processor(CalendarEventAdd, isJavaScript)
 def cal_event_add(request, form):
     return abstract_response(request, form)
+
+@ajax_processor(CalendarEventDel, isJavaScript)
+def cal_event_del(request, form):
+    return abstract_remove(request, form)
 

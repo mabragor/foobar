@@ -163,8 +163,11 @@ class AjaxForm(forms.Form):
             raise forms.ValidationError(_('Unsupported type.'))
         return value
 
-class OnlyID(AjaxForm):
+class GetScheduleInfo(AjaxForm):
     id = forms.IntegerField()
+
+    def clean_id(self):
+        return self.check_obj_existence(Schedule, 'id')
 
     def query(self):
         id = self.cleaned_data['id']
@@ -230,7 +233,19 @@ class CalendarEventAdd(AjaxForm):
         room = Room.objects.get(id=c['room_id'])
         begin = c['begin']
         ev_type = c['ev_type']
-        Schedule(course=course, room=room, begin=begin, status=0).save()
+        event = Schedule(course=course, room=room, begin=begin, status=0)
+        event.save()
+        return event.id
+
+class CalendarEventDel(AjaxForm):
+    id = forms.IntegerField()
+
+    def clean_id(self):
+        return self.check_obj_existence(Schedule, 'id')
+
+    def remove(self):
+        c = self.cleaned_data
+        Schedule.objects.get(id=c['id']).delete()
 
 class CopyWeek(AjaxForm):
     from_date = forms.DateField()

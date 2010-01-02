@@ -20,8 +20,9 @@ class Event(object):
 
     """ Класс события. """
 
-    def __init__(self, id, dt, duration, course, *args, **kwargs):
+    def __init__(self, id, course_id, dt, duration, course, *args, **kwargs):
         self.id = id
+        self.course_id = course_id
         self.dt = dt
         self.duration = duration
         self.course = course
@@ -113,7 +114,7 @@ class EventStorage(QAbstractTableModel):
                     end = __(e['end'])
                     duration = end - start
                     room = int(e['room']) + 100
-                    event = Event(e['id'], start, duration, e['title'])
+                    event = Event(e['id'], e['course'], start, duration, e['title'])
                     self.insert(room, event)
                 self.weekRange = week_range
                 self.emit(SIGNAL('layoutChanged()'))
@@ -225,8 +226,9 @@ class EventStorage(QAbstractTableModel):
         cell_list = self.get_cells_by_event(event, room)
         if cell_list:
             for row, col in cell_list:
-                del( rc2e[ (row, col, room) ] )
-            del( e2rc[ (event, room) ] )
+                del( self.rc2e[ (row, col, room) ] )
+            del( self.e2rc[ (event, room) ] )
+            self.emit(SIGNAL('layoutChanged()'))
 
     def move(self, row, col, room, event):
         """ Метод перемещения события по координатной сетке. """

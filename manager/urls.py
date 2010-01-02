@@ -32,4 +32,5 @@ urlpatterns += patterns(
     url(r'^get_week/$', 'get_week'),
     url(r'^copy_week/$', 'copy_week'),
     url(r'^cal_event_add/$', 'cal_event_add'),
+    url(r'^cal_event_del/$', 'cal_event_del'),
     )

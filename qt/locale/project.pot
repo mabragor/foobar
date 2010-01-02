@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-30 11:56+0300\n"
+"POT-Creation-Date: 2010-01-02 18:38+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: courses_list.py:27
+#: courses_list.py:27 dlg_event_info.py:27
 msgid "Title"
 msgstr ""
 
@@ -40,7 +40,7 @@ msgstr ""
 msgid "Assigned"
 msgstr ""
 
-#: courses_list.py:30
+#: courses_list.py:30 dlg_event_info.py:37
 msgid "Begin"
 msgstr ""
 
@@ -130,7 +130,7 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: dlg_event_assign.py:37
+#: dlg_event_assign.py:37 dlg_event_info.py:47
 msgid "Room"
 msgstr ""
 
@@ -138,7 +138,7 @@ msgstr ""
 msgid "Assign the event"
 msgstr ""
 
-#: dlg_event_assign.py:103 manager.py:262 manager.py:297
+#: dlg_event_assign.py:103 dlg_event_info.py:108 manager.py:262 manager.py:300
 msgid "Warning"
 msgstr ""
 
@@ -148,6 +148,42 @@ msgstr ""
 
 #: dlg_event_assign.py:105
 msgid "Choose the course on the course's tree."
+msgstr ""
+
+#: dlg_event_info.py:32
+msgid "Coach"
+msgstr ""
+
+#: dlg_event_info.py:42
+msgid "Duration"
+msgstr ""
+
+#: dlg_event_info.py:67
+msgid "Visit"
+msgstr ""
+
+#: dlg_event_info.py:68
+msgid "Remove"
+msgstr ""
+
+#: dlg_event_info.py:69
+msgid "Close"
+msgstr ""
+
+#: dlg_event_info.py:82
+msgid "Register the visit"
+msgstr ""
+
+#: dlg_event_info.py:134
+msgid "Event remove"
+msgstr ""
+
+#: dlg_event_info.py:135
+msgid "Are you sure to remove this event from the calendar?"
+msgstr ""
+
+#: dlg_event_info.py:151 event_storage.py:107
+msgid "Check response format!"
 msgstr ""
 
 #: dlg_searching.py:21
@@ -266,160 +302,172 @@ msgstr ""
 msgid "RFID reader"
 msgstr ""
 
-#: event_storage.py:45
+#: event_storage.py:48
 msgid "Monday"
 msgstr ""
 
-#: event_storage.py:45
+#: event_storage.py:48
 msgid "Tuesday"
 msgstr ""
 
-#: event_storage.py:46
+#: event_storage.py:49
 msgid "Wednesday"
 msgstr ""
 
-#: event_storage.py:46
+#: event_storage.py:49
 msgid "Thursday"
 msgstr ""
 
-#: event_storage.py:47
+#: event_storage.py:50
 msgid "Friday"
 msgstr ""
 
-#: event_storage.py:47
+#: event_storage.py:50
 msgid "Saturday"
 msgstr ""
 
-#: event_storage.py:48
+#: event_storage.py:51
 msgid "Sunday"
 msgstr ""
 
-#: event_storage.py:103
-msgid "Check response format!"
+#: event_storage.py:96
+msgid "Request information for the calendar."
+msgstr ""
+
+#: event_storage.py:102
+msgid "Parsing the response..."
+msgstr ""
+
+#: event_storage.py:109
+msgid "Filling the calendar..."
+msgstr ""
+
+#: event_storage.py:121
+msgid "Done"
 msgstr ""
 
 #: http_ajax.py:50
 msgid "HTTP Error"
 msgstr ""
 
-#: manager.py:41
+#: manager.py:42
 msgid "Manager's interface"
 msgstr ""
 
-#: manager.py:42
+#: manager.py:43
 msgid "Ready"
 msgstr ""
 
-#: manager.py:47
+#: manager.py:49
 #, python-format
 msgid "Filter: Room \"%s\" is changed its state"
 msgstr ""
 
-#: manager.py:70
+#: manager.py:72
 msgid "<<"
 msgstr ""
 
-#: manager.py:71
+#: manager.py:73
 msgid ">>"
 msgstr ""
 
-#: manager.py:72
+#: manager.py:74
 msgid "Today"
 msgstr ""
 
-#: manager.py:90
+#: manager.py:92
 msgid "Week:"
 msgstr ""
 
-#: manager.py:140
+#: manager.py:142
 msgid "File"
 msgstr ""
 
-#: manager.py:141
+#: manager.py:143
 msgid "Application settings"
 msgstr ""
 
-#: manager.py:142
+#: manager.py:144
 msgid "Manage the application settings."
 msgstr ""
 
-#: manager.py:144
+#: manager.py:146
 msgid "Exit"
 msgstr ""
 
-#: manager.py:145
+#: manager.py:147
 msgid "Close the application."
 msgstr ""
 
-#: manager.py:148
+#: manager.py:150
 msgid "Client"
 msgstr ""
 
-#: manager.py:149
+#: manager.py:151
 msgid "New"
 msgstr ""
 
-#: manager.py:150
+#: manager.py:152
 msgid "Register new client."
 msgstr ""
 
-#: manager.py:151
+#: manager.py:153
 msgid "Search by RFID"
 msgstr ""
 
-#: manager.py:152
+#: manager.py:154
 msgid "Search a client with its RFID card."
 msgstr ""
 
-#: manager.py:153
+#: manager.py:155
 msgid "Search by name"
 msgstr ""
 
-#: manager.py:154
+#: manager.py:156
 msgid "Search a client with its name."
 msgstr ""
 
-#: manager.py:155
+#: manager.py:157
 msgid "One visit"
 msgstr ""
 
-#: manager.py:156
+#: manager.py:158
 msgid "One visit client."
 msgstr ""
 
-#: manager.py:159
+#: manager.py:161
 msgid "Event"
 msgstr ""
 
-#: manager.py:160
+#: manager.py:162
 msgid "Training"
 msgstr ""
 
-#: manager.py:161
+#: manager.py:163
 msgid "Assign a training event."
 msgstr ""
 
-#: manager.py:162
+#: manager.py:164
 msgid "Rent"
 msgstr ""
 
-#: manager.py:163
+#: manager.py:165
 msgid "Assign a rent event."
 msgstr ""
 
-#: manager.py:166
+#: manager.py:168
 msgid "Calendar"
 msgstr ""
 
-#: manager.py:167
+#: manager.py:169
 msgid "Copy week"
 msgstr ""
 
-#: manager.py:168
+#: manager.py:170
 msgid "Copy current week into other."
 msgstr ""
 
-#: manager.py:293
+#: manager.py:296
 msgid "The week has been copied sucessfully."
 msgstr ""
 

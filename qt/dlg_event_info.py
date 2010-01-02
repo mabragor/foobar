@@ -65,10 +65,12 @@ class DlgEventInfo(QDialog):
         groupLayout.addWidget(self.comboRoom, 4, 1)
 
         self.buttonVisit = QPushButton(_('Visit'))
+        self.buttonRemove = QPushButton(_('Remove'))
         self.buttonClose = QPushButton(_('Close'))
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(self.buttonVisit)
+        buttonLayout.addWidget(self.buttonRemove)
         buttonLayout.addStretch(1)
         buttonLayout.addWidget(self.buttonClose)
 
@@ -89,12 +91,15 @@ class DlgEventInfo(QDialog):
     def setSignals(self):
         self.connect(self.buttonVisit, SIGNAL('clicked()'),
                      self.visitEvent)
+        self.connect(self.buttonRemove, SIGNAL('clicked()'),
+                     self.eventRemove)
         self.connect(self.buttonClose, SIGNAL('clicked()'),
                      self, SLOT('reject()'))
 
-    def initData(self, event_id, rooms):
+    def initData(self, calendar_event, room_id, rooms):
         ajax = HttpAjax(self, '/manager/get_course_info/',
-                        {'id': event_id})
+                        {'id': calendar_event.id})
+        self.calendar_event = calendar_event
         response = ajax.parse_json()
         if response['code'] != 200:
             return QMessageBox.warning(
@@ -102,7 +107,7 @@ class DlgEventInfo(QDialog):
                 _('Warning'),
                 '[%(code)s] %(desc)s' % response,
                 QMessageBox.Ok, QMessageBox.Ok)
-        info = response['info']
+        self.event_info = info = response['info']
         self.editTitle.setText(info['title'])
         self.editCoach.setText(info['coach'])
         start = __(info['start'])
@@ -123,19 +128,24 @@ class DlgEventInfo(QDialog):
     def visitEvent(self):
         print 'registered'
 
-    def applyDialog(self):
-        e_date = self.editDate.date().toPyDate()
-        e_time = self.editTime.time().toPyTime()
-        index = self.comboRoom.currentIndex()
-        room = self.comboRoom.itemData(index).toInt()
-        index = self.tree.currentIndex()
-        course = index.data(userRoles['getObjectID']).toPyObject()
-        if type(course) is not list:
-            return QMessageBox.warning(
-                self,
-                _('Warning'),
-                '\n'.join([_('What course do you want to assign?'),
-                           _('Choose the course on the course\'s tree.')]),
-                QMessageBox.Ok, QMessageBox.Ok)
-        self.callback(e_date, e_time, room, course)
-        self.accept()
+    def eventRemove(self):
+        reply = QMessageBox.question(
+            self, _('Event remove'),
+            _('Are you sure to remove this event from the calendar?'),
+            QMessageBox.Yes, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            ajax = HttpAjax(self, '/manager/cal_event_del/',
+                            {'id': self.event_info['id']})
+            if ajax:
+                response = ajax.parse_json()
+                if 'code' in response:
+                    if response['code'] == 200:
+                        index = self.comboRoom.currentIndex()
+                        room_id, ok = self.comboRoom.itemData(index).toInt()
+                        model = self.parent.scheduleModel
+                        model.remove(self.calendar_event, room_id)
+                        self.reject()
+                else:
+                    print _('Check response format!')
+        else:
+            print 'just a joke'

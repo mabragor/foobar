@@ -246,14 +246,12 @@ class MainWindow(QMainWindow):
     def eventTraining(self):
         def callback(e_date, e_time, room_tuple, course):
             room, ok = room_tuple
-            title, id, count, price, coaches, duration = course
+            title, course_id, count, price, coaches, duration = course
             begin = datetime.combine(e_date, e_time)
             duration = timedelta(minutes=int(duration * 60))
-            event = Event(id, begin, duration, title)
-            self.schedule.insertEvent(room, event)
 
             ajax = HttpAjax(self, '/manager/cal_event_add/',
-                            {'course_id': id,
+                            {'course_id': course_id,
                              'room_id': room - 100,
                              'begin': begin,
                              'ev_type': 0})
@@ -264,7 +262,10 @@ class MainWindow(QMainWindow):
                     _('Warning'),
                     '[%(code)s] %(desc)s' % response,
                     QMessageBox.Ok, QMessageBox.Ok)
-                print 'AJAX eventTraining(): [%(code)s] %(desc)s' % response
+
+            id = int(response['saved_id'])
+            event = Event(id, course_id, begin, duration, title)
+            self.schedule.insertEvent(room, event)
 
 
 	self.dialog = DlgEventAssign(self)
@@ -317,13 +318,10 @@ class MainWindow(QMainWindow):
 	print 'USER INFO:', json_like
 	return json_like
 
-    def showEventProperties(self, event_id):
-        def callback():
-            print 'showEventProperties callback'
+    def showEventProperties(self, calendar_event, room_id):
 	self.dialog = DlgEventInfo(self)
 	self.dialog.setModal(True)
-        self.dialog.setCallback(callback)
-        self.dialog.initData(event_id, self.rooms)
+        self.dialog.initData(calendar_event, room_id, self.rooms)
 	self.dialog.exec_()
 
     # Drag'n'Drop section begins
