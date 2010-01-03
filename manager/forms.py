@@ -4,7 +4,7 @@
 
 from django import forms
 from storage import models as storage
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 from datetime import timedelta, datetime, date
 
 class StatusForm(forms.ModelForm):
@@ -178,6 +178,14 @@ class RegisterVisit(AjaxForm):
 
     def clean_event_id(self):
         return self.check_obj_existence(storage.Schedule, 'event_id')
+
+    def clean(self):
+        c = self.cleaned_data
+        client = storage.Client.objects.get(rfid_code=c['rfid_code'])
+        event = storage.Schedule.objects.get(id=c['event_id'])
+        if storage.Visit.objects.filter(client=client, schedule=event).count() > 0:
+            raise forms.ValidationError(_('The client is already registered on this event.'))
+        return self.cleaned_data
 
     def save(self):
         c = self.cleaned_data

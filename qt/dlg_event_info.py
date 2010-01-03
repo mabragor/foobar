@@ -147,10 +147,15 @@ class DlgEventInfo(QDialog):
 	    response = ajax.parse_json()
             if 'code' in response:
                 if response['code'] == 200:
-                    reply = QMessageBox.question(
+                    reply = QMessageBox.information(
                         self, _('Client registration'),
                         _('The client is registered on this event.'))
                     self.reject()
+                else:
+                    QMessageBox.warning(self, _('Warning'),
+                                        response['desc'],
+                                        QMessageBox.Ok,
+                                        QMessageBox.Ok)
             else:
                 print _('Check response format!')
 	else:

@@ -291,4 +291,5 @@ class Visit(models.Model):
     class Meta:
         verbose_name = _(u'Visit')
         verbose_name_plural = _(u'Visits')
+        unique_together = ('client', 'schedule')
 

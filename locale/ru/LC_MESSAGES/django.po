@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-27 15:30+0300\n"
+"POT-Creation-Date: 2010-01-04 01:24+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,15 +53,32 @@ msgstr "Используйте метод POST"
 msgid "Please, do not break our code :)"
 msgstr "Пожалуйста, не ломайте нас :)"
 
-#: manager/forms.py:175
+#: manager/forms.py:161
+#, python-format
+msgid "Wrong ID of %s."
+msgstr "Неверный идентификатор для %s."
+
+#: manager/forms.py:168 manager/forms.py:171
+msgid "Date has to be in the future."
+msgstr "Дата должна быть в будущем."
+
+#: manager/forms.py:173
+msgid "Unsupported type."
+msgstr "Неподдерживаемый тип."
+
+#: manager/forms.py:193
+msgid "The client is already registered on this event."
+msgstr "Клиент уже зарегистрирован на это событие."
+
+#: manager/forms.py:297
 msgid "Date must be Monday."
 msgstr "Дата должна быть понедельником"
 
-#: manager/forms.py:184
+#: manager/forms.py:306
 msgid "It is impossible to copy events to the past."
 msgstr "Нельзя копировать события в прошлое."
 
-#: manager/forms.py:193
+#: manager/forms.py:315
 msgid "It is impossible to copy the week into itself."
 msgstr "Нельзя копировать неделю в саму себя."
 
@@ -71,7 +88,7 @@ msgstr "Неверный метод запроса."
 
 #: patcher/models.py:8
 msgid "Name of patch"
-msgstr ""
+msgstr "Имя патча"
 
 #: patcher/models.py:9
 msgid "Applied"
@@ -79,22 +96,22 @@ msgstr "Назначено"
 
 #: patcher/models.py:12
 msgid "Patch"
-msgstr ""
+msgstr "Патч"
 
 #: patcher/models.py:13
 msgid "Patches"
-msgstr ""
+msgstr "Патчи"
 
-#: qt/courses_list.py:27 storage/models.py:44 storage/models.py:73
-#: storage/models.py:102
+#: qt/courses_list.py:27 qt/dlg_event_info.py:29 storage/models.py:46
+#: storage/models.py:75 storage/models.py:104
 msgid "Title"
 msgstr "Заголовок"
 
-#: qt/courses_list.py:27 storage/models.py:105 storage/models.py:159
+#: qt/courses_list.py:27 storage/models.py:107 storage/models.py:161
 msgid "Price"
 msgstr "Цена"
 
-#: qt/courses_list.py:28 storage/models.py:164 storage/models.py:165
+#: qt/courses_list.py:28 storage/models.py:166 storage/models.py:167
 msgid "Card"
 msgstr "Карта"
 
@@ -110,31 +127,31 @@ msgstr ""
 msgid "Assigned"
 msgstr ""
 
-#: qt/courses_list.py:30 storage/models.py:154
+#: qt/courses_list.py:30 qt/dlg_event_info.py:39 storage/models.py:156
 msgid "Begin"
 msgstr ""
 
-#: qt/courses_list.py:31 storage/models.py:155
+#: qt/courses_list.py:31 storage/models.py:157
 msgid "Expired"
 msgstr "Окончено"
 
-#: qt/courses_list.py:31 storage/models.py:156
+#: qt/courses_list.py:31 storage/models.py:158 storage/models.py:207
 msgid "Cancelled"
 msgstr ""
 
-#: qt/courses_list.py:119 qt/dlg_course_assign.py:26
+#: qt/courses_list.py:123 qt/dlg_course_assign.py:26
 msgid "Normal"
 msgstr ""
 
-#: qt/courses_list.py:119 qt/dlg_course_assign.py:27
+#: qt/courses_list.py:123 qt/dlg_course_assign.py:27
 msgid "Club"
 msgstr ""
 
-#: qt/courses_list.py:258
+#: qt/courses_list.py:262
 msgid "Cancel course"
 msgstr ""
 
-#: qt/courses_list.py:259
+#: qt/courses_list.py:263
 msgid "Cancel current course."
 msgstr ""
 
@@ -142,9 +159,9 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
-#: qt/dlg_copy_week.py:27 qt/dlg_course_assign.py:65 qt/dlg_event_assign.py:60
+#: qt/dlg_copy_week.py:27 qt/dlg_course_assign.py:65 qt/dlg_event_assign.py:61
 #: qt/dlg_searching.py:30 qt/dlg_settings.py:26 qt/dlg_user_info.py:77
-#: qt/dlg_waiting_rfid.py:30 storage/models.py:204
+#: qt/dlg_waiting_rfid.py:30
 msgid "Cancel"
 msgstr "Отмена"
 
@@ -180,11 +197,11 @@ msgstr ""
 msgid "12 months"
 msgstr ""
 
-#: qt/dlg_course_assign.py:61 qt/dlg_event_assign.py:56
+#: qt/dlg_course_assign.py:61 qt/dlg_event_assign.py:57
 msgid "Available courses"
 msgstr ""
 
-#: qt/dlg_course_assign.py:64 qt/dlg_event_assign.py:59 qt/manager.py:160
+#: qt/dlg_course_assign.py:64 qt/dlg_event_assign.py:60
 msgid "Assign"
 msgstr ""
 
@@ -200,24 +217,78 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: qt/dlg_event_assign.py:36 storage/models.py:48
+#: qt/dlg_event_assign.py:37 qt/dlg_event_info.py:49 storage/models.py:50
 msgid "Room"
 msgstr "Зал"
 
-#: qt/dlg_event_assign.py:73
+#: qt/dlg_event_assign.py:74
 msgid "Assign the event"
 msgstr ""
 
-#: qt/dlg_event_assign.py:102 qt/manager.py:279
+#: qt/dlg_event_assign.py:103 qt/dlg_event_info.py:113
+#: qt/dlg_event_info.py:155 qt/manager.py:262 qt/manager.py:300
 msgid "Warning"
 msgstr ""
 
-#: qt/dlg_event_assign.py:103
+#: qt/dlg_event_assign.py:104
 msgid "What course do you want to assign?"
 msgstr ""
 
-#: qt/dlg_event_assign.py:104
+#: qt/dlg_event_assign.py:105
 msgid "Choose the course on the course's tree."
+msgstr ""
+
+#: qt/dlg_event_info.py:34 storage/models.py:26
+msgid "Coach"
+msgstr "Тренер"
+
+#: qt/dlg_event_info.py:44
+#, fuzzy
+msgid "Duration"
+msgstr "Взаимосвязь"
+
+#: qt/dlg_event_info.py:69 qt/dlg_show_visitors.py:32
+#: templates/statistic/courses.html:62
+msgid "Visitors"
+msgstr "Посетители"
+
+#: qt/dlg_event_info.py:70 storage/models.py:292
+#, fuzzy
+msgid "Visit"
+msgstr "Посетители"
+
+#: qt/dlg_event_info.py:71
+msgid "Remove"
+msgstr ""
+
+#: qt/dlg_event_info.py:72 qt/dlg_show_visitors.py:35
+#, fuzzy
+msgid "Close"
+msgstr "Курс"
+
+#: qt/dlg_event_info.py:86
+#, fuzzy
+msgid "Register the visit"
+msgstr "Зарегистрирован"
+
+#: qt/dlg_event_info.py:151
+msgid "Client registration"
+msgstr ""
+
+#: qt/dlg_event_info.py:152
+msgid "The client is registered on this event."
+msgstr ""
+
+#: qt/dlg_event_info.py:160 qt/dlg_event_info.py:182 qt/event_storage.py:107
+msgid "Check response format!"
+msgstr ""
+
+#: qt/dlg_event_info.py:166
+msgid "Event remove"
+msgstr ""
+
+#: qt/dlg_event_info.py:167
+msgid "Are you sure to remove this event from the calendar?"
 msgstr ""
 
 #: qt/dlg_searching.py:21
@@ -228,11 +299,11 @@ msgstr ""
 msgid "Find"
 msgstr ""
 
-#: qt/dlg_searching.py:42 qt/dlg_user_info.py:29
+#: qt/dlg_searching.py:42 qt/dlg_show_visitors.py:22 qt/dlg_user_info.py:29
 msgid "Last name"
 msgstr ""
 
-#: qt/dlg_searching.py:43 qt/dlg_user_info.py:28
+#: qt/dlg_searching.py:43 qt/dlg_show_visitors.py:23 qt/dlg_user_info.py:28
 msgid "First name"
 msgstr ""
 
@@ -283,6 +354,15 @@ msgstr ""
 #: qt/dlg_settings.py:139
 msgid "Login and password"
 msgstr ""
+
+#: qt/dlg_show_visitors.py:24 storage/models.py:151
+msgid "Type"
+msgstr "Тип"
+
+#: qt/dlg_show_visitors.py:48
+#, fuzzy
+msgid "Registered visitors"
+msgstr "Зарегистрирован"
 
 #: qt/dlg_user_info.py:30
 msgid "Email"
@@ -336,158 +416,182 @@ msgstr ""
 msgid "RFID reader"
 msgstr ""
 
-#: qt/event_storage.py:44
+#: qt/event_storage.py:48
 msgid "Monday"
 msgstr ""
 
-#: qt/event_storage.py:44
+#: qt/event_storage.py:48
 msgid "Tuesday"
 msgstr ""
 
-#: qt/event_storage.py:45
+#: qt/event_storage.py:49
 msgid "Wednesday"
 msgstr ""
 
-#: qt/event_storage.py:45
+#: qt/event_storage.py:49
 msgid "Thursday"
 msgstr ""
 
-#: qt/event_storage.py:46
+#: qt/event_storage.py:50
 msgid "Friday"
 msgstr ""
 
-#: qt/event_storage.py:46
+#: qt/event_storage.py:50
 msgid "Saturday"
 msgstr ""
 
-#: qt/event_storage.py:47
+#: qt/event_storage.py:51
 msgid "Sunday"
 msgstr ""
 
-#: qt/event_storage.py:102
-msgid "Check response format!"
+#: qt/event_storage.py:96
+msgid "Request information for the calendar."
 msgstr ""
+
+#: qt/event_storage.py:102
+msgid "Parsing the response..."
+msgstr ""
+
+#: qt/event_storage.py:109
+msgid "Filling the calendar..."
+msgstr ""
+
+#: qt/event_storage.py:121 storage/models.py:206
+msgid "Done"
+msgstr "Выполнено"
 
 #: qt/http_ajax.py:50
 msgid "HTTP Error"
 msgstr "Ошибка"
 
-#: qt/manager.py:41
+#: qt/manager.py:42
 msgid "Manager's interface"
 msgstr ""
 
-#: qt/manager.py:42
+#: qt/manager.py:43
 msgid "Ready"
 msgstr ""
 
-#: qt/manager.py:47
+#: qt/manager.py:49
 #, python-format
 msgid "Filter: Room \"%s\" is changed its state"
 msgstr ""
 
-#: qt/manager.py:70
+#: qt/manager.py:72
 msgid "<<"
 msgstr ""
 
-#: qt/manager.py:71
+#: qt/manager.py:73
 msgid ">>"
 msgstr ""
 
-#: qt/manager.py:72
+#: qt/manager.py:74
 msgid "Today"
 msgstr ""
 
-#: qt/manager.py:90
+#: qt/manager.py:92
 msgid "Week:"
 msgstr ""
 
-#: qt/manager.py:140
+#: qt/manager.py:142
 msgid "File"
 msgstr ""
 
-#: qt/manager.py:141
+#: qt/manager.py:143
 msgid "Application settings"
 msgstr ""
 
-#: qt/manager.py:142
+#: qt/manager.py:144
 msgid "Manage the application settings."
 msgstr ""
 
-#: qt/manager.py:144
+#: qt/manager.py:146
 msgid "Exit"
 msgstr ""
 
-#: qt/manager.py:145
+#: qt/manager.py:147
 msgid "Close the application."
 msgstr ""
 
-#: qt/manager.py:148 storage/models.py:37
+#: qt/manager.py:150 storage/models.py:39
 msgid "Client"
 msgstr ""
 
-#: qt/manager.py:149
+#: qt/manager.py:151
 msgid "New"
 msgstr ""
 
-#: qt/manager.py:150
+#: qt/manager.py:152
 msgid "Register new client."
 msgstr ""
 
-#: qt/manager.py:151
+#: qt/manager.py:153
 msgid "Search by RFID"
 msgstr ""
 
-#: qt/manager.py:152
+#: qt/manager.py:154
 msgid "Search a client with its RFID card."
 msgstr ""
 
-#: qt/manager.py:153
+#: qt/manager.py:155
 msgid "Search by name"
 msgstr ""
 
-#: qt/manager.py:154
+#: qt/manager.py:156
 msgid "Search a client with its name."
 msgstr ""
 
-#: qt/manager.py:155
+#: qt/manager.py:157
 msgid "One visit"
 msgstr ""
 
-#: qt/manager.py:156
+#: qt/manager.py:158
 msgid "One visit client."
 msgstr ""
 
-#: qt/manager.py:159
+#: qt/manager.py:161
 msgid "Event"
 msgstr ""
 
-#: qt/manager.py:161
-msgid "Assign event."
+#: qt/manager.py:162
+msgid "Training"
+msgstr ""
+
+#: qt/manager.py:163
+msgid "Assign a training event."
 msgstr ""
 
 #: qt/manager.py:164
-msgid "Calendar"
+msgid "Rent"
 msgstr ""
 
 #: qt/manager.py:165
+msgid "Assign a rent event."
+msgstr ""
+
+#: qt/manager.py:168
+msgid "Calendar"
+msgstr ""
+
+#: qt/manager.py:169
 msgid "Copy week"
 msgstr ""
 
-#: qt/manager.py:166
+#: qt/manager.py:170
 msgid "Copy current week into other."
 msgstr ""
 
-#: qt/manager.py:275
+#: qt/manager.py:296
 msgid "The week has been copied sucessfully."
 msgstr ""
 
-#: qt/tree_model.py:50 storage/models.py:115
+#: qt/tree_model.py:50 storage/models.py:117
 #: templates/statistic/courses.html:31 templates/statistic/index.html:15
 msgid "Courses"
 msgstr "Курсы"
 
-#: rfid/models.py:9 storage/models.py:13 storage/models.py:108
-#: storage/models.py:153 storage/models.py:277
+#: rfid/models.py:9 storage/models.py:15 storage/models.py:110
+#: storage/models.py:155 storage/models.py:289
 msgid "Registered"
 msgstr "Зарегистрирован"
 
@@ -499,121 +603,109 @@ msgstr "Идентификатор карты"
 msgid "Card codes"
 msgstr "Идентификаторы карт"
 
-#: storage/admin.py:41
+#: storage/admin.py:43
 msgid "Relation"
 msgstr "Взаимосвязь"
 
-#: storage/admin.py:52
+#: storage/admin.py:54
 msgid "Links"
 msgstr "Ссылки"
 
-#: storage/models.py:24
-msgid "Coach"
-msgstr "Тренер"
-
-#: storage/models.py:25
+#: storage/models.py:27
 msgid "Coaches"
 msgstr "Тренеры"
 
-#: storage/models.py:38
+#: storage/models.py:40
 msgid "Clients"
 msgstr "Клиенты"
 
-#: storage/models.py:45
+#: storage/models.py:47
 msgid "Color"
 msgstr "Цвет"
 
-#: storage/models.py:49
+#: storage/models.py:51
 msgid "Rooms"
 msgstr "Залы"
 
-#: storage/models.py:76
+#: storage/models.py:78
 msgid "Style"
 msgstr "Стиль"
 
-#: storage/models.py:77
+#: storage/models.py:79
 msgid "Styles"
 msgstr "Стили"
 
-#: storage/models.py:104 templates/statistic/courses.html:60
+#: storage/models.py:106 templates/statistic/courses.html:60
 msgid "Count"
 msgstr "Количество"
 
-#: storage/models.py:106 storage/models.py:160
+#: storage/models.py:108 storage/models.py:162
 msgid "The price of the course."
 msgstr "Цена курса."
 
-#: storage/models.py:109 templates/statistic/courses.html:64
+#: storage/models.py:111 templates/statistic/courses.html:64
 msgid "Salary"
 msgstr "Зарплата"
 
-#: storage/models.py:110
+#: storage/models.py:112
 msgid "The salary for the course."
 msgstr "Зарплата за занятие."
 
-#: storage/models.py:114
+#: storage/models.py:116
 msgid "Course"
 msgstr "Курс"
 
-#: storage/models.py:146
+#: storage/models.py:148
 msgid "Normal card"
 msgstr "Обычная карта"
 
-#: storage/models.py:146
+#: storage/models.py:148
 msgid "Club card"
 msgstr "Клубная карта"
 
-#: storage/models.py:149
-msgid "Type"
-msgstr "Тип"
-
-#: storage/models.py:150
+#: storage/models.py:152
 msgid "Type of client's card"
 msgstr "Тип карты клиента"
 
-#: storage/models.py:157
+#: storage/models.py:159
 msgid "Exercises sold"
 msgstr "Продано тренировок"
 
-#: storage/models.py:158
+#: storage/models.py:160
 msgid "Exercises used"
 msgstr "Использовано тренировок"
 
-#: storage/models.py:203
-msgid "Done"
-msgstr "Выполнено"
+#: storage/models.py:205
+msgid "Waiting"
+msgstr ""
 
-#: storage/models.py:208
+#: storage/models.py:211
 msgid "Begins"
 msgstr "Начинается"
 
-#: storage/models.py:209
+#: storage/models.py:213
 msgid "Is looking for members?"
 msgstr "Идёт набор участников?"
 
-#: storage/models.py:210
+#: storage/models.py:215
 msgid "Are there free places?"
 msgstr "Есть свободные места?"
 
-#: storage/models.py:211
+#: storage/models.py:216
 msgid "Status"
 msgstr "Статус"
 
-#: storage/models.py:215
+#: storage/models.py:220
 msgid "Schedule"
 msgstr "Расписание"
 
-#: storage/models.py:216
+#: storage/models.py:221
 msgid "Schedules"
 msgstr "Расписания"
 
-#: storage/models.py:280
-msgid "Action"
-msgstr "Действие"
-
-#: storage/models.py:281
-msgid "Actions"
-msgstr "Действия"
+#: storage/models.py:293
+msgid "Visits"
+msgstr "Посещения"
 
 #: templates/login.html:8
 msgid "Authentication"
@@ -687,10 +779,6 @@ msgstr "Стоимость"
 msgid "Hours"
 msgstr "Часы"
 
-#: templates/statistic/courses.html:62
-msgid "Visitors"
-msgstr "Посетители"
-
 #: templates/statistic/courses.html:63
 msgid "Visitors by card"
 msgstr "Посетители по карте"
@@ -698,4 +786,3 @@ msgstr "Посетители по карте"
 #: templates/statistic/courses.html:65
 msgid "Income"
 msgstr ""
-
