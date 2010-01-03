@@ -277,6 +277,11 @@ class Schedule(models.Model):
         except self.DoesNotExist:
             return None
 
+    def get_visitors(self):
+        return [(v.client.last_name,
+                 v.client.first_name,
+                 v.client.rfid_code) for v in self.visit_set.all()]
+
 class Visit(models.Model):
     client = models.ForeignKey(Client)
     schedule = models.ForeignKey(Schedule)

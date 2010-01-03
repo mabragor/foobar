@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-03 12:51+0300\n"
+"POT-Creation-Date: 2010-01-04 00:49+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: courses_list.py:27 dlg_event_info.py:28
+#: courses_list.py:27 dlg_event_info.py:29
 msgid "Title"
 msgstr ""
 
@@ -40,7 +40,7 @@ msgstr ""
 msgid "Assigned"
 msgstr ""
 
-#: courses_list.py:30 dlg_event_info.py:38
+#: courses_list.py:30 dlg_event_info.py:39
 msgid "Begin"
 msgstr ""
 
@@ -130,7 +130,7 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: dlg_event_assign.py:37 dlg_event_info.py:48
+#: dlg_event_assign.py:37 dlg_event_info.py:49
 msgid "Room"
 msgstr ""
 
@@ -138,7 +138,7 @@ msgstr ""
 msgid "Assign the event"
 msgstr ""
 
-#: dlg_event_assign.py:103 dlg_event_info.py:108 manager.py:262 manager.py:300
+#: dlg_event_assign.py:103 dlg_event_info.py:113 manager.py:262 manager.py:300
 msgid "Warning"
 msgstr ""
 
@@ -150,47 +150,51 @@ msgstr ""
 msgid "Choose the course on the course's tree."
 msgstr ""
 
-#: dlg_event_info.py:33
+#: dlg_event_info.py:34
 msgid "Coach"
 msgstr ""
 
-#: dlg_event_info.py:43
+#: dlg_event_info.py:44
 msgid "Duration"
 msgstr ""
 
-#: dlg_event_info.py:68
-msgid "Visit"
-msgstr ""
-
-#: dlg_event_info.py:69
-msgid "Remove"
+#: dlg_event_info.py:69 dlg_show_visitors.py:33
+msgid "Visitors"
 msgstr ""
 
 #: dlg_event_info.py:70
+msgid "Visit"
+msgstr ""
+
+#: dlg_event_info.py:71
+msgid "Remove"
+msgstr ""
+
+#: dlg_event_info.py:72 dlg_show_visitors.py:36
 msgid "Close"
 msgstr ""
 
-#: dlg_event_info.py:83
+#: dlg_event_info.py:86
 msgid "Register the visit"
 msgstr ""
 
-#: dlg_event_info.py:146
+#: dlg_event_info.py:151
 msgid "Client registration"
 msgstr ""
 
-#: dlg_event_info.py:147
+#: dlg_event_info.py:152
 msgid "The client is registered on this event."
 msgstr ""
 
-#: dlg_event_info.py:150 dlg_event_info.py:173 event_storage.py:107
+#: dlg_event_info.py:155 dlg_event_info.py:177 event_storage.py:107
 msgid "Check response format!"
 msgstr ""
 
-#: dlg_event_info.py:157
+#: dlg_event_info.py:161
 msgid "Event remove"
 msgstr ""
 
-#: dlg_event_info.py:158
+#: dlg_event_info.py:162
 msgid "Are you sure to remove this event from the calendar?"
 msgstr ""
 
@@ -202,11 +206,11 @@ msgstr ""
 msgid "Find"
 msgstr ""
 
-#: dlg_searching.py:42 dlg_user_info.py:29
+#: dlg_searching.py:42 dlg_show_visitors.py:23 dlg_user_info.py:29
 msgid "Last name"
 msgstr ""
 
-#: dlg_searching.py:43 dlg_user_info.py:28
+#: dlg_searching.py:43 dlg_show_visitors.py:24 dlg_user_info.py:28
 msgid "First name"
 msgstr ""
 
@@ -256,6 +260,14 @@ msgstr ""
 
 #: dlg_settings.py:139
 msgid "Login and password"
+msgstr ""
+
+#: dlg_show_visitors.py:25
+msgid "Type"
+msgstr ""
+
+#: dlg_show_visitors.py:49
+msgid "Registered visitors"
 msgstr ""
 
 #: dlg_user_info.py:30

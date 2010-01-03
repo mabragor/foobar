@@ -7,6 +7,7 @@ from datetime import datetime
 from event_storage import Event
 from http_ajax import HttpAjax
 from dlg_waiting_rfid import DlgWaitingRFID
+from dlg_show_visitors import DlgShowVisitors
 
 import gettext
 gettext.bindtextdomain('project', './locale/')
@@ -65,11 +66,13 @@ class DlgEventInfo(QDialog):
         groupLayout.addWidget(labelRoom, 4, 0)
         groupLayout.addWidget(self.comboRoom, 4, 1)
 
+        self.buttonVisitors = QPushButton(_('Visitors'))
         self.buttonVisit = QPushButton(_('Visit'))
         self.buttonRemove = QPushButton(_('Remove'))
         self.buttonClose = QPushButton(_('Close'))
 
         buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(self.buttonVisitors)
         buttonLayout.addWidget(self.buttonVisit)
         buttonLayout.addWidget(self.buttonRemove)
         buttonLayout.addStretch(1)
@@ -90,6 +93,8 @@ class DlgEventInfo(QDialog):
         self.tree.setModel(model)
 
     def setSignals(self):
+        self.connect(self.buttonVisitors, SIGNAL('clicked()'),
+                     self.showVisitors)
         self.connect(self.buttonVisit, SIGNAL('clicked()'),
                      self.visitEvent)
         self.connect(self.buttonRemove, SIGNAL('clicked()'),
@@ -172,3 +177,9 @@ class DlgEventInfo(QDialog):
                     print _('Check response format!')
         else:
             print 'just a joke'
+
+    def showVisitors(self):
+        dialog = DlgShowVisitors(self)
+        dialog.setModal(True)
+        dialog.initData(self.event_info['id'])
+        dialog.exec_()

@@ -310,3 +310,14 @@ class CopyWeek(AjaxForm):
             ne = storage.Schedule(room=e.room, course=e.course)
             ne.begin = e.begin+delta
             ne.save()
+
+class GetVisitors(AjaxForm):
+    event_id = forms.IntegerField()
+
+    def clean_event_id(self):
+        return self.check_obj_existence(storage.Schedule, 'event_id')
+
+    def query(self):
+        event_id = self.cleaned_data['event_id']
+        event = storage.Schedule.objects.get(id=event_id)
+        return event.get_visitors()
