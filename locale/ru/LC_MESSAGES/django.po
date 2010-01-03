@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-04 01:24+0300\n"
+"POT-Creation-Date: 2010-01-04 01:57+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,32 +53,36 @@ msgstr "Используйте метод POST"
 msgid "Please, do not break our code :)"
 msgstr "Пожалуйста, не ломайте нас :)"
 
-#: manager/forms.py:161
+#: manager/forms.py:156
 #, python-format
 msgid "Wrong ID of %s."
 msgstr "Неверный идентификатор для %s."
 
-#: manager/forms.py:168 manager/forms.py:171
+#: manager/forms.py:163 manager/forms.py:166
 msgid "Date has to be in the future."
 msgstr "Дата должна быть в будущем."
 
-#: manager/forms.py:173
+#: manager/forms.py:168
 msgid "Unsupported type."
 msgstr "Неподдерживаемый тип."
 
-#: manager/forms.py:193
+#: manager/forms.py:187
+msgid "Avoid the appointment in the past."
+msgstr "Нельзя назначать на прошедшие события."
+
+#: manager/forms.py:189
 msgid "The client is already registered on this event."
 msgstr "Клиент уже зарегистрирован на это событие."
 
-#: manager/forms.py:297
+#: manager/forms.py:293
 msgid "Date must be Monday."
 msgstr "Дата должна быть понедельником"
 
-#: manager/forms.py:306
+#: manager/forms.py:302
 msgid "It is impossible to copy events to the past."
 msgstr "Нельзя копировать события в прошлое."
 
-#: manager/forms.py:315
+#: manager/forms.py:311
 msgid "It is impossible to copy the week into itself."
 msgstr "Нельзя копировать неделю в саму себя."
 

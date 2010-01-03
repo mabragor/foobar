@@ -183,6 +183,8 @@ class RegisterVisit(AjaxForm):
         c = self.cleaned_data
         client = storage.Client.objects.get(rfid_code=c['rfid_code'])
         event = storage.Schedule.objects.get(id=c['event_id'])
+        if event.begin <= datetime.now():
+            raise forms.ValidationError(_('Avoid the appointment in the past.'))
         if storage.Visit.objects.filter(client=client, schedule=event).count() > 0:
             raise forms.ValidationError(_('The client is already registered on this event.'))
         return self.cleaned_data

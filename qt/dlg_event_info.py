@@ -145,7 +145,7 @@ class DlgEventInfo(QDialog):
 			    {'rfid_code': self.rfid_id,
                              'event_id': self.event_info['id']})
 	    response = ajax.parse_json()
-            if 'code' in response:
+            if response and 'code' in response:
                 if response['code'] == 200:
                     reply = QMessageBox.information(
                         self, _('Client registration'),
