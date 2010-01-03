@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-02 18:38+0300\n"
+"POT-Creation-Date: 2010-01-03 12:51+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Ruslan Popov <ruslan.popov@gmail.com>\n"
 "Language-Team: LANGUAGE <RU@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: courses_list.py:27 dlg_event_info.py:27
+#: courses_list.py:27 dlg_event_info.py:28
 msgid "Title"
 msgstr "Название"
 
@@ -40,7 +40,7 @@ msgstr "Использовано"
 msgid "Assigned"
 msgstr "Назначено"
 
-#: courses_list.py:30 dlg_event_info.py:37
+#: courses_list.py:30 dlg_event_info.py:38
 msgid "Begin"
 msgstr "Начало"
 
@@ -130,7 +130,7 @@ msgstr "Дата"
 msgid "Time"
 msgstr "Время"
 
-#: dlg_event_assign.py:37 dlg_event_info.py:47
+#: dlg_event_assign.py:37 dlg_event_info.py:48
 msgid "Room"
 msgstr "Зал"
 
@@ -150,41 +150,49 @@ msgstr "Какой курсы вы собирались назначить?"
 msgid "Choose the course on the course's tree."
 msgstr "Выберите курс на дереве курсов."
 
-#: dlg_event_info.py:32
+#: dlg_event_info.py:33
 msgid "Coach"
 msgstr "Тренер"
 
-#: dlg_event_info.py:42
+#: dlg_event_info.py:43
 msgid "Duration"
 msgstr "Длительность"
 
-#: dlg_event_info.py:67
+#: dlg_event_info.py:68
 msgid "Visit"
 msgstr "Посещение"
 
-#: dlg_event_info.py:68
+#: dlg_event_info.py:69
 msgid "Remove"
 msgstr "Удалить"
 
-#: dlg_event_info.py:69
+#: dlg_event_info.py:70
 msgid "Close"
 msgstr "Закрыть"
 
-#: dlg_event_info.py:82
+#: dlg_event_info.py:83
 msgid "Register the visit"
 msgstr "Регистрация визита"
 
-#: dlg_event_info.py:134
+#: dlg_event_info.py:146
+msgid "Client registration"
+msgstr "Регистрация клиента"
+
+#: dlg_event_info.py:147
+msgid "The client is registered on this event."
+msgstr "Клиент зарегистрирован на это событие."
+
+#: dlg_event_info.py:150 dlg_event_info.py:173 event_storage.py:107
+msgid "Check response format!"
+msgstr "Проверьте формат отклика!"
+
+#: dlg_event_info.py:157
 msgid "Event remove"
 msgstr "Удаление события"
 
-#: dlg_event_info.py:135
+#: dlg_event_info.py:158
 msgid "Are you sure to remove this event from the calendar?"
 msgstr "Вы уверены, что желаете удалить это событие с календаря?"
-
-#: dlg_event_info.py:151 event_storage.py:107
-msgid "Check response format!"
-msgstr "Проверьте формат отклика!"
 
 #: dlg_searching.py:21
 msgid "Search"

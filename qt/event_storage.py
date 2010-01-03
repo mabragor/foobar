@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
+# (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 import sys, re, time
 from datetime import datetime, timedelta

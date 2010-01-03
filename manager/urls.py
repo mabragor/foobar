@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
+# (c) 2009      Dmitry <alerion.um@gmail.com>
 
 from django.conf.urls.defaults import *
 
@@ -33,4 +35,5 @@ urlpatterns += patterns(
     url(r'^copy_week/$', 'copy_week'),
     url(r'^cal_event_add/$', 'cal_event_add'),
     url(r'^cal_event_del/$', 'cal_event_del'),
+    url(r'^register_visit/$', 'register_visit'),
     )

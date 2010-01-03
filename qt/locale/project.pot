@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-02 18:38+0300\n"
+"POT-Creation-Date: 2010-01-03 12:51+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: courses_list.py:27 dlg_event_info.py:27
+#: courses_list.py:27 dlg_event_info.py:28
 msgid "Title"
 msgstr ""
 
@@ -40,7 +40,7 @@ msgstr ""
 msgid "Assigned"
 msgstr ""
 
-#: courses_list.py:30 dlg_event_info.py:37
+#: courses_list.py:30 dlg_event_info.py:38
 msgid "Begin"
 msgstr ""
 
@@ -130,7 +130,7 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: dlg_event_assign.py:37 dlg_event_info.py:47
+#: dlg_event_assign.py:37 dlg_event_info.py:48
 msgid "Room"
 msgstr ""
 
@@ -150,40 +150,48 @@ msgstr ""
 msgid "Choose the course on the course's tree."
 msgstr ""
 
-#: dlg_event_info.py:32
+#: dlg_event_info.py:33
 msgid "Coach"
 msgstr ""
 
-#: dlg_event_info.py:42
+#: dlg_event_info.py:43
 msgid "Duration"
 msgstr ""
 
-#: dlg_event_info.py:67
+#: dlg_event_info.py:68
 msgid "Visit"
 msgstr ""
 
-#: dlg_event_info.py:68
+#: dlg_event_info.py:69
 msgid "Remove"
 msgstr ""
 
-#: dlg_event_info.py:69
+#: dlg_event_info.py:70
 msgid "Close"
 msgstr ""
 
-#: dlg_event_info.py:82
+#: dlg_event_info.py:83
 msgid "Register the visit"
 msgstr ""
 
-#: dlg_event_info.py:134
+#: dlg_event_info.py:146
+msgid "Client registration"
+msgstr ""
+
+#: dlg_event_info.py:147
+msgid "The client is registered on this event."
+msgstr ""
+
+#: dlg_event_info.py:150 dlg_event_info.py:173 event_storage.py:107
+msgid "Check response format!"
+msgstr ""
+
+#: dlg_event_info.py:157
 msgid "Event remove"
 msgstr ""
 
-#: dlg_event_info.py:135
+#: dlg_event_info.py:158
 msgid "Are you sure to remove this event from the calendar?"
-msgstr ""
-
-#: dlg_event_info.py:151 event_storage.py:107
-msgid "Check response format!"
 msgstr ""
 
 #: dlg_searching.py:21

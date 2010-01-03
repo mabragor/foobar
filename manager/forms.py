@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+# (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
+# (c) 2009      Dmitry <alerion.um@gmail.com>
 
 from django import forms
-from storage.models import Schedule, Card, Client, Course, Room
+from storage import models as storage
 from django.utils.translation import ugettext_lazy as _
 from datetime import timedelta, datetime, date
 
@@ -10,7 +12,7 @@ class StatusForm(forms.ModelForm):
     outside = forms.BooleanField(required=False)
 
     class Meta:
-        model = Schedule
+        model = storage.Schedule
         exclude = ('room', 'course', 'begin', 'looking', 'places')
 
     def clean(self):
@@ -35,7 +37,7 @@ class StatusForm(forms.ModelForm):
 class ScheduleForm(forms.ModelForm):
 
     class Meta:
-        model = Schedule
+        model = storage.Schedule
         exclude = ('looking', 'places', 'change', 'status')
 
     def clean_begin(self):
@@ -51,7 +53,7 @@ class ScheduleForm(forms.ModelForm):
 
         if room and begin and course:
             end = begin + timedelta(hours=course.duration)
-            result = Schedule.objects.select_related().filter(room=room).filter(begin__range=(begin.date(), begin.date()+timedelta(days=1)))
+            result = storage.Schedule.objects.select_related().filter(room=room).filter(begin__range=(begin.date(), begin.date()+timedelta(days=1)))
 
             if self.instance.pk:
                 result = result.exclude(pk=self.instance.pk)
@@ -70,15 +72,15 @@ class UserCardForm(forms.ModelForm):
     rfid_code = forms.CharField(max_length=8)
 
     class Meta:
-        model = Card
+        model = storage.Card
         exclude = ('reg_date', 'exp_date', 'client')
 
     def clean_rfid_code(self):
         rfid = self.cleaned_data['rfid_code']
         try:
-            user = Client.objects.get(rfid_code=rfid)
+            user = storage.Client.objects.get(rfid_code=rfid)
             self.cleaned_data['client'] = user
-        except Client.DoesNotExist:
+        except storage.Client.DoesNotExist:
             raise form.ValidationError('Undefined rfid code.')
         return user
 
@@ -113,7 +115,7 @@ class CopyForm(forms.Form):
         to_date = self.validate_date(self.cleaned_data['to_date'])
         if to_date < date.today():
             raise forms.ValidationError('Can not paste events into the past.')
-        if Schedule.objects.filter(begin__range=(to_date, to_date+timedelta(days=7))).count():
+        if storage.Schedule.objects.filter(begin__range=(to_date, to_date+timedelta(days=7))).count():
             raise forms.ValidationError('Week must be empty to paste events.')
         return to_date
 
@@ -127,10 +129,10 @@ class CopyForm(forms.Form):
     def save(self):
         from_date = self.cleaned_data.get('from_date')
         to_date = self.cleaned_data.get('to_date')
-        events = Schedule.objects.filter(begin__range=(from_date, from_date+timedelta(days=7)))
+        events = storage.Schedule.objects.filter(begin__range=(from_date, from_date+timedelta(days=7)))
         delta = to_date - from_date
         for e in events:
-            ne = Schedule(room=e.room, course=e.course)
+            ne = storage.Schedule(room=e.room, course=e.course)
             ne.begin = e.begin+delta
             ne.save()
 
@@ -139,6 +141,9 @@ class CopyForm(forms.Form):
 
 
 class AjaxForm(forms.Form):
+
+    # TODO: check symbols of RFID code
+
     def get_errors(self):
         from django.utils.encoding import force_unicode
         return ''.join([force_unicode(v) for k, v in self.errors.items()])
@@ -163,15 +168,37 @@ class AjaxForm(forms.Form):
             raise forms.ValidationError(_('Unsupported type.'))
         return value
 
+class RegisterVisit(AjaxForm):
+    event_id = forms.IntegerField()
+    card_id = forms.IntegerField(required=False)
+    rfid_code = forms.CharField(max_length=8)
+
+    def clean_client_id(self):
+        return self.check_obj_existence(storage.Client, 'client_id')
+
+    def clean_event_id(self):
+        return self.check_obj_existence(storage.Schedule, 'event_id')
+
+    def save(self):
+        c = self.cleaned_data
+        client = storage.Client.objects.get(rfid_code=c['rfid_code'])
+        event = storage.Schedule.objects.get(id=c['event_id'])
+        visit = storage.Visit(client=client, schedule=event)
+        if c['card_id'] is not None:
+            card = storage.Card.objects.get(id=c['card_id'])
+            visit.card = card
+        visit.save()
+        return visit.id
+
 class GetScheduleInfo(AjaxForm):
     id = forms.IntegerField()
 
     def clean_id(self):
-        return self.check_obj_existence(Schedule, 'id')
+        return self.check_obj_existence(storage.Schedule, 'id')
 
     def query(self):
         id = self.cleaned_data['id']
-        event = Schedule.objects.get(id=id)
+        event = storage.Schedule.objects.get(id=id)
         info = event.get_calendar_obj()
         return info
 
@@ -206,7 +233,7 @@ class DateRange(AjaxForm):
         filter = self.cleaned_data['filter']
         monday = self.cleaned_data['monday']
         limit = monday + timedelta(days=7)
-        schedules = Schedule.objects.filter(begin__range=(monday, limit))
+        schedules = storage.Schedule.objects.filter(begin__range=(monday, limit))
         if len(filter) > 0:
             schedules = schedules.filter(room__in=c['filter'])
         events = [item.get_calendar_obj() for item in schedules]
@@ -219,21 +246,21 @@ class CalendarEventAdd(AjaxForm):
     ev_type = forms.IntegerField()
 
     def clean_course_id(self):
-        return self.check_obj_existence(Course, 'course_id')
+        return self.check_obj_existence(storage.Course, 'course_id')
 
     def clean_room_id(self):
-        return self.check_obj_existence(Room, 'room_id')
+        return self.check_obj_existence(storage.Room, 'room_id')
 
     def clean_begin(self):
         return self.check_future('begin')
 
     def save(self):
         c = self.cleaned_data
-        course = Course.objects.get(id=c['course_id'])
-        room = Room.objects.get(id=c['room_id'])
+        course = storage.Course.objects.get(id=c['course_id'])
+        room = storage.Room.objects.get(id=c['room_id'])
         begin = c['begin']
         ev_type = c['ev_type']
-        event = Schedule(course=course, room=room, begin=begin, status=0)
+        event = storage.Schedule(course=course, room=room, begin=begin, status=0)
         event.save()
         return event.id
 
@@ -241,11 +268,11 @@ class CalendarEventDel(AjaxForm):
     id = forms.IntegerField()
 
     def clean_id(self):
-        return self.check_obj_existence(Schedule, 'id')
+        return self.check_obj_existence(storage.Schedule, 'id')
 
     def remove(self):
         c = self.cleaned_data
-        Schedule.objects.get(id=c['id']).delete()
+        storage.Schedule.objects.get(id=c['id']).delete()
 
 class CopyWeek(AjaxForm):
     from_date = forms.DateField()
@@ -263,7 +290,7 @@ class CopyWeek(AjaxForm):
         to_date = self.validate_date(self.cleaned_data['to_date'])
         if to_date < date.today():
             raise forms.ValidationError(_('It is impossible to copy events to the past.'))
-        if Schedule.objects.filter(begin__range=(to_date, to_date+timedelta(days=7))).count():
+        if storage.Schedule.objects.filter(begin__range=(to_date, to_date+timedelta(days=7))).count():
             raise forms.ValidationError('Week must be empty to paste events.')
         return to_date
 
@@ -277,9 +304,9 @@ class CopyWeek(AjaxForm):
     def save(self):
         from_date = self.cleaned_data.get('from_date')
         to_date = self.cleaned_data.get('to_date')
-        events = Schedule.objects.filter(begin__range=(from_date, from_date+timedelta(days=7)))
+        events = storage.Schedule.objects.filter(begin__range=(from_date, from_date+timedelta(days=7)))
         delta = to_date - from_date
         for e in events:
-            ne = Schedule(room=e.room, course=e.course)
+            ne = storage.Schedule(room=e.room, course=e.course)
             ne.begin = e.begin+delta
             ne.save()

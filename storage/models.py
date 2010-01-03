@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
+# (c) 2009      Dmitry <alerion.um@gmail.com>
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -275,12 +277,13 @@ class Schedule(models.Model):
         except self.DoesNotExist:
             return None
 
-class Action(models.Model):
+class Visit(models.Model):
+    client = models.ForeignKey(Client)
     schedule = models.ForeignKey(Schedule)
-    card = models.ForeignKey(Card)
-    when = models.DateTimeField(verbose_name=_(u'Registered'))
+    card = models.ForeignKey(Card, null=True, blank=True)
+    when = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
 
     class Meta:
-        verbose_name = _(u'Action')
-        verbose_name_plural = _(u'Actions')
+        verbose_name = _(u'Visit')
+        verbose_name_plural = _(u'Visits')
 

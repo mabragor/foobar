@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 from django.conf import settings
 from django.utils import simplejson
@@ -12,7 +13,8 @@ from lib import str2date
 from lib.decorators import ajax_processor, render_to
 
 from forms import UserRFID, UserName, UserInfo, DateRange, \
-    CopyWeek, GetScheduleInfo, CalendarEventAdd, CalendarEventDel
+    CopyWeek, GetScheduleInfo, CalendarEventAdd, CalendarEventDel, \
+    RegisterVisit
 
 from storage.models import Client, Card, Course, Group, Schedule
 
@@ -113,6 +115,10 @@ def get_week(request, form):
 
 @ajax_processor(CopyWeek, isJavaScript)
 def copy_week(request, form):
+    return abstract_response(request, form)
+
+@ajax_processor(RegisterVisit, isJavaScript)
+def register_visit(request, form):
     return abstract_response(request, form)
 
 @ajax_processor(CalendarEventAdd, isJavaScript)

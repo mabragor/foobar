@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
+# (c) 2009      Dmitry <alerion.um@gmail.com>
 
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
@@ -60,7 +62,7 @@ class ScheduleAdmin(admin.ModelAdmin):
     fieldsets = ((None, {'fields': ('course', 'begin')}),)
 admin.site.register(models.Schedule, ScheduleAdmin)
 
-class ActionAdmin(admin.ModelAdmin):
-    list_display = ('schedule', 'card', 'when')
-    fieldsets = ((None, {'fields': ('schedule', 'card', 'when')}),)
-admin.site.register(models.Action, ActionAdmin)
+class VisitAdmin(admin.ModelAdmin):
+    list_display = ('client', 'schedule', 'card', 'when')
+    fieldsets = ((None, {'fields': ()}),)
+admin.site.register(models.Visit, VisitAdmin)

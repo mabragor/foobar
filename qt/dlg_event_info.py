@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-# (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
+# (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 import time
 from datetime import datetime
 
 from event_storage import Event
 from http_ajax import HttpAjax
+from dlg_waiting_rfid import DlgWaitingRFID
 
 import gettext
 gettext.bindtextdomain('project', './locale/')
@@ -126,7 +127,29 @@ class DlgEventInfo(QDialog):
         self.comboRoom.setCurrentIndex(current)
 
     def visitEvent(self):
-        print 'registered'
+	def callback(rfid):
+	    self.rfid_id = rfid
+
+	self.callback = callback
+	self.dialog = DlgWaitingRFID(self)
+	self.dialog.setModal(True)
+	dlgStatus = self.dialog.exec_()
+
+	if QDialog.Accepted == dlgStatus:
+	    ajax = HttpAjax(self, '/manager/register_visit/',
+			    {'rfid_code': self.rfid_id,
+                             'event_id': self.event_info['id']})
+	    response = ajax.parse_json()
+            if 'code' in response:
+                if response['code'] == 200:
+                    reply = QMessageBox.question(
+                        self, _('Client registration'),
+                        _('The client is registered on this event.'))
+                    self.reject()
+            else:
+                print _('Check response format!')
+	else:
+	    print 'dialog was rejected'
 
     def eventRemove(self):
         reply = QMessageBox.question(
