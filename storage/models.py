@@ -11,7 +11,6 @@ class AbstractUser(models.Model):
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
     email = models.EmailField(max_length=64, blank=True, null=True)
-    rfid_code = models.CharField(max_length=8)
     reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
 
     class Meta:
@@ -34,6 +33,7 @@ class Coach(AbstractUser):
         return obj
 
 class Client(AbstractUser):
+    rfid_code = models.CharField(max_length=8)
 
     class Meta:
         verbose_name = _(u'Client')
@@ -41,6 +41,15 @@ class Client(AbstractUser):
 
     def get_course_list(self):
         return [card.get_info() for card in self.card_set.all().order_by('-reg_date')]
+
+class Renter(AbstractUser):
+    phone_mobile = models.CharField(max_length=16, blank=True, null=True)
+    phone_work = models.CharField(max_length=16, blank=True, null=True)
+    phone_home = models.CharField(max_length=16, blank=True, null=True)
+
+    class Meta:
+        verbose_name = _(u'Renter')
+        verbose_name_plural = _(u'Renters')
 
 class Room(models.Model):
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
@@ -97,6 +106,24 @@ class Group(models.Model):
             'title': self.title,
             'children': [item.get_node() for item in self.course_set.all()]
             }
+
+class Rent(models.Model):
+    RENT_STATUS = (('0', _(u'Unpaid')), ('1', _(u'Partially')), ('2', _('Paid')))
+    renter = models.ForeignKey(Renter)
+    status = models.CharField(max_length=1, choices=RENT_STATUS, default=0)
+    title = models.CharField(max_length=64)
+    desc = models.TextField(blank=True, default=u'')
+    reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
+    begin_date = models.DateTimeField(verbose_name=_(u'Begin'))
+    end_date = models.DateTimeField(verbose_name=_(u'End'))
+    paid = models.FloatField()
+
+    class Meta:
+        verbose_name = _(u'Rent')
+        verbose_name_plural = _(u'Rents')
+
+    def __unicode__(self):
+        return self.title
 
 class Course(models.Model):
     group = models.ManyToManyField(Group)
@@ -207,7 +234,8 @@ class Schedule(models.Model):
         ('2', _('Cancelled')),
     )
     room = models.ForeignKey(Room)
-    course = models.ForeignKey(Course)
+    course = models.ForeignKey(Course, null=True, blank=True)
+    rent = models.ForeignKey(Rent, null=True, blank=True)
     begin = models.DateTimeField(verbose_name=_(u'Begins'))
     # НЕ НУЖНО
     looking = models.BooleanField(verbose_name=_(u'Is looking for members?'), default=True)
@@ -225,7 +253,7 @@ class Schedule(models.Model):
 
     @property
     def end(self):
-        return self.begin + timedelta(hours=self.course.duration)
+        return self.begin + timedelta(minutes=int(60 * self.course.duration))
 
     def get_calendar_obj(self):
         obj = {
