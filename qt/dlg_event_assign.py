@@ -14,10 +14,11 @@ from PyQt4.QtCore import *
 
 class DlgEventAssign(QDialog):
 
-    def __init__(self, parent=None):
+    def __init__(self, mode='training', parent=None):
         QDialog.__init__(self, parent)
 
         self.parent = parent
+        self.mode = mode
         self.setMinimumWidth(600)
 
         labelDate = QLabel(_('Date'))
@@ -49,14 +50,6 @@ class DlgEventAssign(QDialog):
         groupLayout.addWidget(labelRoom, 2, 0)
         groupLayout.addWidget(self.comboRoom, 2, 1)
 
-        self.tree = CoursesTree(self)
-
-        courseLayout = QVBoxLayout()
-        courseLayout.addWidget(self.tree)
-
-        groupCourses = QGroupBox(_('Available courses'))
-        groupCourses.setLayout(courseLayout)
-
         self.buttonAssign = QPushButton(_('Assign'))
         self.buttonCancel = QPushButton(_('Cancel'))
 
@@ -67,7 +60,23 @@ class DlgEventAssign(QDialog):
 
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(groupLayout)
-        mainLayout.addWidget(groupCourses)
+
+        if self.mode == 'training':
+            self.tree = CoursesTree(self)
+            courseLayout = QVBoxLayout()
+            courseLayout.addWidget(self.tree)
+            groupCourses = QGroupBox(_('Available courses'))
+            groupCourses.setLayout(courseLayout)
+            mainLayout.addWidget(groupCourses)
+        else:
+            self.comboRent = QComboBox()
+            self.comboRent.addItem(_('Reserved'))
+            self.comboRent.addItem(_('Paid'))
+            labelRent = QLabel(_('Rent'))
+            labelRoom.setBuddy(self.comboRoom)
+            groupLayout.addWidget(labelRoom, 3, 0)
+            groupLayout.addWidget(self.comboRoom, 3, 1)
+
         mainLayout.addLayout(buttonLayout)
 
         self.setLayout(mainLayout)

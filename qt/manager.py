@@ -154,8 +154,6 @@ class MainWindow(QMainWindow):
 		     'clientSearchRFID', _('Search a client with its RFID card.')),
 		    (_('Search by name'), 'Ctrl+F',
 		     'clientSearchName', _('Search a client with its name.')),
-		    (_('One visit'), '',
-		     'clientOneVisit', _('One visit client.')),
 		    ]
 	     ),
 	    (_('Event'), [
@@ -240,9 +238,6 @@ class MainWindow(QMainWindow):
 	else:
 	    print 'dialog was rejected'
 
-    def clientOneVisit(self):
-	print 'one visit client'
-
     def eventTraining(self):
         def callback(e_date, e_time, room_tuple, course):
             room, ok = room_tuple
@@ -268,7 +263,7 @@ class MainWindow(QMainWindow):
             self.schedule.insertEvent(room, event)
 
 
-	self.dialog = DlgEventAssign(self)
+	self.dialog = DlgEventAssign('training', self)
 	self.dialog.setModal(True)
         self.dialog.setCallback(callback)
         self.dialog.setModel(self.tree)
