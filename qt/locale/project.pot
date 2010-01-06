@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-04 01:23+0300\n"
+"POT-Creation-Date: 2010-01-06 23:54+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: courses_list.py:27 dlg_event_info.py:29
+#: courses_list.py:27 dlg_event_assign.py:74 dlg_event_info.py:29
 msgid "Title"
 msgstr ""
 
@@ -40,7 +40,7 @@ msgstr ""
 msgid "Assigned"
 msgstr ""
 
-#: courses_list.py:30 dlg_event_info.py:39
+#: courses_list.py:30 dlg_event_assign.py:75 dlg_event_info.py:39
 msgid "Begin"
 msgstr ""
 
@@ -72,7 +72,7 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
-#: dlg_copy_week.py:27 dlg_course_assign.py:65 dlg_event_assign.py:61
+#: dlg_copy_week.py:27 dlg_course_assign.py:65 dlg_event_assign.py:63
 #: dlg_searching.py:30 dlg_settings.py:26 dlg_user_info.py:77
 #: dlg_waiting_rfid.py:30
 msgid "Cancel"
@@ -110,11 +110,11 @@ msgstr ""
 msgid "12 months"
 msgstr ""
 
-#: dlg_course_assign.py:61 dlg_event_assign.py:57
+#: dlg_course_assign.py:61 dlg_event_assign.py:58
 msgid "Available courses"
 msgstr ""
 
-#: dlg_course_assign.py:64 dlg_event_assign.py:60
+#: dlg_course_assign.py:64 dlg_event_assign.py:62
 msgid "Assign"
 msgstr ""
 
@@ -122,32 +122,60 @@ msgstr ""
 msgid "Choose the course"
 msgstr ""
 
-#: dlg_event_assign.py:23
+#: dlg_event_assign.py:25
 msgid "Date"
 msgstr ""
 
-#: dlg_event_assign.py:30
+#: dlg_event_assign.py:32
 msgid "Time"
 msgstr ""
 
-#: dlg_event_assign.py:37 dlg_event_info.py:49
+#: dlg_event_assign.py:39 dlg_event_info.py:49
 msgid "Room"
 msgstr ""
 
 #: dlg_event_assign.py:74
-msgid "Assign the event"
+msgid "Renter"
 msgstr ""
 
-#: dlg_event_assign.py:103 dlg_event_info.py:113 dlg_event_info.py:155
-#: manager.py:262 manager.py:300
+#: dlg_event_assign.py:74
+msgid "Status"
+msgstr ""
+
+#: dlg_event_assign.py:75
+msgid "End"
+msgstr ""
+
+#: dlg_event_assign.py:81
+msgid "Rents"
+msgstr ""
+
+#: dlg_event_assign.py:90 dlg_event_assign.py:143 dlg_event_info.py:113
+#: dlg_event_info.py:155 manager.py:257 manager.py:289 manager.py:318
 msgid "Warning"
 msgstr ""
 
-#: dlg_event_assign.py:104
+#: dlg_event_assign.py:95
+msgid "Reserved"
+msgstr ""
+
+#: dlg_event_assign.py:96
+msgid "Paid partially"
+msgstr ""
+
+#: dlg_event_assign.py:97
+msgid "Paid"
+msgstr ""
+
+#: dlg_event_assign.py:113
+msgid "Assign the event"
+msgstr ""
+
+#: dlg_event_assign.py:144
 msgid "What course do you want to assign?"
 msgstr ""
 
-#: dlg_event_assign.py:105
+#: dlg_event_assign.py:145
 msgid "Choose the course on the course's tree."
 msgstr ""
 
@@ -187,7 +215,7 @@ msgstr ""
 msgid "The client is registered on this event."
 msgstr ""
 
-#: dlg_event_info.py:160 dlg_event_info.py:182 event_storage.py:107
+#: dlg_event_info.py:160 dlg_event_info.py:182 event_storage.py:108
 msgid "Check response format!"
 msgstr ""
 
@@ -323,43 +351,43 @@ msgstr ""
 msgid "RFID reader"
 msgstr ""
 
-#: event_storage.py:48
+#: event_storage.py:49
 msgid "Monday"
 msgstr ""
 
-#: event_storage.py:48
+#: event_storage.py:49
 msgid "Tuesday"
 msgstr ""
 
-#: event_storage.py:49
+#: event_storage.py:50
 msgid "Wednesday"
 msgstr ""
 
-#: event_storage.py:49
+#: event_storage.py:50
 msgid "Thursday"
 msgstr ""
 
-#: event_storage.py:50
+#: event_storage.py:51
 msgid "Friday"
 msgstr ""
 
-#: event_storage.py:50
+#: event_storage.py:51
 msgid "Saturday"
 msgstr ""
 
-#: event_storage.py:51
+#: event_storage.py:52
 msgid "Sunday"
 msgstr ""
 
-#: event_storage.py:96
+#: event_storage.py:97
 msgid "Request information for the calendar."
 msgstr ""
 
-#: event_storage.py:102
+#: event_storage.py:103
 msgid "Parsing the response..."
 msgstr ""
 
-#: event_storage.py:109
+#: event_storage.py:110
 msgid "Filling the calendar..."
 msgstr ""
 
@@ -448,47 +476,39 @@ msgstr ""
 msgid "Search a client with its name."
 msgstr ""
 
-#: manager.py:157
-msgid "One visit"
-msgstr ""
-
-#: manager.py:158
-msgid "One visit client."
-msgstr ""
-
-#: manager.py:161
+#: manager.py:159
 msgid "Event"
 msgstr ""
 
-#: manager.py:162
+#: manager.py:160
 msgid "Training"
 msgstr ""
 
-#: manager.py:163
+#: manager.py:161
 msgid "Assign a training event."
 msgstr ""
 
-#: manager.py:164
+#: manager.py:162
 msgid "Rent"
 msgstr ""
 
-#: manager.py:165
+#: manager.py:163
 msgid "Assign a rent event."
 msgstr ""
 
-#: manager.py:168
+#: manager.py:166
 msgid "Calendar"
 msgstr ""
 
-#: manager.py:169
+#: manager.py:167
 msgid "Copy week"
 msgstr ""
 
-#: manager.py:170
+#: manager.py:168
 msgid "Copy current week into other."
 msgstr ""
 
-#: manager.py:296
+#: manager.py:314
 msgid "The week has been copied sucessfully."
 msgstr ""
 
