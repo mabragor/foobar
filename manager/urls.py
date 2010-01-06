@@ -37,4 +37,5 @@ urlpatterns += patterns(
     url(r'^cal_event_del/$', 'cal_event_del'),
     url(r'^register_visit/$', 'register_visit'),
     url(r'^get_visitors/$', 'get_visitors'),
+    url(r'^get_rents/$', 'get_rents'),
     )

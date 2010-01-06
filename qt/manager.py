@@ -259,7 +259,7 @@ class MainWindow(QMainWindow):
                     QMessageBox.Ok, QMessageBox.Ok)
 
             id = int(response['saved_id'])
-            event = Event(id, course_id, begin, duration, title)
+            event = Event(id, course_id, 'training', begin, duration, title)
             self.schedule.insertEvent(room, event)
 
 
@@ -268,15 +268,16 @@ class MainWindow(QMainWindow):
         self.dialog.setCallback(callback)
         self.dialog.setModel(self.tree)
         self.dialog.setRooms(self.rooms)
-	dlgStatus = self.dialog.exec_()
-
-	if QDialog.Accepted == dlgStatus:
-            print 'accept'
-        else:
-            print 'reject'
+	self.dialog.exec_()
 
     def eventRent(self):
-        print 'rent action'
+        def callback(e_date, e_time, room_tuple, course):
+            pass
+	self.dialog = DlgEventAssign('rent', self)
+	self.dialog.setModal(True)
+        self.dialog.setCallback(callback)
+        self.dialog.setRooms(self.rooms)
+	self.dialog.exec_()
 
     def copyWeek(self):
         def callback(selected_date):

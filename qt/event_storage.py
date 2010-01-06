@@ -20,9 +20,10 @@ class Event(object):
 
     """ Класс события. """
 
-    def __init__(self, id, course_id, dt, duration, course, *args, **kwargs):
+    def __init__(self, id, course_id, e_type, dt, duration, course, *args, **kwargs):
         self.id = id
         self.course_id = course_id
+        self.type = e_type
         self.dt = dt
         self.duration = duration
         self.course = course
@@ -107,14 +108,13 @@ class EventStorage(QAbstractTableModel):
                 print _('Check response format!')
             if response['code'] == 200:
                 self.parent.statusBar().showMessage(_('Filling the calendar...'))
-                #print 'EventStorage::loadData\n', response['events']
-                #{id, course, title, room, color, room_name, start, end}
                 for e in response['events']:
                     start = __(e['start'])
                     end = __(e['end'])
                     duration = end - start
                     room = int(e['room']) + 100
-                    event = Event(e['id'], e['course'], start, duration, e['title'])
+                    # FIXME: event type
+                    event = Event(e['id'], e['course'], 'training', start, duration, e['title'])
                     self.insert(room, event)
                 self.weekRange = week_range
                 self.emit(SIGNAL('layoutChanged()'))

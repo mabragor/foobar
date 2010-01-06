@@ -14,11 +14,26 @@ class CoachAdmin(admin.ModelAdmin):
 admin.site.register(models.Coach, CoachAdmin)
 
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ('rfid_code', 'first_name', 'last_name', 'email', 'reg_date')
-    search_fields = ('rfid_code', 'first_name')
+    list_display = ('rfid_code', 'last_name', 'first_name', 'email', 'reg_date')
+    search_fields = ('rfid_code', 'last_name', 'first_name')
     fieldsets = ((None, {'fields': ('first_name', 'last_name',
                                     'email')}),)
 admin.site.register(models.Client, ClientAdmin)
+
+class RenterAdmin(admin.ModelAdmin):
+    list_display = ('last_name', 'first_name', 'email', 'reg_date')
+    search_fields = ('last_name', 'first_name')
+    fieldsets = ((None, {'fields': ('last_name', 'first_name', 'email')}),
+                 (_('Phones'), {'fields': ('phone_mobile', 'phone_work', 'phone_home')}))
+admin.site.register(models.Renter, RenterAdmin)
+
+class RentAdmin(admin.ModelAdmin):
+    list_display = ('renter', 'status', 'title', 'begin_date', 'end_date', 'reg_date')
+    search_fields = ('renter', 'title')
+    fieldsets = ((None, {'fields': ('renter', 'paid', 'status')}),
+                 (_('Info'), {'fields': ('title', 'desc')}),
+                 (_('Dates'), {'fields': ('begin_date', 'end_date')}))
+admin.site.register(models.Rent, RentAdmin)
 
 class RoomAdmin(admin.ModelAdmin):
     list_display = ('title', 'color')
@@ -54,15 +69,3 @@ class CardAdmin(admin.ModelAdmin):
         (_('Links'), {'fields': ('course', 'client')}),
         )
 admin.site.register(models.Card, CardAdmin)
-
-class ScheduleAdmin(admin.ModelAdmin):
-    list_display = ('course', 'begin')
-    ordering = ('course', 'begin')
-    search_fields = ('course',)
-    fieldsets = ((None, {'fields': ('course', 'begin')}),)
-admin.site.register(models.Schedule, ScheduleAdmin)
-
-class VisitAdmin(admin.ModelAdmin):
-    list_display = ('client', 'schedule', 'card', 'when')
-    fieldsets = ((None, {'fields': ()}),)
-admin.site.register(models.Visit, VisitAdmin)

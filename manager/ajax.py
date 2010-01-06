@@ -131,3 +131,12 @@ def get_visitors(request, form):
     response, visitors = abstract_request(request, form)
     response.update( {'visitor_list': visitors} )
     return response
+
+@ajax_processor(None, isJavaScript)
+def get_rents(request):
+    today = date.today()
+    end = today + timedelta(days=(7 - today.weekday()))
+    print today, end
+    rents = storage.Rent.objects.filter(begin_date__range=(today, end))
+    rent_list = [i.get_info() for i in rents]
+    return {'code': 200, 'desc': 'Ok', 'rent_list': rent_list}

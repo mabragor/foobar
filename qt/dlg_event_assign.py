@@ -3,6 +3,7 @@
 
 from settings import userRoles
 from courses_tree import CoursesTree
+from http_ajax import HttpAjax
 
 import gettext
 gettext.bindtextdomain('project', './locale/')
@@ -50,6 +51,14 @@ class DlgEventAssign(QDialog):
         groupLayout.addWidget(labelRoom, 2, 0)
         groupLayout.addWidget(self.comboRoom, 2, 1)
 
+        if self.mode == 'training':
+            self.tree = CoursesTree(self)
+            courseLayout = QVBoxLayout()
+            courseLayout.addWidget(self.tree)
+            groupCourses = QGroupBox(_('Available courses'))
+            groupCourses.setLayout(courseLayout)
+            mainLayout.addWidget(groupCourses)
+
         self.buttonAssign = QPushButton(_('Assign'))
         self.buttonCancel = QPushButton(_('Cancel'))
 
@@ -61,21 +70,42 @@ class DlgEventAssign(QDialog):
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(groupLayout)
 
-        if self.mode == 'training':
-            self.tree = CoursesTree(self)
-            courseLayout = QVBoxLayout()
-            courseLayout.addWidget(self.tree)
-            groupCourses = QGroupBox(_('Available courses'))
-            groupCourses.setLayout(courseLayout)
-            mainLayout.addWidget(groupCourses)
-        else:
-            self.comboRent = QComboBox()
-            self.comboRent.addItem(_('Reserved'))
-            self.comboRent.addItem(_('Paid'))
-            labelRent = QLabel(_('Rent'))
-            labelRoom.setBuddy(self.comboRoom)
-            groupLayout.addWidget(labelRoom, 3, 0)
-            groupLayout.addWidget(self.comboRoom, 3, 1)
+        if self.mode == 'rent':
+            labels = QStringList([_('Renter'), _('Status'), _('Title'),
+                                  _('Begin'), _('End')])
+
+            self.rent = QTableWidget(0, 5)
+            self.rent.setHorizontalHeaderLabels(labels)
+            rentLayout = QVBoxLayout()
+            rentLayout.addWidget(self.rent)
+            rentGroup = QGroupBox(_('Rents'))
+            rentGroup.setLayout(rentLayout)
+            mainLayout.addWidget(rentGroup)
+
+            ajax = HttpAjax(self, '/manager/get_rents/', {})
+            response = ajax.parse_json()
+            if 'code' in response:
+                if response['code'] != 200:
+                    return QMessageBox.warning(
+                        self, _('Warning'),
+                        '[%(code)s] %(desc)s' % response,
+                        QMessageBox.Ok, QMessageBox.Ok)
+                else:
+                    rent_list = response['rent_list']
+                    status_desc = ( _('Reserved'),
+                                    _('Paid partially'),
+                                    _('Paid') )
+                    for rent_id, renter, status, title, desc, begin_date, end_date in rent_list:
+                        lastRow = self.rent.rowCount()
+                        self.rent.insertRow(lastRow)
+                        self.rent.setItem(lastRow, 0, QTableWidgetItem(renter))
+                        self.rent.setItem(lastRow, 1, QTableWidgetItem(status_desc[int(status)]))
+                        self.rent.setItem(lastRow, 2, QTableWidgetItem(title))
+                        self.rent.setItem(lastRow, 3, QTableWidgetItem(begin_date))
+                        self.rent.setItem(lastRow, 4, QTableWidgetItem(end_date))
+
+            else:
+                print 'Check response format!'
 
         mainLayout.addLayout(buttonLayout)
 
@@ -104,14 +134,17 @@ class DlgEventAssign(QDialog):
         e_time = self.editTime.time().toPyTime()
         index = self.comboRoom.currentIndex()
         room = self.comboRoom.itemData(index).toInt()
-        index = self.tree.currentIndex()
-        course = index.data(userRoles['getObjectID']).toPyObject()
-        if type(course) is not list:
-            return QMessageBox.warning(
-                self,
-                _('Warning'),
-                '\n'.join([_('What course do you want to assign?'),
-                           _('Choose the course on the course\'s tree.')]),
-                QMessageBox.Ok, QMessageBox.Ok)
-        self.callback(e_date, e_time, room, course)
+        if self.mode == 'training':
+            index = self.tree.currentIndex()
+            course = index.data(userRoles['getObjectID']).toPyObject()
+            if type(course) is not list:
+                return QMessageBox.warning(
+                    self,
+                    _('Warning'),
+                    '\n'.join([_('What course do you want to assign?'),
+                               _('Choose the course on the course\'s tree.')]),
+                    QMessageBox.Ok, QMessageBox.Ok)
+            self.callback(e_date, e_time, room, course)
+        else:
+            self.callback(e_date, e_time, room, course)
         self.accept()

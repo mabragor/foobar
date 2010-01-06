@@ -8,9 +8,9 @@ from datetime import timedelta, datetime
 from django.conf import settings
 
 class AbstractUser(models.Model):
-    first_name = models.CharField(max_length=64)
-    last_name = models.CharField(max_length=64)
-    email = models.EmailField(max_length=64, blank=True, null=True)
+    first_name = models.CharField(verbose_name=_(u'First name'), max_length=64)
+    last_name = models.CharField(verbose_name=_(u'Last name'), max_length=64)
+    email = models.EmailField(verbose_name=_(u'E-mail'), max_length=64, blank=True, null=True)
     reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
 
     class Meta:
@@ -33,7 +33,7 @@ class Coach(AbstractUser):
         return obj
 
 class Client(AbstractUser):
-    rfid_code = models.CharField(max_length=8)
+    rfid_code = models.CharField(verbose_name=_(u'RFID'), max_length=8)
 
     class Meta:
         verbose_name = _(u'Client')
@@ -43,13 +43,36 @@ class Client(AbstractUser):
         return [card.get_info() for card in self.card_set.all().order_by('-reg_date')]
 
 class Renter(AbstractUser):
-    phone_mobile = models.CharField(max_length=16, blank=True, null=True)
-    phone_work = models.CharField(max_length=16, blank=True, null=True)
-    phone_home = models.CharField(max_length=16, blank=True, null=True)
+    phone_mobile = models.CharField(verbose_name=_(u'Mobile phone'), max_length=16, blank=True, null=True)
+    phone_work = models.CharField(verbose_name=_(u'Work phone'), max_length=16, blank=True, null=True)
+    phone_home = models.CharField(verbose_name=_(u'Home phone'), max_length=16, blank=True, null=True)
 
     class Meta:
         verbose_name = _(u'Renter')
         verbose_name_plural = _(u'Renters')
+
+class Rent(models.Model):
+    RENT_STATUS = (('0', _(u'Reserved')), ('1', _(u'Piad partially')), ('2', _('Paid')))
+    renter = models.ForeignKey(Renter, verbose_name=_(u'Renter'))
+    status = models.CharField(verbose_name=_(u'Status'), max_length=1, choices=RENT_STATUS, default=0)
+    title = models.CharField(verbose_name=_(u'Title'), max_length=64)
+    desc = models.TextField(verbose_name=_(u'Description'), blank=True, default=u'')
+    reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
+    begin_date = models.DateField(verbose_name=_(u'Begin'))
+    end_date = models.DateField(verbose_name=_(u'End'))
+    paid = models.FloatField(verbose_name=_(u'Paid amount'))
+
+    class Meta:
+        verbose_name = _(u'Rent')
+        verbose_name_plural = _(u'Rents')
+
+    def __unicode__(self):
+        return self.title
+
+    def get_info(self):
+        return (self.pk, self.renter.__unicode__(), self.status,
+                self.title, self.desc,
+                self.begin_date, self.end_date)
 
 class Room(models.Model):
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
@@ -107,29 +130,11 @@ class Group(models.Model):
             'children': [item.get_node() for item in self.course_set.all()]
             }
 
-class Rent(models.Model):
-    RENT_STATUS = (('0', _(u'Unpaid')), ('1', _(u'Partially')), ('2', _('Paid')))
-    renter = models.ForeignKey(Renter)
-    status = models.CharField(max_length=1, choices=RENT_STATUS, default=0)
-    title = models.CharField(max_length=64)
-    desc = models.TextField(blank=True, default=u'')
-    reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
-    begin_date = models.DateTimeField(verbose_name=_(u'Begin'))
-    end_date = models.DateTimeField(verbose_name=_(u'End'))
-    paid = models.FloatField()
-
-    class Meta:
-        verbose_name = _(u'Rent')
-        verbose_name_plural = _(u'Rents')
-
-    def __unicode__(self):
-        return self.title
-
 class Course(models.Model):
-    group = models.ManyToManyField(Group)
-    coach = models.ManyToManyField(Coach)
+    group = models.ManyToManyField(Group, verbose_name=_(u'Group'))
+    coach = models.ManyToManyField(Coach, verbose_name=_(u'Coach'))
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
-    duration = models.FloatField()
+    duration = models.FloatField(verbose_name=_(u'Duration'))
     count = models.IntegerField(verbose_name=_(u'Count'))
     price = models.FloatField(verbose_name=_(u'Price'),
                               help_text=_(u'The price of the course.'),
@@ -173,8 +178,8 @@ class Course(models.Model):
 
 class Card(models.Model):
     CARD_TYPE = (('0', _(u'Normal card')), ('1', _(u'Club card')))
-    course = models.ForeignKey(Course)
-    client = models.ForeignKey(Client)
+    course = models.ForeignKey(Course, verbose_name=_(u'Course'))
+    client = models.ForeignKey(Client, verbose_name=_(u'Client'))
     type = models.CharField(verbose_name=_(u'Type'),
                             help_text=_(u'Type of client\'s card'),
                             max_length=1, choices=CARD_TYPE,
@@ -233,16 +238,16 @@ class Schedule(models.Model):
         ('1', _('Done')),
         ('2', _('Cancelled')),
     )
-    room = models.ForeignKey(Room)
-    course = models.ForeignKey(Course, null=True, blank=True)
-    rent = models.ForeignKey(Rent, null=True, blank=True)
+    room = models.ForeignKey(Room, verbose_name=_(u'Room'))
+    course = models.ForeignKey(Course, verbose_name=_(u'Course'), null=True, blank=True)
+    rent = models.ForeignKey(Rent, verbose_name=_(u'Rent'), null=True, blank=True)
     begin = models.DateTimeField(verbose_name=_(u'Begins'))
     # НЕ НУЖНО
     looking = models.BooleanField(verbose_name=_(u'Is looking for members?'), default=True)
     # НЕ НУЖНО
     places = models.BooleanField(verbose_name=_(u'Are there free places?'), default=True)
     status = models.CharField(verbose_name=_(u'Status'), max_length=1, choices=ACTION_STATUSES, null=True)
-    change = models.ForeignKey(Coach, null=True, blank=True)
+    change = models.ForeignKey(Coach, verbose_name=_(u'Change'), null=True, blank=True)
 
     class Meta:
         verbose_name = _(u'Schedule')
@@ -311,9 +316,9 @@ class Schedule(models.Model):
                  v.client.rfid_code) for v in self.visit_set.all()]
 
 class Visit(models.Model):
-    client = models.ForeignKey(Client)
-    schedule = models.ForeignKey(Schedule)
-    card = models.ForeignKey(Card, null=True, blank=True)
+    client = models.ForeignKey(Client, verbose_name=_(u'Client'))
+    schedule = models.ForeignKey(Schedule, verbose_name=_(u'Event'))
+    card = models.ForeignKey(Card, verbose_name=_(u'Card'), null=True, blank=True)
     when = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
 
     class Meta:
