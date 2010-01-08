@@ -2,7 +2,7 @@
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 import sys, re, time
-from datetime import datetime, timedelta
+from datetime import datetime, date, timedelta
 
 import gettext
 gettext.bindtextdomain('project', './locale/')
@@ -146,9 +146,10 @@ class EventStorage(QAbstractTableModel):
     def headerData(self, section, orientation, role):
         """ Метод для определения вертикальных и горизонтальных меток для
         рядов и колонок таблицы. """
-        #print 'EventStorage::headerData'
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return QVariant(self.week_days[section])
+            mon, sun = self.weekRange
+            daystr = (mon + timedelta(days=section)).strftime('%d/%m')
+            return QVariant('%s\n%s' % (self.week_days[section], daystr))
         if orientation == Qt.Vertical and role == Qt.DisplayRole:
             begin_hour, end_hour = self.work_hours
             start = timedelta(hours=begin_hour)
