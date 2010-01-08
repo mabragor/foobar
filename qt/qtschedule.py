@@ -186,10 +186,6 @@ class QtSchedule(QTableView):
         if not variant.isValid():
             return
         evt = variant.toPyObject()
-        print '---------------'
-        print dir(evt)
-        print evt.id
-        print '---------------'
         self.parent.showEventProperties(evt, room_id)
         event.accept()
 

@@ -110,12 +110,6 @@ class DlgEventInfo(QDialog):
                      self, SLOT('reject()'))
 
     def initData(self, schedule, room_id):
-        print '==============='
-        print schedule.event
-        print schedule.type, schedule.id
-        print dir(schedule)
-        print '==============='
-
         ajax = HttpAjax(self, '/manager/get_event_info/',
                         {'id': schedule.id})
         self.schedule = schedule
@@ -123,7 +117,6 @@ class DlgEventInfo(QDialog):
         self.schedule = schedule = response['info']
         event = schedule['event']
         room = schedule['room']
-        print schedule
         self.editTitle.setText(event['title'])
         self.editCoach.setText(event['coaches'])
         begin = __(schedule['begin'])
