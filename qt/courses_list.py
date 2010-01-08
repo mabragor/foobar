@@ -36,21 +36,25 @@ class CourseListModel(QAbstractTableModel):
 
     def initData(self, data):
         """
-        Формат полученных данных:
-        [{id, course_id, title, price, card_type,
-          count_sold, count_used,
-          reg_date, exp_date, cnl_date},
-          ...
-          ]
+        Формат полученных данных: см. методы about() у моделей.
         """
         for rec in data:
             if type(rec) is not dict:
                 raise 'Check format'
-            row = []
-            for i in self.model_fields: # reorder items
-                row.append(rec[i])
-            self.storage.append(row)
-
+            course = rec['course']
+            self.storage.append( [
+                course['title'],
+                rec['price'],
+                rec['type'],
+                rec['sold'],
+                rec['used'],
+                rec['register'],
+                rec['begin'],
+                rec['expire'],
+                rec['cancel'],
+                rec['id'],
+                course['id']
+                ] )
         self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
                   QModelIndex(), 1, self.rowCount())
 
@@ -66,14 +70,10 @@ class CourseListModel(QAbstractTableModel):
         changed = []
         for i in self.temporary_assigned:
             obj = self.model_fields
-            index_course_id = obj.index('course_id')
-            course_id = i[index_course_id]
-            index_card_type = obj.index('card_type')
-            card_type = i[index_card_type]
-            index_bgn_date = obj.index('bgn_date')
-            bgn_date = i[index_bgn_date]
-            index_exp_date = obj.index('exp_date')
-            exp_date = i[index_exp_date]
+            course_id = i[ obj.index('course_id') ]
+            card_type = i[ obj.index('card_type') ]
+            bgn_date = i[ obj.index('bgn_date') ]
+            exp_date = i[ obj.index('exp_date') ]
             assigned.append( (course_id, card_type,
                               unicode(bgn_date),
                               unicode(exp_date)) )
@@ -150,7 +150,6 @@ class CourseListModel(QAbstractTableModel):
 
     def setRow(self, index, record, role, card_type=1,
                bgn_date=date.today(), duration_index=0):
-        print 'setRow:', card_type, duration_index
         if index.isValid() and role == Qt.EditRole:
             today = date.today()
             reg_date = today
@@ -163,8 +162,6 @@ class CourseListModel(QAbstractTableModel):
                           relativedelta(months=+12), #3
                       )
                 exp_date = bgn_date + deltas[duration_index]
-            print bgn_date, type(bgn_date)
-            print exp_date, type(exp_date)
             title, course_id, count, price, coaches, duration = record
             record = [title, price, card_type, count, 0,
                       reg_date, bgn_date, exp_date, None, 0, course_id]
@@ -209,7 +206,6 @@ class CourseListModel(QAbstractTableModel):
         self.beginInsertRows(QModelIndex(), position, position+rows-1)
         for i in xrange(rows):
             self.storage.insert(0, tuple())
-
         self.endInsertRows()
         return True
 

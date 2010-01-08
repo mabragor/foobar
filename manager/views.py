@@ -22,7 +22,7 @@ def index(request):
 @ajax_processor()
 def ajax_get_rooms(request):
     rooms = Room.objects.all()
-    return {'rows': [item.get_store_obj() for item in rooms]}
+    return {'rows': [item.about() for item in rooms]}
 
 @ajax_processor()
 def ajax_get_course_tree(request):

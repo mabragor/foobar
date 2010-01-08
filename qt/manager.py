@@ -11,7 +11,7 @@ gettext.textdomain('project')
 _ = lambda a: unicode(gettext.gettext(a), 'utf8')
 
 from http_ajax import HttpAjax
-from event_storage import Event, EventStorage
+from event_storage import EventTraining, EventRent, EventStorage
 from qtschedule import QtScheduleDelegate, QtSchedule
 
 from courses_tree import CoursesTree, TreeModel
@@ -51,7 +51,7 @@ class MainWindow(QMainWindow):
 
     def setupViews(self):
         self.tree = self.getCoursesTree()
-        self.rooms = tuple( [ (a['text'], a['color'], a['id'] + 100) for a in self.getRooms()['rows'] ] )
+        self.rooms = tuple( [ (a['title'], a['color'], a['id'] + 100) for a in self.getRooms()['rows'] ] )
 
         self.scheduleModel = EventStorage(
             (8, 23), timedelta(minutes=30), self.rooms, self
@@ -251,17 +251,9 @@ class MainWindow(QMainWindow):
                              'begin': begin,
                              'ev_type': 0})
             response = ajax.parse_json()
-            if response['code'] != 200:
-                return QMessageBox.warning(
-                    self,
-                    _('Warning'),
-                    '[%(code)s] %(desc)s' % response,
-                    QMessageBox.Ok, QMessageBox.Ok)
-
             id = int(response['saved_id'])
-            event = Event(id, course_id, 'training', begin, duration, title)
+            event = EventTraining(course, id, begin, duration, 0)
             self.schedule.insertEvent(room, event)
-
 
 	self.dialog = DlgEventAssign('training', self)
 	self.dialog.setModal(True)
@@ -271,8 +263,22 @@ class MainWindow(QMainWindow):
 	self.dialog.exec_()
 
     def eventRent(self):
-        def callback(e_date, e_time, room_tuple, course):
-            pass
+        def callback(e_date, e_time, room_tuple, rent):
+            room, ok = room_tuple
+            rent_id, renter, status, title, desc, begin_date, end_date = rent
+            begin = datetime.combine(e_date, e_time)
+#             duration = timedelta(minutes=int(duration * 60))
+
+#             ajax = HttpAjax(self, '/manager/cal_event_add/',
+#                             {'course_id': course_id,
+#                              'room_id': room - 100,
+#                              'begin': begin,
+#                              'ev_type': 0})
+#             response = ajax.parse_json()
+#             if response['code'] != 200:
+#             id = int(response['saved_id'])
+#             event = Event(id, course_id, 'training', begin, duration, title)
+#             self.schedule.insertEvent(room, event)
 	self.dialog = DlgEventAssign('rent', self)
 	self.dialog.setModal(True)
         self.dialog.setCallback(callback)
@@ -288,15 +294,7 @@ class MainWindow(QMainWindow):
                             {'from_date': from_range[0],
                              'to_date': to_range[0]})
             response = ajax.parse_json()
-            if response['code'] == 200:
-                self.statusBar().showMessage(_('The week has been copied sucessfully.'))
-            else:
-                return QMessageBox.warning(
-                    self,
-                    _('Warning'),
-                    '[%(code)s] %(desc)s' % response,
-                    QMessageBox.Ok, QMessageBox.Ok)
-                print 'AJAX copyWeek(): [%(code)s] %(desc)s' % response
+            self.statusBar().showMessage(_('The week has been copied sucessfully.'))
 
 	self.dialog = DlgCopyWeek(self)
 	self.dialog.setModal(True)
@@ -317,7 +315,7 @@ class MainWindow(QMainWindow):
     def showEventProperties(self, calendar_event, room_id):
 	self.dialog = DlgEventInfo(self)
 	self.dialog.setModal(True)
-        self.dialog.initData(calendar_event, room_id, self.rooms)
+        self.dialog.initData(calendar_event, room_id)
 	self.dialog.exec_()
 
     # Drag'n'Drop section begins

@@ -51,6 +51,9 @@ class DlgEventAssign(QDialog):
         groupLayout.addWidget(labelRoom, 2, 0)
         groupLayout.addWidget(self.comboRoom, 2, 1)
 
+        mainLayout = QVBoxLayout()
+        mainLayout.addLayout(groupLayout)
+
         if self.mode == 'training':
             self.tree = CoursesTree(self)
             courseLayout = QVBoxLayout()
@@ -67,9 +70,6 @@ class DlgEventAssign(QDialog):
         buttonLayout.addWidget(self.buttonAssign)
         buttonLayout.addWidget(self.buttonCancel)
 
-        mainLayout = QVBoxLayout()
-        mainLayout.addLayout(groupLayout)
-
         if self.mode == 'rent':
             labels = QStringList([_('Renter'), _('Status'), _('Title'),
                                   _('Begin'), _('End')])
@@ -84,26 +84,18 @@ class DlgEventAssign(QDialog):
 
             ajax = HttpAjax(self, '/manager/get_rents/', {})
             response = ajax.parse_json()
-            if 'code' in response:
-                if response['code'] != 200:
-                    return QMessageBox.warning(
-                        self, _('Warning'),
-                        '[%(code)s] %(desc)s' % response,
-                        QMessageBox.Ok, QMessageBox.Ok)
-                else:
-                    rent_list = response['rent_list']
-                    status_desc = ( _('Reserved'),
-                                    _('Paid partially'),
-                                    _('Paid') )
-                    for rent_id, renter, status, title, desc, begin_date, end_date in rent_list:
-                        lastRow = self.rent.rowCount()
-                        self.rent.insertRow(lastRow)
-                        self.rent.setItem(lastRow, 0, QTableWidgetItem(renter))
-                        self.rent.setItem(lastRow, 1, QTableWidgetItem(status_desc[int(status)]))
-                        self.rent.setItem(lastRow, 2, QTableWidgetItem(title))
-                        self.rent.setItem(lastRow, 3, QTableWidgetItem(begin_date))
-                        self.rent.setItem(lastRow, 4, QTableWidgetItem(end_date))
-
+            self.rent_list = response['rent_list']
+            status_desc = ( _('Reserved'),
+                            _('Paid partially'),
+                            _('Paid') )
+            for rent_id, renter, status, title, desc, begin_date, end_date in self.rent_list:
+                lastRow = self.rent.rowCount()
+                self.rent.insertRow(lastRow)
+                self.rent.setItem(lastRow, 0, QTableWidgetItem(renter))
+                self.rent.setItem(lastRow, 1, QTableWidgetItem(status_desc[int(status)]))
+                self.rent.setItem(lastRow, 2, QTableWidgetItem(title))
+                self.rent.setItem(lastRow, 3, QTableWidgetItem(begin_date))
+                self.rent.setItem(lastRow, 4, QTableWidgetItem(end_date))
             else:
                 print 'Check response format!'
 
@@ -146,5 +138,6 @@ class DlgEventAssign(QDialog):
                     QMessageBox.Ok, QMessageBox.Ok)
             self.callback(e_date, e_time, room, course)
         else:
-            self.callback(e_date, e_time, room, course)
+            rent = self.rent_list[ self.rent.currentRow() ]
+            self.callback(e_date, e_time, room, rent)
         self.accept()

@@ -40,9 +40,17 @@ class HttpAjax(QObject):
         self.port = network.portHttpServer.text()
 
     def parse_json(self):
-        if self.response.status == 200:
+        if self.response.status == 200: # http status
             data = self.response.read()
-            return json.read(data)
+            response = json.read(data)
+            if 'code' in response and response['code'] != 200: # json status
+                QMessageBox.warning(
+                    self,
+                    _('Warning'),
+                    '[%(code)s] %(desc)s' % response,
+                    QMessageBox.Ok, QMessageBox.Ok)
+                return None
+            return response
         else:
             print self.response.status
             open('./dump.html', 'w').write(self.response.read())

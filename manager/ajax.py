@@ -20,7 +20,7 @@ isJavaScript = False
 @ajax_processor(None, isJavaScript)
 def available_courses(request):
     groups = storage.Group.objects.all()
-    return [item.get_node() for item in groups]
+    return [item.about() for item in groups]
 
 @ajax_processor(forms.UserRFID, isJavaScript)
 def get_user_info(request, form):
@@ -33,7 +33,7 @@ def get_user_info(request, form):
         'email': user.email,
         'rfid_id': rfid_id,
         'reg_date': user.reg_date,
-        'course_list': user.get_course_list()
+        'course_list': user.course_list()
         }
 
 @ajax_processor(forms.UserName, isJavaScript)
@@ -99,7 +99,7 @@ def abstract_remove(request, form):
     return {'code': 200, 'desc': 'Ok'}
 
 @ajax_processor(forms.GetScheduleInfo, isJavaScript)
-def get_course_info(request, form):
+def get_event_info(request, form):
     response, result = abstract_request(request, form)
     response.update( {'info': result} )
     return response
@@ -138,5 +138,5 @@ def get_rents(request):
     end = today + timedelta(days=(7 - today.weekday()))
     print today, end
     rents = storage.Rent.objects.filter(begin_date__range=(today, end))
-    rent_list = [i.get_info() for i in rents]
+    rent_list = [i.about() for i in rents]
     return {'code': 200, 'desc': 'Ok', 'rent_list': rent_list}

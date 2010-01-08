@@ -51,6 +51,13 @@ class DlgEventInfo(QDialog):
         self.comboRoom.setDisabled(True)
         labelRoom.setBuddy(self.comboRoom)
 
+        labelStatus = QLabel(_('Status'))
+        self.comboStatus = QComboBox()
+        self.comboStatus.addItem(_('Waiting'), QVariant(0))
+        self.comboStatus.addItem(_('Warning'), QVariant(1))
+        self.comboStatus.addItem(_('Passed'), QVariant(2))
+        labelStatus.setBuddy(self.comboStatus)
+
         groupLayout = QGridLayout()
         groupLayout.setColumnStretch(1, 1)
         groupLayout.setColumnMinimumWidth(1, 250)
@@ -83,7 +90,7 @@ class DlgEventInfo(QDialog):
         mainLayout.addLayout(buttonLayout)
 
         self.setLayout(mainLayout)
-        self.setWindowTitle(_('Register the visit'))
+        self.setWindowTitle(_('Event'))
         self.setSignals()
 
     def setCallback(self, callback):
@@ -102,28 +109,33 @@ class DlgEventInfo(QDialog):
         self.connect(self.buttonClose, SIGNAL('clicked()'),
                      self, SLOT('reject()'))
 
-    def initData(self, calendar_event, room_id, rooms):
-        ajax = HttpAjax(self, '/manager/get_course_info/',
-                        {'id': calendar_event.id})
-        self.calendar_event = calendar_event
+    def initData(self, schedule, room_id):
+        print '==============='
+        print schedule.event
+        print schedule.type, schedule.id
+        print dir(schedule)
+        print '==============='
+
+        ajax = HttpAjax(self, '/manager/get_event_info/',
+                        {'id': schedule.id})
+        self.schedule = schedule
         response = ajax.parse_json()
-        if response['code'] != 200:
-            return QMessageBox.warning(
-                self,
-                _('Warning'),
-                '[%(code)s] %(desc)s' % response,
-                QMessageBox.Ok, QMessageBox.Ok)
-        self.event_info = info = response['info']
-        self.editTitle.setText(info['title'])
-        self.editCoach.setText(info['coach'])
-        start = __(info['start'])
-        end = __(info['end'])
-        self.editBegin.setDateTime(QDateTime(start))
-        duration = (end - start).seconds / 60
+        self.schedule = schedule = response['info']
+        event = schedule['event']
+        room = schedule['room']
+        print schedule
+        self.editTitle.setText(event['title'])
+        self.editCoach.setText(event['coaches'])
+        begin = __(schedule['begin'])
+        end = __(schedule['end'])
+        self.editBegin.setDateTime(QDateTime(begin))
+        duration = (end - begin).seconds / 60
         self.editDuration.setText(str(duration))
-        self.setRooms(rooms, int(info['room']) + 100)
+        self.setRooms(self.parent.rooms, int(room['id']))
+        self.comboStatus.setCurrentIndex( int(schedule['status']) )
 
     def setRooms(self, rooms, current_id):
+        current_id += 100
         current = 0
         for title, color, id in rooms:
             self.comboRoom.addItem(title, QVariant(id))
@@ -143,14 +155,13 @@ class DlgEventInfo(QDialog):
 	if QDialog.Accepted == dlgStatus:
 	    ajax = HttpAjax(self, '/manager/register_visit/',
 			    {'rfid_code': self.rfid_id,
-                             'event_id': self.event_info['id']})
+                             'event_id': self.schedule['id']})
 	    response = ajax.parse_json()
             if response and 'code' in response:
                 if response['code'] == 200:
                     reply = QMessageBox.information(
                         self, _('Client registration'),
                         _('The client is registered on this event.'))
-                    self.reject()
                 else:
                     QMessageBox.warning(self, _('Warning'),
                                         response['desc'],
@@ -168,7 +179,7 @@ class DlgEventInfo(QDialog):
             QMessageBox.Yes, QMessageBox.No)
         if reply == QMessageBox.Yes:
             ajax = HttpAjax(self, '/manager/cal_event_del/',
-                            {'id': self.event_info['id']})
+                            {'id': self.schedule['id']})
             if ajax:
                 response = ajax.parse_json()
                 if 'code' in response:
@@ -176,7 +187,7 @@ class DlgEventInfo(QDialog):
                         index = self.comboRoom.currentIndex()
                         room_id, ok = self.comboRoom.itemData(index).toInt()
                         model = self.parent.scheduleModel
-                        model.remove(self.calendar_event, room_id)
+                        model.remove(self.schedule, room_id)
                         self.reject()
                 else:
                     print _('Check response format!')
@@ -186,5 +197,5 @@ class DlgEventInfo(QDialog):
     def showVisitors(self):
         dialog = DlgShowVisitors(self)
         dialog.setModal(True)
-        dialog.initData(self.event_info['id'])
+        dialog.initData(self.schedule['id'])
         dialog.exec_()

@@ -20,16 +20,44 @@ class Event(object):
 
     """ Класс события. """
 
-    def __init__(self, id, course_id, e_type, dt, duration, course, *args, **kwargs):
-        self.id = id
-        self.course_id = course_id
-        self.type = e_type
-        self.dt = dt
+    def __init__(self, id, begin, duration, status):
+        self.schedule_id = id
+        self.begin = begin
         self.duration = duration
-        self.course = course
+        self.status = status
 
     def __unicode__(self):
-        return self.course
+        return self.title
+
+    @property
+    def id(self):
+        return self.schedule_id
+
+    @property
+    def event_id(self):
+        return self.event['id']
+
+    @property
+    def title(self):
+        return self.event['title']
+
+class EventTraining(Event):
+
+    """ Класс тренировки. """
+
+    def __init__(self, course, schedule_id, begin, duration, status):
+        Event.__init__(self, schedule_id, begin, duration, status)
+        self.type = 'training'
+        self.event = course
+
+class EventRent(Event):
+
+    """ Класс аренды. """
+
+    def __init__(self, rent, schedule_id, begin, duration, status):
+        Event.__init__(self, schedule_id, begin, duration, status)
+        self.type = 'rent'
+        self.event = rent
 
 class EventStorage(QAbstractTableModel):
 
@@ -96,30 +124,23 @@ class EventStorage(QAbstractTableModel):
         self.initModel()
         self.parent.statusBar().showMessage(_('Request information for the calendar.'))
         monday, sunday = week_range = self.date2range(d)
-	ajax = HttpAjax(self, '/manager/get_week/',
+	ajax = HttpAjax(self.parent, '/manager/get_week/',
                         {'monday': monday,
                          'filter': []})
 	if ajax:
             self.parent.statusBar().showMessage(_('Parsing the response...'))
 	    response = ajax.parse_json()
-            if 'code' in response:
-                print 'AJAX result: [%(code)s] %(desc)s' % response
-            else:
-                print _('Check response format!')
-            if response['code'] == 200:
-                self.parent.statusBar().showMessage(_('Filling the calendar...'))
-                for e in response['events']:
-                    start = __(e['start'])
-                    end = __(e['end'])
-                    duration = end - start
-                    room = int(e['room']) + 100
-                    # FIXME: event type
-                    event = Event(e['id'], e['course'], 'training', start, duration, e['title'])
-                    self.insert(room, event)
-                self.weekRange = week_range
-                self.emit(SIGNAL('layoutChanged()'))
-                self.parent.statusBar().showMessage(_('Done'), 2000)
-                return True
+            self.parent.statusBar().showMessage(_('Filling the calendar...'))
+            for e in response['events']:
+                begin = __(e['begin'])
+                end = __(e['end'])
+                duration = end - begin
+                event = EventTraining(e['event'], e['id'], begin, duration, e['status'])
+                self.insert( int(e['room']['id']), event )
+            self.weekRange = week_range
+            self.emit(SIGNAL('layoutChanged()'))
+            self.parent.statusBar().showMessage(_('Done'), 2000)
+            return True
 	return False
 
     def headerData(self, section, orientation, role):
@@ -144,16 +165,16 @@ class EventStorage(QAbstractTableModel):
         event = self.get_event_by_cell(index.row(), index.column(), room_id)
         if event:
             if role == Qt.ToolTipRole:
-                return QVariant(event.course)
+                return QVariant(event.title)
             if role == Qt.DisplayRole:
                 cells = self.get_cells_by_event(event, room_id)
                 if cells:
                     if cells[0] == (index.row(), index.column()):
-                        event.type = 'head'
+                        event.show_type = 'head'
                     elif cells[-1] == (index.row(), index.column()):
-                        event.type = 'tail'
+                        event.show_type = 'tail'
                     else:
-                        event.type = 'body'
+                        event.show_type = 'body'
                 return QVariant(event)
         return QVariant()
 
@@ -212,7 +233,8 @@ class EventStorage(QAbstractTableModel):
 
     def insert(self, room, event):
         """ Метод регистрации нового события. """
-        row, col = self.datetime2rowcol(event.dt)
+        room += 100 # we have to use this shift
+        row, col = self.datetime2rowcol(event.begin)
         #self.beginInsertRows(QModelIndex(), row, row)
         cells = []
         for i in xrange(event.duration.seconds / self.quant.seconds):

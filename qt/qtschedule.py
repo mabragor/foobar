@@ -185,8 +185,12 @@ class QtSchedule(QTableView):
         variant = model.data(model.index(row, col), Qt.DisplayRole, room_id)
         if not variant.isValid():
             return
-        cal_event = variant.toPyObject()
-        self.parent.showEventProperties(cal_event, room_id)
+        evt = variant.toPyObject()
+        print '---------------'
+        print dir(evt)
+        print evt.id
+        print '---------------'
+        self.parent.showEventProperties(evt, room_id)
         event.accept()
 
     def mouseMoveEvent(self, event):
@@ -290,7 +294,7 @@ class QtScheduleDelegate(QItemDelegate):
 
         for room_name, room_color, room_id in rooms:
             event = model.data(index, Qt.DisplayRole, room_id).toPyObject()
-            if type(event) is Event:
+            if isinstance(event, Event):
                 # заполняем тело события
                 w = option.rect.width() / count
                 h = option.rect.height()
@@ -306,9 +310,9 @@ class QtScheduleDelegate(QItemDelegate):
                 # отрисовываем элементы в зависимости от типа ячейки
                 painter.drawLine(x, y+h, x, y)
                 painter.drawLine(x+w, y+h, x+w, y)
-                if event.type == 'head':
+                if event.show_type == 'head':
                     painter.drawLine(x, y, x+w, y)
-                elif event.type == 'tail':
+                elif event.show_type == 'tail':
                     painter.drawLine(x, y+h, x+w, y+h)
                 else:
                     pass

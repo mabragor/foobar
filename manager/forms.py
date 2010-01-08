@@ -209,7 +209,7 @@ class GetScheduleInfo(AjaxForm):
     def query(self):
         id = self.cleaned_data['id']
         event = storage.Schedule.objects.get(id=id)
-        info = event.get_calendar_obj()
+        info = event.about()
         return info
 
 class UserRFID(forms.Form):
@@ -246,7 +246,7 @@ class DateRange(AjaxForm):
         schedules = storage.Schedule.objects.filter(begin__range=(monday, limit))
         if len(filter) > 0:
             schedules = schedules.filter(room__in=c['filter'])
-        events = [item.get_calendar_obj() for item in schedules]
+        events = [item.about() for item in schedules]
         return events
 
 class CalendarEventAdd(AjaxForm):

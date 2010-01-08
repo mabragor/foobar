@@ -8,8 +8,8 @@ from datetime import timedelta, datetime
 from django.conf import settings
 
 class AbstractUser(models.Model):
-    first_name = models.CharField(verbose_name=_(u'First name'), max_length=64)
     last_name = models.CharField(verbose_name=_(u'Last name'), max_length=64)
+    first_name = models.CharField(verbose_name=_(u'First name'), max_length=64)
     email = models.EmailField(verbose_name=_(u'E-mail'), max_length=64, blank=True, null=True)
     reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
 
@@ -19,18 +19,31 @@ class AbstractUser(models.Model):
     def __unicode__(self):
         return unicode('%s %s' % (self.first_name, self.last_name))
 
+    def about(self):
+        return {
+            'id': self.pk,
+            'last_name': self.last_name,
+            'first_name': self.first_name,
+            'email': self.email,
+            }
+
 class Coach(AbstractUser):
 
     class Meta:
         verbose_name = _(u'Coach')
         verbose_name_plural = _(u'Coaches')
 
-    def get_store_obj(self):
-        obj = {
-            'id': self.pk,
-            'name': self.__unicode__()
-        }
-        return obj
+#     def get_store_obj(self):
+#         obj = {
+#             'id': self.pk,
+#             'name': self.__unicode__()
+#         }
+#         return obj
+
+    def about(self):
+        result = super(Coach, self).about()
+        result.update( {} )
+        return result
 
 class Client(AbstractUser):
     rfid_code = models.CharField(verbose_name=_(u'RFID'), max_length=8)
@@ -39,8 +52,13 @@ class Client(AbstractUser):
         verbose_name = _(u'Client')
         verbose_name_plural = _(u'Clients')
 
-    def get_course_list(self):
-        return [card.get_info() for card in self.card_set.all().order_by('-reg_date')]
+    def about(self):
+        result = super(Client, self).about()
+        result.update( {'rfid_code': self.rfid_code} )
+        return result
+
+    def course_list(self):
+        return [card.about() for card in self.card_set.all().order_by('-reg_date')]
 
 class Renter(AbstractUser):
     phone_mobile = models.CharField(verbose_name=_(u'Mobile phone'), max_length=16, blank=True, null=True)
@@ -50,6 +68,15 @@ class Renter(AbstractUser):
     class Meta:
         verbose_name = _(u'Renter')
         verbose_name_plural = _(u'Renters')
+
+    def about(self):
+        result = super(Renter, self).about()
+        result.update( {
+                'phone_mobile': self.phone_mobile,
+                'phone_work': self.phone_work,
+                'phone_home': self.phone_home,
+                } )
+        return result
 
 class Rent(models.Model):
     RENT_STATUS = (('0', _(u'Reserved')), ('1', _(u'Piad partially')), ('2', _('Paid')))
@@ -69,10 +96,16 @@ class Rent(models.Model):
     def __unicode__(self):
         return self.title
 
-    def get_info(self):
-        return (self.pk, self.renter.__unicode__(), self.status,
-                self.title, self.desc,
-                self.begin_date, self.end_date)
+    def about(self):
+        return {
+            'id': self.pk,
+            'renter': self.renter.about(),
+            'status': self.status,
+            'title': self.title,
+            'desc': self.desc,
+            'begin': self.begin_date,
+            'end': self.end_date
+            }
 
 class Room(models.Model):
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
@@ -85,23 +118,12 @@ class Room(models.Model):
     def __unicode__(self):
         return self.title
 
-    def get_store_obj(self):
-        obj = {
+    def about(self):
+        return {
             'id': self.pk,
+            'title': self.title,
             'color': self.color,
-            'text': self.title
         }
-        return obj
-
-    def get_tree_node(self):
-        obj = {
-            'id': self.pk,
-            'text': self.title,
-            'leaf': True,
-            'cls': 'file',
-            'color': self.color
-        }
-        return obj
 
 class Group(models.Model):
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
@@ -113,22 +135,16 @@ class Group(models.Model):
     def __unicode__(self):
         return self.title
 
-    def get_tree_node(self):
-        obj = {
-            'id': 'g_%s' % self.pk,
-            'text': self.title,
-            'cls': 'folder',
-            'children': [item.get_tree_node() for item in self.course_set.all()],
-            'allowDrag': False
-        }
-        return obj
-
-    def get_node(self):
+    def about(self):
         return {
             'id': self.pk,
             'title': self.title,
-            'children': [item.get_node() for item in self.course_set.all()]
+            'children': self.children,
             }
+
+    @property
+    def children(self):
+        return [item.about() for item in self.course_set.all()]
 
 class Course(models.Model):
     group = models.ManyToManyField(Group, verbose_name=_(u'Group'))
@@ -157,23 +173,15 @@ class Course(models.Model):
     def groups(self):
         return ','.join([unicode(a) for a in self.group.all()])
 
-    def get_tree_node(self):
-        coaches = ', '.join(unicode(coach) for coach in self.coach.all())
+    def about(self):
         return {
             'id': self.pk,
-            'text': '%s : %s' % (self.title, coaches),
-            'leaf': True,
-            'cls': 'file'
-            }
-
-    def get_node(self):
-        return {
-            'id': self.pk,
+            'groups': self.groups(),
+            'coaches': self.coaches(),
             'title': self.title,
-            'coaches': ','.join([item.__unicode__() for item in self.coach.all()]),
+            'duration': self.duration,
             'count': self.count,
             'price': self.price,
-            'duration': self.duration
             }
 
 class Card(models.Model):
@@ -202,23 +210,20 @@ class Card(models.Model):
     def __unicode__(self):
         return self.course.title
 
-    def get_info(self):
+    def about(self):
         return {
             'id': self.pk,
-            'course_id': self.course.pk,
-            'title': self.course.title,
-            'reg_date': self.reg_date,
-            'bgn_date': self.bgn_date,
-            'exp_date': self.exp_date,
-            'cnl_date': self.cnl_date,
-            'count_sold': self.count_sold,
-            'count_used': self.count_used,
+            'course': self.course.about(),
+            'client': self.client.about(),
+            'type': self.type,
+            'register': self.reg_date,
+            'begin': self.bgn_date,
+            'expire': self.exp_date,
+            'cancel': self.cnl_date,
+            'sold': self.count_sold,
+            'used': self.count_used,
             'price': self.price,
-            'card_type': self.type,
-            # это надо будет удалить
-            'deleteable': False,#self.deleteable(),
-            'is_old': self.is_old()
-        }
+            }
 
     def deleteable(self):
         #if self.reg_date <= datetime.now() - timedelta(days=1):
@@ -235,19 +240,18 @@ class Card(models.Model):
 class Schedule(models.Model):
     ACTION_STATUSES = (
         ('0', _('Waiting')),
-        ('1', _('Done')),
-        ('2', _('Cancelled')),
+        ('1', _('Warning')),
+        ('2', _('Passed')),
     )
     room = models.ForeignKey(Room, verbose_name=_(u'Room'))
     course = models.ForeignKey(Course, verbose_name=_(u'Course'), null=True, blank=True)
     rent = models.ForeignKey(Rent, verbose_name=_(u'Rent'), null=True, blank=True)
     begin = models.DateTimeField(verbose_name=_(u'Begins'))
-    # НЕ НУЖНО
-    looking = models.BooleanField(verbose_name=_(u'Is looking for members?'), default=True)
-    # НЕ НУЖНО
-    places = models.BooleanField(verbose_name=_(u'Are there free places?'), default=True)
     status = models.CharField(verbose_name=_(u'Status'), max_length=1, choices=ACTION_STATUSES, null=True)
     change = models.ForeignKey(Coach, verbose_name=_(u'Change'), null=True, blank=True)
+    # НЕ НУЖНО
+    looking = models.BooleanField(verbose_name=_(u'Is looking for members?'), default=True)
+    places = models.BooleanField(verbose_name=_(u'Are there free places?'), default=True)
 
     class Meta:
         verbose_name = _(u'Schedule')
@@ -260,18 +264,18 @@ class Schedule(models.Model):
     def end(self):
         return self.begin + timedelta(minutes=int(60 * self.course.duration))
 
-    def get_calendar_obj(self):
+    def about(self):
         obj = {
             'id': self.pk,
-            'start': self.begin,
+            'room': self.room.about(),
+            'begin': self.begin,
             'end': self.end,
-            'room': self.room.pk,
-            'color': self.room.color,
-            'course': self.course.pk,
-            'coach': ' '.join([unicode(item) for item in self.course.coach.all()]),
-            'room_name': self.room.__unicode__(),
-            'title': self.course.__unicode__()
+            'status': self.status,
         }
+        if self.course:
+            obj.update( {'type': 'training', 'event': self.course.about()} )
+        if self.rent:
+            obj.update( {'type': 'rent', 'event': self.rent.about()} )
         return obj
 
     def get_for_user(self, user):
@@ -326,3 +330,11 @@ class Visit(models.Model):
         verbose_name_plural = _(u'Visits')
         unique_together = ('client', 'schedule')
 
+    def about(self):
+        return {
+            'id': self.pk,
+            'client': self.client.about(),
+            'event': self.schedule.about(),
+            'card': self.card.about(),
+            'when': self.when,
+            }
