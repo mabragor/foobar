@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
+# (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 from http_ajax import HttpAjax
 
@@ -13,10 +13,11 @@ from PyQt4.QtCore import *
 
 class DlgSearchByName(QDialog):
 
-    def __init__(self, parent=None):
+    def __init__(self, mode='client', parent=None):
         QDialog.__init__(self, parent)
 
         self.setMinimumWidth(500)
+        self.mode = mode
 
         labelField = QLabel(_('Search'))
         self.editField = QLineEdit()
@@ -26,26 +27,26 @@ class DlgSearchByName(QDialog):
         fieldLayout.addWidget(labelField)
         fieldLayout.addWidget(self.editField)
 
-        buttonFind = QPushButton(_('Find'))
+        self.buttonFind = QPushButton(_('Find'))
         buttonCancel = QPushButton(_('Cancel'))
 
-        self.connect(buttonFind, SIGNAL('clicked()'),
+        self.connect(self.buttonFind, SIGNAL('clicked()'),
                      self.searchFor)
         self.connect(buttonCancel, SIGNAL('clicked()'),
                      self, SLOT('reject()'))
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch(1)
-        buttonLayout.addWidget(buttonFind)
+        buttonLayout.addWidget(self.buttonFind)
         buttonLayout.addWidget(buttonCancel)
 
         labels = QStringList([_('Last name'),
                               _('First name'),
-                              _('RFID code')])
+                              _('E-mail')])
 
         self.userTable = QTableWidget(0, 3)
         self.userTable.setHorizontalHeaderLabels(labels)
-        self.userTable.hideColumn(2)
+        #self.userTable.hideColumn(2)
 
         self.userTable.setSelectionMode(QAbstractItemView.SingleSelection)
 
@@ -72,40 +73,38 @@ class DlgSearchByName(QDialog):
         self.mainLayout.addLayout(button2Layout)
 
         self.setLayout(self.mainLayout)
-        self.setWindowTitle(_('Search client by name'))
+
+        if self.mode == 'client':
+            self.setWindowTitle(_('Search client by name'))
+        else:
+            self.setWindowTitle(_('Search renter by name'))
 
     def setCallback(self, callback):
         self.callback = callback
 
     def searchFor(self):
-        name = self.editField.text()
-        ajax = HttpAjax(self, '/manager/get_users_info_by_name/',
-                        {'name': name,})
+        name = self.editField.text().toUtf8()
+        params = {'name': name, 'mode': self.mode}
+        ajax = HttpAjax(self, '/manager/get_users_info_by_name/', params)
         response = ajax.parse_json()
-        if 'code' in response:
-            if response['code'] == 200:
-                user_list = response['user_list']
-                self.showList(user_list)
-            print 'AJAX result: [%(code)s] %(desc)s' % response
-        else:
-            print 'Check response format!'
-
+        user_list = response['users']
+        self.showList(user_list)
 
     def showList(self, user_list):
         self.user_list = user_list
         while self.userTable.rowCount() > 0:
             self.userTable.removeRow(0)
 
-        for last_name, first_name, rfid_code in user_list:
+        for user in user_list:
             lastRow = self.userTable.rowCount()
             self.userTable.insertRow(lastRow)
-            self.userTable.setItem(lastRow, 0, QTableWidgetItem(last_name))
-            self.userTable.setItem(lastRow, 1, QTableWidgetItem(first_name))
-            self.userTable.setItem(lastRow, 2, QTableWidgetItem(rfid_code))
+            self.userTable.setItem(lastRow, 0, QTableWidgetItem(user['last_name']))
+            self.userTable.setItem(lastRow, 1, QTableWidgetItem(user['first_name']))
+            self.userTable.setItem(lastRow, 2, QTableWidgetItem(user['email']))
 
         if len(user_list) > 0:
             self.userTable.selectRow(0)
-            self.buttonShow.setDisabled(False)
+            self.buttonFind.setDisabled(False)
             self.buttonShow.setFocus(Qt.OtherFocusReason)
         else:
             self.buttonShow.setDisabled(True)
@@ -113,6 +112,6 @@ class DlgSearchByName(QDialog):
 
     def applyDialog(self):
         index = self.userTable.currentIndex()
-        rfid_code = self.user_list[index.row()][2]
-        self.callback(rfid_code)
+        user_id = self.user_list[index.row()]['id']
+        self.callback(user_id)
         self.accept()

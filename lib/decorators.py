@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
+# (c) 2009      Dmitry <alerion.um@gmail.com>
 
 from django.conf import settings
 from django.shortcuts import render_to_response

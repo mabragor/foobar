@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+# (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
+# (c) 2009      Dmitry <alerion.um@gmail.com>
+
 from django.utils import simplejson, datetime_safe
 
 import time

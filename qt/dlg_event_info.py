@@ -115,6 +115,7 @@ class DlgEventInfo(QDialog):
         self.schedule = schedule
         response = ajax.parse_json()
         self.schedule = schedule = response['info']
+        print schedule
         event = schedule['event']
         room = schedule['room']
         self.editTitle.setText(event['title'])

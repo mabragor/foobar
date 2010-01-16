@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
+# (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 import httplib, urllib, json
 
@@ -24,7 +24,7 @@ class HttpAjax(QObject):
         headers = {'Content-type': 'application/x-www-form-urlencoded',
                    'Accept': 'text/plain'}
         hostport = '%s:%s' % (self.host, self.port)
-        print hostport
+        print 'HttpAjax:', hostport
         conn = httplib.HTTPConnection(hostport)
         conn.request('POST', url, params, headers)
         self.response = conn.getresponse()
@@ -44,11 +44,9 @@ class HttpAjax(QObject):
             data = self.response.read()
             response = json.read(data)
             if 'code' in response and response['code'] != 200: # json status
-                QMessageBox.warning(
-                    self,
-                    _('Warning'),
-                    '[%(code)s] %(desc)s' % response,
-                    QMessageBox.Ok, QMessageBox.Ok)
+                QMessageBox.warning(self.parent, _('Warning'),
+                                    '[%(code)s] %(desc)s' % response,
+                                    QMessageBox.Ok, QMessageBox.Ok)
                 return None
             return response
         else:

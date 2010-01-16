@@ -54,11 +54,12 @@ class Client(AbstractUser):
 
     def about(self):
         result = super(Client, self).about()
-        result.update( {'rfid_code': self.rfid_code} )
+        result.update( {'rfid_code': self.rfid_code,
+                        'course_list': self.course_list()} )
         return result
 
     def course_list(self):
-        return [card.about() for card in self.card_set.all().order_by('-reg_date')]
+        return [card.about(True) for card in self.card_set.all().order_by('-reg_date')]
 
 class Renter(AbstractUser):
     phone_mobile = models.CharField(verbose_name=_(u'Mobile phone'), max_length=16, blank=True, null=True)
@@ -75,8 +76,12 @@ class Renter(AbstractUser):
                 'phone_mobile': self.phone_mobile,
                 'phone_work': self.phone_work,
                 'phone_home': self.phone_home,
+                'rent_list': self.rent_list()
                 } )
         return result
+
+    def rent_list(self):
+        return [rent.about(True) for rent in self.rent_set.all().order_by('-reg_date')]
 
 class Rent(models.Model):
     RENT_STATUS = (('0', _(u'Reserved')), ('1', _(u'Piad partially')), ('2', _('Paid')))
@@ -96,16 +101,20 @@ class Rent(models.Model):
     def __unicode__(self):
         return self.title
 
-    def about(self):
-        return {
+    def about(self, short=False):
+        result = {
             'id': self.pk,
-            'renter': self.renter.about(),
             'status': self.status,
             'title': self.title,
             'desc': self.desc,
-            'begin': self.begin_date,
-            'end': self.end_date
+            'reg_date': self.reg_date,
+            'begin_date': self.begin_date,
+            'end_date': self.end_date,
+            'paid': self.paid,
             }
+        if not short:
+            result.update( {'renter': self.renter.about(),} )
+        return result
 
 class Room(models.Model):
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
@@ -210,11 +219,10 @@ class Card(models.Model):
     def __unicode__(self):
         return self.course.title
 
-    def about(self):
-        return {
+    def about(self, short=False):
+        obj = {
             'id': self.pk,
             'course': self.course.about(),
-            'client': self.client.about(),
             'type': self.type,
             'register': self.reg_date,
             'begin': self.bgn_date,
@@ -224,6 +232,9 @@ class Card(models.Model):
             'used': self.count_used,
             'price': self.price,
             }
+        if not short:
+            obj.update( {'client': self.client.about(),} )
+        return obj
 
     def deleteable(self):
         #if self.reg_date <= datetime.now() - timedelta(days=1):

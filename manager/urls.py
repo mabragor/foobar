@@ -26,9 +26,12 @@ urlpatterns = patterns(
 
 urlpatterns += patterns(
     'manager.ajax',
-    url(r'^get_user_info/$', 'get_user_info'),
+    url(r'^get_client_info/$', 'get_client_info'),
+    url(r'^get_renter_info/$', 'get_renter_info'),
     url(r'^get_users_info_by_name/$', 'get_users_info_by_name'),
     url(r'^set_user_info/$', 'set_user_info'),
+    url(r'^set_renter_info/$', 'set_renter_info'),
+    url(r'^set_rent/$', 'set_rent'),
     url(r'^available_courses/$', 'available_courses'),
     url(r'^get_event_info/$', 'get_event_info'),
     url(r'^get_week/$', 'get_week'),
@@ -36,6 +39,7 @@ urlpatterns += patterns(
     url(r'^cal_event_add/$', 'cal_event_add'),
     url(r'^cal_event_del/$', 'cal_event_del'),
     url(r'^register_visit/$', 'register_visit'),
+    url(r'^register_rent/$', 'register_rent'),
     url(r'^get_visitors/$', 'get_visitors'),
     url(r'^get_rents/$', 'get_rents'),
     )

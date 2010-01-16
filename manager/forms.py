@@ -3,9 +3,18 @@
 # (c) 2009      Dmitry <alerion.um@gmail.com>
 
 from django import forms
-from storage import models as storage
+from django.db.models import Q
 from django.utils.translation import ugettext as _
+
+from storage import models as storage
 from datetime import timedelta, datetime, date
+
+# Create own field to process a list of ids.
+class ListField(forms.Field):
+    def clean(self, data):
+        if data is None:
+            return []
+        return eval(data)
 
 class StatusForm(forms.ModelForm):
     change_flag = forms.BooleanField(required=False)
@@ -59,7 +68,6 @@ class ScheduleForm(forms.ModelForm):
                 result = result.exclude(pk=self.instance.pk)
 
             for item in result:
-                #print item.course.__unicode__()
                 if (begin < item.end < end) or (begin <= item.begin < end):
                     raise forms.ValidationError('Incorect begin date for this room')
         return self.cleaned_data
@@ -144,6 +152,9 @@ class AjaxForm(forms.Form):
 
     # TODO: check symbols of RFID code
 
+    def param(self, name):
+        return self.cleaned_data[name]
+
     def get_errors(self):
         from django.utils.encoding import force_unicode
         return ''.join([force_unicode(v) for k, v in self.errors.items()])
@@ -167,6 +178,12 @@ class AjaxForm(forms.Form):
         else:
             raise forms.ValidationError(_('Unsupported type.'))
         return value
+
+    def obj_by_id(self, model, field_name):
+        object_name = field_name.split('_')[0]
+        object_id = self.cleaned_data[field_name]
+        del( self.cleaned_data[field_name] )
+        return model.objects.get(id=object_id)
 
 class RegisterVisit(AjaxForm):
     event_id = forms.IntegerField()
@@ -209,33 +226,148 @@ class GetScheduleInfo(AjaxForm):
     def query(self):
         id = self.cleaned_data['id']
         event = storage.Schedule.objects.get(id=id)
-        info = event.about()
-        return info
+        return event.about()
 
 class UserRFID(forms.Form):
     rfid_code = forms.CharField(max_length=8)
 
-class UserName(forms.Form):
+class UserSearch(AjaxForm):
+    """ Form searches users using their names and returns users list. """
     name = forms.CharField(max_length=64)
+    mode = forms.CharField(max_length=6)
 
-# Create own field to process a list of ids.
-class ListField(forms.Field):
-    def clean(self, data):
-        if data is None:
-            return []
-        return eval(data)
+    def query(self):
+        name = self.param('name')
+        mode = self.param('mode')
+        if mode == 'client':
+            model = storage.Client
+        else: # renter
+            model = storage.Renter
+        users = model.objects.filter(Q(first_name=name)|Q(last_name=name))
+        return [item.about() for item in users]
 
-class UserInfo(forms.Form):
+class UserInfo(AjaxForm):
+    """ Base form for Client and Renter. See below. """
     user_id = forms.IntegerField()
     first_name = forms.CharField(max_length=64)
     last_name = forms.CharField(max_length=64)
     email = forms.EmailField(max_length=64)
+
+    def clean_user_id(self):
+        return int( self.cleaned_data['user_id'] )
+
+class ClientInfo(UserInfo):
+    """ See parent. FIXME """
     rfid_code = forms.CharField(max_length=8)
     course_assigned = ListField(required=False)
     course_cancelled = ListField(required=False)
     course_changed = ListField(required=False)
 
+    def save(self):
+        data = self.cleaned_data
+
+        assigned = data['course_assigned']
+
+        user_id = data['user_id']
+        for i in ['user_id', 'course_assigned',
+                  'course_changed', 'course_cancelled']:
+            del(data[i])
+        if 0 == user_id:
+            user = storage.Client(**data)
+        else:
+            user = storage.Client.objects.get(id=user_id)
+            for key, value in data.items():
+                setattr(user, key, value)
+        user.save()
+
+        if len(assigned) > 0:
+            for id, card_type, bgn_date, exp_date in assigned:
+                bgn_date = date(*[int(i) for i in bgn_date.split('-')])
+                exp_date = date(*[int(i) for i in exp_date.split('-')])
+                course = storage.Course.objects.get(id=id)
+                card = storage.Card(
+                    course=course, client=user,type=card_type,
+                    bgn_date=bgn_date, exp_date=exp_date,
+                    count_sold=course.count,
+                    price=course.price)
+                card.save()
+
+        return user.id
+
+class RenterInfo(UserInfo):
+    """ See parent. Form saves and returns the ID of the created
+    renter. Also it may just returns the user's info using passed
+    ID. """
+    phone_mobile = forms.CharField(max_length=16, required=False)
+    phone_work = forms.CharField(max_length=16, required=False)
+    phone_home = forms.CharField(max_length=16, required=False)
+
+    def save(self):
+        data = self.cleaned_data
+        user_id = data['user_id']; del(data['user_id'])
+        if 0 == user_id:
+            user = storage.Renter(**data)
+        else:
+            user = storage.Renter.objects.get(id=user_id)
+            for key, value in data.items():
+                setattr(user, key, value)
+        user.save()
+        return user.id
+
+class UserIdRfid(AjaxForm):
+    """ Form returns user's info using passed IDs and mode. """
+    user_id = forms.IntegerField(required=False)
+    rfid_code = forms.CharField(max_length=8, required=False)
+    mode = forms.CharField(max_length=6)
+
+    def query(self):
+        mode = self.param('mode')
+        user_id = self.param('user_id')
+        if mode == 'client':
+            if user_id is None:
+                user = storage.Client.objects.get(rfid_code=self.param('rfid_code'))
+            else:
+                user = storage.Client.objects.get(id=user_id)
+        elif mode == 'renter':
+            user = storage.Renter.objects.get(id=user_id)
+        return user.about()
+
+class RegisterRent(AjaxForm):
+    """ Form registers the rent and returns its ID. """
+
+    renter_id = forms.IntegerField()
+    status = forms.IntegerField()
+    title = forms.CharField(max_length=64)
+    desc = forms.CharField()
+    begin_date = forms.DateField()
+    end_date = forms.DateField()
+    paid = forms.FloatField()
+
+    def clean_renter_id(self):
+        return self.check_obj_existence(storage.Renter, 'renter_id')
+
+    # FIXME: Add the status range check
+
+    def clean(self):
+        data = self.cleaned_data
+        begin = data['begin_date']
+        end = data['end_date']
+        if begin < date.today():
+            raise forms.ValidationError(_('Avoid a rent assignment in the past.'))
+        if end < begin:
+            raise forms.ValidationError(_('Exchange the dates.'))
+        return self.cleaned_data
+
+    def save(self):
+        data = self.cleaned_data
+        data.update( {'renter': self.obj_by_id(storage.Renter, 'renter_id')} )
+        rent = storage.Rent(**data)
+        rent.save()
+        return rent.id
+
 class DateRange(AjaxForm):
+    """ Form acquires a date range and return the list of events inside
+    this range. """
     monday = forms.DateField()
     filter = ListField(required=False)
 
@@ -250,6 +382,7 @@ class DateRange(AjaxForm):
         return events
 
 class CalendarEventAdd(AjaxForm):
+    """ Form creates new event using a passing datas. """
     course_id = forms.IntegerField()
     room_id = forms.IntegerField()
     begin = forms.DateTimeField()
@@ -275,6 +408,7 @@ class CalendarEventAdd(AjaxForm):
         return event.id
 
 class CalendarEventDel(AjaxForm):
+    """ Form acquires an event ID and deletes appropriate event. """
     id = forms.IntegerField()
 
     def clean_id(self):
@@ -285,6 +419,8 @@ class CalendarEventDel(AjaxForm):
         storage.Schedule.objects.get(id=c['id']).delete()
 
 class CopyWeek(AjaxForm):
+    """ Form acquires two dates and makes a copy from first one to
+    second. """
     from_date = forms.DateField()
     to_date = forms.DateField()
 
@@ -317,11 +453,13 @@ class CopyWeek(AjaxForm):
         events = storage.Schedule.objects.filter(begin__range=(from_date, from_date+timedelta(days=7)))
         delta = to_date - from_date
         for e in events:
-            ne = storage.Schedule(room=e.room, course=e.course)
+            ne = storage.Schedule(room=e.room, course=e.course,
+                                  rent=e.rent, status=0)
             ne.begin = e.begin+delta
             ne.save()
 
 class GetVisitors(AjaxForm):
+    """ Form acquires an event ID and returns the list of visitors. """
     event_id = forms.IntegerField()
 
     def clean_event_id(self):

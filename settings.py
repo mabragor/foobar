@@ -37,14 +37,14 @@ TEMPLATE_DIRS = (
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
-    'django.contrib.comments',
+    #'django.contrib.comments',
     'django.contrib.contenttypes',
     'django.contrib.flatpages',
     'django.contrib.markup',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'django.contrib.sitemaps',
-    'django.contrib.webdesign',
+    #'django.contrib.sitemaps',
+    #'django.contrib.webdesign',
 )
 
 # robots begin

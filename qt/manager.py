@@ -19,7 +19,7 @@ from courses_tree import CoursesTree, TreeModel
 from dlg_settings import DlgSettings
 from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_searching import DlgSearchByName
-from dlg_user_info import DlgUserInfo
+from dlg_user_info import DlgClientInfo, DlgRenterInfo
 from dlg_event_assign import DlgEventAssign
 from dlg_event_info import DlgEventInfo
 from dlg_copy_week import DlgCopyWeek
@@ -156,6 +156,13 @@ class MainWindow(QMainWindow):
 		     'clientSearchName', _('Search a client with its name.')),
 		    ]
 	     ),
+	    (_('Renter'), [
+		    (_('New'), '',
+		     'renterNew', _('Register new renter.')),
+		    (_('Search by name'), '',
+		     'renterSearchName', _('Search a renter with its name.')),
+		    ]
+	     ),
 	    (_('Event'), [
 		    (_('Training'), 'Ctrl+T',
 		     'eventTraining', _('Assign a training event.')),
@@ -192,7 +199,7 @@ class MainWindow(QMainWindow):
 
     def clientNew(self):
 	print 'register new client'
-	self.dialog = DlgUserInfo(self)
+	self.dialog = DlgClientInfo(self)
 	self.dialog.setModal(True)
 	self.dialog.exec_()
 
@@ -207,33 +214,62 @@ class MainWindow(QMainWindow):
 	dlgStatus = self.dialog.exec_()
 
 	if QDialog.Accepted == dlgStatus:
-	    ajax = HttpAjax(self, '/manager/get_user_info/',
-			    {'rfid_code': self.rfid_id})
-	    json_like = ajax.parse_json()
-	    self.dialog = DlgUserInfo(self)
+	    ajax = HttpAjax(self, '/manager/get_client_info/',
+			    {'rfid_code': self.rfid_id,
+                             'mode': 'client'})
+	    response = ajax.parse_json()
+	    self.dialog = DlgClientInfo(self)
 	    self.dialog.setModal(True)
-	    self.dialog.initData(json_like)
+	    self.dialog.initData(response['info'])
 	    self.dialog.exec_()
 	else:
 	    print 'dialog was rejected'
 
     def clientSearchName(self):
 	print 'search client by its name'
-	def callback(rfid):
-	    self.rfid_id = rfid
+	def callback(user_id):
+	    self.user_id = user_id
 
-	self.dialog = DlgSearchByName(self)
+	self.dialog = DlgSearchByName('client', self)
 	self.dialog.setModal(True)
 	self.dialog.setCallback(callback)
 	dlgStatus = self.dialog.exec_()
 
 	if QDialog.Accepted == dlgStatus:
-	    ajax = HttpAjax(self, '/manager/get_user_info/',
-			    {'rfid_code': self.rfid_id})
-	    json_like = ajax.parse_json()
-	    self.dialog = DlgUserInfo(self)
+	    ajax = HttpAjax(self, '/manager/get_client_info/',
+			    {'user_id': self.user_id,
+                             'mode': 'client'})
+	    response = ajax.parse_json()
+	    self.dialog = DlgClientInfo(self)
 	    self.dialog.setModal(True)
-	    self.dialog.initData(json_like)
+	    self.dialog.initData(response['info'])
+	    self.dialog.exec_()
+	else:
+	    print 'dialog was rejected'
+
+    def renterNew(self):
+	print 'register new renter'
+	self.dialog = DlgRenterInfo(self)
+	self.dialog.setModal(True)
+	self.dialog.exec_()
+
+    def renterSearchName(self):
+	def callback(id):
+	    self.user_id = id
+
+	self.dialog = DlgSearchByName('renter', self)
+	self.dialog.setModal(True)
+	self.dialog.setCallback(callback)
+	dlgStatus = self.dialog.exec_()
+
+	if QDialog.Accepted == dlgStatus:
+	    ajax = HttpAjax(self, '/manager/get_renter_info/',
+			    {'user_id': self.user_id,
+                             'mode': 'renter'})
+	    response = ajax.parse_json()
+	    self.dialog = DlgRenterInfo(self)
+	    self.dialog.setModal(True)
+	    self.dialog.initData(response['info'])
 	    self.dialog.exec_()
 	else:
 	    print 'dialog was rejected'
@@ -303,14 +339,14 @@ class MainWindow(QMainWindow):
 
     # Обработчики меню: конец
 
-    def getUserInfo(self, rfid):
-	""" Метод для получения информации о пользователе по идентификатору
-	его карты. """
-	ajax = HttpAjax(self, '/manager/get_user_info/',
-			{'rfid_code': rfid})
-	json_like = ajax.parse_json()
-	print 'USER INFO:', json_like
-	return json_like
+#     def getUserInfo(self, rfid):
+# 	""" Метод для получения информации о пользователе по идентификатору
+# 	его карты. """
+# 	ajax = HttpAjax(self, '/manager/get_client_info/',
+# 			{'rfid_code': rfid, mode='client'})
+# 	json_like = ajax.parse_json()
+# 	print 'USER INFO:', json_like
+# 	return json_like
 
     def showEventProperties(self, calendar_event, room_id):
 	self.dialog = DlgEventInfo(self)
