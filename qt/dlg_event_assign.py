@@ -88,16 +88,20 @@ class DlgEventAssign(QDialog):
             status_desc = ( _('Reserved'),
                             _('Paid partially'),
                             _('Paid') )
-            for rent_id, renter, status, title, desc, begin_date, end_date in self.rent_list:
+            print self.rent_list
+            for row in self.rent_list:
                 lastRow = self.rent.rowCount()
                 self.rent.insertRow(lastRow)
+
+                renter = '%s %s' % (row['renter']['last_name'],
+                                    row['renter']['first_name'])
+                status = [_('Reserved'), _('Paid partially'), _('Paid')][int( row['status'] )]
+
                 self.rent.setItem(lastRow, 0, QTableWidgetItem(renter))
-                self.rent.setItem(lastRow, 1, QTableWidgetItem(status_desc[int(status)]))
-                self.rent.setItem(lastRow, 2, QTableWidgetItem(title))
-                self.rent.setItem(lastRow, 3, QTableWidgetItem(begin_date))
-                self.rent.setItem(lastRow, 4, QTableWidgetItem(end_date))
-            else:
-                print 'Check response format!'
+                self.rent.setItem(lastRow, 1, QTableWidgetItem(status))
+                self.rent.setItem(lastRow, 2, QTableWidgetItem(row['title']))
+                self.rent.setItem(lastRow, 3, QTableWidgetItem(row['begin_date']))
+                self.rent.setItem(lastRow, 4, QTableWidgetItem(row['end_date']))
 
         mainLayout.addLayout(buttonLayout)
 

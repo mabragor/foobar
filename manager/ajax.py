@@ -119,8 +119,9 @@ def get_visitors(request, form):
 
 @ajax_processor(None, isJavaScript)
 def get_rents(request):
-    today = date.today()
-    end = today + timedelta(days=(7 - today.weekday()))
-    rents = storage.Rent.objects.filter(begin_date__range=(today, end))
+    #today = date.today()
+    #end = today + timedelta(days=(7 - today.weekday()))
+    #rents = storage.Rent.objects.filter(begin_date__range=(today, end))
+    rents = storage.Rent.objects.filter(end_date__gte=date.today)
     rent_list = [i.about() for i in rents]
     return {'code': 200, 'desc': 'Ok', 'rent_list': rent_list}
