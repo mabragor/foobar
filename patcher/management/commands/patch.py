@@ -33,6 +33,7 @@ class Command(NoArgsCommand):
                 content = open(infile, 'r').readlines()
                 for line in content:
                     sql_line = line.strip()
-                    print sql_line
-                    cursor.execute(sql_line)
+                    if len(sql_line) > 0:
+                        print sql_line
+                        cursor.execute(sql_line)
                 Applied(name=patch_name).save()
