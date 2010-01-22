@@ -489,6 +489,7 @@ class CopyWeek(AjaxForm):
                                   rent=e.rent, status=0,
                                   duration=e.duration)
             ne.begin = e.begin+delta
+            ne.end = ne.begin + timedelta(minutes=(60 * e.duration))
             ne.save()
 
 class GetVisitors(AjaxForm):
