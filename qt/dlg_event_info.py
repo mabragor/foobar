@@ -119,7 +119,8 @@ class DlgEventInfo(QDialog):
         event = schedule['event']
         room = schedule['room']
         self.editTitle.setText(event['title'])
-        self.editCoach.setText(event['coaches'])
+        if schedule['type'] == 'training':
+            self.editCoach.setText(event['coaches'])
         begin = __(schedule['begin'])
         end = __(schedule['end'])
         self.editBegin.setDateTime(QDateTime(begin))

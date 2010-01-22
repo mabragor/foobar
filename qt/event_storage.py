@@ -187,12 +187,11 @@ class EventStorage(QAbstractTableModel):
 
     def get_event_by_cell(self, row, col, room_id):
         """ Получение события по указанным координатам. """
-        event = self.rc2e.get( (row, col, room_id), None )
-        return event
+        return self.rc2e.get( (row, col, room_id), None )
 
-    def get_cells_by_event(self, event, room):
+    def get_cells_by_event(self, event, room_id):
         """ Получение всех ячеек события. """
-        return self.e2rc.get( (event, room), None )
+        return self.e2rc.get( (event, room_id), None )
 
     def date2range(self, dt):
         """ Возвращаем диапазон недели для переданной даты. """
@@ -220,7 +219,6 @@ class EventStorage(QAbstractTableModel):
         Для каждого зала из списка проверить наличие свободных
         интервалов времени.
         """
-        print 'EventStorage::may_insert'
         result = []
         for room_name, room_color, room_id in self.rooms:
             free = []
@@ -232,17 +230,21 @@ class EventStorage(QAbstractTableModel):
                 result.append(room_id)
         return result
 
-    def insert(self, room, event):
+    def insert(self, room_id, event, emit_signal=False):
         """ Метод регистрации нового события. """
-        room += 100 # we have to use this shift
+        self.emit(SIGNAL('layoutAboutToBeChanged()'))
+
         row, col = self.datetime2rowcol(event.begin)
         #self.beginInsertRows(QModelIndex(), row, row)
         cells = []
         for i in xrange(event.duration.seconds / self.quant.seconds):
             cells.append( (row + i, col) )
-            self.rc2e.update( { (row + i, col, room): event } )
-        self.e2rc.update( { (event, room): cells } )
+            self.rc2e.update( { (row + i, col, room_id): event } )
+        self.e2rc.update( { (event, room_id): cells } )
         #self.endInsertRows()
+
+        if emit_signal:
+            self.emit(SIGNAL('layoutChanged()'))
 
     def remove(self, event, room):
         """ Метод удаления информации о событии. """

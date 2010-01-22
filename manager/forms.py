@@ -383,10 +383,11 @@ class DateRange(AjaxForm):
 
 class CalendarEventAdd(AjaxForm):
     """ Form creates new event using a passing datas. """
-    course_id = forms.IntegerField()
+    event_id = forms.IntegerField()
     room_id = forms.IntegerField()
     begin = forms.DateTimeField()
     ev_type = forms.IntegerField()
+    duration = forms.FloatField(required=False)
 
     def clean_course_id(self):
         return self.check_obj_existence(storage.Course, 'course_id')
@@ -398,12 +399,35 @@ class CalendarEventAdd(AjaxForm):
         return self.check_future('begin')
 
     def save(self):
-        c = self.cleaned_data
-        course = storage.Course.objects.get(id=c['course_id'])
-        room = storage.Room.objects.get(id=c['room_id'])
-        begin = c['begin']
-        ev_type = c['ev_type']
-        event = storage.Schedule(course=course, room=room, begin=begin, status=0)
+        data = self.cleaned_data
+        ev_type = data['ev_type']
+        if ev_type == 0:
+            model = storage.Course
+        else:
+            model = storage.Rent
+        obj = model.objects.get(id=data['event_id'])
+        room = storage.Room.objects.get(id=data['room_id'])
+        begin = data['begin']
+        duration = data['duration']
+        if ev_type == 0:
+            end = begin + timedelta(minutes=(60 * obj.duration))
+        else:
+            end = begin + timedelta(minutes=(60 * duration))
+        today = date.today()
+        e_count = storage.Schedule.objects.filter(
+            room=room,
+            begin__year=today.year,
+            begin__month=today.month,
+            begin__day=today.day
+            ).filter(begin__lte=end).filter(end__gt=begin).count()
+        if e_count != 0:
+            return 0
+        if ev_type == 0:
+            event = storage.Schedule(course=obj, room=room, status=0,
+                                     begin=begin, end=end, duration=obj.duration)
+        else:
+            event = storage.Schedule(rent=obj, room=room, status=0,
+                                     begin=begin, end=end, duration=duration)
         event.save()
         return event.id
 
@@ -454,7 +478,8 @@ class CopyWeek(AjaxForm):
         delta = to_date - from_date
         for e in events:
             ne = storage.Schedule(room=e.room, course=e.course,
-                                  rent=e.rent, status=0)
+                                  rent=e.rent, status=0,
+                                  duration=e.duration)
             ne.begin = e.begin+delta
             ne.save()
 

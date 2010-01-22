@@ -51,12 +51,12 @@ class MainWindow(QMainWindow):
 
     def setupViews(self):
         self.tree = self.getCoursesTree()
-        self.rooms = tuple( [ (a['title'], a['color'], a['id'] + 100) for a in self.getRooms()['rows'] ] )
+        self.rooms = tuple( [ (a['title'], a['color'], a['id']) for a in self.getRooms()['rows'] ] )
 
         self.scheduleModel = EventStorage(
-            (8, 23), timedelta(minutes=30), self.rooms, self
+            (8, 24), timedelta(minutes=30), self.rooms, self
             )
-	self.schedule = QtSchedule((8, 23), timedelta(minutes=30), self.rooms, self)
+	self.schedule = QtSchedule((8, 24), timedelta(minutes=30), self.rooms, self)
         self.schedule.setModel(self.scheduleModel)
 
         headerPanel = QHBoxLayout()
@@ -282,8 +282,8 @@ class MainWindow(QMainWindow):
             duration = timedelta(minutes=int(duration * 60))
 
             ajax = HttpAjax(self, '/manager/cal_event_add/',
-                            {'course_id': course_id,
-                             'room_id': room - 100,
+                            {'event_id': course_id,
+                             'room_id': room,
                              'begin': begin,
                              'ev_type': 0})
             response = ajax.parse_json()
@@ -299,22 +299,24 @@ class MainWindow(QMainWindow):
 	self.dialog.exec_()
 
     def eventRent(self):
-        def callback(e_date, e_time, room_tuple, rent):
+        def callback(e_date, e_time, e_duration, room_tuple, rent):
             room, ok = room_tuple
-            rent_id, renter, status, title, desc, begin_date, end_date = rent
+            rent_id = rent['id']
             begin = datetime.combine(e_date, e_time)
-#             duration = timedelta(minutes=int(duration * 60))
-
-#             ajax = HttpAjax(self, '/manager/cal_event_add/',
-#                             {'course_id': course_id,
-#                              'room_id': room - 100,
-#                              'begin': begin,
-#                              'ev_type': 0})
-#             response = ajax.parse_json()
-#             if response['code'] != 200:
-#             id = int(response['saved_id'])
-#             event = Event(id, course_id, 'training', begin, duration, title)
-#             self.schedule.insertEvent(room, event)
+            duration = timedelta(hours=e_duration.hour,
+                                 minutes=e_duration.minute)
+            params = {
+                'event_id': rent_id,
+                'room_id': room,
+                'begin': begin,
+                'ev_type': 1,
+                'duration': float(duration.seconds) / 3600
+                }
+            ajax = HttpAjax(self, '/manager/cal_event_add/', params)
+            response = ajax.parse_json()
+            id = int(response['saved_id'])
+            event = EventRent(rent_id, id, begin, duration, rent['title'])
+            self.schedule.insertEvent(room, event)
 	self.dialog = DlgEventAssign('rent', self)
 	self.dialog.setModal(True)
         self.dialog.setCallback(callback)

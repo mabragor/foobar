@@ -44,12 +44,24 @@ class DlgEventAssign(QDialog):
         groupLayout.setColumnStretch(1, 1)
         groupLayout.setColumnMinimumWidth(1, 250)
 
-        groupLayout.addWidget(labelDate, 0, 0)
-        groupLayout.addWidget(self.editDate, 0, 1)
-        groupLayout.addWidget(labelTime, 1, 0)
-        groupLayout.addWidget(self.editTime, 1, 1)
-        groupLayout.addWidget(labelRoom, 2, 0)
-        groupLayout.addWidget(self.comboRoom, 2, 1)
+        row = 0
+        groupLayout.addWidget(labelDate, row, 0)
+        groupLayout.addWidget(self.editDate, row, 1)
+        row += 1
+        groupLayout.addWidget(labelTime, row, 0)
+        groupLayout.addWidget(self.editTime, row, 1)
+        row += 1
+        if self.mode == 'rent':
+            labelDuration = QLabel(_('Duration'))
+            self.editDuration = QTimeEdit()
+            labelDuration.setBuddy(self.editDuration)
+            self.editDuration.setTime(QTime(1, 0))
+            groupLayout.addWidget(labelDuration, row, 0)
+            groupLayout.addWidget(self.editDuration, row, 1)
+            row += 1
+
+        groupLayout.addWidget(labelRoom, row, 0)
+        groupLayout.addWidget(self.comboRoom, row, 1)
 
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(groupLayout)
@@ -88,7 +100,8 @@ class DlgEventAssign(QDialog):
             status_desc = ( _('Reserved'),
                             _('Paid partially'),
                             _('Paid') )
-            print self.rent_list
+            if len(self.rent_list) == 0:
+                self.self.buttonAssign.setDisabled(True)
             for row in self.rent_list:
                 lastRow = self.rent.rowCount()
                 self.rent.insertRow(lastRow)
@@ -142,6 +155,7 @@ class DlgEventAssign(QDialog):
                     QMessageBox.Ok, QMessageBox.Ok)
             self.callback(e_date, e_time, room, course)
         else:
+            e_duration = self.editDuration.time().toPyTime()
             rent = self.rent_list[ self.rent.currentRow() ]
-            self.callback(e_date, e_time, room, rent)
+            self.callback(e_date, e_time, e_duration, room, rent)
         self.accept()
