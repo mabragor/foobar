@@ -398,6 +398,27 @@ class CalendarEventAdd(AjaxForm):
     def clean_begin(self):
         return self.check_future('begin')
 
+    def clean(self):
+        data = self.cleaned_data
+
+        room = storage.Room.objects.get(id=data['room_id'])
+        begin = data['begin']
+        if data['ev_type'] == 0:
+            obj = storage.Course.objects.get(id=data['event_id'])
+            end = begin + timedelta(minutes=(60 * obj.duration))
+        else:
+            end = begin + timedelta(minutes=(60 * data['duration']))
+
+        today = date.today()
+        if storage.Schedule.objects.filter(
+            room=room,
+            begin__year=today.year,
+            begin__month=today.month,
+            begin__day=today.day
+            ).filter(begin__lte=end).filter(end__gt=begin).count() != 0:
+            raise forms.ValidationError(_('There is an event intersection.'))
+        return self.cleaned_data
+
     def save(self):
         data = self.cleaned_data
         ev_type = data['ev_type']
@@ -408,24 +429,12 @@ class CalendarEventAdd(AjaxForm):
         obj = model.objects.get(id=data['event_id'])
         room = storage.Room.objects.get(id=data['room_id'])
         begin = data['begin']
-        duration = data['duration']
         if ev_type == 0:
             end = begin + timedelta(minutes=(60 * obj.duration))
-        else:
-            end = begin + timedelta(minutes=(60 * duration))
-        today = date.today()
-        e_count = storage.Schedule.objects.filter(
-            room=room,
-            begin__year=today.year,
-            begin__month=today.month,
-            begin__day=today.day
-            ).filter(begin__lte=end).filter(end__gt=begin).count()
-        if e_count != 0:
-            return 0
-        if ev_type == 0:
             event = storage.Schedule(course=obj, room=room, status=0,
                                      begin=begin, end=end, duration=obj.duration)
         else:
+            end = begin + timedelta(minutes=(60 * data['duration']))
             event = storage.Schedule(rent=obj, room=room, status=0,
                                      begin=begin, end=end, duration=duration)
         event.save()
