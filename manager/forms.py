@@ -422,21 +422,20 @@ class CalendarEventAdd(AjaxForm):
     def save(self):
         data = self.cleaned_data
         ev_type = data['ev_type']
-        if ev_type == 0:
-            model = storage.Course
-        else:
-            model = storage.Rent
-        obj = model.objects.get(id=data['event_id'])
         room = storage.Room.objects.get(id=data['room_id'])
         begin = data['begin']
         if ev_type == 0:
+            obj = storage.Course.objects.get(id=data['event_id'])
             end = begin + timedelta(minutes=(60 * obj.duration))
-            event = storage.Schedule(course=obj, room=room, status=0,
-                                     begin=begin, end=end, duration=obj.duration)
+            event = storage.Schedule(
+                course= obj, room=room, status=0,
+                begin=begin, end=end, duration=obj.duration)
         else:
             end = begin + timedelta(minutes=(60 * data['duration']))
-            event = storage.Schedule(rent=obj, room=room, status=0,
-                                     begin=begin, end=end, duration=duration)
+            event = storage.Schedule(
+                rent=storage.Rent.objects.get(id=data['event_id']),
+                room=room, status=0,
+                begin=begin, end=end, duration=data['duration'])
         event.save()
         return event.id
 
