@@ -52,11 +52,10 @@ class Client(AbstractUser):
         verbose_name = _(u'Client')
         verbose_name_plural = _(u'Clients')
 
-    def about(self, short=False):
+    def about(self):
         result = super(Client, self).about()
-        result.update( {'rfid_code': self.rfid_code} )
-        if not short:
-            result.update( {'course_list': self.course_list()} )
+        result.update( {'rfid_code': self.rfid_code,
+                        'course_list': self.course_list()} )
         return result
 
     def course_list(self):
@@ -71,15 +70,14 @@ class Renter(AbstractUser):
         verbose_name = _(u'Renter')
         verbose_name_plural = _(u'Renters')
 
-    def about(self, short=False):
+    def about(self):
         result = super(Renter, self).about()
         result.update( {
                 'phone_mobile': self.phone_mobile,
                 'phone_work': self.phone_work,
                 'phone_home': self.phone_home,
+                'rent_list': self.rent_list()
                 } )
-        if not short:
-            result.update( {'rent_list': self.rent_list()} )
         return result
 
     def rent_list(self):
@@ -113,8 +111,9 @@ class Rent(models.Model):
             'begin_date': self.begin_date,
             'end_date': self.end_date,
             'paid': self.paid,
-            'renter': self.renter.about(short),
             }
+        if not short:
+            result.update( {'renter': self.renter.about(),} )
         return result
 
 class Room(models.Model):
@@ -259,8 +258,6 @@ class Schedule(models.Model):
     course = models.ForeignKey(Course, verbose_name=_(u'Course'), null=True, blank=True)
     rent = models.ForeignKey(Rent, verbose_name=_(u'Rent'), null=True, blank=True)
     begin = models.DateTimeField(verbose_name=_(u'Begins'))
-    end = models.DateTimeField(verbose_name=_(u'Ends'))
-    duration = models.FloatField(verbose_name=_(u'Duration'))
     status = models.CharField(verbose_name=_(u'Status'), max_length=1, choices=ACTION_STATUSES, null=True)
     change = models.ForeignKey(Coach, verbose_name=_(u'Change'), null=True, blank=True)
     # НЕ НУЖНО
@@ -273,6 +270,10 @@ class Schedule(models.Model):
 
     def __unicode__(self):
         return u'%s(%s) %s' % (self.course, self.room, self.begin)
+
+    @property
+    def end(self):
+        return self.begin + timedelta(minutes=int(60 * self.course.duration))
 
     def about(self):
         obj = {
