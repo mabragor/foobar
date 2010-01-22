@@ -263,6 +263,8 @@ class DlgRenterInfo(QDialog):
         self.setLayout(layout)
         self.setWindowTitle(_('Renter\'s information'))
 
+        #self.editLastName.setProperty('errorHighlight', QVariant(True))
+
     def initData(self, data):
         self.user_id = data['id']
         self.editLastName.setText(data.get('last_name', ''))
@@ -311,6 +313,15 @@ class DlgRenterInfo(QDialog):
         self.addOneRow(params)
 
     def applyDialog(self):
+        dontApply = False
+        for widget in [self.editLastName, self.editFirstName,
+                       self.editEmail, self.editPhoneMobile,
+                       self.editPhoneWork, self.editPhoneHome]:
+            if 0 == len(widget.text().toUtf8()):
+                dontApply = True
+                widget.setProperty('errorHighlight', QVariant(True))
+        if dontApply:
+            return
         params = {
             'user_id': self.user_id,
             'last_name': self.editLastName.text().toUtf8(),
