@@ -82,7 +82,7 @@ class QtSchedule(QTableView):
         return (self.rowAt(abs_y), self.columnAt(abs_x))
 
     def insertEvent(self, room_id, event):
-        self.model().insert(room_id, event)
+        self.model().insert(room_id, event, True)
 
     def cellRowColRelative(self, rel):
         """ Метод определяет какой ячейке принадлежат переданные координаты,
