@@ -32,12 +32,14 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
 	QMainWindow.__init__(self, parent)
 
-	self.createMenus()
-	self.setupViews()
-
 	self.mimes = {'course': 'application/x-course-item',
 		      'event':  'application/x-calendar-event',
 		      }
+        self.rooms = None
+        self.tree = None
+
+	self.createMenus()
+	self.setupViews()
 
 	self.setWindowTitle(_('Manager\'s interface'))
 	self.statusBar().showMessage(_('Ready'), 2000)
@@ -50,25 +52,19 @@ class MainWindow(QMainWindow):
         return handler
 
     def setupViews(self):
-        self.tree = self.getCoursesTree()
-        self.rooms = tuple( [ (a['title'], a['color'], a['id']) for a in self.getRooms()['rows'] ] )
-
-        self.scheduleModel = EventStorage(
-            (8, 24), timedelta(minutes=30), self.rooms, self
-            )
 	self.schedule = QtSchedule((8, 24), timedelta(minutes=30), self.rooms, self)
-        self.schedule.setModel(self.scheduleModel)
 
         headerPanel = QHBoxLayout()
-        for title, color, id in self.rooms:
-            buttonFilter = QPushButton(title)
-            buttonFilter.setCheckable(True)
-            headerPanel.addWidget(buttonFilter)
-            self.connect(buttonFilter, SIGNAL('clicked()'),
-                         self.prepareFilter(id, title))
+        if self.rooms and len(self.rooms) > 0:
+            for title, color, id in self.rooms:
+                buttonFilter = QPushButton(title)
+                buttonFilter.setCheckable(True)
+                headerPanel.addWidget(buttonFilter)
+                self.connect(buttonFilter, SIGNAL('clicked()'),
+                             self.prepareFilter(id, title))
 
-        self.bpMonday = QLabel(self.scheduleModel.getMonday().strftime('%d/%m/%Y'))
-        self.bpSunday = QLabel(self.scheduleModel.getSunday().strftime('%d/%m/%Y'))
+        self.bpMonday = QLabel('--/--/----')
+        self.bpSunday = QLabel('--/--/----')
         self.buttonPrev = QPushButton(_('<<'))
         self.buttonNext = QPushButton(_('>>'))
         self.buttonToday = QPushButton(_('Today'))
@@ -107,6 +103,26 @@ class MainWindow(QMainWindow):
         mainWidget.setLayout(mainLayout)
 
 	self.setCentralWidget(mainWidget)
+
+        settings = QSettings()
+        settings.beginGroup('network')
+        host = settings.value('addressHttpServer', QVariant('WrongHost'))
+        settings.endGroup()
+
+        if 'WrongHost' == host.toString():
+            self.setupApp()
+        else:
+            self.loadInitialData()
+
+    def loadInitialData(self):
+        self.tree = self.getCoursesTree()
+        self.rooms = tuple( [ (a['title'], a['color'], a['id']) for a in self.getRooms()['rows'] ] )
+        self.scheduleModel = EventStorage(
+            (8, 24), timedelta(minutes=30), self.rooms, self
+            )
+        self.schedule.setModel(self.scheduleModel)
+        self.bpMonday.setText(self.scheduleModel.getMonday().strftime('%d/%m/%Y'))
+        self.bpSunday.setText(self.scheduleModel.getSunday().strftime('%d/%m/%Y'))
 
     def showWeekRange(self, week_range):
         monday, sunday = week_range
@@ -196,6 +212,7 @@ class MainWindow(QMainWindow):
 	self.dialog = DlgSettings(self)
 	self.dialog.setModal(True)
 	self.dialog.exec_()
+        self.loadInitialData()
 
     def clientNew(self):
 	print 'register new client'

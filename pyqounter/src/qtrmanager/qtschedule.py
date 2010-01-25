@@ -248,7 +248,7 @@ class QtSchedule(QTableView):
 
     def viewportEvent(self, event):
         """ Reimplement ToolTip Event. """
-        if event.type() == QEvent.ToolTip:
+        if event.type() == QEvent.ToolTip and self.rooms:
             help = QHelpEvent(event)
             index = self.indexAt(help.pos())
             row = index.row()
