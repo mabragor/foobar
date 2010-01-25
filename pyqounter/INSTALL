@@ -1,0 +1,8 @@
+To install it, make sure you have Python 2.4 or greater installed. Then run
+this command from the command prompt:
+
+    python setup_manager.py install
+
+or
+
+    python setup_client.py install
