@@ -17,6 +17,7 @@ from qtschedule import QtScheduleDelegate, QtSchedule
 from courses_tree import CoursesTree, TreeModel
 
 from dlg_settings import DlgSettings
+from dlg_login import DlgLogin
 from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_searching import DlgSearchByName
 from dlg_user_info import DlgClientInfo, DlgRenterInfo
@@ -156,6 +157,9 @@ class MainWindow(QMainWindow):
 	data. Создать обработчики для каждого действия. """
 	data = [
 	    (_('File'), [
+		    (_('Login'), '',
+		     'login', _('Start session.')),
+                    (None, None, None, None),
 		    (_('Application settings'), 'Ctrl+G',
 		     'setupApp', _('Manage the application settings.')),
                     (None, None, None, None),
@@ -207,6 +211,21 @@ class MainWindow(QMainWindow):
 		self.menu.addAction(action)
 
     # Обработчики меню: начало
+
+    def login(self):
+	def callback(login, password):
+	    self.login = login
+            self.password = password
+
+	self.dialog = DlgLogin(self)
+	self.dialog.setCallback(callback)
+	self.dialog.setModal(True)
+	dlgStatus = self.dialog.exec_()
+
+	if QDialog.Accepted == dlgStatus:
+            print 'may login', self.login, self.password
+        else:
+            print 'rejected'
 
     def setupApp(self):
 	self.dialog = DlgSettings(self)
