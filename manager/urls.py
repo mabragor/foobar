@@ -26,6 +26,7 @@ urlpatterns = patterns(
 
 urlpatterns += patterns(
     'manager.ajax',
+    url(r'^login/$', 'login'),
     url(r'^get_client_info/$', 'get_client_info'),
     url(r'^get_renter_info/$', 'get_renter_info'),
     url(r'^get_users_info_by_name/$', 'get_users_info_by_name'),

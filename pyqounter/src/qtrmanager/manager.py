@@ -224,6 +224,10 @@ class MainWindow(QMainWindow):
 
 	if QDialog.Accepted == dlgStatus:
             print 'may login', self.login, self.password
+            params = {'login': self.login,
+                      'password': self.password}
+	    ajax = HttpAjax(self, '/manager/login/', params)
+	    response = ajax.parse_json()
         else:
             print 'rejected'
 

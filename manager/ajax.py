@@ -19,7 +19,7 @@ isJavaScript = False
 
 def abstract_request(request, form):
     if form.is_valid():
-        result = form.query()
+        result = form.query(request)
     else:
         return {'code': 404, 'desc': 'Form is not valid',
                 'errors': form.get_errors()}
@@ -125,3 +125,12 @@ def get_rents(request):
     rents = storage.Rent.objects.filter(end_date__gte=date.today)
     rent_list = [i.about(True) for i in rents]
     return {'code': 200, 'desc': 'Ok', 'rent_list': rent_list}
+
+
+
+
+@ajax_processor(forms.Login, isJavaScript)
+def login(request, form):
+    response, result = abstract_request(request, form)
+    #response.update( {'visitor_list': visitors} )
+    return response

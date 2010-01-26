@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
-import httplib, urllib, json
+import httplib, urllib, json, base64, string
 
 from dlg_settings import TabNetwork
 
@@ -42,6 +42,8 @@ class HttpAjax(QObject):
     def parse_json(self):
         if self.response.status == 200: # http status
             data = self.response.read()
+            print 'headers are\n', self.response.getheaders()
+            print 'set cookie is', self.response.getheader('set-cookie')
             response = json.read(data)
             if 'code' in response and response['code'] != 200: # json status
                 QMessageBox.warning(self.parent, _('Warning'),

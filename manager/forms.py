@@ -2,6 +2,7 @@
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 # (c) 2009      Dmitry <alerion.um@gmail.com>
 
+from django.conf import settings
 from django import forms
 from django.db.models import Q
 from django.utils.translation import ugettext as _
@@ -153,7 +154,13 @@ class AjaxForm(forms.Form):
     # TODO: check symbols of RFID code
 
     def param(self, name):
-        return self.cleaned_data[name]
+        try:
+            return self.cleaned_data[name]
+        except KeyError:
+            if settings.DEBUG:
+                raise forms.ValidationError(_('There is no such key: %s.') % unicode(name))
+            else:
+                print _('There is no such key: %s.') % unicode(name)
 
     def get_errors(self):
         from django.utils.encoding import force_unicode
@@ -184,6 +191,45 @@ class AjaxForm(forms.Form):
         object_id = self.cleaned_data[field_name]
         del( self.cleaned_data[field_name] )
         return model.objects.get(id=object_id)
+
+class Login(AjaxForm):
+    login = forms.CharField(max_length=30)
+    password = forms.CharField(max_length=128)
+
+    def clean_login(self):
+        login = self.param('login')
+        if len(login) == 0:
+            raise forms.ValidationError('Empty login.')
+        return login
+
+    def clean_password(self):
+        password = self.param('password')
+        if len(password) == 0:
+            raise forms.ValidationError('Empty password.')
+        return password
+
+    def clean(self):
+        from django.contrib import auth
+        login = self.param('login')
+        password = self.param('password')
+        user = auth.authenticate(username=login, password=password)
+        if user is not None:
+            if not user.is_active:
+                raise forms.ValidationError('Your account has been disabled!')
+            else:
+                return self.cleaned_data
+        else:
+            raise forms.ValidationError('Your username and password were incorrect.')
+
+    def query(self, request):
+        from django.contrib import auth
+        login = self.param('login')
+        password = self.param('password')
+        user = auth.authenticate(username=login, password=password)
+        if user and user.is_active:
+            auth.login(request, user)
+            print request.session.session_key
+        return request
 
 class RegisterVisit(AjaxForm):
     event_id = forms.IntegerField()
@@ -223,7 +269,7 @@ class GetScheduleInfo(AjaxForm):
     def clean_id(self):
         return self.check_obj_existence(storage.Schedule, 'id')
 
-    def query(self):
+    def query(self, request=None):
         id = self.cleaned_data['id']
         event = storage.Schedule.objects.get(id=id)
         return event.about()
@@ -236,7 +282,7 @@ class UserSearch(AjaxForm):
     name = forms.CharField(max_length=64)
     mode = forms.CharField(max_length=6)
 
-    def query(self):
+    def query(self, request=None):
         name = self.param('name')
         mode = self.param('mode')
         if mode == 'client':
@@ -320,7 +366,7 @@ class UserIdRfid(AjaxForm):
     rfid_code = forms.CharField(max_length=8, required=False)
     mode = forms.CharField(max_length=6)
 
-    def query(self):
+    def query(self, request=None):
         mode = self.param('mode')
         user_id = self.param('user_id')
         if mode == 'client':
@@ -371,7 +417,7 @@ class DateRange(AjaxForm):
     monday = forms.DateField()
     filter = ListField(required=False)
 
-    def query(self):
+    def query(self, request=None):
         filter = self.cleaned_data['filter']
         monday = self.cleaned_data['monday']
         limit = monday + timedelta(days=7)
@@ -499,7 +545,7 @@ class GetVisitors(AjaxForm):
     def clean_event_id(self):
         return self.check_obj_existence(storage.Schedule, 'event_id')
 
-    def query(self):
+    def query(self, request=None):
         event_id = self.cleaned_data['event_id']
         event = storage.Schedule.objects.get(id=event_id)
         return event.get_visitors()
