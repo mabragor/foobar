@@ -12,5 +12,5 @@ setup(name='pyqounter-manager',
       url='http://snegiri.dontexist.org/pyqounter',
       packages=['qtrmanager'],
       package_dir={'qtrmanager': 'src/qtrmanager'},
-      package_data={'qtrmanager': ['locale/*', 'manager.css']}
+      package_data={'qtrmanager': ['locale/ru/LC_MESSAGES/*mo', 'manager.css']}
      )
