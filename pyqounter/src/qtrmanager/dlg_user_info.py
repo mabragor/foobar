@@ -182,7 +182,7 @@ class DlgClientInfo(QDialog):
             'course_changed': changed
             }
         #print 'DlgClientInfo::saveSettings', params
-        ajax = HttpAjax(self, '/manager/set_user_info/', params)
+        ajax = HttpAjax(self, '/manager/set_user_info/', params, self.parent.session_id)
         response = ajax.parse_json()
         self.accept()
 
@@ -332,7 +332,7 @@ class DlgRenterInfo(QDialog):
             'phone_home': self.editPhoneHome.text().toUtf8(),
             }
         #print 'DlgRentAssign::applyDialog\n', params, '\n';
-        ajax = HttpAjax(self, '/manager/set_renter_info/', params)
+        ajax = HttpAjax(self, '/manager/set_renter_info/', params, self.parent.session_id)
         response = ajax.parse_json()
         renter_id = int( response['saved_id'] )
 
@@ -346,7 +346,7 @@ class DlgRenterInfo(QDialog):
                 'end_date'   : rent['end_date'],
                 'paid'       : rent['paid'],
                 }
-            ajax = HttpAjax(self, '/manager/set_rent/', params)
+            ajax = HttpAjax(self, '/manager/set_rent/', params, self.parent.session_id)
             response = ajax.parse_json()
             rent_id = int( response['saved_id'] )
 

@@ -94,7 +94,7 @@ class DlgEventAssign(QDialog):
             rentGroup.setLayout(rentLayout)
             mainLayout.addWidget(rentGroup)
 
-            ajax = HttpAjax(self, '/manager/get_rents/', {})
+            ajax = HttpAjax(self, '/manager/get_rents/', {}, self.parent.session_id)
             response = ajax.parse_json()
             self.rent_list = response['rent_list']
             status_desc = ( _('Reserved'),

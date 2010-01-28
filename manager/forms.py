@@ -228,8 +228,8 @@ class Login(AjaxForm):
         user = auth.authenticate(username=login, password=password)
         if user and user.is_active:
             auth.login(request, user)
-            print request.session.session_key
-        return request
+            #print request.session.session_key
+        return '%s %s' % (user.last_name, user.first_name)
 
 class RegisterVisit(AjaxForm):
     event_id = forms.IntegerField()

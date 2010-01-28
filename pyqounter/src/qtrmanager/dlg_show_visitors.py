@@ -49,7 +49,7 @@ class DlgShowVisitors(QDialog):
 
     def initData(self, event_id):
         ajax = HttpAjax(self, '/manager/get_visitors/',
-                        {'event_id': event_id})
+                        {'event_id': event_id}, self.parent.parent.session_id)
         response = ajax.parse_json()
         if 'code' in response:
             if response['code'] == 200:

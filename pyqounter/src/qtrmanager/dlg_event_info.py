@@ -111,7 +111,7 @@ class DlgEventInfo(QDialog):
 
     def initData(self, schedule, room_id):
         ajax = HttpAjax(self, '/manager/get_event_info/',
-                        {'id': schedule.id})
+                        {'id': schedule.id}, self.parent.session_id)
         self.schedule = schedule
         response = ajax.parse_json()
         self.schedule = schedule = response['info']
@@ -150,7 +150,7 @@ class DlgEventInfo(QDialog):
 	if QDialog.Accepted == dlgStatus:
 	    ajax = HttpAjax(self, '/manager/register_visit/',
 			    {'rfid_code': self.rfid_id,
-                             'event_id': self.schedule['id']})
+                             'event_id': self.schedule['id']}, self.parent.session_id)
 	    response = ajax.parse_json()
             if response and 'code' in response:
                 if response['code'] == 200:
@@ -174,7 +174,7 @@ class DlgEventInfo(QDialog):
             QMessageBox.Yes, QMessageBox.No)
         if reply == QMessageBox.Yes:
             ajax = HttpAjax(self, '/manager/cal_event_del/',
-                            {'id': self.schedule['id']})
+                            {'id': self.schedule['id']}, self.parent.session_id)
             if ajax:
                 response = ajax.parse_json()
                 if 'code' in response:

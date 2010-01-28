@@ -33,19 +33,38 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
 	QMainWindow.__init__(self, parent)
 
+        self.session_id = None
+
 	self.mimes = {'course': 'application/x-course-item',
 		      'event':  'application/x-calendar-event',
 		      }
-        self.rooms = None
-        self.tree = None
+        self.rooms = []
+        self.tree = []
 
 	self.createMenus()
 	self.setupViews()
 
-	self.setWindowTitle(_('Manager\'s interface'))
+        settings = QSettings()
+        settings.beginGroup('network')
+        host = settings.value('addressHttpServer', QVariant('WrongHost'))
+        settings.endGroup()
+
+        if 'WrongHost' == host.toString():
+            self.setupApp()
+
+        self.baseTitle = _('Manager\'s interface')
+	self.logoutTitle()
 	self.statusBar().showMessage(_('Ready'), 2000)
 	self.resize(640, 480)
+
         # start here event loading thread
+        self.loadInitialData()
+
+    def loggedTitle(self, name):
+	self.setWindowTitle('%s : %s' % (self.baseTitle, name))
+
+    def logoutTitle(self):
+	self.setWindowTitle('%s : %s' % (self.baseTitle, _('Login to start session')))
 
     def prepareFilter(self, id, title):
         def handler():
@@ -105,18 +124,8 @@ class MainWindow(QMainWindow):
 
 	self.setCentralWidget(mainWidget)
 
-        settings = QSettings()
-        settings.beginGroup('network')
-        host = settings.value('addressHttpServer', QVariant('WrongHost'))
-        settings.endGroup()
-
-        if 'WrongHost' == host.toString():
-            self.setupApp()
-        else:
-            self.loadInitialData()
-
     def loadInitialData(self):
-        self.tree = self.getCoursesTree()
+        #self.tree = self.getCoursesTree()
         self.rooms = tuple( [ (a['title'], a['color'], a['id']) for a in self.getRooms()['rows'] ] )
         self.scheduleModel = EventStorage(
             (8, 24), timedelta(minutes=30), self.rooms, self
@@ -134,7 +143,7 @@ class MainWindow(QMainWindow):
 	return self.mimes.get(name, None)
 
     def getRooms(self):
-	ajax = HttpAjax(self, '/manager/get_rooms/', {})
+	ajax = HttpAjax(self, '/manager/get_rooms/', {}, self.session_id)
 	if ajax:
 	    json_like = ajax.parse_json()
 	else:
@@ -147,7 +156,7 @@ class MainWindow(QMainWindow):
 	return json_like
 
     def getCoursesTree(self):
-	ajax = HttpAjax(self, '/manager/available_courses/', {})
+	ajax = HttpAjax(self, '/manager/available_courses/', {}, self.session_id)
 	response = ajax.parse_json() # see format at courses_tree.py
 	return TreeModel(response)
 
@@ -157,8 +166,10 @@ class MainWindow(QMainWindow):
 	data. Создать обработчики для каждого действия. """
 	data = [
 	    (_('File'), [
-		    (_('Login'), '',
-		     'login', _('Start session.')),
+		    (_('Log in'), '',
+		     'login', _('Start user session.')),
+		    (_('Log out'), '',
+		     'logout', _('End user session.')),
                     (None, None, None, None),
 		    (_('Application settings'), 'Ctrl+G',
 		     'setupApp', _('Manage the application settings.')),
@@ -210,6 +221,9 @@ class MainWindow(QMainWindow):
 		self.connect(action, SIGNAL('triggered()'), getattr(self, name))
 		self.menu.addAction(action)
 
+    def setSessionID(self, id):
+        self.session_id = id
+
     # Обработчики меню: начало
 
     def login(self):
@@ -226,10 +240,20 @@ class MainWindow(QMainWindow):
             print 'may login', self.login, self.password
             params = {'login': self.login,
                       'password': self.password}
-	    ajax = HttpAjax(self, '/manager/login/', params)
+	    ajax = HttpAjax(self, '/manager/login/',
+                            params, self.session_id)
 	    response = ajax.parse_json()
+            if 'user_info' in response:
+                self.loggedTitle(response['user_info'])
+                self.tree = self.getCoursesTree()
+                self.scheduleModel.showCurrWeek()
         else:
             print 'rejected'
+
+    def logout(self):
+        self.session_id = None
+        self.setWindowTitle('%s : %s' % (self.baseTitle, _('Login to start session')))
+        self.scheduleModel.initModel()
 
     def setupApp(self):
 	self.dialog = DlgSettings(self)
@@ -256,7 +280,7 @@ class MainWindow(QMainWindow):
 	if QDialog.Accepted == dlgStatus:
 	    ajax = HttpAjax(self, '/manager/get_client_info/',
 			    {'rfid_code': self.rfid_id,
-                             'mode': 'client'})
+                             'mode': 'client'}, self.session_id)
 	    response = ajax.parse_json()
 	    self.dialog = DlgClientInfo(self)
 	    self.dialog.setModal(True)
@@ -278,7 +302,7 @@ class MainWindow(QMainWindow):
 	if QDialog.Accepted == dlgStatus:
 	    ajax = HttpAjax(self, '/manager/get_client_info/',
 			    {'user_id': self.user_id,
-                             'mode': 'client'})
+                             'mode': 'client'}, self.session_id)
 	    response = ajax.parse_json()
 	    self.dialog = DlgClientInfo(self)
 	    self.dialog.setModal(True)
@@ -305,7 +329,7 @@ class MainWindow(QMainWindow):
 	if QDialog.Accepted == dlgStatus:
 	    ajax = HttpAjax(self, '/manager/get_renter_info/',
 			    {'user_id': self.user_id,
-                             'mode': 'renter'})
+                             'mode': 'renter'}, self.session_id)
 	    response = ajax.parse_json()
 	    self.dialog = DlgRenterInfo(self)
 	    self.dialog.setModal(True)
@@ -325,7 +349,7 @@ class MainWindow(QMainWindow):
                             {'event_id': course_id,
                              'room_id': room,
                              'begin': begin,
-                             'ev_type': 0})
+                             'ev_type': 0}, self.session_id)
             response = ajax.parse_json()
             id = int(response['saved_id'])
             event = EventTraining(course, id, begin, duration, 0)
@@ -352,7 +376,7 @@ class MainWindow(QMainWindow):
                 'ev_type': 1,
                 'duration': float(duration.seconds) / 3600
                 }
-            ajax = HttpAjax(self, '/manager/cal_event_add/', params)
+            ajax = HttpAjax(self, '/manager/cal_event_add/', params, self.session_id)
             response = ajax.parse_json()
             id = int(response['saved_id'])
             event = EventRent(rent_id, id, begin, duration, rent['title'])
@@ -370,7 +394,7 @@ class MainWindow(QMainWindow):
             to_range = model.date2range(selected_date)
             ajax = HttpAjax(self, '/manager/copy_week/',
                             {'from_date': from_range[0],
-                             'to_date': to_range[0]})
+                             'to_date': to_range[0]}, self.session_id)
             response = ajax.parse_json()
             self.statusBar().showMessage(_('The week has been copied sucessfully.'))
 

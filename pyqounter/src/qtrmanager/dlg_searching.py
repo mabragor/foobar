@@ -17,6 +17,7 @@ class DlgSearchByName(QDialog):
         QDialog.__init__(self, parent)
 
         self.setMinimumWidth(500)
+        self.parent = parent
         self.mode = mode
 
         labelField = QLabel(_('Search'))
@@ -85,7 +86,7 @@ class DlgSearchByName(QDialog):
     def searchFor(self):
         name = self.editField.text().toUtf8()
         params = {'name': name, 'mode': self.mode}
-        ajax = HttpAjax(self, '/manager/get_users_info_by_name/', params)
+        ajax = HttpAjax(self, '/manager/get_users_info_by_name/', params, self.parent.session_id)
         response = ajax.parse_json()
         user_list = response['users']
         self.showList(user_list)

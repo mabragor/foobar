@@ -15,7 +15,7 @@ from PyQt4.QtGui import *
 
 class HttpAjax(QObject):
 
-    def __init__(self, parent, url, params):
+    def __init__(self, parent, url, params, session_id=None):
         self.get_settings()
 
         self.parent = parent
@@ -23,11 +23,36 @@ class HttpAjax(QObject):
         params = urllib.urlencode(params)
         headers = {'Content-type': 'application/x-www-form-urlencoded',
                    'Accept': 'text/plain'}
+
+        print 'HttpAjax:constructor:session_id is', session_id
+        if session_id:
+            headers.update( { 'Cookie': 'sessionid=%s' % session_id } )
+
         hostport = '%s:%s' % (self.host, self.port)
-        print 'HttpAjax:', hostport
+        print 'HttpAjax:', hostport, '\n', headers
         conn = httplib.HTTPConnection(hostport)
         conn.request('POST', url, params, headers)
         self.response = conn.getresponse()
+
+            #print 'headers are\n', self.response.getheaders()
+            # sessionid=d5b2996237b9044ba98c5622d6311c43;
+            # expires=Tue, 09-Feb-2010 16:32:24 GMT;
+            # Max-Age=1209600;
+            # Path=/
+        cookie_string = self.response.getheader('set-cookie')
+        if cookie_string:
+            print 'set cookie is', cookie_string
+            cookie = {}
+            for item in cookie_string.split('; '):
+                key, value = item.split('=')
+                cookie.update( { key: value } )
+            import pprint
+            pprint.pprint(cookie)
+
+            session_id = cookie.get('sessionid', None)
+            print 'session id is', session_id
+            self.parent.setSessionID(session_id)
+
         conn.close()
 
     def get_settings(self):
@@ -42,8 +67,6 @@ class HttpAjax(QObject):
     def parse_json(self):
         if self.response.status == 200: # http status
             data = self.response.read()
-            print 'headers are\n', self.response.getheaders()
-            print 'set cookie is', self.response.getheader('set-cookie')
             response = json.read(data)
             if 'code' in response and response['code'] != 200: # json status
                 QMessageBox.warning(self.parent, _('Warning'),
@@ -51,9 +74,13 @@ class HttpAjax(QObject):
                                     QMessageBox.Ok, QMessageBox.Ok)
                 return None
             return response
-        else:
-            print self.response.status
+        elif self.response.status == 302: # authentication
+            QMessageBox.warning(self.parent, _('Warning'),
+                                _('Authenticate yourself.'))
+            return None
+        elif self.response.status == 500: # error
             open('./dump.html', 'w').write(self.response.read())
+        else:
             QMessageBox.critical(
                 self.parent, _('HTTP Error'),
                 '[%s] %s' % (

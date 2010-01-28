@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-13 10:07+0300\n"
+"POT-Creation-Date: 2010-01-28 19:23+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: courses_list.py:27 dlg_event_assign.py:74 dlg_event_info.py:29
-#: dlg_rent_assign.py:21 dlg_user_info.py:226
+#: courses_list.py:27 dlg_event_assign.py:86 dlg_event_info.py:29
+#: dlg_rent_assign.py:21 dlg_user_info.py:227
 msgid "Title"
 msgstr ""
 
@@ -41,8 +41,8 @@ msgstr ""
 msgid "Assigned"
 msgstr ""
 
-#: courses_list.py:30 dlg_event_assign.py:75 dlg_event_info.py:39
-#: dlg_rent_assign.py:42 dlg_user_info.py:227
+#: courses_list.py:30 dlg_event_assign.py:87 dlg_event_info.py:39
+#: dlg_rent_assign.py:45 dlg_user_info.py:228
 msgid "Begin"
 msgstr ""
 
@@ -70,14 +70,15 @@ msgstr ""
 msgid "Cancel current course."
 msgstr ""
 
-#: dlg_copy_week.py:26 dlg_settings.py:25 dlg_user_info.py:77
-#: dlg_user_info.py:241
+#: dlg_copy_week.py:26 dlg_settings.py:25 dlg_user_info.py:79
+#: dlg_user_info.py:242
 msgid "Apply"
 msgstr ""
 
-#: dlg_copy_week.py:27 dlg_course_assign.py:65 dlg_event_assign.py:66
-#: dlg_rent_assign.py:70 dlg_searching.py:31 dlg_settings.py:26
-#: dlg_user_info.py:78 dlg_user_info.py:242 dlg_waiting_rfid.py:30
+#: dlg_copy_week.py:27 dlg_course_assign.py:65 dlg_event_assign.py:78
+#: dlg_login.py:41 dlg_rent_assign.py:73 dlg_searching.py:31
+#: dlg_settings.py:26 dlg_user_info.py:80 dlg_user_info.py:243
+#: dlg_waiting_rfid.py:30
 msgid "Cancel"
 msgstr ""
 
@@ -113,11 +114,11 @@ msgstr ""
 msgid "12 months"
 msgstr ""
 
-#: dlg_course_assign.py:61 dlg_event_assign.py:61
+#: dlg_course_assign.py:61 dlg_event_assign.py:73
 msgid "Available courses"
 msgstr ""
 
-#: dlg_course_assign.py:64 dlg_event_assign.py:65 dlg_rent_assign.py:69
+#: dlg_course_assign.py:64 dlg_event_assign.py:77 dlg_rent_assign.py:72
 msgid "Assign"
 msgstr ""
 
@@ -137,59 +138,61 @@ msgstr ""
 msgid "Room"
 msgstr ""
 
-#: dlg_event_assign.py:74 manager.py:159
+#: dlg_event_assign.py:55 dlg_event_info.py:44
+msgid "Duration"
+msgstr ""
+
+#: dlg_event_assign.py:86 manager.py:190
 msgid "Renter"
 msgstr ""
 
-#: dlg_event_assign.py:74 dlg_event_info.py:54 dlg_rent_assign.py:32
-#: dlg_user_info.py:226
+#: dlg_event_assign.py:86 dlg_event_info.py:54 dlg_rent_assign.py:33
+#: dlg_user_info.py:227
 msgid "Status"
 msgstr ""
 
-#: dlg_event_assign.py:75 dlg_rent_assign.py:49 dlg_user_info.py:227
+#: dlg_event_assign.py:87 dlg_rent_assign.py:52 dlg_user_info.py:228
 msgid "End"
 msgstr ""
 
-#: dlg_event_assign.py:81
+#: dlg_event_assign.py:93
 msgid "Rents"
 msgstr ""
 
-#: dlg_event_assign.py:88 dlg_rent_assign.py:30 dlg_user_info.py:275
+#: dlg_event_assign.py:100 dlg_event_assign.py:111 dlg_rent_assign.py:31
+#: dlg_user_info.py:284
 msgid "Reserved"
 msgstr ""
 
-#: dlg_event_assign.py:89 dlg_rent_assign.py:30 dlg_user_info.py:275
+#: dlg_event_assign.py:101 dlg_event_assign.py:111 dlg_rent_assign.py:31
+#: dlg_user_info.py:284
 msgid "Paid partially"
 msgstr ""
 
-#: dlg_event_assign.py:90 dlg_rent_assign.py:30 dlg_rent_assign.py:36
-#: dlg_user_info.py:226 dlg_user_info.py:275
+#: dlg_event_assign.py:102 dlg_event_assign.py:111 dlg_rent_assign.py:31
+#: dlg_rent_assign.py:38 dlg_user_info.py:227 dlg_user_info.py:284
 msgid "Paid"
 msgstr ""
 
-#: dlg_event_assign.py:105
+#: dlg_event_assign.py:122
 msgid "Assign the event"
 msgstr ""
 
-#: dlg_event_assign.py:135 dlg_event_info.py:57 dlg_event_info.py:160
-#: http_ajax.py:47
+#: dlg_event_assign.py:152 dlg_event_info.py:57 dlg_event_info.py:161
+#: http_ajax.py:72 http_ajax.py:78
 msgid "Warning"
 msgstr ""
 
-#: dlg_event_assign.py:136
+#: dlg_event_assign.py:153
 msgid "What course do you want to assign?"
 msgstr ""
 
-#: dlg_event_assign.py:137
+#: dlg_event_assign.py:154
 msgid "Choose the course on the course's tree."
 msgstr ""
 
 #: dlg_event_info.py:34
 msgid "Coach"
-msgstr ""
-
-#: dlg_event_info.py:44
-msgid "Duration"
 msgstr ""
 
 #: dlg_event_info.py:56
@@ -216,35 +219,51 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: dlg_event_info.py:93 manager.py:166
+#: dlg_event_info.py:93 manager.py:197
 msgid "Event"
 msgstr ""
 
-#: dlg_event_info.py:157
+#: dlg_event_info.py:158
 msgid "Client registration"
 msgstr ""
 
-#: dlg_event_info.py:158
+#: dlg_event_info.py:159
 msgid "The client is registered on this event."
 msgstr ""
 
-#: dlg_event_info.py:165 dlg_event_info.py:187
+#: dlg_event_info.py:166 dlg_event_info.py:188
 msgid "Check response format!"
 msgstr ""
 
-#: dlg_event_info.py:171
+#: dlg_event_info.py:172
 msgid "Event remove"
 msgstr ""
 
-#: dlg_event_info.py:172
+#: dlg_event_info.py:173
 msgid "Are you sure to remove this event from the calendar?"
 msgstr ""
 
-#: dlg_rent_assign.py:26
+#: dlg_login.py:23
+msgid "Login"
+msgstr ""
+
+#: dlg_login.py:28
+msgid "Password"
+msgstr ""
+
+#: dlg_login.py:40
+msgid "Ok"
+msgstr ""
+
+#: dlg_login.py:58
+msgid "Authentication"
+msgstr ""
+
+#: dlg_rent_assign.py:27
 msgid "Description"
 msgstr ""
 
-#: dlg_rent_assign.py:82
+#: dlg_rent_assign.py:85
 msgid "Rent registration"
 msgstr ""
 
@@ -256,17 +275,17 @@ msgstr ""
 msgid "Find"
 msgstr ""
 
-#: dlg_searching.py:43 dlg_show_visitors.py:22 dlg_user_info.py:30
-#: dlg_user_info.py:210
+#: dlg_searching.py:43 dlg_show_visitors.py:22 dlg_user_info.py:32
+#: dlg_user_info.py:211
 msgid "Last name"
 msgstr ""
 
-#: dlg_searching.py:44 dlg_show_visitors.py:23 dlg_user_info.py:29
-#: dlg_user_info.py:212
+#: dlg_searching.py:44 dlg_show_visitors.py:23 dlg_user_info.py:31
+#: dlg_user_info.py:213
 msgid "First name"
 msgstr ""
 
-#: dlg_searching.py:45 dlg_user_info.py:214
+#: dlg_searching.py:45 dlg_user_info.py:215
 msgid "E-mail"
 msgstr ""
 
@@ -326,75 +345,75 @@ msgstr ""
 msgid "Registered visitors"
 msgstr ""
 
-#: dlg_user_info.py:31
+#: dlg_user_info.py:33
 msgid "Email"
 msgstr ""
 
-#: dlg_user_info.py:32
+#: dlg_user_info.py:34
 msgid "Year of birth"
 msgstr ""
 
-#: dlg_user_info.py:33
+#: dlg_user_info.py:35
 msgid "Sex"
 msgstr ""
 
-#: dlg_user_info.py:34
+#: dlg_user_info.py:36
 msgid "RFID"
 msgstr ""
 
-#: dlg_user_info.py:41
+#: dlg_user_info.py:43
 msgid "Male"
 msgstr ""
 
-#: dlg_user_info.py:42
+#: dlg_user_info.py:44
 msgid "Female"
 msgstr ""
 
-#: dlg_user_info.py:63 dlg_user_info.py:223
+#: dlg_user_info.py:65 dlg_user_info.py:224
 msgid "Base data"
 msgstr ""
 
-#: dlg_user_info.py:72
+#: dlg_user_info.py:74
 msgid "Courses' history"
 msgstr ""
 
-#: dlg_user_info.py:75
+#: dlg_user_info.py:77
 msgid "Assign RFID"
 msgstr ""
 
-#: dlg_user_info.py:76
+#: dlg_user_info.py:78
 msgid "Assign course"
 msgstr ""
 
-#: dlg_user_info.py:102
+#: dlg_user_info.py:104
 msgid "Client's information"
 msgstr ""
 
-#: dlg_user_info.py:216
+#: dlg_user_info.py:217
 msgid "Mobile phone"
 msgstr ""
 
-#: dlg_user_info.py:218
+#: dlg_user_info.py:219
 msgid "Work phone"
 msgstr ""
 
-#: dlg_user_info.py:220
+#: dlg_user_info.py:221
 msgid "Home phone"
 msgstr ""
 
-#: dlg_user_info.py:227
+#: dlg_user_info.py:228
 msgid "Registered"
 msgstr ""
 
-#: dlg_user_info.py:237
+#: dlg_user_info.py:238
 msgid "Rents' history"
 msgstr ""
 
-#: dlg_user_info.py:240
+#: dlg_user_info.py:241
 msgid "Assign rent"
 msgstr ""
 
-#: dlg_user_info.py:263
+#: dlg_user_info.py:264
 msgid "Renter's information"
 msgstr ""
 
@@ -406,31 +425,31 @@ msgstr ""
 msgid "RFID reader"
 msgstr ""
 
-#: event_storage.py:77
+#: event_storage.py:78
 msgid "Monday"
 msgstr ""
 
-#: event_storage.py:77
+#: event_storage.py:78
 msgid "Tuesday"
 msgstr ""
 
-#: event_storage.py:78
+#: event_storage.py:79
 msgid "Wednesday"
 msgstr ""
 
-#: event_storage.py:78
+#: event_storage.py:79
 msgid "Thursday"
 msgstr ""
 
-#: event_storage.py:79
+#: event_storage.py:80
 msgid "Friday"
 msgstr ""
 
-#: event_storage.py:79
+#: event_storage.py:80
 msgid "Saturday"
 msgstr ""
 
-#: event_storage.py:80
+#: event_storage.py:81
 msgid "Sunday"
 msgstr ""
 
@@ -442,132 +461,160 @@ msgstr ""
 msgid "Parsing the response..."
 msgstr ""
 
-#: event_storage.py:133
+#: event_storage.py:134
+msgid "No reply"
+msgstr ""
+
+#: event_storage.py:136
 msgid "Filling the calendar..."
 msgstr ""
 
-#: event_storage.py:142
+#: event_storage.py:149
 msgid "Done"
 msgstr ""
 
-#: http_ajax.py:56
+#: http_ajax.py:79
+msgid "Authenticate yourself."
+msgstr ""
+
+#: http_ajax.py:85
 msgid "HTTP Error"
 msgstr ""
 
-#: manager.py:42
+#: manager.py:55
 msgid "Manager's interface"
 msgstr ""
 
-#: manager.py:43
+#: manager.py:57
 msgid "Ready"
 msgstr ""
 
-#: manager.py:49
+#: manager.py:67 manager.py:255
+msgid "Login to start session"
+msgstr ""
+
+#: manager.py:71
 #, python-format
 msgid "Filter: Room \"%s\" is changed its state"
 msgstr ""
 
-#: manager.py:72
+#: manager.py:88
 msgid "<<"
 msgstr ""
 
-#: manager.py:73
+#: manager.py:89
 msgid ">>"
 msgstr ""
 
-#: manager.py:74
+#: manager.py:90
 msgid "Today"
 msgstr ""
 
-#: manager.py:92
+#: manager.py:108
 msgid "Week:"
 msgstr ""
 
-#: manager.py:142
+#: manager.py:168
 msgid "File"
 msgstr ""
 
-#: manager.py:143
-msgid "Application settings"
-msgstr ""
-
-#: manager.py:144
-msgid "Manage the application settings."
-msgstr ""
-
-#: manager.py:146
-msgid "Exit"
-msgstr ""
-
-#: manager.py:147
-msgid "Close the application."
-msgstr ""
-
-#: manager.py:150
-msgid "Client"
-msgstr ""
-
-#: manager.py:151 manager.py:160
-msgid "New"
-msgstr ""
-
-#: manager.py:152
-msgid "Register new client."
-msgstr ""
-
-#: manager.py:153
-msgid "Search by RFID"
-msgstr ""
-
-#: manager.py:154
-msgid "Search a client with its RFID card."
-msgstr ""
-
-#: manager.py:155 manager.py:162
-msgid "Search by name"
-msgstr ""
-
-#: manager.py:156
-msgid "Search a client with its name."
-msgstr ""
-
-#: manager.py:161
-msgid "Register new renter."
-msgstr ""
-
-#: manager.py:163
-msgid "Search a renter with its name."
-msgstr ""
-
-#: manager.py:167
-msgid "Training"
-msgstr ""
-
-#: manager.py:168
-msgid "Assign a training event."
-msgstr ""
-
 #: manager.py:169
-msgid "Rent"
+msgid "Log in"
 msgstr ""
 
 #: manager.py:170
-msgid "Assign a rent event."
+msgid "Start user session."
 msgstr ""
 
-#: manager.py:173
-msgid "Calendar"
+#: manager.py:171
+msgid "Log out"
+msgstr ""
+
+#: manager.py:172
+msgid "End user session."
 msgstr ""
 
 #: manager.py:174
-msgid "Copy week"
+msgid "Application settings"
 msgstr ""
 
 #: manager.py:175
+msgid "Manage the application settings."
+msgstr ""
+
+#: manager.py:177
+msgid "Exit"
+msgstr ""
+
+#: manager.py:178
+msgid "Close the application."
+msgstr ""
+
+#: manager.py:181
+msgid "Client"
+msgstr ""
+
+#: manager.py:182 manager.py:191
+msgid "New"
+msgstr ""
+
+#: manager.py:183
+msgid "Register new client."
+msgstr ""
+
+#: manager.py:184
+msgid "Search by RFID"
+msgstr ""
+
+#: manager.py:185
+msgid "Search a client with its RFID card."
+msgstr ""
+
+#: manager.py:186 manager.py:193
+msgid "Search by name"
+msgstr ""
+
+#: manager.py:187
+msgid "Search a client with its name."
+msgstr ""
+
+#: manager.py:192
+msgid "Register new renter."
+msgstr ""
+
+#: manager.py:194
+msgid "Search a renter with its name."
+msgstr ""
+
+#: manager.py:198
+msgid "Training"
+msgstr ""
+
+#: manager.py:199
+msgid "Assign a training event."
+msgstr ""
+
+#: manager.py:200
+msgid "Rent"
+msgstr ""
+
+#: manager.py:201
+msgid "Assign a rent event."
+msgstr ""
+
+#: manager.py:204
+msgid "Calendar"
+msgstr ""
+
+#: manager.py:205
+msgid "Copy week"
+msgstr ""
+
+#: manager.py:206
 msgid "Copy current week into other."
 msgstr ""
 
-#: manager.py:333
+#: manager.py:399
 msgid "The week has been copied sucessfully."
 msgstr ""
 

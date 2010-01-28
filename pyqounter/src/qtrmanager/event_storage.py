@@ -74,6 +74,7 @@ class EventStorage(QAbstractTableModel):
 
         self.getMime = parent.getMime
 
+        self.weekRange = self.date2range(datetime.now())
         self.week_days = [ _('Monday'), _('Tuesday'),
               _('Wednesday'), _('Thursday'),
               _('Friday'), _('Saturday'),
@@ -84,7 +85,7 @@ class EventStorage(QAbstractTableModel):
         self.cols_count = len(self.week_days)
 
         self.initModel()
-        self.showCurrWeek()
+        #self.showCurrWeek()
 
     def rowCount(self, parent):
         if parent.isValid():
@@ -121,17 +122,23 @@ class EventStorage(QAbstractTableModel):
         return self.weekRange
 
     def loadData(self, d):
-        self.initModel()
         self.parent.statusBar().showMessage(_('Request information for the calendar.'))
         monday, sunday = week_range = self.date2range(d)
 	ajax = HttpAjax(self.parent, '/manager/get_week/',
                         {'monday': monday,
-                         'filter': []})
+                         'filter': []}, self.parent.session_id)
 	if ajax:
             self.parent.statusBar().showMessage(_('Parsing the response...'))
 	    response = ajax.parse_json()
+            if response is None:
+                self.parent.statusBar().showMessage(_('No reply'))
+                return False
             self.parent.statusBar().showMessage(_('Filling the calendar...'))
+            self.initModel()
             for e in response['events']:
+
+                qApp.processEvents()
+
                 begin = __(e['begin'])
                 end = __(e['end'])
                 duration = end - begin
