@@ -72,10 +72,11 @@ class MainWindow(QMainWindow):
         return handler
 
     def setupViews(self):
+        self.rooms = tuple( [ (a['title'], a['color'], a['id']) for a in self.getRooms()['rows'] ] )
+
 	self.schedule = QtSchedule((8, 24), timedelta(minutes=30), self.rooms, self)
 
         headerPanel = QHBoxLayout()
-        self.rooms = tuple( [ (a['title'], a['color'], a['id']) for a in self.getRooms()['rows'] ] )
         if self.rooms and len(self.rooms) > 0:
             for title, color, id in self.rooms:
                 buttonFilter = QPushButton(title)
