@@ -101,7 +101,7 @@ class DlgEventAssign(QDialog):
                             _('Paid partially'),
                             _('Paid') )
             if len(self.rent_list) == 0:
-                self.self.buttonAssign.setDisabled(True)
+                self.buttonAssign.setDisabled(True)
             for row in self.rent_list:
                 lastRow = self.rent.rowCount()
                 self.rent.insertRow(lastRow)
