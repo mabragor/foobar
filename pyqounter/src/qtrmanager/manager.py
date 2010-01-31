@@ -41,6 +41,7 @@ class MainWindow(QMainWindow):
         self.rooms = []
         self.tree = []
 
+        self.menus = []
 	self.createMenus()
 	self.setupViews()
 
@@ -210,21 +211,27 @@ class MainWindow(QMainWindow):
              ),
 	    ]
 
+
 	for topic, info in data:
-	    self.menu = self.menuBar().addMenu(topic)
+	    menu = self.menuBar().addMenu(topic)
+            if topic != _('File'):
+                menu.setDisabled(True)
 	    for title, short, name, desc in info:
                 if not title:
-                    self.menu.addSeparator()
+                    menu.addSeparator()
                     continue
 		setattr(self, 'act_%s' % name, QAction(title, self))
 		action = getattr(self, 'act_%s' % name)
 		action.setShortcut(short)
 		action.setStatusTip(desc)
 		self.connect(action, SIGNAL('triggered()'), getattr(self, name))
-		self.menu.addAction(action)
+		menu.addAction(action)
+            self.menus.append(menu)
 
     def setSessionID(self, id):
         self.session_id = id
+        for menu in self.menus:
+            menu.setDisabled(False)
 
     # Обработчики меню: начало
 
