@@ -81,6 +81,7 @@ class MainWindow(QMainWindow):
             for title, color, id in self.rooms:
                 buttonFilter = QPushButton(title)
                 buttonFilter.setCheckable(True)
+                buttonFilter.setDisabled(True) # BUG #28
                 headerPanel.addWidget(buttonFilter)
                 self.connect(buttonFilter, SIGNAL('clicked()'),
                              self.prepareFilter(id, title))
