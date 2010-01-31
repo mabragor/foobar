@@ -57,4 +57,8 @@ dbdrop:
 	mysql -u root -p; \
 	rm -f ./mysql.tmp
 
+dump:
+	grep PASS settings_local.py
+	mysqldump -u $(PROJECTNAME) -p $(PROJECTNAME) > $(PROJECTNAME).mysql.dump
+
 include targets.mk
