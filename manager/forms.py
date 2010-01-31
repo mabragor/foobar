@@ -370,12 +370,18 @@ class UserIdRfid(AjaxForm):
         mode = self.param('mode')
         user_id = self.param('user_id')
         if mode == 'client':
-            if user_id is None:
-                user = storage.Client.objects.get(rfid_code=self.param('rfid_code'))
-            else:
-                user = storage.Client.objects.get(id=user_id)
+            try:
+                if user_id is None:
+                    user = storage.Client.objects.get(rfid_code=self.param('rfid_code'))
+                else:
+                    user = storage.Client.objects.get(id=user_id)
+            except storage.Client.DoesNotExist:
+                return None
         elif mode == 'renter':
-            user = storage.Renter.objects.get(id=user_id)
+            try:
+                user = storage.Renter.objects.get(id=user_id)
+            except storage.Renter.DoesNotExist:
+                return None
         return user.about()
 
 class RegisterRent(AjaxForm):

@@ -284,10 +284,14 @@ class MainWindow(QMainWindow):
 			    {'rfid_code': self.rfid_id,
                              'mode': 'client'}, self.session_id)
 	    response = ajax.parse_json()
-	    self.dialog = DlgClientInfo(self)
-	    self.dialog.setModal(True)
-	    self.dialog.initData(response['info'])
-	    self.dialog.exec_()
+            if response['info'] is None:
+                QMessageBox.warning(self, _('Warning'),
+                                    _('This RFID belongs to nobody.'))
+            else:
+                self.dialog = DlgClientInfo(self)
+                self.dialog.setModal(True)
+                self.dialog.initData(response['info'])
+                self.dialog.exec_()
 	else:
 	    print 'dialog was rejected'
 
