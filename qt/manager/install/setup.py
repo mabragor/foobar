@@ -3,14 +3,14 @@
 from distutils.core import setup
 
 setup(name='pyqounter-manager',
-      version='1.0.0',
+      version='0.1.0',
       description='Accounting System / Manager',
       author='Ruslan Popov',
       author_email='ruslan.popov@gmail.com',
       maintainer='Ruslan Popov',
       maintainer_email='ruslan.popov@gmail.com',
       url='http://snegiri.dontexist.org/pyqounter',
-      packages=['qtrmanager'],
-      package_dir={'qtrmanager': 'src/qtrmanager'},
-      package_data={'qtrmanager': ['locale/ru/LC_MESSAGES/*mo', 'manager.css']}
+      packages=['manager'],
+      package_dir={'manager': 'src/manager'},
+      package_data={'manager': ['locale/ru/LC_MESSAGES/*mo', 'manager.css']}
      )

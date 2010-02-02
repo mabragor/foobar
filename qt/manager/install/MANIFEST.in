@@ -1,0 +1,7 @@
+include README
+include LICENSE
+include AUTHORS
+include INSTALL
+include MANIFEST.in
+recursive-include src/manager/locale *.mo
+recursive-include src/manager *.css
