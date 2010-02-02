@@ -133,6 +133,11 @@ def cal_event_del(request, form):
     return abstract_remove(request, form)
 
 @login_required
+@ajax_processor(forms.ExchangeRoom, isJavaScript)
+def event_exchange_room(request, form):
+    return abstract_response(request, form)
+
+@login_required
 @ajax_processor(forms.GetVisitors, isJavaScript)
 def get_visitors(request, form):
     response, visitors = abstract_request(request, form)

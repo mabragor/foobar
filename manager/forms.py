@@ -502,6 +502,26 @@ class CalendarEventDel(AjaxForm):
         c = self.cleaned_data
         storage.Schedule.objects.get(id=c['id']).delete()
 
+class ExchangeRoom(AjaxForm):
+    """ Form acquires the IDs of two events and tries to exchange their
+    rooms."""
+    id_a = forms.IntegerField()
+    id_b = forms.IntegerField()
+
+    def clean(self):
+        data = self.cleaned_data
+        try:
+            event_a = storage.Schedule.objects.get(id=int(data['id_a']))
+            event_b = storage.Schedule.objects.get(id=int(data['id_b']))
+        except:
+            raise forms.ValidationError(_('Check event IDs.'))
+        return data
+
+    def save(self):
+        data = self.cleaned_data
+        event_a = storage.Schedule.objects.get(id=int(data['id_a']))
+        event_b = storage.Schedule.objects.get(id=int(data['id_b']))
+
 class CopyWeek(AjaxForm):
     """ Form acquires two dates and makes a copy from first one to
     second. """

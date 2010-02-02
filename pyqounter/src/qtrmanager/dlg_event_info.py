@@ -48,7 +48,6 @@ class DlgEventInfo(QDialog):
 
         labelRoom = QLabel(_('Room'))
         self.comboRoom = QComboBox()
-        self.comboRoom.setDisabled(True)
         labelRoom.setBuddy(self.comboRoom)
 
         labelStatus = QLabel(_('Status'))
@@ -100,6 +99,8 @@ class DlgEventInfo(QDialog):
         self.tree.setModel(model)
 
     def setSignals(self):
+        self.connect(self.comboRoom, SIGNAL('currentIndexChanged(int)'),
+                     self.changeRoom)
         self.connect(self.buttonVisitors, SIGNAL('clicked()'),
                      self.showVisitors)
         self.connect(self.buttonVisit, SIGNAL('clicked()'),
@@ -126,17 +127,31 @@ class DlgEventInfo(QDialog):
         self.editBegin.setDateTime(QDateTime(begin))
         duration = (end - begin).seconds / 60
         self.editDuration.setText(str(duration))
-        self.setRooms(self.parent.rooms, int(room['id']))
+        self.initRooms(int(room['id']))
         self.comboStatus.setCurrentIndex( int(schedule['status']) )
 
-    def setRooms(self, rooms, current_id):
-        current_id += 100
-        current = 0
-        for title, color, id in rooms:
+    def initRooms(self, current_id):
+        self.current_room_index = current_id - 1
+        for title, color, id in self.parent.rooms:
             self.comboRoom.addItem(title, QVariant(id))
-            if id == current_id:
+            if id == current_id + 100:
                 current = self.comboRoom.count() - 1
-        self.comboRoom.setCurrentIndex(current)
+        self.comboRoom.setCurrentIndex(current_room_index)
+
+    def changeRoom(self, new_index):
+        """
+        Замена зала.
+        1. Выбранный зал пуст в течении всего периода.
+           Изменить зал для события.
+        2. Выбранный зал занят полностью, т.е. два занятия совпадают.
+           Обменять залы.
+        3. Выбранный зал занят частично.
+           Отменить замену, выдать сообщение.
+        """
+        if new_index != self.current_room_index:
+            # выполнить проверку занятости зала
+            #
+            pass
 
     def visitEvent(self):
 	def callback(rfid):
@@ -158,10 +173,7 @@ class DlgEventInfo(QDialog):
                         self, _('Client registration'),
                         _('The client is registered on this event.'))
                 else:
-                    QMessageBox.warning(self, _('Warning'),
-                                        response['desc'],
-                                        QMessageBox.Ok,
-                                        QMessageBox.Ok)
+                    QMessageBox.warning(self, _('Warning'), response['desc'])
             else:
                 print _('Check response format!')
 	else:
