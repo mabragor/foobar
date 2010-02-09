@@ -50,7 +50,7 @@ class QtSchedule(QTableView):
         #self.setDragDropMode(QAbstractItemView.DragDrop) #InternalMove
 
         # Запрещаем изменение размеров ячейки
-        self.horizontalHeader().setResizeMode(QHeaderView.Fixed)
+        self.horizontalHeader().setResizeMode(QHeaderView.Stretch)
         self.verticalHeader().setResizeMode(QHeaderView.Fixed)
 
         # Скроллинг
