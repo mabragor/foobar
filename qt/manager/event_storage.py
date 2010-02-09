@@ -63,7 +63,7 @@ class EventStorage(QAbstractTableModel):
 
     def __init__(self, work_hours,
                  quant=timedelta(minutes=30),
-                 room_list=tuple(), parent=None):
+                 room_list=tuple(), mode='week', parent=None):
         QAbstractTableModel.__init__(self, parent)
 
         self.parent = parent
@@ -74,11 +74,15 @@ class EventStorage(QAbstractTableModel):
 
         self.getMime = parent.getMime
 
+        self.showMode = mode # 'week' or 'day'
         self.weekRange = self.date2range(datetime.now())
-        self.week_days = [ _('Monday'), _('Tuesday'),
-              _('Wednesday'), _('Thursday'),
-              _('Friday'), _('Saturday'),
-              _('Sunday') ]
+        if 'week' == self.showMode:
+            self.week_days = [ _('Monday'), _('Tuesday'),
+                               _('Wednesday'), _('Thursday'),
+                               _('Friday'), _('Saturday'),
+                               _('Sunday') ]
+        else:
+            self.week_days = [ _('Day') ]
 
         begin_hour, end_hour = work_hours
         self.rows_count = (end_hour - begin_hour) * timedelta(hours=1).seconds / quant.seconds
@@ -113,12 +117,8 @@ class EventStorage(QAbstractTableModel):
         items_a = self.e2rc[ (event_a, room_a) ]
         items_b = self.e2rc[ (event_b, room_b) ]
         # удалить все записи о каждом событии
-        del(self.e2rc[(event_a, room_a)])
-        del(self.e2rc[(event_b, room_b)])
-        for row, col in items_a:
-            del(self.rc2e[ (row, col, room_a) ])
-        for row, col in items_b:
-            del(self.rc2e[ (row, col, room_b) ])
+        self.remove(event_a, room_a)
+        self.remove(event_b, room_b)
         # проверить возможность обмена
         if self.may_insert(event_a, room_b) and \
                 self.may_insert(event_b, room_a):
@@ -140,24 +140,36 @@ class EventStorage(QAbstractTableModel):
         return False
 
     def showCurrWeek(self):
-        now = datetime.now()
-        self.weekRange = self.date2range(now)
-        self.loadData(now)
-        return self.weekRange
+        if 'week' == self.showMode:
+            now = datetime.now()
+            self.weekRange = self.date2range(now)
+            self.loadData(now)
+            return self.weekRange
+        else:
+            return None
 
     def showPrevWeek(self):
-        current_monday, current_sunday = self.weekRange
-        prev_monday = current_monday - timedelta(days=7)
-        self.loadData(prev_monday)
-        return self.weekRange
+        if 'week' == self.showMode:
+            current_monday, current_sunday = self.weekRange
+            prev_monday = current_monday - timedelta(days=7)
+            self.loadData(prev_monday)
+            return self.weekRange
+        else:
+            return None
 
     def showNextWeek(self):
-        current_monday, current_sunday = self.weekRange
-        next_monday = current_monday + timedelta(days=7)
-        self.loadData(next_monday)
-        return self.weekRange
+        if 'week' == self.showMode:
+            current_monday, current_sunday = self.weekRange
+            next_monday = current_monday + timedelta(days=7)
+            self.loadData(next_monday)
+            return self.weekRange
+        else:
+            return None
 
     def loadData(self, d):
+        if 'day' == self.showMode:
+            return False
+
         self.parent.statusBar().showMessage(_('Request information for the calendar.'))
         monday, sunday = week_range = self.date2range(d)
 	ajax = HttpAjax(self.parent, '/manager/get_week/',
@@ -172,7 +184,6 @@ class EventStorage(QAbstractTableModel):
             self.parent.statusBar().showMessage(_('Filling the calendar...'))
             self.initModel()
             for e in response['events']:
-
                 qApp.processEvents()
 
                 begin = __(e['begin'])
@@ -190,9 +201,12 @@ class EventStorage(QAbstractTableModel):
         """ Метод для определения вертикальных и горизонтальных меток для
         рядов и колонок таблицы. """
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            mon, sun = self.weekRange
-            daystr = (mon + timedelta(days=section)).strftime('%d/%m')
-            return QVariant('%s\n%s' % (self.week_days[section], daystr))
+            if 'week' == self.showMode:
+                mon, sun = self.weekRange
+                daystr = (mon + timedelta(days=section)).strftime('%d/%m')
+                return QVariant('%s\n%s' % (self.week_days[section], daystr))
+            else:
+                return self.dayHeader
         if orientation == Qt.Vertical and role == Qt.DisplayRole:
             begin_hour, end_hour = self.work_hours
             start = timedelta(hours=begin_hour)
@@ -307,14 +321,15 @@ class EventStorage(QAbstractTableModel):
         if emit_signal:
             self.emit(SIGNAL('layoutChanged()'))
 
-    def remove(self, event, room):
+    def remove(self, event, room, emit_signal=False):
         """ Метод удаления информации о событии. """
         cell_list = self.get_cells_by_event(event, room)
         if cell_list:
             for row, col in cell_list:
                 del( self.rc2e[ (row, col, room) ] )
             del( self.e2rc[ (event, room) ] )
-            self.emit(SIGNAL('layoutChanged()'))
+            if emit_signal:
+                self.emit(SIGNAL('layoutChanged()'))
 
     def move(self, row, col, room, event):
         """ Метод перемещения события по координатной сетке. """
