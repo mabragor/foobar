@@ -134,7 +134,7 @@ def cal_event_del(request, form):
 
 @login_required
 @ajax_processor(forms.ExchangeRoom, isJavaScript)
-def event_exchange_room(request, form):
+def exchange_room(request, form):
     return abstract_response(request, form)
 
 @login_required

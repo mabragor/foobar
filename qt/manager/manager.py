@@ -92,6 +92,9 @@ class MainWindow(QMainWindow):
         self.buttonPrev = QPushButton(_('<<'))
         self.buttonNext = QPushButton(_('>>'))
         self.buttonToday = QPushButton(_('Today'))
+        self.buttonPrev.setDisabled(True)
+        self.buttonNext.setDisabled(True)
+        self.buttonToday.setDisabled(True)
 
         # callback helper function
         def prev_week():
@@ -214,6 +217,7 @@ class MainWindow(QMainWindow):
 
 	for topic, info in data:
 	    menu = self.menuBar().addMenu(topic)
+            # Отключаем элементы меню, надо войти в систему
             if topic != _('File'):
                 menu.setDisabled(True)
 	    for title, short, name, desc in info:
@@ -230,8 +234,13 @@ class MainWindow(QMainWindow):
 
     def setSessionID(self, id):
         self.session_id = id
+        # Активировать элементы меню
         for menu in self.menus:
             menu.setDisabled(False)
+        # Активировать кнопки навигации
+        self.buttonPrev.setDisabled(False)
+        self.buttonNext.setDisabled(False)
+        self.buttonToday.setDisabled(False)
 
     # Обработчики меню: начало
 
@@ -456,7 +465,7 @@ if __name__=="__main__":
     QCoreApplication.setOrganizationName('Home, Sweet Home')
     QCoreApplication.setOrganizationDomain('snegiri.dontexist.org')
     QCoreApplication.setApplicationName('foobar')
-    QCoreApplication.setApplicationVersion('1.0')
+    QCoreApplication.setApplicationVersion('0.1')
 
     app = QApplication(sys.argv)
     app.setStyleSheet(readStyleSheet('manager.css'))

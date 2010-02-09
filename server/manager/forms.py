@@ -508,6 +508,23 @@ class ExchangeRoom(AjaxForm):
     id_a = forms.IntegerField()
     id_b = forms.IntegerField()
 
+    def event_intersection(self, event_a, event_b):
+        """ Метод для определения пересечения событий по времени. """
+        a1 = event_a.begin
+        a2 = a1 + timedelta(minutes=int(60 * event_a.duration))
+        b1 = event_b.begin
+        b2 = b1 + timedelta(minutes=int(60 * event_b.duration))
+
+        if a1 <= b1 < a2 <= b2:
+            return True
+        if b1 <= a1 < b2 <= a2:
+            return True
+        if a1 <= b1 < b2 <= a2:
+            return True
+        if b1 <= a1 < a2 <= b2:
+            return True
+        return False
+
     def clean(self):
         data = self.cleaned_data
         try:
@@ -515,12 +532,50 @@ class ExchangeRoom(AjaxForm):
             event_b = storage.Schedule.objects.get(id=int(data['id_b']))
         except:
             raise forms.ValidationError(_('Check event IDs.'))
-        return data
+
+        if event_a == event_b:
+            raise forms.ValidationError(_('Unable to exchange the same event.'))
+
+        if not self.event_intersection(event_a, event_b):
+            raise forms.ValidationError(_('There is no event intersection.'))
+
+        # события совпадают по времени начала и длительности
+        if event_a.begin == event_b.begin and \
+                event_a.duration == event_a.duration:
+            return self.cleaned_data
+
+        raise forms.ValidationError(_('Not implemented yet.'))
+
+
+#         if storage.Schedule.objects.filter(
+#             room=room,
+#             begin__year=today.year,
+#             begin__month=today.month,
+#             begin__day=today.day
+#             ).filter(begin__lte=end).filter(end__gt=begin).count() != 0:
+#             raise forms.ValidationError(_('There is an event intersection.'))
+
+
 
     def save(self):
         data = self.cleaned_data
+        print data
+
         event_a = storage.Schedule.objects.get(id=int(data['id_a']))
         event_b = storage.Schedule.objects.get(id=int(data['id_b']))
+
+        print event_a, event_a.room
+        print event_b, event_b.room
+
+        room_tmp = event_a.room
+        event_a.room = event_b.room
+        event_b.room = room_tmp
+
+        print event_a, event_a.room
+        print event_b, event_b.room
+
+        event_a.save()
+        event_b.save()
 
 class CopyWeek(AjaxForm):
     """ Form acquires two dates and makes a copy from first one to

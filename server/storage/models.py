@@ -288,6 +288,20 @@ class Schedule(models.Model):
             obj.update( {'type': 'rent', 'event': self.rent.about()} )
         return obj
 
+    @property
+    def typeof(self):
+        if self.course is None:
+            return 1
+        else:
+            return 0
+
+    @property
+    def object(self):
+        if self.course is not None:
+            return self.course
+        else:
+            return self.rent
+
     def get_for_user(self, user):
         type = None
         if user is None or self.end < datetime.today():

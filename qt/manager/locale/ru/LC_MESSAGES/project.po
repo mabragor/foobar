@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-01 01:08+0300\n"
+"POT-Creation-Date: 2010-02-04 18:59+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Ruslan Popov <ruslan.popov@gmail.com>\n"
 "Language-Team: LANGUAGE <RU@li.org>\n"
@@ -602,21 +602,14 @@ msgstr "Данная RFID метка никому не принадлежит."
 msgid "The week has been copied sucessfully."
 msgstr "Неделя была скопирована успешно."
 
+#: qtschedule.py:65
+msgid "Exchange rooms"
+msgstr "Обмен залов"
+
+#: qtschedule.py:66
+msgid "Exchange rooms between selected and current events."
+msgstr "Обмен залов между выбранным и текущим событием."
+
 #: tree_model.py:50
 msgid "Courses"
 msgstr "Курсы"
-
-#~ msgid "Email"
-#~ msgstr "Е-почта"
-
-#~ msgid "Year of birth"
-#~ msgstr "Год рождения"
-
-#~ msgid "Sex"
-#~ msgstr "Пол"
-
-#~ msgid "Male"
-#~ msgstr "Мужской"
-
-#~ msgid "Female"
-#~ msgstr "Женский"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-01 01:08+0300\n"
+"POT-Creation-Date: 2010-02-04 18:59+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -600,6 +600,14 @@ msgstr ""
 
 #: manager.py:412
 msgid "The week has been copied sucessfully."
+msgstr ""
+
+#: qtschedule.py:65
+msgid "Exchange rooms"
+msgstr ""
+
+#: qtschedule.py:66
+msgid "Exchange rooms between selected and current events."
 msgstr ""
 
 #: tree_model.py:50

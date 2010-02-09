@@ -103,6 +103,30 @@ class EventStorage(QAbstractTableModel):
         self.rc2e = {} # (row, col, room): event
         self.e2rc = {} # (event, room): [(row, col), (row, col), ...]
 
+    def exchangeRoom(self, data_a, data_b):
+        # запихать сюда код из шедулера
+
+        room_a = data_a[2]
+        room_b = data_b[2]
+        # получить данные о событиях
+        event_a = self.rc2e[data_a]
+        event_b = self.rc2e[data_b]
+        # получить списки ячеек для каждого события
+        items_a = self.e2rc[ (event_a, room_a) ]
+        items_b = self.e2rc[ (event_b, room_b) ]
+        # удалить все записи о каждом событии
+        del(self.e2rc[(event_a, room_a)])
+        del(self.e2rc[(event_b, room_b)])
+        for row, col in items_a:
+            del(self.rc2e[ (row, col, room_a) ])
+        for row, col in items_b:
+            del(self.rc2e[ (row, col, room_b) ])
+        # добавить события, обменяв залы
+        self.insert(room_a, event_b)
+        self.insert(room_b, event_a)
+
+        self.emit(SIGNAL('layoutChanged()'))
+
     def showCurrWeek(self):
         now = datetime.now()
         self.weekRange = self.date2range(now)

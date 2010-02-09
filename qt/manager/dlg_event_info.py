@@ -136,7 +136,7 @@ class DlgEventInfo(QDialog):
             self.comboRoom.addItem(title, QVariant(id))
             if id == current_id + 100:
                 current = self.comboRoom.count() - 1
-        self.comboRoom.setCurrentIndex(current_room_index)
+        self.comboRoom.setCurrentIndex(self.current_room_index)
 
     def changeRoom(self, new_index):
         """

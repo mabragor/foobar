@@ -39,7 +39,7 @@ urlpatterns += patterns(
     url(r'^copy_week/$', 'copy_week'),
     url(r'^cal_event_add/$', 'cal_event_add'),
     url(r'^cal_event_del/$', 'cal_event_del'),
-    url(r'^event_exchange_room/$', 'event_exchange_room'),
+    url(r'^exchange_room/$', 'exchange_room'),
     url(r'^register_visit/$', 'register_visit'),
     url(r'^register_rent/$', 'register_rent'),
     url(r'^get_visitors/$', 'get_visitors'),
