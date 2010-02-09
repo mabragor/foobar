@@ -91,11 +91,14 @@ class WaitingRFID(QThread):
 
         rfid_code = ''
         # инициализация считывателя
-        self.port = serial.Serial(PORT['name'], PORT['rate'],
-                                  bytesize = PORT['bits_in_byte'],
-                                  parity = PORT['parity'],
-                                  stopbits = PORT['stop_bits']
-                             )
+        try:
+            self.port = serial.Serial(PORT['name'], PORT['rate'],
+                                      bytesize = PORT['bits_in_byte'],
+                                      parity = PORT['parity'],
+                                      stopbits = PORT['stop_bits'])
+        except serial.serialutil.SerialException:
+            return
+
         self.port.setDTR(True)
         self.port.setRTS(True)
 
