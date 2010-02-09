@@ -199,17 +199,15 @@ class QtSchedule(QTableView):
         print "CALL EXCHANGE ROOMS"
         params = {'id_a': self.current_event.id,
                   'id_b': self.selected_event.id}
-        print params
-        ajax = HttpAjax(self, '/manager/exchange_room/',
-                        params, self.parent.session_id)
-        response = ajax.parse_json()
-        if response:
-            if 'code' in response and response['code'] == 200:
-                self.model().exchangeRoom(self.current_data,
-                                          self.selected_data)
-                data = self.current_data
-                self.current_data = self.selected_data
-                self.selected_data = data
+        if self.model().exchangeRoom(params,
+                                     self.current_data,
+                                     self.selected_data):
+            data = self.current_data
+            self.current_data = self.selected_data
+            self.selected_data = data
+            self.parent.statusBar().showMessage(_('Complete.'))
+        else:
+            self.parent.statusBar().showMessage(_('Unable to exchange.'))
 
     def mousePressEvent(self, event):
         """ Обработчик нажатия кнопки мыши. Отрабатываем здесь DnD. """

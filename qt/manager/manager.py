@@ -261,7 +261,7 @@ class MainWindow(QMainWindow):
 	    ajax = HttpAjax(self, '/manager/login/',
                             params, self.session_id)
 	    response = ajax.parse_json()
-            if 'user_info' in response:
+            if response and 'user_info' in response:
                 self.loggedTitle(response['user_info'])
                 self.tree = self.getCoursesTree()
                 self.scheduleModel.showCurrWeek()

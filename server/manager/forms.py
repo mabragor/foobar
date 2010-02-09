@@ -544,6 +544,7 @@ class ExchangeRoom(AjaxForm):
                 event_a.duration == event_a.duration:
             return self.cleaned_data
 
+        return self.cleaned_data # СДЕЛАТЬ ПРОВЕРКИ ПОЛНОСТЬЮ
         raise forms.ValidationError(_('Not implemented yet.'))
 
 

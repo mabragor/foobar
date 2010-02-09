@@ -103,9 +103,7 @@ class EventStorage(QAbstractTableModel):
         self.rc2e = {} # (row, col, room): event
         self.e2rc = {} # (event, room): [(row, col), (row, col), ...]
 
-    def exchangeRoom(self, data_a, data_b):
-        # запихать сюда код из шедулера
-
+    def exchangeRoom(self, params, data_a, data_b):
         room_a = data_a[2]
         room_b = data_b[2]
         # получить данные о событиях
@@ -121,11 +119,25 @@ class EventStorage(QAbstractTableModel):
             del(self.rc2e[ (row, col, room_a) ])
         for row, col in items_b:
             del(self.rc2e[ (row, col, room_b) ])
-        # добавить события, обменяв залы
-        self.insert(room_a, event_b)
-        self.insert(room_b, event_a)
-
+        # проверить возможность обмена
+        if self.may_insert(event_a, room_b) and \
+                self.may_insert(event_b, room_a):
+            # отправить инфо на сервер
+            ajax = HttpAjax(self.parent, '/manager/exchange_room/',
+                            params, self.parent.session_id)
+            if ajax:
+                response = ajax.parse_json()
+                if response is not None:
+                    # добавить события, обменяв залы
+                    self.insert(room_a, event_b)
+                    self.insert(room_b, event_a)
+                    self.emit(SIGNAL('layoutChanged()'))
+                    return True
+        # вертать взад
+        self.insert(room_a, event_a)
+        self.insert(room_b, event_b)
         self.emit(SIGNAL('layoutChanged()'))
+        return False
 
     def showCurrWeek(self):
         now = datetime.now()
@@ -242,7 +254,25 @@ class EventStorage(QAbstractTableModel):
         col = dt.weekday()
         return (row, col)
 
-    def may_insert(self, event, row, col):
+    def may_insert(self, event, room_id):
+        """ Метод для проверки позможности размещения события по указанным
+        координатам. Возвращает True/False. """
+        row, col = self.datetime2rowcol(event.begin)
+        for i in xrange(event.duration.seconds / self.quant.seconds):
+            try:
+                self.rc2e[ (row + i, col, room_id) ]
+                return False
+            except KeyError:
+                pass
+        return True
+
+    def prepare_event_cells(self, event, room_id, row, col):
+        cells = []
+        for i in xrange(event.duration.seconds / self.quant.seconds):
+            cells.append( (row + i, col, room_id) )
+        return cells
+
+    def get_free_rooms(self, event, row, col):
         """ Метод для проверки возможности размещения события по указанным
         координатам. Возвращает список залов, которые предоставляют такую
         возможность.
