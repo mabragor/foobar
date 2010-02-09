@@ -48,6 +48,7 @@ class DlgEventInfo(QDialog):
 
         labelRoom = QLabel(_('Room'))
         self.comboRoom = QComboBox()
+        self.comboRoom.setDisabled(True)
         labelRoom.setBuddy(self.comboRoom)
 
         labelStatus = QLabel(_('Status'))
