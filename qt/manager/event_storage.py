@@ -59,6 +59,33 @@ class EventRent(Event):
         self.type = 'rent'
         self.event = rent
 
+class ModelStorage():
+
+    def __init__(self):
+        self.init()
+
+    def init(self):
+        self.rc2e = {} # (row, col, room): event
+        self.e2rc = {} # (event, room): [(row, col), (row, col), ...]
+
+    def getByRCR(self, key):
+        return self.rc2e.get(key, None)
+
+    def setByRCR(self, key, value):
+        self.rc2e.update( { key: value } )
+
+    def delByRCR(self, key):
+        del(self.rc2e[key])
+
+    def getByER(self, key):
+        return self.e2rc.get(key, None)
+
+    def setByER(self, key, value):
+        self.e2rc.update( { key: value } )
+
+    def delByER(self, key):
+        del(self.e2rc[key])
+
 class EventStorage(QAbstractTableModel):
 
     def __init__(self, work_hours,
@@ -74,6 +101,8 @@ class EventStorage(QAbstractTableModel):
 
         self.getMime = parent.getMime
 
+        self.storage = ModelStorage()
+
         self.showMode = mode # 'week' or 'day'
         self.weekRange = self.date2range(datetime.now())
         if 'week' == self.showMode:
@@ -88,8 +117,7 @@ class EventStorage(QAbstractTableModel):
         self.rows_count = (end_hour - begin_hour) * timedelta(hours=1).seconds / quant.seconds
         self.cols_count = len(self.week_days)
 
-        self.initModel()
-        #self.showCurrWeek()
+        self.storage.init()
 
     def rowCount(self, parent):
         if parent.isValid():
@@ -103,19 +131,26 @@ class EventStorage(QAbstractTableModel):
         else:
             return self.cols_count
 
-    def initModel(self):
-        self.rc2e = {} # (row, col, room): event
-        self.e2rc = {} # (event, room): [(row, col), (row, col), ...]
+    def changeShowMode(self, mode, column):
+        if mode != self.showMode:
+            self.showMode = mode
+            self.dayColumn = column
+
+    def colByMode(self, column):
+        if self.showMode == 'week':
+            return column
+        else:
+            return self.dayColumn
 
     def exchangeRoom(self, params, data_a, data_b):
         room_a = data_a[2]
         room_b = data_b[2]
         # получить данные о событиях
-        event_a = self.rc2e[data_a]
-        event_b = self.rc2e[data_b]
+        event_a = self.storage.getByRCR(data_a)
+        event_b = self.storage.getByRCR(data_b)
         # получить списки ячеек для каждого события
-        items_a = self.e2rc[ (event_a, room_a) ]
-        items_b = self.e2rc[ (event_b, room_b) ]
+        items_a = self.storage.getByER( (event_a, room_a) )
+        items_b = self.storage.getByER( (event_b, room_b) )
         # удалить все записи о каждом событии
         self.remove(event_a, room_a)
         self.remove(event_b, room_b)
@@ -182,7 +217,7 @@ class EventStorage(QAbstractTableModel):
                 self.parent.statusBar().showMessage(_('No reply'))
                 return False
             self.parent.statusBar().showMessage(_('Filling the calendar...'))
-            self.initModel()
+            self.storage.init()
             for e in response['events']:
                 qApp.processEvents()
 
@@ -206,7 +241,7 @@ class EventStorage(QAbstractTableModel):
                 daystr = (mon + timedelta(days=section)).strftime('%d/%m')
                 return QVariant('%s\n%s' % (self.week_days[section], daystr))
             else:
-                return self.dayHeader
+                return self.dayHeader #FIXME
         if orientation == Qt.Vertical and role == Qt.DisplayRole:
             begin_hour, end_hour = self.work_hours
             start = timedelta(hours=begin_hour)
@@ -220,16 +255,18 @@ class EventStorage(QAbstractTableModel):
             return QVariant()
         if role not in (Qt.DisplayRole, Qt.ToolTipRole):
             return QVariant()
-        event = self.get_event_by_cell(index.row(), index.column(), room_id)
+        row = index.row()
+        col = index.column()
+        event = self.get_event_by_cell(row, col, room_id)
         if event:
             if role == Qt.ToolTipRole:
                 return QVariant(event.title)
             if role == Qt.DisplayRole:
                 cells = self.get_cells_by_event(event, room_id)
                 if cells:
-                    if cells[0] == (index.row(), index.column()):
+                    if cells[0] == (row, col):
                         event.show_type = 'head'
-                    elif cells[-1] == (index.row(), index.column()):
+                    elif cells[-1] == (row, col):
                         event.show_type = 'tail'
                     else:
                         event.show_type = 'body'
@@ -244,11 +281,11 @@ class EventStorage(QAbstractTableModel):
 
     def get_event_by_cell(self, row, col, room_id):
         """ Получение события по указанным координатам. """
-        return self.rc2e.get( (row, col, room_id), None )
+        return self.storage.getByRCR( (row, col, room_id) )
 
     def get_cells_by_event(self, event, room_id):
         """ Получение всех ячеек события. """
-        return self.e2rc.get( (event, room_id), None )
+        return self.storage.getByER( (event, room_id) )
 
     def date2range(self, dt):
         """ Возвращаем диапазон недели для переданной даты. """
@@ -273,37 +310,36 @@ class EventStorage(QAbstractTableModel):
         координатам. Возвращает True/False. """
         row, col = self.datetime2rowcol(event.begin)
         for i in xrange(event.duration.seconds / self.quant.seconds):
-            try:
-                self.rc2e[ (row + i, col, room_id) ]
+            if self.storage.getByRCR(
+                (row + i, col, room_id)
+                ) is not None:
                 return False
-            except KeyError:
-                pass
         return True
 
-    def prepare_event_cells(self, event, room_id, row, col):
-        cells = []
-        for i in xrange(event.duration.seconds / self.quant.seconds):
-            cells.append( (row + i, col, room_id) )
-        return cells
+#     def prepare_event_cells(self, event, room_id, row, col):
+#         cells = []
+#         for i in xrange(event.duration.seconds / self.quant.seconds):
+#             cells.append( (row + i, col, room_id) )
+#         return cells
 
-    def get_free_rooms(self, event, row, col):
-        """ Метод для проверки возможности размещения события по указанным
-        координатам. Возвращает список залов, которые предоставляют такую
-        возможность.
+#     def get_free_rooms(self, event, row, col):
+#         """ Метод для проверки возможности размещения события по указанным
+#         координатам. Возвращает список залов, которые предоставляют такую
+#         возможность.
 
-        Для каждого зала из списка проверить наличие свободных
-        интервалов времени.
-        """
-        result = []
-        for room_name, room_color, room_id in self.rooms:
-            free = []
-            for i in xrange(event.duration.seconds / self.quant.seconds):
-                free.append( self.rc2e.get( (row + i, col, room_id), None ) is None )
-            print free
+#         Для каждого зала из списка проверить наличие свободных
+#         интервалов времени.
+#         """
+#         result = []
+#         for room_name, room_color, room_id in self.rooms:
+#             free = []
+#             for i in xrange(event.duration.seconds / self.quant.seconds):
+#                 free.append( self.rc2e.get( (row + i, col, room_id), None ) is None )
+#             print free
 
-            if reduce( lambda x,y: x and y, free ):
-                result.append(room_id)
-        return result
+#             if reduce( lambda x,y: x and y, free ):
+#                 result.append(room_id)
+#         return result
 
     def insert(self, room_id, event, emit_signal=False):
         """ Метод регистрации нового события. """
@@ -314,8 +350,8 @@ class EventStorage(QAbstractTableModel):
         cells = []
         for i in xrange(event.duration.seconds / self.quant.seconds):
             cells.append( (row + i, col) )
-            self.rc2e.update( { (row + i, col, room_id): event } )
-        self.e2rc.update( { (event, room_id): cells } )
+            self.storage.setByRCR( (row + i, col, room_id), event )
+        self.storage.setByER( (event, room_id), cells )
         #self.endInsertRows()
 
         if emit_signal:
@@ -326,8 +362,8 @@ class EventStorage(QAbstractTableModel):
         cell_list = self.get_cells_by_event(event, room)
         if cell_list:
             for row, col in cell_list:
-                del( self.rc2e[ (row, col, room) ] )
-            del( self.e2rc[ (event, room) ] )
+                self.storage.delByRCR( (row, col, room) )
+            self.storage.delByER( (event, room) )
             if emit_signal:
                 self.emit(SIGNAL('layoutChanged()'))
 

@@ -134,7 +134,7 @@ class MainWindow(QMainWindow):
     def loadInitialData(self):
         #self.tree = self.getCoursesTree()
         self.scheduleModel = EventStorage(
-            (8, 24), timedelta(minutes=30), self.rooms, self
+            (8, 24), timedelta(minutes=30), self.rooms, 'week', self
             )
         self.schedule.setModel(self.scheduleModel)
         self.bpMonday.setText(self.scheduleModel.getMonday().strftime('%d/%m/%Y'))

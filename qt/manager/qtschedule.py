@@ -34,6 +34,9 @@ class QtSchedule(QTableView):
         self.work_hours = work_hours
         self.quant = quant
 
+        self.showMode = 'week' # also it may take 'day' value
+        self.previousModel = None
+
         self.current_event = None
         self.current_data = None
         self.selected_event = None
@@ -50,8 +53,11 @@ class QtSchedule(QTableView):
         #self.setDragDropMode(QAbstractItemView.DragDrop) #InternalMove
 
         # Запрещаем изменение размеров ячейки
-        self.horizontalHeader().setResizeMode(QHeaderView.Stretch)
         self.verticalHeader().setResizeMode(QHeaderView.Fixed)
+        self.horizontalHeader().setResizeMode(QHeaderView.Stretch)
+        self.connect(self.horizontalHeader(),
+                     SIGNAL('sectionClicked(int)'),
+                     self.expandDay)
 
         # Скроллинг
         self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
@@ -130,6 +136,25 @@ class QtSchedule(QTableView):
             self.scrolledCellY += dy
         QTableView.scrollContentsBy(self, dx, dy)
 
+    def expandDay(self, section):
+        if 'week' == self.showMode:
+            self.dayModel = EventStorage(
+                (8, 24), timedelta(minutes=30), self.rooms, 'day', self.parent
+                )
+            self.previousModel = self.model()
+            # сохраняем заголовок столбца
+            self.dayModel.dayHeader = self.previousModel.headerData(section, Qt.Horizontal, Qt.DisplayRole)
+            # копируем часть расписания
+
+
+
+            self.setModel(self.dayModel)
+            self.showMode = 'day'
+        else:
+            self.setModel(self.previousModel)
+            self.previousModel = None
+            self.showMode = 'week'
+
     def data_of_event(self, event):
         """ Метод для получения информации по возникшему событию. """
         index = self.indexAt(event.pos())
@@ -190,9 +215,6 @@ class QtSchedule(QTableView):
                     self.current_event.begin < datetime.now() or \
                     self.selected_event.begin < datetime.now():
                 self.ctxMenuExchange.setDisabled(True)
-
-            print type(self.current_event.duration)
-
             self.contextMenu.exec_(event.globalPos())
 
     def exchangeRooms(self):
