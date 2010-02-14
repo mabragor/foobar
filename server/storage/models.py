@@ -362,3 +362,24 @@ class Visit(models.Model):
             'card': self.card.about(),
             'when': self.when,
             }
+
+TYPICAL_CHARGES = (
+    ('0', _('Coach change')),
+    ('1', _('Economic expenses')),
+    ('2', _('Salary')),
+    ('3', _('Subsist')),
+    ('4', _('Advertising')),
+    ('5', _('Capital investments')),
+    )
+
+TYPICAL_GAIN = (
+    ('0', _('Basic services')),
+    ('1', _('Club cards')),
+    ('2', _('Gift certificates')),
+    ('3', _('Open abonement')),
+    ('4', _('ISIC cards')),
+    ('5', _('Cofe machine')),
+    ('6', _('Room rent')),
+    ('7', _('Dance show')),
+    )
+
