@@ -34,9 +34,6 @@ class QtSchedule(QTableView):
         self.work_hours = work_hours
         self.quant = quant
 
-        self.showMode = 'week' # also it may take 'day' value
-        self.previousModel = None
-
         self.current_event = None
         self.current_data = None
         self.selected_event = None
@@ -137,23 +134,8 @@ class QtSchedule(QTableView):
         QTableView.scrollContentsBy(self, dx, dy)
 
     def expandDay(self, section):
-        if 'week' == self.showMode:
-            self.dayModel = EventStorage(
-                (8, 24), timedelta(minutes=30), self.rooms, 'day', self.parent
-                )
-            self.previousModel = self.model()
-            # сохраняем заголовок столбца
-            self.dayModel.dayHeader = self.previousModel.headerData(section, Qt.Horizontal, Qt.DisplayRole)
-            # копируем часть расписания
-
-
-
-            self.setModel(self.dayModel)
-            self.showMode = 'day'
-        else:
-            self.setModel(self.previousModel)
-            self.previousModel = None
-            self.showMode = 'week'
+        self.model().changeShowMode(section)
+        self.horizontalHeader().setResizeMode(QHeaderView.Stretch)
 
     def data_of_event(self, event):
         """ Метод для получения информации по возникшему событию. """
@@ -215,15 +197,14 @@ class QtSchedule(QTableView):
                     self.current_event.begin < datetime.now() or \
                     self.selected_event.begin < datetime.now():
                 self.ctxMenuExchange.setDisabled(True)
+            if 'week' != self.model().showMode:
+                self.ctxMenuExchange.setDisabled(True)
             self.contextMenu.exec_(event.globalPos())
 
     def exchangeRooms(self):
-        print "CALL EXCHANGE ROOMS"
-        params = {'id_a': self.current_event.id,
-                  'id_b': self.selected_event.id}
-        if self.model().exchangeRoom(params,
-                                     self.current_data,
-                                     self.selected_data):
+        exchanged = self.model().exchangeRoom(self.current_data,
+                                              self.selected_data)
+        if exchanged:
             data = self.current_data
             self.current_data = self.selected_data
             self.selected_data = data

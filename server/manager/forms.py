@@ -145,10 +145,6 @@ class CopyForm(forms.Form):
             ne.begin = e.begin+delta
             ne.save()
 
-
-
-
-
 class AjaxForm(forms.Form):
 
     # TODO: check symbols of RFID code
