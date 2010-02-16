@@ -14,7 +14,7 @@ class Command(NoArgsCommand):
     help = 'Applied new patches on database. Use before syncdb command.'
 
     def handle_noargs(self, **options):
-        if os.path.basename(os.path.realpath(os.path.curdir)) != 'foobar':
+        if os.path.basename(os.path.realpath(os.path.curdir)) != 'server':
             print 'Go to project\'s root.'
             return
 
