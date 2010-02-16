@@ -494,6 +494,13 @@ class CalendarEventDel(AjaxForm):
     def clean_id(self):
         return self.check_obj_existence(storage.Schedule, 'id')
 
+    def clean(self):
+        id = self.cleaned_data['id']
+        event = storage.Schedule.objects.get(id=id)
+        if event.begin < datatime.now():
+            raise forms.ValidationError(_('Unable to delete this event.'))
+        return self.cleaned_data
+
     def remove(self):
         c = self.cleaned_data
         storage.Schedule.objects.get(id=c['id']).delete()

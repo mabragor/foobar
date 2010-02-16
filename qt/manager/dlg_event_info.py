@@ -130,6 +130,7 @@ class DlgEventInfo(QDialog):
         self.editDuration.setText(str(duration))
         self.initRooms(int(room['id']))
         self.comboStatus.setCurrentIndex( int(schedule['status']) )
+        self.buttonRemove.setDisabled( begin < datetime.now() )
 
     def initRooms(self, current_id):
         self.current_room_index = current_id - 1
