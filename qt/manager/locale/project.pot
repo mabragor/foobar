@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-04 18:59+0300\n"
+"POT-Creation-Date: 2010-02-16 21:46+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,114 +16,20 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: courses_list.py:27 dlg_event_assign.py:86 dlg_event_info.py:29
-#: dlg_rent_assign.py:21 dlg_user_info.py:219
-msgid "Title"
-msgstr ""
-
-#: courses_list.py:27
-msgid "Price"
-msgstr ""
-
-#: courses_list.py:28
-msgid "Card"
-msgstr ""
-
-#: courses_list.py:29
-msgid "Sold"
-msgstr ""
-
-#: courses_list.py:29
-msgid "Used"
-msgstr ""
-
-#: courses_list.py:30
-msgid "Assigned"
-msgstr ""
-
-#: courses_list.py:30 dlg_event_assign.py:87 dlg_event_info.py:39
-#: dlg_rent_assign.py:45 dlg_user_info.py:220
-msgid "Begin"
-msgstr ""
-
-#: courses_list.py:31
-msgid "Expired"
-msgstr ""
-
-#: courses_list.py:31
-msgid "Cancelled"
-msgstr ""
-
-#: courses_list.py:123 dlg_course_assign.py:26
-msgid "Normal"
-msgstr ""
-
-#: courses_list.py:123 dlg_course_assign.py:27
-msgid "Club"
-msgstr ""
-
-#: courses_list.py:258
-msgid "Cancel course"
-msgstr ""
-
-#: courses_list.py:259
-msgid "Cancel current course."
-msgstr ""
-
 #: dlg_copy_week.py:26 dlg_settings.py:25 dlg_user_info.py:71
 #: dlg_user_info.py:234
 msgid "Apply"
 msgstr ""
 
-#: dlg_copy_week.py:27 dlg_course_assign.py:65 dlg_event_assign.py:78
-#: dlg_login.py:41 dlg_rent_assign.py:73 dlg_searching.py:32
-#: dlg_settings.py:26 dlg_user_info.py:72 dlg_user_info.py:235
+#: dlg_copy_week.py:27 dlg_event_assign.py:78 dlg_login.py:41
+#: dlg_rent_assign.py:73 dlg_searching.py:32 dlg_settings.py:26
+#: dlg_team_assign.py:65 dlg_user_info.py:72 dlg_user_info.py:235
 #: dlg_waiting_rfid.py:30
 msgid "Cancel"
 msgstr ""
 
 #: dlg_copy_week.py:44
 msgid "Choose a week to copy to"
-msgstr ""
-
-#: dlg_course_assign.py:23
-msgid "Type of card"
-msgstr ""
-
-#: dlg_course_assign.py:29
-msgid "Course starts"
-msgstr ""
-
-#: dlg_course_assign.py:36
-msgid "Course ends after"
-msgstr ""
-
-#: dlg_course_assign.py:39
-msgid "3 months"
-msgstr ""
-
-#: dlg_course_assign.py:40
-msgid "6 months"
-msgstr ""
-
-#: dlg_course_assign.py:41
-msgid "9 months"
-msgstr ""
-
-#: dlg_course_assign.py:42
-msgid "12 months"
-msgstr ""
-
-#: dlg_course_assign.py:61 dlg_event_assign.py:73
-msgid "Available courses"
-msgstr ""
-
-#: dlg_course_assign.py:64 dlg_event_assign.py:77 dlg_rent_assign.py:72
-msgid "Assign"
-msgstr ""
-
-#: dlg_course_assign.py:78
-msgid "Choose the course"
 msgstr ""
 
 #: dlg_event_assign.py:25
@@ -142,13 +48,31 @@ msgstr ""
 msgid "Duration"
 msgstr ""
 
-#: dlg_event_assign.py:86 manager.py:193
+#: dlg_event_assign.py:73 dlg_team_assign.py:61
+msgid "Available teams"
+msgstr ""
+
+#: dlg_event_assign.py:77 dlg_rent_assign.py:72 dlg_team_assign.py:64
+msgid "Assign"
+msgstr ""
+
+#: dlg_event_assign.py:86 manager.py:196
 msgid "Renter"
 msgstr ""
 
-#: dlg_event_assign.py:86 dlg_event_info.py:53 dlg_rent_assign.py:33
+#: dlg_event_assign.py:86 dlg_event_info.py:54 dlg_rent_assign.py:33
 #: dlg_user_info.py:219
 msgid "Status"
+msgstr ""
+
+#: dlg_event_assign.py:86 dlg_event_info.py:29 dlg_rent_assign.py:21
+#: dlg_user_info.py:219 team_list.py:27
+msgid "Title"
+msgstr ""
+
+#: dlg_event_assign.py:87 dlg_event_info.py:39 dlg_rent_assign.py:45
+#: dlg_user_info.py:220 team_list.py:30
+msgid "Begin"
 msgstr ""
 
 #: dlg_event_assign.py:87 dlg_rent_assign.py:52 dlg_user_info.py:220
@@ -178,68 +102,68 @@ msgstr ""
 msgid "Assign the event"
 msgstr ""
 
-#: dlg_event_assign.py:152 dlg_event_info.py:56 dlg_event_info.py:176
-#: http_ajax.py:72 http_ajax.py:78 manager.py:295
+#: dlg_event_assign.py:152 dlg_event_info.py:57 dlg_event_info.py:177
+#: http_ajax.py:72 http_ajax.py:78 manager.py:304
 msgid "Warning"
 msgstr ""
 
 #: dlg_event_assign.py:153
-msgid "What course do you want to assign?"
+msgid "What team do you want to assign?"
 msgstr ""
 
 #: dlg_event_assign.py:154
-msgid "Choose the course on the course's tree."
+msgid "Choose the team on the team's tree."
 msgstr ""
 
 #: dlg_event_info.py:34
 msgid "Coach"
 msgstr ""
 
-#: dlg_event_info.py:55
+#: dlg_event_info.py:56
 msgid "Waiting"
 msgstr ""
 
-#: dlg_event_info.py:57
+#: dlg_event_info.py:58
 msgid "Passed"
 msgstr ""
 
-#: dlg_event_info.py:75 dlg_show_visitors.py:32
+#: dlg_event_info.py:76 dlg_show_visitors.py:32
 msgid "Visitors"
 msgstr ""
 
-#: dlg_event_info.py:76
+#: dlg_event_info.py:77
 msgid "Visit"
 msgstr ""
 
-#: dlg_event_info.py:77
+#: dlg_event_info.py:78
 msgid "Remove"
 msgstr ""
 
-#: dlg_event_info.py:78 dlg_show_visitors.py:35
+#: dlg_event_info.py:79 dlg_show_visitors.py:35
 msgid "Close"
 msgstr ""
 
-#: dlg_event_info.py:92 manager.py:200
+#: dlg_event_info.py:93 manager.py:203
 msgid "Event"
 msgstr ""
 
-#: dlg_event_info.py:173
+#: dlg_event_info.py:174
 msgid "Client registration"
 msgstr ""
 
-#: dlg_event_info.py:174
+#: dlg_event_info.py:175
 msgid "The client is registered on this event."
 msgstr ""
 
-#: dlg_event_info.py:178 dlg_event_info.py:200
+#: dlg_event_info.py:179 dlg_event_info.py:201
 msgid "Check response format!"
 msgstr ""
 
-#: dlg_event_info.py:184
+#: dlg_event_info.py:185
 msgid "Event remove"
 msgstr ""
 
-#: dlg_event_info.py:185
+#: dlg_event_info.py:186
 msgid "Are you sure to remove this event from the calendar?"
 msgstr ""
 
@@ -345,6 +269,46 @@ msgstr ""
 msgid "Registered visitors"
 msgstr ""
 
+#: dlg_team_assign.py:23
+msgid "Type of card"
+msgstr ""
+
+#: dlg_team_assign.py:26 team_list.py:123
+msgid "Normal"
+msgstr ""
+
+#: dlg_team_assign.py:27 team_list.py:123
+msgid "Club"
+msgstr ""
+
+#: dlg_team_assign.py:29
+msgid "Team starts"
+msgstr ""
+
+#: dlg_team_assign.py:36
+msgid "Team ends after"
+msgstr ""
+
+#: dlg_team_assign.py:39
+msgid "3 months"
+msgstr ""
+
+#: dlg_team_assign.py:40
+msgid "6 months"
+msgstr ""
+
+#: dlg_team_assign.py:41
+msgid "9 months"
+msgstr ""
+
+#: dlg_team_assign.py:42
+msgid "12 months"
+msgstr ""
+
+#: dlg_team_assign.py:78
+msgid "Choose the team"
+msgstr ""
+
 #: dlg_user_info.py:54
 msgid "RFID"
 msgstr ""
@@ -354,7 +318,7 @@ msgid "Base data"
 msgstr ""
 
 #: dlg_user_info.py:66
-msgid "Courses' history"
+msgid "Teams' history"
 msgstr ""
 
 #: dlg_user_info.py:69
@@ -362,7 +326,7 @@ msgid "Assign RFID"
 msgstr ""
 
 #: dlg_user_info.py:70
-msgid "Assign course"
+msgid "Assign team"
 msgstr ""
 
 #: dlg_user_info.py:96
@@ -405,51 +369,59 @@ msgstr ""
 msgid "RFID reader"
 msgstr ""
 
-#: event_storage.py:78
-msgid "Monday"
-msgstr ""
-
-#: event_storage.py:78
-msgid "Tuesday"
-msgstr ""
-
-#: event_storage.py:79
-msgid "Wednesday"
-msgstr ""
-
-#: event_storage.py:79
-msgid "Thursday"
-msgstr ""
-
-#: event_storage.py:80
-msgid "Friday"
-msgstr ""
-
-#: event_storage.py:80
-msgid "Saturday"
-msgstr ""
-
-#: event_storage.py:81
-msgid "Sunday"
+#: event_storage.py:88
+msgid "ModelStorage: Unknown operation"
 msgstr ""
 
 #: event_storage.py:125
+msgid "Monday"
+msgstr ""
+
+#: event_storage.py:125
+msgid "Tuesday"
+msgstr ""
+
+#: event_storage.py:126
+msgid "Wednesday"
+msgstr ""
+
+#: event_storage.py:126
+msgid "Thursday"
+msgstr ""
+
+#: event_storage.py:127
+msgid "Friday"
+msgstr ""
+
+#: event_storage.py:127
+msgid "Saturday"
+msgstr ""
+
+#: event_storage.py:128
+msgid "Sunday"
+msgstr ""
+
+#: event_storage.py:130
+msgid "Day"
+msgstr ""
+
+#: event_storage.py:234
 msgid "Request information for the calendar."
 msgstr ""
 
-#: event_storage.py:131
+#: event_storage.py:240
 msgid "Parsing the response..."
 msgstr ""
 
-#: event_storage.py:134
+#: event_storage.py:243
 msgid "No reply"
 msgstr ""
 
-#: event_storage.py:136
+#: event_storage.py:245
 msgid "Filling the calendar..."
 msgstr ""
 
-#: event_storage.py:149
+#: event_storage.py:257
 msgid "Done"
 msgstr ""
 
@@ -469,7 +441,7 @@ msgstr ""
 msgid "Ready"
 msgstr ""
 
-#: manager.py:68 manager.py:264
+#: manager.py:68 manager.py:273
 msgid "Login to start session"
 msgstr ""
 
@@ -490,126 +462,170 @@ msgstr ""
 msgid "Today"
 msgstr ""
 
-#: manager.py:112
+#: manager.py:115
 msgid "Week:"
 msgstr ""
 
-#: manager.py:171 manager.py:217
+#: manager.py:174 manager.py:221
 msgid "File"
 msgstr ""
 
-#: manager.py:172
+#: manager.py:175
 msgid "Log in"
 msgstr ""
 
-#: manager.py:173
+#: manager.py:176
 msgid "Start user session."
 msgstr ""
 
-#: manager.py:174
+#: manager.py:177
 msgid "Log out"
 msgstr ""
 
-#: manager.py:175
+#: manager.py:178
 msgid "End user session."
 msgstr ""
 
-#: manager.py:177
+#: manager.py:180
 msgid "Application settings"
 msgstr ""
 
-#: manager.py:178
+#: manager.py:181
 msgid "Manage the application settings."
 msgstr ""
 
-#: manager.py:180
+#: manager.py:183
 msgid "Exit"
 msgstr ""
 
-#: manager.py:181
+#: manager.py:184
 msgid "Close the application."
 msgstr ""
 
-#: manager.py:184
+#: manager.py:187
 msgid "Client"
 msgstr ""
 
-#: manager.py:185 manager.py:194
+#: manager.py:188 manager.py:197
 msgid "New"
 msgstr ""
 
-#: manager.py:186
+#: manager.py:189
 msgid "Register new client."
 msgstr ""
 
-#: manager.py:187
+#: manager.py:190
 msgid "Search by RFID"
 msgstr ""
 
-#: manager.py:188
+#: manager.py:191
 msgid "Search a client with its RFID card."
 msgstr ""
 
-#: manager.py:189 manager.py:196
+#: manager.py:192 manager.py:199
 msgid "Search by name"
 msgstr ""
 
-#: manager.py:190
+#: manager.py:193
 msgid "Search a client with its name."
 msgstr ""
 
-#: manager.py:195
+#: manager.py:198
 msgid "Register new renter."
 msgstr ""
 
-#: manager.py:197
+#: manager.py:200
 msgid "Search a renter with its name."
 msgstr ""
 
-#: manager.py:201
+#: manager.py:204
 msgid "Training"
 msgstr ""
 
-#: manager.py:202
+#: manager.py:205
 msgid "Assign a training event."
 msgstr ""
 
-#: manager.py:203
+#: manager.py:206
 msgid "Rent"
 msgstr ""
 
-#: manager.py:204
+#: manager.py:207
 msgid "Assign a rent event."
 msgstr ""
 
-#: manager.py:207
+#: manager.py:210
 msgid "Calendar"
 msgstr ""
 
-#: manager.py:208
+#: manager.py:211
 msgid "Copy week"
 msgstr ""
 
-#: manager.py:209
+#: manager.py:212
 msgid "Copy current week into other."
 msgstr ""
 
-#: manager.py:296
+#: manager.py:305
 msgid "This RFID belongs to nobody."
 msgstr ""
 
-#: manager.py:412
+#: manager.py:421
 msgid "The week has been copied sucessfully."
 msgstr ""
 
-#: qtschedule.py:65
+#: qtschedule.py:72
 msgid "Exchange rooms"
 msgstr ""
 
-#: qtschedule.py:66
+#: qtschedule.py:73
 msgid "Exchange rooms between selected and current events."
 msgstr ""
 
+#: qtschedule.py:211
+msgid "Complete."
+msgstr ""
+
+#: qtschedule.py:213
+msgid "Unable to exchange."
+msgstr ""
+
+#: team_list.py:27
+msgid "Price"
+msgstr ""
+
+#: team_list.py:28
+msgid "Card"
+msgstr ""
+
+#: team_list.py:29
+msgid "Sold"
+msgstr ""
+
+#: team_list.py:29
+msgid "Used"
+msgstr ""
+
+#: team_list.py:30
+msgid "Assigned"
+msgstr ""
+
+#: team_list.py:31
+msgid "Expired"
+msgstr ""
+
+#: team_list.py:31
+msgid "Cancelled"
+msgstr ""
+
+#: team_list.py:258
+msgid "Cancel team"
+msgstr ""
+
+#: team_list.py:259
+msgid "Cancel current team."
+msgstr ""
+
 #: tree_model.py:50
-msgid "Courses"
+msgid "Teams"
 msgstr ""

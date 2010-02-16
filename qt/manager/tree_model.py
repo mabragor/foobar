@@ -47,7 +47,7 @@ class AbstractTreeModel(QAbstractItemModel):
         QAbstractItemModel.__init__(self, parent)
 
         rootData = []
-        rootData.append(QVariant(_('Courses')))
+        rootData.append(QVariant(_('Teams')))
         self.rootItem = TreeItem(rootData)
         self.setData(data)
 

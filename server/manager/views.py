@@ -25,18 +25,18 @@ def ajax_get_rooms(request):
     return {'rows': [item.about() for item in rooms]}
 
 @ajax_processor()
-def ajax_get_course_tree(request):
+def ajax_get_team_tree(request):
     groups = Group.objects.all()
     return [item.get_tree_node() for item in groups]
 
 @ajax_processor(UserRFID)
-def ajax_get_user_courses(request, form):
+def ajax_get_user_teams(request, form):
     rfid = form.cleaned_data['rfid_code']
     try:
         user = Client.objects.get(rfid_code=rfid)
-        return {'courses': user.get_course_list()}
+        return {'teams': user.get_team_list()}
     except Client.DoesNotExist:
-        return {'courses': []} # FIXME
+        return {'teams': []} # FIXME
 
 @ajax_processor()
 def ajax_add_event(request, pk=None):
@@ -78,7 +78,7 @@ def ajax_change_date(request):
         begin = datetime.fromtimestamp(int(request.POST['start']))
         if begin < datetime.now():
             return {'result': False, 'msg': 'Cann\'t set event in the past.'}
-        end = begin + timedelta(hours=event.course.duration),
+        end = begin + timedelta(hours=event.team.duration),
         end = end[0]
         result = Schedule.objects.select_related().filter(room=event.room).filter(begin__day=begin.day).exclude(pk=event.pk)
 
@@ -109,16 +109,16 @@ def ajax_del_user_couse(request):
         try:
             card = Card.objects.get(pk=request.POST.get('id'))
         except Card.DoesNotExist:
-            return {'result': False, 'msg': 'Incorect course.'}
+            return {'result': False, 'msg': 'Incorect team.'}
         if card.deleteable():
             card.delete()
             return {'result': True, 'msg': 'Success.'}
         else:
-            return {'result': False, 'msg': 'Course is undeleteable.'}
+            return {'result': False, 'msg': 'Team is undeleteable.'}
     return {'result': False, 'msg': 'Incorect request type.'}
 
 @ajax_processor()
-def ajax_add_user_course(request):
+def ajax_add_user_team(request):
     output = {}
     if request.method == 'POST':
         form = UserCardForm(request.POST)

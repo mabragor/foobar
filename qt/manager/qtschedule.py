@@ -287,7 +287,7 @@ class QtSchedule(QTableView):
     def dragEnterEvent(self, event):
         print 'QtSchedule::dragEnterEvent',
         if event.mimeData().hasFormat(self.getMime('event')) or \
-                event.mimeData().hasFormat(self.getMime('course')):
+                event.mimeData().hasFormat(self.getMime('team')):
             event.acceptProposedAction()
             print 'accept'
         else:
@@ -304,7 +304,7 @@ class QtSchedule(QTableView):
         if len(free_rooms) > 0:
             QTableView.dragMoveEvent(self, event)
             if event.mimeData().hasFormat(self.getMime('event')) or \
-                    event.mimeData().hasFormat(self.getMime('course')):
+                    event.mimeData().hasFormat(self.getMime('team')):
                 event.acceptProposedAction()
         else:
             event.ignore()
@@ -312,7 +312,7 @@ class QtSchedule(QTableView):
     def dropEvent(self, event):
         print 'QtSchedule::dropEvent',
         event_mime = self.getMime('event')
-        course_mime = self.getMime('course')
+        team_mime = self.getMime('team')
         if event.mimeData().hasFormat(event_mime):
             itemData = event.mimeData().data(event_mime)
             dataStream = QDataStream(itemData, QIODevice.ReadOnly)
@@ -325,12 +325,12 @@ class QtSchedule(QTableView):
             drop_cell = self.cellRowColRelative(event.pos())
             print self.emptyRoomAt(drop_cell)
 
-        elif event.mimeData().hasFormat(course_mime):
-            itemData = event.mimeData().data(course_mime)
+        elif event.mimeData().hasFormat(team_mime):
+            itemData = event.mimeData().data(team_mime)
             dataStream = QDataStream(itemData, QIODevice.ReadOnly)
-            course = QString()
-            dataStream >> course
-            #print course
+            team = QString()
+            dataStream >> team
+            #print team
 
             event.acceptProposedAction()
 

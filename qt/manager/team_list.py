@@ -13,7 +13,7 @@ _ = lambda a: unicode(gettext.gettext(a), 'utf8')
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
-class CourseListModel(QAbstractTableModel):
+class TeamListModel(QAbstractTableModel):
 
     def __init__(self, parent=None):
         QAbstractTableModel.__init__(self, parent)
@@ -29,10 +29,10 @@ class CourseListModel(QAbstractTableModel):
                        _('Sold'), _('Used'),
                        _('Assigned'), _('Begin'),
                        _('Expired'), _('Cancelled'),
-                       'id', 'course_id']
+                       'id', 'team_id']
         self.model_fields = ['title', 'price', 'card_type', 'count_sold', 'count_used',
                              'reg_date', 'bgn_date', 'exp_date', 'cnl_date',
-                             'id', 'course_id']
+                             'id', 'team_id']
 
     def initData(self, data):
         """
@@ -41,9 +41,9 @@ class CourseListModel(QAbstractTableModel):
         for rec in data:
             if type(rec) is not dict:
                 raise 'Check format'
-            course = rec['course']
+            team = rec['team']
             self.storage.append( [
-                course['title'],
+                team['title'],
                 rec['price'],
                 rec['type'],
                 rec['sold'],
@@ -53,7 +53,7 @@ class CourseListModel(QAbstractTableModel):
                 rec['expire'],
                 rec['cancel'],
                 rec['id'],
-                course['id']
+                team['id']
                 ] )
         self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
                   QModelIndex(), 1, self.rowCount())
@@ -70,11 +70,11 @@ class CourseListModel(QAbstractTableModel):
         changed = []
         for i in self.temporary_assigned:
             obj = self.model_fields
-            course_id = i[ obj.index('course_id') ]
+            team_id = i[ obj.index('team_id') ]
             card_type = i[ obj.index('card_type') ]
             bgn_date = i[ obj.index('bgn_date') ]
             exp_date = i[ obj.index('exp_date') ]
-            assigned.append( (course_id, card_type,
+            assigned.append( (team_id, card_type,
                               unicode(bgn_date),
                               unicode(exp_date)) )
         self.temporary_assigned = []
@@ -162,9 +162,9 @@ class CourseListModel(QAbstractTableModel):
                           relativedelta(months=+12), #3
                       )
                 exp_date = bgn_date + deltas[duration_index]
-            title, course_id, count, price, coaches, duration = record
+            title, team_id, count, price, coaches, duration = record
             record = [title, price, card_type, count, 0,
-                      reg_date, bgn_date, exp_date, None, 0, course_id]
+                      reg_date, bgn_date, exp_date, None, 0, team_id]
 
             idx_row = index.row()
             idx_col = 0
@@ -216,7 +216,7 @@ class CourseListModel(QAbstractTableModel):
         self.endRemoveRows()
         return True
 
-class CoursesListDelegate(QItemDelegate):
+class TeamListDelegate(QItemDelegate):
 
     """ Делегат, позволяющий пользователю изменять содержимое ячеек. """
 
@@ -246,7 +246,7 @@ class CoursesListDelegate(QItemDelegate):
     def updateEditorGeometry(self, editor, option, index):
         editor.setGeometry(option.rect)
 
-class CoursesList(QTableView):
+class TeamList(QTableView):
 
     """ Класс списка курсов. """
 
@@ -255,9 +255,9 @@ class CoursesList(QTableView):
 
         self.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
 
-        self.actionCourseCancel = QAction(_('Cancel course'), self)
-        self.actionCourseCancel.setStatusTip(_('Cancel current course.'))
-        self.connect(self.actionCourseCancel, SIGNAL('triggered()'), self.courseCancel)
+        self.actionTeamCancel = QAction(_('Cancel team'), self)
+        self.actionTeamCancel.setStatusTip(_('Cancel current team.'))
+        self.connect(self.actionTeamCancel, SIGNAL('triggered()'), self.teamCancel)
 
 #     def mousePressEvent(self, event):
 #         if event.button() == Qt.LeftButton:
@@ -268,8 +268,8 @@ class CoursesList(QTableView):
         index = self.indexAt(event.pos())
         self.contextRow = index.row()
         menu = QMenu(self)
-        menu.addAction(self.actionCourseCancel)
+        menu.addAction(self.actionTeamCancel)
         menu.exec_(event.globalPos())
 
-    def courseCancel(self):
+    def teamCancel(self):
         print 'canceled [%i]' % self.contextRow

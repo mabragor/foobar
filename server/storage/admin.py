@@ -49,7 +49,7 @@ class GroupAdmin(admin.ModelAdmin):
     fieldsets = ((None, {'fields': ('title', )}),)
 admin.site.register(models.Group, GroupAdmin)
 
-class CourseAdmin(admin.ModelAdmin):
+class TeamAdmin(admin.ModelAdmin):
     list_display = ('title', 'coaches', 'groups', 'price', 'duration', 'reg_date')
     ordering = ('title', 'group')
     search_fields = ('title', 'group')
@@ -58,14 +58,14 @@ class CourseAdmin(admin.ModelAdmin):
         (_(u'Relation'), {'fields': ('group', 'coach')}),
         )
 
-admin.site.register(models.Course, CourseAdmin)
+admin.site.register(models.Team, TeamAdmin)
 
 class CardAdmin(admin.ModelAdmin):
-    list_display = ('course', 'client', 'type', 'count_sold', 'count_used',
+    list_display = ('team', 'client', 'type', 'count_sold', 'count_used',
                     'price','reg_date', 'bgn_date', 'exp_date')
     ordering = ('reg_date', 'exp_date', 'count_sold', 'client')
     fieldsets = (
         (None, {'fields': ('type', 'exp_date', 'count_sold', 'price')}),
-        (_('Links'), {'fields': ('course', 'client')}),
+        (_('Links'), {'fields': ('team', 'client')}),
         )
 admin.site.register(models.Card, CardAdmin)

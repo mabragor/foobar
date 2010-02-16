@@ -41,9 +41,9 @@ class TreeModel(AbstractTreeModel):
                     child = TreeItem(itemData, folder)
                     folder.appendChild(child)
 
-class CoursesTree(QTreeView):
+class TeamTree(QTreeView):
 
-    """ Класс дерева курсов. """
+    """ Класс дерева направлений и групп. """
 
     def __init__(self, parent=None):
         QTreeView.__init__(self, parent)
@@ -70,8 +70,8 @@ class CoursesTree(QTreeView):
 #     def doubleClickedSignal(self, index):
 #         """ Обработчик двойного клика. Отображаем диалог для размещения курса
 #         на календаре. """
-#         print 'CoursesTree::doubleClickedSignal', index
-#         dialog = DlgCourseAssign(self.rooms)
+#         print 'TeamTree::doubleClickedSignal', index
+#         dialog = DlgTeamAssign(self.rooms)
 #         dialog.exec_()
 
 
@@ -84,7 +84,7 @@ class CoursesTree(QTreeView):
 #             dataStream = QDataStream(itemData, QIODevice.WriteOnly)
 #             dataStream << self.model().data(index, Qt.DisplayRole)
 #             mimeData = QMimeData()
-#             mimeData.setData(self.getMime('course'), itemData)
+#             mimeData.setData(self.getMime('team'), itemData)
 
 #             drag = QDrag(self)
 #             drag.setMimeData(mimeData)
@@ -99,7 +99,7 @@ class CoursesTree(QTreeView):
 #                 }
 
 #             res = drag.start(Qt.CopyAction)
-#             print 'CoursesTree::mousePressEvent', drop_action[res]
+#             print 'TeamTree::mousePressEvent', drop_action[res]
 
 #         QTreeView.mousePressEvent(self, event)
 

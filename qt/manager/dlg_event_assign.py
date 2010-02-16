@@ -2,7 +2,7 @@
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 from settings import userRoles
-from courses_tree import CoursesTree
+from team_tree import TeamTree
 from http_ajax import HttpAjax
 
 import gettext
@@ -67,12 +67,12 @@ class DlgEventAssign(QDialog):
         mainLayout.addLayout(groupLayout)
 
         if self.mode == 'training':
-            self.tree = CoursesTree(self)
-            courseLayout = QVBoxLayout()
-            courseLayout.addWidget(self.tree)
-            groupCourses = QGroupBox(_('Available courses'))
-            groupCourses.setLayout(courseLayout)
-            mainLayout.addWidget(groupCourses)
+            self.tree = TeamTree(self)
+            teamLayout = QVBoxLayout()
+            teamLayout.addWidget(self.tree)
+            groupTeams = QGroupBox(_('Available teams'))
+            groupTeams.setLayout(teamLayout)
+            mainLayout.addWidget(groupTeams)
 
         self.buttonAssign = QPushButton(_('Assign'))
         self.buttonCancel = QPushButton(_('Cancel'))
@@ -145,15 +145,15 @@ class DlgEventAssign(QDialog):
         room = self.comboRoom.itemData(index).toInt()
         if self.mode == 'training':
             index = self.tree.currentIndex()
-            course = index.data(userRoles['getObjectID']).toPyObject()
-            if type(course) is not list:
+            team = index.data(userRoles['getObjectID']).toPyObject()
+            if type(team) is not list:
                 return QMessageBox.warning(
                     self,
                     _('Warning'),
-                    '\n'.join([_('What course do you want to assign?'),
-                               _('Choose the course on the course\'s tree.')]),
+                    '\n'.join([_('What team do you want to assign?'),
+                               _('Choose the team on the team\'s tree.')]),
                     QMessageBox.Ok, QMessageBox.Ok)
-            self.callback(e_date, e_time, room, course)
+            self.callback(e_date, e_time, room, team)
         else:
             e_duration = self.editDuration.time().toPyTime()
             rent = self.rent_list[ self.rent.currentRow() ]

@@ -12,16 +12,16 @@ urlpatterns = patterns(
     url(r'^del_event/$', 'ajax_del_event', name='ajax_del_event'),
     url(r'^change_date/$', 'ajax_change_date', name='ajax_change_date'),
     url(r'^get_events/$', 'ajax_get_events', name='ajax_get_events'),
-    url(r'^ajax_get_user_courses/$', 'ajax_get_user_courses', name='ajax_get_user_courses'),
-    url(r'^get_course_tree/$', 'ajax_get_course_tree', name='ajax_get_course_tree'),
+    url(r'^ajax_get_user_teams/$', 'ajax_get_user_teams', name='ajax_get_user_teams'),
+    url(r'^get_team_tree/$', 'ajax_get_team_tree', name='ajax_get_team_tree'),
     url(r'^get_rooms/$', 'ajax_get_rooms', name='ajax_get_rooms'),
-    url(r'^del_user_course/$', 'ajax_del_user_couse', name='ajax_del_user_couse'),
+    url(r'^del_user_team/$', 'ajax_del_user_couse', name='ajax_del_user_couse'),
     url(r'^get_coach_list/$', 'ajax_get_coach_list', name='ajax_get_coach_list'),
     url(r'^get_unstatus_event/$', 'ajax_get_unstatus_event', name='ajax_get_unstatus_event'),
     url(r'^save_event_status/$', 'ajax_save_event_status', name='ajax_save_event_status'),
     url(r'^get_status_timer/$', 'ajax_get_status_timer', name='ajax_get_status_timer'),
     #url(r'^copy_week/$', 'ajax_copy_week', name='ajax_copy_week'),
-    url(r'^add_user_course/$', 'ajax_add_user_course', name='ajax_add_user_course')
+    url(r'^add_user_team/$', 'ajax_add_user_team', name='ajax_add_user_team')
     )
 
 urlpatterns += patterns(
@@ -33,7 +33,7 @@ urlpatterns += patterns(
     url(r'^set_user_info/$', 'set_user_info'),
     url(r'^set_renter_info/$', 'set_renter_info'),
     url(r'^set_rent/$', 'set_rent'),
-    url(r'^available_courses/$', 'available_courses'),
+    url(r'^available_teams/$', 'available_teams'),
     url(r'^get_event_info/$', 'get_event_info'),
     url(r'^get_week/$', 'get_week'),
     url(r'^copy_week/$', 'copy_week'),

@@ -23,7 +23,7 @@ class StatusForm(forms.ModelForm):
 
     class Meta:
         model = storage.Schedule
-        exclude = ('room', 'course', 'begin', 'looking', 'places')
+        exclude = ('room', 'team', 'begin', 'looking', 'places')
 
     def clean(self):
         data = self.cleaned_data
@@ -59,10 +59,10 @@ class ScheduleForm(forms.ModelForm):
     def clean(self):
         room = self.cleaned_data['room']
         begin = self.cleaned_data.get('begin')
-        course = self.cleaned_data['course']
+        team = self.cleaned_data['team']
 
-        if room and begin and course:
-            end = begin + timedelta(hours=course.duration)
+        if room and begin and team:
+            end = begin + timedelta(hours=team.duration)
             result = storage.Schedule.objects.select_related().filter(room=room).filter(begin__range=(begin.date(), begin.date()+timedelta(days=1)))
 
             if self.instance.pk:
@@ -141,7 +141,7 @@ class CopyForm(forms.Form):
         events = storage.Schedule.objects.filter(begin__range=(from_date, from_date+timedelta(days=7)))
         delta = to_date - from_date
         for e in events:
-            ne = storage.Schedule(room=e.room, course=e.course)
+            ne = storage.Schedule(room=e.room, team=e.team)
             ne.begin = e.begin+delta
             ne.save()
 
@@ -301,18 +301,18 @@ class UserInfo(AjaxForm):
 class ClientInfo(UserInfo):
     """ See parent. FIXME """
     rfid_code = forms.CharField(max_length=8)
-    course_assigned = ListField(required=False)
-    course_cancelled = ListField(required=False)
-    course_changed = ListField(required=False)
+    team_assigned = ListField(required=False)
+    team_cancelled = ListField(required=False)
+    team_changed = ListField(required=False)
 
     def save(self):
         data = self.cleaned_data
 
-        assigned = data['course_assigned']
+        assigned = data['team_assigned']
 
         user_id = data['user_id']
-        for i in ['user_id', 'course_assigned',
-                  'course_changed', 'course_cancelled']:
+        for i in ['user_id', 'team_assigned',
+                  'team_changed', 'team_cancelled']:
             del(data[i])
         if 0 == user_id:
             user = storage.Client(**data)
@@ -326,12 +326,12 @@ class ClientInfo(UserInfo):
             for id, card_type, bgn_date, exp_date in assigned:
                 bgn_date = date(*[int(i) for i in bgn_date.split('-')])
                 exp_date = date(*[int(i) for i in exp_date.split('-')])
-                course = storage.Course.objects.get(id=id)
+                team = storage.Team.objects.get(id=id)
                 card = storage.Card(
-                    course=course, client=user,type=card_type,
+                    team=team, client=user,type=card_type,
                     bgn_date=bgn_date, exp_date=exp_date,
-                    count_sold=course.count,
-                    price=course.price)
+                    count_sold=team.count,
+                    price=team.price)
                 card.save()
 
         return user.id
@@ -437,8 +437,8 @@ class CalendarEventAdd(AjaxForm):
     ev_type = forms.IntegerField()
     duration = forms.FloatField(required=False)
 
-    def clean_course_id(self):
-        return self.check_obj_existence(storage.Course, 'course_id')
+    def clean_team_id(self):
+        return self.check_obj_existence(storage.Team, 'team_id')
 
     def clean_room_id(self):
         return self.check_obj_existence(storage.Room, 'room_id')
@@ -452,7 +452,7 @@ class CalendarEventAdd(AjaxForm):
         room = storage.Room.objects.get(id=data['room_id'])
         begin = data['begin']
         if data['ev_type'] == 0:
-            obj = storage.Course.objects.get(id=data['event_id'])
+            obj = storage.Team.objects.get(id=data['event_id'])
             end = begin + timedelta(minutes=(60 * obj.duration))
         else:
             end = begin + timedelta(minutes=(60 * data['duration']))
@@ -473,10 +473,10 @@ class CalendarEventAdd(AjaxForm):
         room = storage.Room.objects.get(id=data['room_id'])
         begin = data['begin']
         if ev_type == 0:
-            obj = storage.Course.objects.get(id=data['event_id'])
+            obj = storage.Team.objects.get(id=data['event_id'])
             end = begin + timedelta(minutes=(60 * obj.duration))
             event = storage.Schedule(
-                course= obj, room=room, status=0,
+                team= obj, room=room, status=0,
                 begin=begin, end=end, duration=obj.duration)
         else:
             end = begin + timedelta(minutes=(60 * data['duration']))
@@ -609,7 +609,7 @@ class CopyWeek(AjaxForm):
         events = storage.Schedule.objects.filter(begin__range=(from_date, from_date+timedelta(days=7)))
         delta = to_date - from_date
         for e in events:
-            ne = storage.Schedule(room=e.room, course=e.course,
+            ne = storage.Schedule(room=e.room, team=e.team,
                                   rent=e.rent, status=0,
                                   duration=e.duration)
             ne.begin = e.begin+delta

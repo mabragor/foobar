@@ -14,7 +14,7 @@ from http_ajax import HttpAjax
 from event_storage import EventTraining, EventRent, EventStorage
 from qtschedule import QtScheduleDelegate, QtSchedule
 
-from courses_tree import CoursesTree, TreeModel
+from team_tree import TeamTree, TreeModel
 
 from dlg_settings import DlgSettings
 from dlg_login import DlgLogin
@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
 
         self.session_id = None
 
-	self.mimes = {'course': 'application/x-course-item',
+	self.mimes = {'team': 'application/x-team-item',
 		      'event':  'application/x-calendar-event',
 		      }
         self.rooms = []
@@ -132,7 +132,7 @@ class MainWindow(QMainWindow):
 	self.setCentralWidget(mainWidget)
 
     def loadInitialData(self):
-        #self.tree = self.getCoursesTree()
+        #self.tree = self.getTeamsTree()
         self.scheduleModel = EventStorage(
             (8, 24), timedelta(minutes=30), self.rooms, 'week', self
             )
@@ -161,9 +161,9 @@ class MainWindow(QMainWindow):
 	"""
 	return json_like
 
-    def getCoursesTree(self):
-	ajax = HttpAjax(self, '/manager/available_courses/', {}, self.session_id)
-	response = ajax.parse_json() # see format at courses_tree.py
+    def getTeamsTree(self):
+	ajax = HttpAjax(self, '/manager/available_teams/', {}, self.session_id)
+	response = ajax.parse_json() # see format at teams_tree.py
 	return TreeModel(response)
 
     def createMenus(self):
@@ -263,7 +263,7 @@ class MainWindow(QMainWindow):
 	    response = ajax.parse_json()
             if response and 'user_info' in response:
                 self.loggedTitle(response['user_info'])
-                self.tree = self.getCoursesTree()
+                self.tree = self.getTeamsTree()
                 self.scheduleModel.showCurrWeek()
         else:
             print 'rejected'
@@ -361,20 +361,20 @@ class MainWindow(QMainWindow):
 	    print 'dialog was rejected'
 
     def eventTraining(self):
-        def callback(e_date, e_time, room_tuple, course):
+        def callback(e_date, e_time, room_tuple, team):
             room, ok = room_tuple
-            title, course_id, count, price, coaches, duration = course
+            title, team_id, count, price, coaches, duration = team
             begin = datetime.combine(e_date, e_time)
             duration = timedelta(minutes=int(duration * 60))
 
             ajax = HttpAjax(self, '/manager/cal_event_add/',
-                            {'event_id': course_id,
+                            {'event_id': team_id,
                              'room_id': room,
                              'begin': begin,
                              'ev_type': 0}, self.session_id)
             response = ajax.parse_json()
             id = int(response['saved_id'])
-            event = EventTraining(course, id, begin, duration, 0)
+            event = EventTraining(team, id, begin, duration, 0)
             self.schedule.insertEvent(room, event)
 
 	self.dialog = DlgEventAssign('training', self)

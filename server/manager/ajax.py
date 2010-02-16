@@ -50,7 +50,7 @@ def login(request, form):
 
 @login_required
 @ajax_processor(None, isJavaScript)
-def available_courses(request): #TODO!
+def available_teams(request): #TODO!
 #     response, users = abstract_request(request, form)
 #     response.update( {'users': users} )
 #     return response

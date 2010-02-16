@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
-from model_sorting import SortClientCourses
-from courses_list import CourseListModel, CoursesListDelegate, CoursesList
+from model_sorting import SortClientTeams
+from team_list import TeamListModel, TeamListDelegate, TeamList
 from http_ajax import HttpAjax
 from dlg_waiting_rfid import DlgWaitingRFID
-from dlg_course_assign import DlgCourseAssign
+from dlg_team_assign import DlgTeamAssign
 from dlg_rent_assign import DlgRentAssign
 
 from datetime import datetime
@@ -58,23 +58,23 @@ class DlgClientInfo(QDialog):
         groupUser.setLayout(layoutUser)
 
         # купленные курсы
-        self.cardinfo = CoursesList(self)
+        self.cardinfo = TeamList(self)
 
         cardLayout = QVBoxLayout()
         cardLayout.addWidget(self.cardinfo)
 
-        groupCard = QGroupBox(_('Courses\' history'))
+        groupCard = QGroupBox(_('Teams\' history'))
         groupCard.setLayout(cardLayout)
 
         buttonAssignRFID = QPushButton(_('Assign RFID'))
-        buttonAssignCourse = QPushButton(_('Assign course'))
+        buttonAssignTeam = QPushButton(_('Assign team'))
         buttonApplyDialog = QPushButton(_('Apply'))
         buttonCancelDialog = QPushButton(_('Cancel'))
 
         self.connect(buttonAssignRFID, SIGNAL('clicked()'),
                      self.assignRFID)
-        self.connect(buttonAssignCourse, SIGNAL('clicked()'),
-                     self.showAssignCourseDlg)
+        self.connect(buttonAssignTeam, SIGNAL('clicked()'),
+                     self.showAssignTeamDlg)
         self.connect(buttonApplyDialog, SIGNAL('clicked()'),
                      self.applyDialog)
         self.connect(buttonCancelDialog, SIGNAL('clicked()'),
@@ -82,7 +82,7 @@ class DlgClientInfo(QDialog):
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(buttonAssignRFID)
-        buttonLayout.addWidget(buttonAssignCourse)
+        buttonLayout.addWidget(buttonAssignTeam)
         buttonLayout.addStretch(1)
         buttonLayout.addWidget(buttonApplyDialog)
         buttonLayout.addWidget(buttonCancelDialog)
@@ -96,13 +96,13 @@ class DlgClientInfo(QDialog):
         self.setWindowTitle(_('Client\'s information'))
 
         # source model
-        self.coursesModel = CourseListModel(self)
+        self.teamsModel = TeamListModel(self)
         # proxy model
-        #self.proxyModel = SortClientCourses(self)
-        #self.proxyModel.setSourceModel(self.coursesModel)
+        #self.proxyModel = SortClientTeams(self)
+        #self.proxyModel.setSourceModel(self.teamsModel)
         # use proxy model to change data representation
-        self.cardinfo.setModel(self.coursesModel)
-        self.delegate = CoursesListDelegate()
+        self.cardinfo.setModel(self.teamsModel)
+        self.delegate = TeamListDelegate()
         #self.cardinfo.setItemDelegate(self.delegate)
 
     def initData(self, data):
@@ -112,11 +112,11 @@ class DlgClientInfo(QDialog):
         self.editEmail.setText(data.get('email', ''))
         self.editRFID.setText(data.get('rfid_code', ''))
 
-        courses = data.get('course_list', [])
-        self.coursesModel.initData(courses)
+        teams = data.get('team_list', [])
+        self.teamsModel.initData(teams)
 
-    def cancelCourse(self):
-        print 'cancel course'
+    def cancelTeam(self):
+        print 'cancel team'
         row = self.cardinfo.currentRow()
         print row
         self.cardinfo.removeRow(row)
@@ -134,22 +134,22 @@ class DlgClientInfo(QDialog):
         if QDialog.Accepted == dlgStatus:
             self.editRFID.setText(self.rfid_id)
 
-    def showAssignCourseDlg(self):
-        dialog = DlgCourseAssign(self)
-        dialog.setCallback(self.assignCourse)
+    def showAssignTeamDlg(self):
+        dialog = DlgTeamAssign(self)
+        dialog.setCallback(self.assignTeam)
         dialog.setModel(self.parent.tree)
         dialog.setModal(True)
         dlgStatus = dialog.exec_()
 
-    def assignCourse(self, card_type, bgn_date, duration_index, data):
+    def assignTeam(self, card_type, bgn_date, duration_index, data):
         # duration matters for club card only
-        lastRow = self.coursesModel.rowCount(QModelIndex())
-        if self.coursesModel.insertRows(lastRow, 1, QModelIndex()):
-            index = self.coursesModel.index(0, 0)
-            self.coursesModel.setRow(index, data, Qt.EditRole, card_type, bgn_date, duration_index)
+        lastRow = self.teamsModel.rowCount(QModelIndex())
+        if self.teamsModel.insertRows(lastRow, 1, QModelIndex()):
+            index = self.teamsModel.index(0, 0)
+            self.teamsModel.setRow(index, data, Qt.EditRole, card_type, bgn_date, duration_index)
 
-        print 'DlgUserInfo::assignCourse DUMP:'
-        for item in self.coursesModel.storage:
+        print 'DlgUserInfo::assignTeam DUMP:'
+        for item in self.teamsModel.storage:
             print '\t',
             for col in item:
                 print col,
@@ -157,21 +157,21 @@ class DlgClientInfo(QDialog):
 
     def applyDialog(self):
         """ Применить настройки. """
-        course_changes = self.coursesModel.get_changes_and_clean()
-        self.saveSettings(course_changes)
+        team_changes = self.teamsModel.get_changes_and_clean()
+        self.saveSettings(team_changes)
         self.accept()
 
-    def saveSettings(self, course_changes):
-        assigned, cancelled, changed = course_changes
+    def saveSettings(self, team_changes):
+        assigned, cancelled, changed = team_changes
         params = {
             'user_id': self.user_id,
             'first_name': self.editFirstName.text().toUtf8(),
             'last_name': self.editLastName.text().toUtf8(),
             'email': self.editEmail.text().toUtf8(),
             'rfid_code': self.editRFID.text().toUtf8(),
-            'course_assigned': assigned,
-            'course_cancelled': cancelled,
-            'course_changed': changed
+            'team_assigned': assigned,
+            'team_cancelled': cancelled,
+            'team_changed': changed
             }
         #print 'DlgClientInfo::saveSettings', params
         ajax = HttpAjax(self, '/manager/set_user_info/', params, self.parent.session_id)

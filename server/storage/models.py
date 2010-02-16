@@ -56,10 +56,10 @@ class Client(AbstractUser):
         result = super(Client, self).about()
         result.update( {'rfid_code': self.rfid_code} )
         if not short:
-            result.update( {'course_list': self.course_list()} )
+            result.update( {'team_list': self.team_list()} )
         return result
 
-    def course_list(self):
+    def team_list(self):
         return [card.about(True) for card in self.card_set.all().order_by('-reg_date')]
 
 class Renter(AbstractUser):
@@ -154,25 +154,25 @@ class Group(models.Model):
 
     @property
     def children(self):
-        return [item.about() for item in self.course_set.all()]
+        return [item.about() for item in self.team_set.all()]
 
-class Course(models.Model):
+class Team(models.Model):
     group = models.ManyToManyField(Group, verbose_name=_(u'Group'))
     coach = models.ManyToManyField(Coach, verbose_name=_(u'Coach'))
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
     duration = models.FloatField(verbose_name=_(u'Duration'))
     count = models.IntegerField(verbose_name=_(u'Count'))
     price = models.FloatField(verbose_name=_(u'Price'),
-                              help_text=_(u'The price of the course.'),
+                              help_text=_(u'The price of this team.'),
                               default=float(0.00))
     reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
     salary = models.IntegerField(verbose_name=_(u'Salary'),
-                                 help_text=_(u'The salary for the course.'),
+                                 help_text=_(u'The salary for this team.'),
                                  default=0)
 
     class Meta:
-        verbose_name = _(u'Course')
-        verbose_name_plural = _(u'Courses')
+        verbose_name = _(u'Team')
+        verbose_name_plural = _(u'Team')
 
     def __unicode__(self):
         return self.title
@@ -196,7 +196,7 @@ class Course(models.Model):
 
 class Card(models.Model):
     CARD_TYPE = (('0', _(u'Normal card')), ('1', _(u'Club card')))
-    course = models.ForeignKey(Course, verbose_name=_(u'Course'))
+    team = models.ForeignKey(Team, verbose_name=_(u'Team'))
     client = models.ForeignKey(Client, verbose_name=_(u'Client'))
     type = models.CharField(verbose_name=_(u'Type'),
                             help_text=_(u'Type of client\'s card'),
@@ -209,7 +209,7 @@ class Card(models.Model):
     count_sold = models.IntegerField(verbose_name=_(u'Exercises sold'))
     count_used = models.IntegerField(verbose_name=_(u'Exercises used'), default=0)
     price = models.FloatField(verbose_name=_(u'Price'),
-                              help_text=_(u'The price of the course.'),
+                              help_text=_(u'The price of this team.'),
                               default=float(0.00))
 
     class Meta:
@@ -218,12 +218,12 @@ class Card(models.Model):
         ordering = ['-reg_date']
 
     def __unicode__(self):
-        return self.course.title
+        return self.team.title
 
     def about(self, short=False):
         obj = {
             'id': self.pk,
-            'course': self.course.about(),
+            'team': self.team.about(),
             'type': self.type,
             'register': self.reg_date,
             'begin': self.bgn_date,
@@ -256,7 +256,7 @@ class Schedule(models.Model):
         ('2', _('Passed')),
     )
     room = models.ForeignKey(Room, verbose_name=_(u'Room'))
-    course = models.ForeignKey(Course, verbose_name=_(u'Course'), null=True, blank=True)
+    team = models.ForeignKey(Team, verbose_name=_(u'Team'), null=True, blank=True)
     rent = models.ForeignKey(Rent, verbose_name=_(u'Rent'), null=True, blank=True)
     begin = models.DateTimeField(verbose_name=_(u'Begins'))
     end = models.DateTimeField(verbose_name=_(u'Ends'))
@@ -272,7 +272,7 @@ class Schedule(models.Model):
         verbose_name_plural = _(u'Schedules')
 
     def __unicode__(self):
-        return u'%s(%s) %s' % (self.course, self.room, self.begin)
+        return u'%s(%s) %s' % (self.team, self.room, self.begin)
 
     def about(self):
         obj = {
@@ -282,23 +282,23 @@ class Schedule(models.Model):
             'end': self.end,
             'status': self.status,
         }
-        if self.course:
-            obj.update( {'type': 'training', 'event': self.course.about()} )
+        if self.team:
+            obj.update( {'type': 'training', 'event': self.team.about()} )
         if self.rent:
             obj.update( {'type': 'rent', 'event': self.rent.about()} )
         return obj
 
     @property
     def typeof(self):
-        if self.course is None:
+        if self.team is None:
             return 1
         else:
             return 0
 
     @property
     def object(self):
-        if self.course is not None:
-            return self.course
+        if self.team is not None:
+            return self.team
         else:
             return self.rent
 
@@ -307,7 +307,7 @@ class Schedule(models.Model):
         if user is None or self.end < datetime.today():
             type = 'unavailable'
         else:
-            cards = Card.objects.filter(client=user, course=self.course, exp_date__gt=datetime.today())
+            cards = Card.objects.filter(client=user, team=self.team, exp_date__gt=datetime.today())
             for item in cards:
                 if item.count > 0:
                     type = 'available'
@@ -316,11 +316,11 @@ class Schedule(models.Model):
 
         obj = {
             'id': self.pk,
-            'title': self.course.__unicode__(),
+            'title': self.team.__unicode__(),
             'room': self.room.__unicode__(),
             'start': self.begin.strftime('%H:%M'),
             'end': self.end.strftime('%H:%M'),
-            'coach': ' '.join([str(item) for item in self.course.coach.all()]),
+            'coach': ' '.join([str(item) for item in self.team.coach.all()]),
             'type': type
         }
         return obj
@@ -332,7 +332,7 @@ class Schedule(models.Model):
             event = self._default_manager.filter(begin__lte=d, status__isnull=True)[0:1].get()
             return {
                 'id': event.pk,
-                'title': '%s - %s' % (event.course.__unicode__(), event.room.__unicode__()),
+                'title': '%s - %s' % (event.team.__unicode__(), event.room.__unicode__()),
                 'date': '%s - %s' % (event.begin, event.end)
             }
         except self.DoesNotExist:

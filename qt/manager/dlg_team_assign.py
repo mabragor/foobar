@@ -2,7 +2,7 @@
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
 
 from settings import userRoles
-from courses_tree import CoursesTree
+from team_tree import TeamTree
 
 import gettext
 gettext.bindtextdomain('project', './locale/')
@@ -12,7 +12,7 @@ _ = lambda a: unicode(gettext.gettext(a), 'utf8')
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
-class DlgCourseAssign(QDialog):
+class DlgTeamAssign(QDialog):
 
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
@@ -26,14 +26,14 @@ class DlgCourseAssign(QDialog):
         self.comboCardType.addItem(_('Normal'))
         self.comboCardType.addItem(_('Club'))
 
-        labelBeginning = QLabel(_('Course starts'))
+        labelBeginning = QLabel(_('Team starts'))
         self.editBeginning = QDateEdit()
         labelBeginning.setBuddy(self.editBeginning)
         current = QDate.currentDate()
         self.editBeginning.setDate(current)
         self.editBeginning.setMinimumDate(current)
 
-        labelFinish = QLabel(_('Course ends after'))
+        labelFinish = QLabel(_('Team ends after'))
         self.comboDuration = QComboBox()
         labelFinish.setBuddy(self.comboDuration)
         self.comboDuration.addItem(_('3 months'))
@@ -53,13 +53,13 @@ class DlgCourseAssign(QDialog):
         groupLayout.addWidget(labelFinish, 2, 0)
         groupLayout.addWidget(self.comboDuration, 2, 1)
 
-        self.tree = CoursesTree(self)
+        self.tree = TeamTree(self)
 
-        courseLayout = QVBoxLayout()
-        courseLayout.addWidget(self.tree)
+        teamLayout = QVBoxLayout()
+        teamLayout.addWidget(self.tree)
 
-        groupCourses = QGroupBox(_('Available courses'))
-        groupCourses.setLayout(courseLayout)
+        groupTeams = QGroupBox(_('Available teams'))
+        groupTeams.setLayout(teamLayout)
 
         self.buttonAssign = QPushButton(_('Assign'))
         self.buttonCancel = QPushButton(_('Cancel'))
@@ -71,11 +71,11 @@ class DlgCourseAssign(QDialog):
 
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(groupLayout)
-        mainLayout.addWidget(groupCourses)
+        mainLayout.addWidget(groupTeams)
         mainLayout.addLayout(buttonLayout)
 
         self.setLayout(mainLayout)
-        self.setWindowTitle(_('Choose the course'))
+        self.setWindowTitle(_('Choose the team'))
         self.setSignals()
 
     def setCallback(self, callback):
@@ -100,6 +100,6 @@ class DlgCourseAssign(QDialog):
         bgn_date = self.editBeginning.date().toPyDate()
         duration = self.comboDuration.currentIndex()
         index = self.tree.currentIndex()
-        course_data = index.data(userRoles['getObjectID']).toPyObject()
-        self.callback(card_type, bgn_date, duration, course_data)
+        team_data = index.data(userRoles['getObjectID']).toPyObject()
+        self.callback(card_type, bgn_date, duration, team_data)
         self.accept()

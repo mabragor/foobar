@@ -4,9 +4,9 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
-class SortClientCourses(QSortFilterProxyModel):
+class SortClientTeams(QSortFilterProxyModel):
 
-    """ Proxy class to change representation of client's courses
+    """ Proxy class to change representation of client's teams
     information. """
 
     def __init__(self, parent=None):

@@ -45,10 +45,10 @@ class EventTraining(Event):
 
     """ Класс тренировки. """
 
-    def __init__(self, course, schedule_id, begin, duration, status):
+    def __init__(self, team, schedule_id, begin, duration, status):
         Event.__init__(self, schedule_id, begin, duration, status)
         self.type = 'training'
-        self.event = course
+        self.event = team
 
 class EventRent(Event):
 
@@ -425,7 +425,7 @@ class EventStorage(QAbstractTableModel):
         """ Метод для декларации MIME типов, поддерживаемых моделью. """
         print 'EventStorage::mimeTypes'
         types = QStringList()
-        types << self.getMime('event') << self.getMime('course')
+        types << self.getMime('event') << self.getMime('team')
         return types
 
     def mimeData(self, indexes):
@@ -454,10 +454,10 @@ class EventStorage(QAbstractTableModel):
             return True
 
         event_mime = self.getMime('event')
-        course_mime = self.getMime('course')
+        team_mime = self.getMime('team')
 
         if not data.hasFormat(event_mime) and \
-                not data.hasFormat(course_mime):
+                not data.hasFormat(team_mime):
             print 'badmime'
             return False
         if column > 0:
