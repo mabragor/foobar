@@ -158,7 +158,7 @@ class Group(models.Model):
 
 class Team(models.Model):
     group = models.ManyToManyField(Group, verbose_name=_(u'Group'))
-    coach = models.ManyToManyField(Coach, verbose_name=_(u'Coach'))
+    coach = models.ForeignKey(Coach, verbose_name=_(u'Coach'))
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
     duration = models.FloatField(verbose_name=_(u'Duration'))
     count = models.IntegerField(verbose_name=_(u'Count'))
@@ -176,9 +176,6 @@ class Team(models.Model):
 
     def __unicode__(self):
         return self.title
-
-    def coaches(self):
-        return ','.join([unicode(a) for a in self.coach.all()])
 
     def groups(self):
         return ','.join([unicode(a) for a in self.group.all()])

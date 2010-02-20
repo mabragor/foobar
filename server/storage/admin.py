@@ -50,7 +50,7 @@ class GroupAdmin(admin.ModelAdmin):
 admin.site.register(models.Group, GroupAdmin)
 
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ('title', 'coaches', 'groups', 'price', 'duration', 'reg_date')
+    list_display = ('title', 'coach', 'groups', 'price', 'duration', 'reg_date')
     ordering = ('title', 'group')
     search_fields = ('title', 'group')
     fieldsets = (
