@@ -162,7 +162,7 @@ class TeamListModel(QAbstractTableModel):
                           relativedelta(months=+12), #3
                       )
                 exp_date = bgn_date + deltas[duration_index]
-            title, team_id, count, price, coaches, duration = record
+            title, team_id, count, price, coach, duration = record
             record = [title, price, card_type, count, 0,
                       reg_date, bgn_date, exp_date, None, 0, team_id]
 

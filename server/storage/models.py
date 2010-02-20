@@ -17,7 +17,7 @@ class AbstractUser(models.Model):
         abstract = True
 
     def __unicode__(self):
-        return unicode('%s %s' % (self.first_name, self.last_name))
+        return '%s %s' % (self.first_name, self.last_name)
 
     def about(self):
         return {
@@ -33,16 +33,9 @@ class Coach(AbstractUser):
         verbose_name = _(u'Coach')
         verbose_name_plural = _(u'Coaches')
 
-#     def get_store_obj(self):
-#         obj = {
-#             'id': self.pk,
-#             'name': self.__unicode__()
-#         }
-#         return obj
-
     def about(self):
         result = super(Coach, self).about()
-        result.update( {} )
+        #result.update( {} )
         return result
 
 class Client(AbstractUser):
@@ -172,7 +165,7 @@ class Team(models.Model):
 
     class Meta:
         verbose_name = _(u'Team')
-        verbose_name_plural = _(u'Team')
+        verbose_name_plural = _(u'Teams')
 
     def __unicode__(self):
         return self.title
@@ -184,7 +177,7 @@ class Team(models.Model):
         return {
             'id': self.pk,
             'groups': self.groups(),
-            'coaches': self.coaches(),
+            'coach': self.coach,
             'title': self.title,
             'duration': self.duration,
             'count': self.count,

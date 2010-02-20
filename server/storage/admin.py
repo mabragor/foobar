@@ -51,13 +51,12 @@ admin.site.register(models.Group, GroupAdmin)
 
 class TeamAdmin(admin.ModelAdmin):
     list_display = ('title', 'coach', 'groups', 'price', 'duration', 'reg_date')
-    ordering = ('title', 'group')
-    search_fields = ('title', 'group')
+    ordering = ('title',)
+    search_fields = ('title',)
     fieldsets = (
         (None, {'fields': ('title', 'duration', 'count', 'price')}),
         (_(u'Relation'), {'fields': ('group', 'coach')}),
         )
-
 admin.site.register(models.Team, TeamAdmin)
 
 class CardAdmin(admin.ModelAdmin):

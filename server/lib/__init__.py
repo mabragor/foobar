@@ -28,10 +28,10 @@ class DatetimeJSONEncoderQt(simplejson.JSONEncoder):
 
     def default(self, o):
         if isinstance(o, datetime):
-            d = o.strftime('%Y-%m-%d %H:%M:%S')
-            return d
+            return o.strftime('%Y-%m-%d %H:%M:%S')
         elif isinstance(o, date):
-            d = o.strftime('%Y-%m-%d')
-            return d
+            return o.strftime('%Y-%m-%d')
+        elif hasattr(o, '__unicode__'):
+            return o.__unicode__()
         else:
-            return super(DatetimeJSONEncoder, self).default(o)
+            return super(DatetimeJSONEncoderQt, self).default(o)

@@ -363,7 +363,7 @@ class MainWindow(QMainWindow):
     def eventTraining(self):
         def callback(e_date, e_time, room_tuple, team):
             room, ok = room_tuple
-            title, team_id, count, price, coaches, duration = team
+            title, team_id, count, price, coach, duration = team
             begin = datetime.combine(e_date, e_time)
             duration = timedelta(minutes=int(duration * 60))
 

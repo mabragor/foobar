@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-16 21:52+0300\n"
+"POT-Creation-Date: 2010-02-20 13:49+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -91,31 +91,35 @@ msgstr "Обменять даты"
 msgid "There is an event intersection."
 msgstr "Есть пересечение событий."
 
-#: manager/forms.py:530
+#: manager/forms.py:501
+msgid "Unable to delete this event."
+msgstr "Невозможно удалить это событие."
+
+#: manager/forms.py:537
 msgid "Check event IDs."
 msgstr "Проверьте идентификаторы событий."
 
-#: manager/forms.py:533
+#: manager/forms.py:540
 msgid "Unable to exchange the same event."
 msgstr "Нельзя обменять событие само на себя."
 
-#: manager/forms.py:536
+#: manager/forms.py:543
 msgid "There is no event intersection."
 msgstr "Нет пересечения событий."
 
-#: manager/forms.py:544
+#: manager/forms.py:551
 msgid "Not implemented yet."
 msgstr "Ещё не реализовано."
 
-#: manager/forms.py:585
+#: manager/forms.py:592
 msgid "Date must be Monday."
 msgstr "Дата должна быть понедельником"
 
-#: manager/forms.py:594
+#: manager/forms.py:601
 msgid "It is impossible to copy events to the past."
 msgstr "Нельзя копировать события в прошлое."
 
-#: manager/forms.py:603
+#: manager/forms.py:610
 msgid "It is impossible to copy the week into itself."
 msgstr "Нельзя копировать неделю в саму себя."
 
@@ -140,7 +144,7 @@ msgid "Patches"
 msgstr "Патчи"
 
 #: rfid/models.py:9 storage/models.py:14 storage/models.py:94
-#: storage/models.py:168 storage/models.py:205 storage/models.py:350
+#: storage/models.py:168 storage/models.py:202 storage/models.py:347
 msgid "Registered"
 msgstr "Зарегистрирован"
 
@@ -168,7 +172,7 @@ msgstr "Даты"
 msgid "Relation"
 msgstr "Взаимосвязь"
 
-#: storage/admin.py:69
+#: storage/admin.py:68
 msgid "Links"
 msgstr "Ссылки"
 
@@ -196,7 +200,7 @@ msgstr "Тренеры"
 msgid "RFID"
 msgstr "RFID"
 
-#: storage/models.py:52 storage/models.py:200 storage/models.py:347
+#: storage/models.py:52 storage/models.py:197 storage/models.py:344
 msgid "Client"
 msgstr "Клиент"
 
@@ -236,7 +240,7 @@ msgstr "Оплачено частично"
 msgid "Paid"
 msgstr "Оплачено"
 
-#: storage/models.py:91 storage/models.py:264
+#: storage/models.py:91 storage/models.py:261
 msgid "Status"
 msgstr "Статус"
 
@@ -249,7 +253,7 @@ msgstr "Заголовок"
 msgid "Description"
 msgstr "Описание"
 
-#: storage/models.py:95 storage/models.py:206
+#: storage/models.py:95 storage/models.py:203
 msgid "Begin"
 msgstr "Начало"
 
@@ -261,7 +265,7 @@ msgstr "Конец"
 msgid "Paid amount"
 msgstr "Оплачена сумма"
 
-#: storage/models.py:100 storage/models.py:260
+#: storage/models.py:100 storage/models.py:257
 msgid "Rent"
 msgstr "Аренда"
 
@@ -273,7 +277,7 @@ msgstr "Аренда"
 msgid "Color"
 msgstr "Цвет"
 
-#: storage/models.py:125 storage/models.py:258
+#: storage/models.py:125 storage/models.py:255
 msgid "Room"
 msgstr "Зал"
 
@@ -293,7 +297,7 @@ msgstr "Стили"
 msgid "Group"
 msgstr "Группа"
 
-#: storage/models.py:163 storage/models.py:263
+#: storage/models.py:163 storage/models.py:260
 msgid "Duration"
 msgstr "Длительность"
 
@@ -301,15 +305,15 @@ msgstr "Длительность"
 msgid "Count"
 msgstr "Количество"
 
-#: storage/models.py:165 storage/models.py:211
+#: storage/models.py:165 storage/models.py:208
 msgid "Price"
 msgstr "Цена"
 
-#: storage/models.py:166 storage/models.py:212
+#: storage/models.py:166 storage/models.py:209
 msgid "The price of this team."
 msgstr "Цена участия в команде."
 
-#: storage/models.py:169 storage/models.py:369
+#: storage/models.py:169 storage/models.py:366
 #: templates/statistic/teams.html:64
 msgid "Salary"
 msgstr "Зарплата"
@@ -318,148 +322,151 @@ msgstr "Зарплата"
 msgid "The salary for this team."
 msgstr "Зарплата за занятие."
 
-#: storage/models.py:174 storage/models.py:175 storage/models.py:199
-#: storage/models.py:259
+#: storage/models.py:174 storage/models.py:196 storage/models.py:256
 msgid "Team"
 msgstr "Команда"
 
-#: storage/models.py:198
+#: storage/models.py:175
+msgid "Teams"
+msgstr "Команды"
+
+#: storage/models.py:195
 msgid "Normal card"
 msgstr "Обычная карта"
 
-#: storage/models.py:198
+#: storage/models.py:195
 msgid "Club card"
 msgstr "Клубная карта"
 
-#: storage/models.py:201
+#: storage/models.py:198
 msgid "Type"
 msgstr "Тип"
 
-#: storage/models.py:202
+#: storage/models.py:199
 msgid "Type of client's card"
 msgstr "Тип карты клиента"
 
-#: storage/models.py:207
+#: storage/models.py:204
 msgid "Expired"
 msgstr "Окончено"
 
-#: storage/models.py:208
+#: storage/models.py:205
 msgid "Cancelled"
 msgstr "Отменено"
 
-#: storage/models.py:209
+#: storage/models.py:206
 msgid "Exercises sold"
 msgstr "Продано тренировок"
 
-#: storage/models.py:210
+#: storage/models.py:207
 msgid "Exercises used"
 msgstr "Использовано тренировок"
 
-#: storage/models.py:216 storage/models.py:217 storage/models.py:349
+#: storage/models.py:213 storage/models.py:214 storage/models.py:346
 msgid "Card"
 msgstr "Карта"
 
-#: storage/models.py:254
+#: storage/models.py:251
 msgid "Waiting"
 msgstr "Ожидание"
 
-#: storage/models.py:255
+#: storage/models.py:252
 msgid "Warning"
 msgstr "Внимание"
 
-#: storage/models.py:256
+#: storage/models.py:253
 msgid "Passed"
 msgstr "Пройдено"
 
-#: storage/models.py:261
+#: storage/models.py:258
 msgid "Begins"
 msgstr "Начинается"
 
-#: storage/models.py:262
+#: storage/models.py:259
 msgid "Ends"
 msgstr "Конец"
 
-#: storage/models.py:265
+#: storage/models.py:262
 msgid "Change"
 msgstr "Замена"
 
-#: storage/models.py:267
+#: storage/models.py:264
 msgid "Is looking for members?"
 msgstr "Идёт набор участников?"
 
-#: storage/models.py:268
+#: storage/models.py:265
 msgid "Are there free places?"
 msgstr "Есть свободные места?"
 
-#: storage/models.py:271
+#: storage/models.py:268
 msgid "Schedule"
 msgstr "Расписание"
 
-#: storage/models.py:272
+#: storage/models.py:269
 msgid "Schedules"
 msgstr "Расписания"
 
-#: storage/models.py:348
+#: storage/models.py:345
 msgid "Event"
 msgstr "Событие"
 
-#: storage/models.py:353
+#: storage/models.py:350
 msgid "Visit"
 msgstr "Посещение"
 
-#: storage/models.py:354
+#: storage/models.py:351
 msgid "Visits"
 msgstr "Посещения"
 
-#: storage/models.py:367
+#: storage/models.py:364
 msgid "Coach change"
 msgstr "Замена тренера"
 
-#: storage/models.py:368
+#: storage/models.py:365
 msgid "Economic expenses"
 msgstr "Хозяйственные нужды"
 
-#: storage/models.py:370
+#: storage/models.py:367
 msgid "Subsist"
 msgstr "Аванс"
 
-#: storage/models.py:371
+#: storage/models.py:368
 msgid "Advertising"
 msgstr "Реклама"
 
-#: storage/models.py:372
+#: storage/models.py:369
 msgid "Capital investments"
 msgstr "Капитальное вложение"
 
-#: storage/models.py:376
+#: storage/models.py:373
 msgid "Basic services"
 msgstr "Основные услуги"
 
-#: storage/models.py:377
+#: storage/models.py:374
 msgid "Club cards"
 msgstr "Клубные карты"
 
-#: storage/models.py:378
+#: storage/models.py:375
 msgid "Gift certificates"
 msgstr "Подарочные сертификаты"
 
-#: storage/models.py:379
+#: storage/models.py:376
 msgid "Open abonement"
 msgstr "Абонемент с открытой датой"
 
-#: storage/models.py:380
+#: storage/models.py:377
 msgid "ISIC cards"
 msgstr "Карта ISIC"
 
-#: storage/models.py:381
+#: storage/models.py:378
 msgid "Cofe machine"
 msgstr "Кофе машина"
 
-#: storage/models.py:382
+#: storage/models.py:379
 msgid "Room rent"
 msgstr "Аренда зала"
 
-#: storage/models.py:383
+#: storage/models.py:380
 msgid "Dance show"
 msgstr "Выступления танцовщиков"
 

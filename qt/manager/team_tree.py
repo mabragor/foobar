@@ -22,7 +22,7 @@ class TreeModel(AbstractTreeModel):
         """
         Формат полученных данных:
         [ {id, title,
-           children: [{id, count, title, price, coaches, duration}, ..]
+           children: [{id, count, title, price, coach, duration}, ..]
            }, ...
         ]
         """
@@ -34,7 +34,7 @@ class TreeModel(AbstractTreeModel):
                 self.rootItem.appendChild(folder)
                 for j in i['children']:
                     order = ('title', 'id', 'count', 'price',
-                             'coaches', 'duration')
+                             'coach', 'duration')
                     itemData = []
                     for param in order:
                         itemData.append( j[param] )
