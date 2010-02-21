@@ -165,10 +165,13 @@ class AjaxForm(forms.Form):
     def check_obj_existence(self, model, field_name):
         value = self.cleaned_data[field_name]
         try:
-            model.objects.get(id=value)
+            setattr(self, 'object_%s' % field_name, model.objects.get(id=value))
         except model.DoesNotExist:
             raise forms.ValidationError(_('Wrong ID of %s.') % unicode(model))
         return value
+
+    def get_object(self, field_name):
+        return getattr(self, 'object_%s' % field_name, self.cleaned_data[field_name])
 
     def check_future(self,field_name):
         value = self.cleaned_data[field_name]
@@ -412,6 +415,25 @@ class RegisterRent(AjaxForm):
         rent = storage.Rent(**data)
         rent.save()
         return rent.id
+
+class RegisterChange(AjaxForm):
+    """ Form registers the coach's change for the event. """
+
+    event_id = forms.IntegerField()
+    coach_id = forms.IntegerField()
+
+    def clean_event_id(self):
+        return self.check_obj_existence(storage.Schedule, 'event_id')
+
+    def clean_coach_id(self):
+        return self.check_obj_existence(storage.Coach, 'coach_id')
+
+    def save(self):
+        event = self.get_object('event_id')
+        coach = self.get_object('coach_id')
+        event.change = coach
+        event.save()
+        return event.id
 
 class DateRange(AjaxForm):
     """ Form acquires a date range and return the list of events inside

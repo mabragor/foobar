@@ -36,6 +36,12 @@ class DlgEventInfo(QDialog):
         self.editCoach.setReadOnly(True)
         labelCoach.setBuddy(self.editCoach)
 
+        labelChange = QLabel(_('Coach change'))
+        self.comboChange = QComboBox()
+        self.comboChange.addItem(_('No change'), QVariant(None))
+        labelChange.setBuddy(self.comboChange)
+        self.buttonChange = QPushButton(_('Change'))
+
         labelBegin = QLabel(_('Begin'))
         self.editBegin = QDateTimeEdit()
         self.editBegin.setReadOnly(True)
@@ -66,12 +72,15 @@ class DlgEventInfo(QDialog):
         groupLayout.addWidget(self.editTitle, 0, 1)
         groupLayout.addWidget(labelCoach, 1, 0)
         groupLayout.addWidget(self.editCoach, 1, 1)
-        groupLayout.addWidget(labelBegin, 2, 0)
-        groupLayout.addWidget(self.editBegin, 2, 1)
-        groupLayout.addWidget(labelDuration, 3, 0)
-        groupLayout.addWidget(self.editDuration, 3, 1)
-        groupLayout.addWidget(labelRoom, 4, 0)
-        groupLayout.addWidget(self.comboRoom, 4, 1)
+        groupLayout.addWidget(labelChange, 2, 0)
+        groupLayout.addWidget(self.comboChange, 2, 1)
+        groupLayout.addWidget(self.buttonChange, 2, 2)
+        groupLayout.addWidget(labelBegin, 3, 0)
+        groupLayout.addWidget(self.editBegin, 3, 1)
+        groupLayout.addWidget(labelDuration, 4, 0)
+        groupLayout.addWidget(self.editDuration, 4, 1)
+        groupLayout.addWidget(labelRoom, 5, 0)
+        groupLayout.addWidget(self.comboRoom, 5, 1)
 
         self.buttonVisitors = QPushButton(_('Visitors'))
         self.buttonVisit = QPushButton(_('Visit'))
@@ -82,6 +91,8 @@ class DlgEventInfo(QDialog):
         buttonLayout.addWidget(self.buttonVisitors)
         buttonLayout.addWidget(self.buttonVisit)
         buttonLayout.addWidget(self.buttonRemove)
+        buttonLayout.addStretch(1)
+        buttonLayout.addWidget(self.buttonChange)
         buttonLayout.addStretch(1)
         buttonLayout.addWidget(self.buttonClose)
 
@@ -108,10 +119,20 @@ class DlgEventInfo(QDialog):
                      self.visitEvent)
         self.connect(self.buttonRemove, SIGNAL('clicked()'),
                      self.eventRemove)
+        self.connect(self.buttonChange, SIGNAL('clicked()'),
+                     self.changeCoach)
         self.connect(self.buttonClose, SIGNAL('clicked()'),
                      self, SLOT('reject()'))
+        self.connect(self.comboChange, SIGNAL('currentIndexChanged(int)'),
+                     self.enableComboChange)
 
     def initData(self, schedule, room_id):
+        ajax = HttpAjax(self, '/manager/get_coaches/',
+                        {}, self.parent.session_id)
+        response = ajax.parse_json()
+        for i in response['coaches_list']:
+            self.comboChange.addItem('%s %s' % (i['last_name'], i['first_name']), QVariant(int(i['id'])))
+
         ajax = HttpAjax(self, '/manager/get_event_info/',
                         {'id': schedule.id}, self.parent.session_id)
         self.schedule = schedule
@@ -130,6 +151,12 @@ class DlgEventInfo(QDialog):
         self.editDuration.setText(str(duration))
         self.initRooms(int(room['id']))
         self.comboStatus.setCurrentIndex( int(schedule['status']) )
+        try:
+            index = int(schedule['change'])
+        except:
+            index = 0
+        self.comboChange.setCurrentIndex(index)
+        self.buttonChange.setDisabled(True)
         self.buttonRemove.setDisabled( begin < datetime.now() )
 
     def initRooms(self, current_id):
@@ -164,20 +191,17 @@ class DlgEventInfo(QDialog):
 	self.dialog.setModal(True)
 	dlgStatus = self.dialog.exec_()
 
-	if QDialog.Accepted == dlgStatus:
+        if QDialog.Accepted == dlgStatus:
+            params = {'rfid_code': self.rfid_id,
+                      'event_id': self.schedule['id']}
 	    ajax = HttpAjax(self, '/manager/register_visit/',
-			    {'rfid_code': self.rfid_id,
-                             'event_id': self.schedule['id']}, self.parent.session_id)
+                            params, self.parent.session_id)
 	    response = ajax.parse_json()
-            if response and 'code' in response:
-                if response['code'] == 200:
-                    reply = QMessageBox.information(
-                        self, _('Client registration'),
-                        _('The client is registered on this event.'))
-                else:
-                    QMessageBox.warning(self, _('Warning'), response['desc'])
+            if response:
+                message = _('The client is registered on this event.')
             else:
-                print _('Check response format!')
+                message = _('Unable to register the visit!')
+            QMessageBox.information(self, _('Client registration'), message)
 	else:
 	    print 'dialog was rejected'
 
@@ -187,19 +211,21 @@ class DlgEventInfo(QDialog):
             _('Are you sure to remove this event from the calendar?'),
             QMessageBox.Yes, QMessageBox.No)
         if reply == QMessageBox.Yes:
+            params = {'id': self.schedule['id']}
             ajax = HttpAjax(self, '/manager/cal_event_del/',
-                            {'id': self.schedule['id']}, self.parent.session_id)
-            if ajax:
-                response = ajax.parse_json()
-                if 'code' in response:
-                    if response['code'] == 200:
-                        index = self.comboRoom.currentIndex()
-                        room_id, ok = self.comboRoom.itemData(index).toInt()
-                        model = self.parent.scheduleModel
-                        model.remove(self.schedule, room_id)
-                        self.reject()
-                else:
-                    print _('Check response format!')
+                            params, self.parent.session_id)
+            response = ajax.parse_json()
+            if response:
+                index = self.comboRoom.currentIndex()
+                room_id, ok = self.comboRoom.itemData(index).toInt()
+                model = self.parent.scheduleModel
+                model.remove(self.schedule, room_id)
+                QMessageBox.information(self, _('Event removing'),
+                                        _('Complete.'))
+                self.reject()
+            else:
+                QMessageBox.information(self, _('Event removing'),
+                                        _('Unable to remove this event!'))
         else:
             print 'just a joke'
 
@@ -208,3 +234,21 @@ class DlgEventInfo(QDialog):
         dialog.setModal(True)
         dialog.initData(self.schedule['id'])
         dialog.exec_()
+
+    def enableComboChange(self, index):
+        self.buttonChange.setDisabled(False)
+
+    def changeCoach(self):
+        index = self.comboChange.currentIndex()
+        coach_id, ok = self.comboChange.itemData(index).toInt()
+
+        params = {'event_id': self.schedule['id'],
+                  'coach_id': coach_id}
+        ajax = HttpAjax(self, '/manager/register_change/',
+                        params, self.parent.session_id)
+        response = ajax.parse_json()
+        if response:
+            message = _('The coach of this event has been changed.')
+        else:
+            message = _('Unable to change a coach.')
+        QMessageBox.information(self, _('Coach change registration'), message)

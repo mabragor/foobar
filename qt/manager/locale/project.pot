@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-16 21:46+0300\n"
+"POT-Creation-Date: 2010-02-21 20:35+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -40,11 +40,11 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: dlg_event_assign.py:39 dlg_event_info.py:49
+#: dlg_event_assign.py:39 dlg_event_info.py:56
 msgid "Room"
 msgstr ""
 
-#: dlg_event_assign.py:55 dlg_event_info.py:44
+#: dlg_event_assign.py:55 dlg_event_info.py:51
 msgid "Duration"
 msgstr ""
 
@@ -60,7 +60,7 @@ msgstr ""
 msgid "Renter"
 msgstr ""
 
-#: dlg_event_assign.py:86 dlg_event_info.py:54 dlg_rent_assign.py:33
+#: dlg_event_assign.py:86 dlg_event_info.py:61 dlg_rent_assign.py:33
 #: dlg_user_info.py:219
 msgid "Status"
 msgstr ""
@@ -70,7 +70,7 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
-#: dlg_event_assign.py:87 dlg_event_info.py:39 dlg_rent_assign.py:45
+#: dlg_event_assign.py:87 dlg_event_info.py:46 dlg_rent_assign.py:45
 #: dlg_user_info.py:220 team_list.py:30
 msgid "Begin"
 msgstr ""
@@ -102,8 +102,8 @@ msgstr ""
 msgid "Assign the event"
 msgstr ""
 
-#: dlg_event_assign.py:152 dlg_event_info.py:57 dlg_event_info.py:177
-#: http_ajax.py:72 http_ajax.py:78 manager.py:304
+#: dlg_event_assign.py:152 dlg_event_info.py:64 http_ajax.py:72
+#: http_ajax.py:78 manager.py:304
 msgid "Warning"
 msgstr ""
 
@@ -119,52 +119,88 @@ msgstr ""
 msgid "Coach"
 msgstr ""
 
-#: dlg_event_info.py:56
+#: dlg_event_info.py:39
+msgid "Coach change"
+msgstr ""
+
+#: dlg_event_info.py:41
+msgid "No change"
+msgstr ""
+
+#: dlg_event_info.py:43
+msgid "Change"
+msgstr ""
+
+#: dlg_event_info.py:63
 msgid "Waiting"
 msgstr ""
 
-#: dlg_event_info.py:58
+#: dlg_event_info.py:65
 msgid "Passed"
 msgstr ""
 
-#: dlg_event_info.py:76 dlg_show_visitors.py:32
+#: dlg_event_info.py:86 dlg_show_visitors.py:32
 msgid "Visitors"
 msgstr ""
 
-#: dlg_event_info.py:77
+#: dlg_event_info.py:87
 msgid "Visit"
 msgstr ""
 
-#: dlg_event_info.py:78
+#: dlg_event_info.py:88
 msgid "Remove"
 msgstr ""
 
-#: dlg_event_info.py:79 dlg_show_visitors.py:35
+#: dlg_event_info.py:89 dlg_show_visitors.py:35
 msgid "Close"
 msgstr ""
 
-#: dlg_event_info.py:93 manager.py:203
+#: dlg_event_info.py:105 manager.py:203
 msgid "Event"
 msgstr ""
 
-#: dlg_event_info.py:174
-msgid "Client registration"
-msgstr ""
-
-#: dlg_event_info.py:175
+#: dlg_event_info.py:201
 msgid "The client is registered on this event."
 msgstr ""
 
-#: dlg_event_info.py:179 dlg_event_info.py:201
-msgid "Check response format!"
+#: dlg_event_info.py:203
+msgid "Unable to register the visit!"
 msgstr ""
 
-#: dlg_event_info.py:185
+#: dlg_event_info.py:204
+msgid "Client registration"
+msgstr ""
+
+#: dlg_event_info.py:210
 msgid "Event remove"
 msgstr ""
 
-#: dlg_event_info.py:186
+#: dlg_event_info.py:211
 msgid "Are you sure to remove this event from the calendar?"
+msgstr ""
+
+#: dlg_event_info.py:223 dlg_event_info.py:227
+msgid "Event removing"
+msgstr ""
+
+#: dlg_event_info.py:224 qtschedule.py:211
+msgid "Complete."
+msgstr ""
+
+#: dlg_event_info.py:228
+msgid "Unable to remove this event!"
+msgstr ""
+
+#: dlg_event_info.py:251
+msgid "The coach of this event has been changed."
+msgstr ""
+
+#: dlg_event_info.py:253
+msgid "Unable to change a coach."
+msgstr ""
+
+#: dlg_event_info.py:254
+msgid "Coach change registration"
 msgstr ""
 
 #: dlg_login.py:23
@@ -580,10 +616,6 @@ msgstr ""
 
 #: qtschedule.py:73
 msgid "Exchange rooms between selected and current events."
-msgstr ""
-
-#: qtschedule.py:211
-msgid "Complete."
 msgstr ""
 
 #: qtschedule.py:213

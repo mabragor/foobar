@@ -123,6 +123,11 @@ def register_rent(request, form):
     return abstract_response(request, form)
 
 @login_required
+@ajax_processor(forms.RegisterChange, isJavaScript)
+def register_change(request, form):
+    return abstract_response(request, form)
+
+@login_required
 @ajax_processor(forms.CalendarEventAdd, isJavaScript)
 def cal_event_add(request, form):
     return abstract_response(request, form)
@@ -153,3 +158,10 @@ def get_rents(request):
     rents = storage.Rent.objects.filter(end_date__gte=date.today)
     rent_list = [i.about(True) for i in rents]
     return {'code': 200, 'desc': 'Ok', 'rent_list': rent_list}
+
+@login_required
+@ajax_processor(None, isJavaScript)
+def get_coaches(request):
+    coaches = storage.Coach.objects.all()
+    coaches_list = [i.about() for i in coaches]
+    return {'code': 200, 'desc': 'Ok', 'coaches_list': coaches_list}

@@ -273,7 +273,10 @@ class Schedule(models.Model):
             'status': self.status,
         }
         if self.team:
-            obj.update( {'type': 'training', 'event': self.team.about()} )
+            obj.update( {'type': 'training',
+                         'event': self.team.about()} )
+            if self.change is not None:
+                obj.update( {'change': self.change.pk} )
         if self.rent:
             obj.update( {'type': 'rent', 'event': self.rent.about()} )
         return obj
