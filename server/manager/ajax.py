@@ -2,16 +2,12 @@
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 from django.conf import settings
-from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Q
-from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 
 from datetime import datetime, date, timedelta
 
-from lib import str2date
-from lib.decorators import ajax_processor, render_to
+from lib.decorators import ajax_processor
 
 import forms
 from storage import models as storage
