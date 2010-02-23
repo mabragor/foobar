@@ -135,7 +135,6 @@ class DlgEventInfo(QDialog):
 
         ajax = HttpAjax(self, '/manager/get_event_info/',
                         {'id': schedule.id}, self.parent.session_id)
-        self.schedule = schedule
         response = ajax.parse_json()
         self.schedule = schedule = response['info']
         print schedule
@@ -219,10 +218,10 @@ class DlgEventInfo(QDialog):
                 index = self.comboRoom.currentIndex()
                 room_id, ok = self.comboRoom.itemData(index).toInt()
                 model = self.parent.scheduleModel
-                model.remove(self.schedule, room_id)
+                model.remove(self.schedule['id'], room_id, True)
                 QMessageBox.information(self, _('Event removing'),
                                         _('Complete.'))
-                self.reject()
+                self.accept()
             else:
                 QMessageBox.information(self, _('Event removing'),
                                         _('Unable to remove this event!'))

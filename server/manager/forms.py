@@ -519,13 +519,14 @@ class CalendarEventDel(AjaxForm):
     def clean(self):
         id = self.cleaned_data['id']
         event = storage.Schedule.objects.get(id=id)
-        if event.begin < datatime.now():
+        if event.begin < datetime.now():
             raise forms.ValidationError(_('Unable to delete this event.'))
         return self.cleaned_data
 
     def remove(self):
         c = self.cleaned_data
-        storage.Schedule.objects.get(id=c['id']).delete()
+        event = storage.Schedule.objects.get(id=c['id'])
+        event.delete()
 
 class ExchangeRoom(AjaxForm):
     """ Form acquires the IDs of two events and tries to exchange their

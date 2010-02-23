@@ -5,6 +5,8 @@ import httplib, urllib, json, base64, string
 
 from dlg_settings import TabNetwork
 
+from settings import DEBUG
+
 import gettext
 gettext.bindtextdomain('project', './locale/')
 gettext.textdomain('project')
@@ -24,33 +26,34 @@ class HttpAjax(QObject):
         headers = {'Content-type': 'application/x-www-form-urlencoded',
                    'Accept': 'text/plain'}
 
-        print 'HttpAjax:constructor:session_id is', session_id
         if session_id:
             headers.update( { 'Cookie': 'sessionid=%s' % session_id } )
 
         hostport = '%s:%s' % (self.host, self.port)
-        print 'HttpAjax:', hostport, '\n', headers
+        if DEBUG:
+            print 'HttpAjax:', hostport, '\n', headers
         conn = httplib.HTTPConnection(hostport)
         conn.request('POST', url, params, headers)
         self.response = conn.getresponse()
 
-            #print 'headers are\n', self.response.getheaders()
-            # sessionid=d5b2996237b9044ba98c5622d6311c43;
-            # expires=Tue, 09-Feb-2010 16:32:24 GMT;
-            # Max-Age=1209600;
-            # Path=/
+        # sessionid=d5b2996237b9044ba98c5622d6311c43;
+        # expires=Tue, 09-Feb-2010 16:32:24 GMT;
+        # Max-Age=1209600;
+        # Path=/
+
         cookie_string = self.response.getheader('set-cookie')
         if cookie_string:
-            print 'set cookie is', cookie_string
             cookie = {}
             for item in cookie_string.split('; '):
                 key, value = item.split('=')
                 cookie.update( { key: value } )
-            import pprint
-            pprint.pprint(cookie)
+            if DEBUG:
+                import pprint
+                pprint.pprint(cookie)
 
             session_id = cookie.get('sessionid', None)
-            print 'session id is', session_id
+            if DEBUG:
+                print 'session id is', session_id
             self.parent.setSessionID(session_id)
 
         conn.close()

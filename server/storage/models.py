@@ -376,3 +376,46 @@ TYPICAL_GAIN = (
     ('7', _('Dance show')),
     )
 
+# Журналирование
+
+from django.contrib.auth.models import User
+
+class Log(models.Model):
+    user = models.ForeignKey(User, verbose_name=_(u'User'), null=True, blank=True)
+    action = models.CharField(verbose_name=_(u'Action'), max_length=64)
+    model = models.CharField(verbose_name=_('Model'), max_length=256)
+    data = models.TextField(verbose_name=_('Data'))
+    reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _(u'Log')
+        verbose_name_plural = _(u'Logs')
+
+    def __unicode__(self):
+        return '%s %s' % (self.model, self.action)
+
+def logging_abstract(instance, action, **kwargs):
+    from django.utils import simplejson
+    from lib import DatetimeJSONEncoderQt
+    json = simplejson.dumps(instance.__dict__, cls=DatetimeJSONEncoderQt)
+    log = Log(model=instance, data=json, action=action)
+    log.save()
+
+def logging_postsave(instance, created, **kwargs):
+    logging_abstract(instance, created and 'create' or 'update', **kwargs)
+
+def logging_postdelete(instance, **kwargs):
+    logging_abstract(instance, 'delete', **kwargs)
+
+for i in [Client, Renter, Rent, Room, Group, Team, Card,
+          Schedule, Visit]:
+    models.signals.post_save.connect(logging_postsave, sender=i)
+    models.signals.post_delete.connect(logging_postdelete, sender=i)
+
+def logging_mysignals(sender, **kwargs):
+    log = Log(user=sender, model='global action',
+              data='', action=kwargs['action'])
+    log.save()
+
+from signals import signal_log_action
+signal_log_action.connect(logging_mysignals)

@@ -12,6 +12,8 @@ from lib.decorators import ajax_processor
 import forms
 from storage import models as storage
 
+from signals import signal_log_action
+
 isJavaScript = False
 
 def abstract_request(request, form):
@@ -42,14 +44,12 @@ def abstract_remove(request, form):
 def login(request, form):
     response, result = abstract_request(request, form)
     response.update( {'user_info': result} )
+    signal_log_action.send(sender=None, action='login %s' % result)
     return response
 
 @login_required
 @ajax_processor(None, isJavaScript)
-def available_teams(request): #TODO!
-#     response, users = abstract_request(request, form)
-#     response.update( {'users': users} )
-#     return response
+def available_teams(request):
     groups = storage.Group.objects.all()
     return [item.about() for item in groups]
 
@@ -63,6 +63,7 @@ def get_users_info_by_name(request, form):
 @login_required
 @ajax_processor(forms.ClientInfo, isJavaScript)
 def set_user_info(request, form):
+    signal_log_action.send(sender=request.user, action='set_user_info')
     return abstract_response(request, form)
 
 @login_required
@@ -75,11 +76,13 @@ def get_client_info(request, form):
 @login_required
 @ajax_processor(forms.RenterInfo, isJavaScript)
 def set_renter_info(request, form):
+    signal_log_action.send(sender=request.user, action='set_renter_info')
     return abstract_response(request, form)
 
 @login_required
 @ajax_processor(forms.RegisterRent, isJavaScript)
 def set_rent(request, form):
+    signal_log_action.send(sender=request.user, action='set_rent')
     return abstract_response(request, form)
 
 @login_required
@@ -106,36 +109,43 @@ def get_week(request, form):
 @login_required
 @ajax_processor(forms.CopyWeek, isJavaScript)
 def copy_week(request, form):
+    signal_log_action.send(sender=request.user, action='copy_week')
     return abstract_response(request, form)
 
 @login_required
 @ajax_processor(forms.RegisterVisit, isJavaScript)
 def register_visit(request, form):
+    signal_log_action.send(sender=request.user, action='register_visit')
     return abstract_response(request, form)
 
 @login_required
 @ajax_processor(forms.RegisterRent, isJavaScript)
 def register_rent(request, form):
+    signal_log_action.send(sender=request.user, action='register_rent')
     return abstract_response(request, form)
 
 @login_required
 @ajax_processor(forms.RegisterChange, isJavaScript)
 def register_change(request, form):
+    signal_log_action.send(sender=request.user, action='register_change')
     return abstract_response(request, form)
 
 @login_required
 @ajax_processor(forms.CalendarEventAdd, isJavaScript)
 def cal_event_add(request, form):
+    signal_log_action.send(sender=request.user, action='cal_event_add')
     return abstract_response(request, form)
 
 @login_required
 @ajax_processor(forms.CalendarEventDel, isJavaScript)
 def cal_event_del(request, form):
+    signal_log_action.send(sender=request.user, action='cal_event_del')
     return abstract_remove(request, form)
 
 @login_required
 @ajax_processor(forms.ExchangeRoom, isJavaScript)
 def exchange_room(request, form):
+    signal_log_action.send(sender=request.user, action='exchange_room')
     return abstract_response(request, form)
 
 @login_required

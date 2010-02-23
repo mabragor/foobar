@@ -74,6 +74,12 @@ class ModelStorage:
     def setFilter(self, column):
         self.column = column
 
+    def searchByID(self, id):
+        for event, room in self.e2rc.keys():
+            if event.id == id:
+                return event
+        return None
+
     def byRCR(self, op, key, value=None):
         if self.column is not None:
             row, column, room_id = key
@@ -386,8 +392,12 @@ class EventStorage(QAbstractTableModel):
         if emit_signal:
             self.emit(SIGNAL('layoutChanged()'))
 
-    def remove(self, event, room, emit_signal=False):
+    def remove(self, event_id, room, emit_signal=False):
         """ Метод удаления информации о событии. """
+        print 'remove:', event_id, room, emit_signal
+        event = self.storage.searchByID(event_id)
+        if event is None:
+            return
         cell_list = self.get_cells_by_event(event, room)
         if cell_list:
             for row, col in cell_list:
