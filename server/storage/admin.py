@@ -50,13 +50,20 @@ class GroupAdmin(admin.ModelAdmin):
     fieldsets = ((None, {'fields': ('title', )}),)
 admin.site.register(models.Group, GroupAdmin)
 
+class PriceGroupAdmin(admin.ModelAdmin):
+    list_display = ('title', )
+    ordering = ('title', )
+    search_fields = ('title',)
+    fieldsets = ((None, {'fields': ('title', )}),)
+admin.site.register(models.PriceGroup, PriceGroupAdmin)
+
 class TeamAdmin(admin.ModelAdmin):
     list_display = ('title', 'coach', 'groups', 'price', 'duration', 'reg_date')
     ordering = ('title',)
     search_fields = ('title',)
     fieldsets = (
         (None, {'fields': ('title', 'duration', 'count', 'price')}),
-        (_(u'Relation'), {'fields': ('group', 'coach')}),
+        (_(u'Relation'), {'fields': ('group', 'price_group', 'coach')}),
         )
 admin.site.register(models.Team, TeamAdmin)
 

@@ -157,8 +157,19 @@ class Group(models.Model):
     def children(self):
         return [item.about() for item in self.team_set.all()]
 
+class PriceGroup(models.Model):
+    title = models.CharField(verbose_name=_(u'Group of price'), max_length=64)
+
+    class Meta:
+        verbose_name = _(u'Price group')
+        verbose_name_plural = _(u'Price groups')
+
+    def __unicode__(self):
+        return self.title
+
 class Team(models.Model):
     group = models.ManyToManyField(Group, verbose_name=_(u'Group'))
+    price_group = models.ForeignKey(PriceGroup, verbose_name=_(u'Price group'))
     coach = models.ForeignKey(Coach, verbose_name=_(u'Coach'))
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
     duration = models.FloatField(verbose_name=_(u'Duration'))
