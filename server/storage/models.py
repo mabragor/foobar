@@ -50,7 +50,12 @@ class Client(AbstractUser):
 
     def about(self, short=False):
         result = super(Client, self).about()
-        result.update( {'rfid_code': self.rfid_code} )
+        result.update( {
+                'phone': self.phone,
+                'discount': self.discount,
+                'birthday': self.birthday,
+                'rfid_code': self.rfid_code,
+                } )
         if not short:
             result.update( {'team_list': self.team_list()} )
         return result

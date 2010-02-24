@@ -30,10 +30,9 @@ class DlgClientInfo(QDialog):
         self.editLastName = QLineEdit()
         self.editFirstName = QLineEdit()
         self.editEmail = QLineEdit()
-        #self.editYearBirth = QLineEdit()
-        #self.editUserSex = QComboBox()
-        #self.editUserSex.addItem(_('Male'))
-        #self.editUserSex.addItem(_('Female'))
+        self.editPhone = QLineEdit()
+        self.editDiscount = QLineEdit()
+        self.dateBirth = QDateEdit()
         self.editRFID = QLineEdit()
         self.editRFID.setReadOnly(True)
 
@@ -47,12 +46,14 @@ class DlgClientInfo(QDialog):
         layoutUser.addWidget(self.editFirstName, 1, 1)
         layoutUser.addWidget(QLabel(_('E-mail')), 2, 0)
         layoutUser.addWidget(self.editEmail, 2, 1)
-        #layoutUser.addWidget(QLabel(_('Year of birth')), 3, 0)
-        #layoutUser.addWidget(self.editYearBirth, 3, 1)
-        #layoutUser.addWidget(QLabel(_('Sex')), 4, 0)
-        #layoutUser.addWidget(self.editUserSex, 4, 1)
-        layoutUser.addWidget( QLabel(_('RFID')), 3, 0)
-        layoutUser.addWidget(self.editRFID, 3, 1)
+        layoutUser.addWidget(QLabel(_('Phone')), 3, 0)
+        layoutUser.addWidget(self.editPhone, 3, 1)
+        layoutUser.addWidget(QLabel(_('Discount')), 4, 0)
+        layoutUser.addWidget(self.editDiscount, 4, 1)
+        layoutUser.addWidget(QLabel(_('Date of birth')), 5, 0)
+        layoutUser.addWidget(self.dateBirth, 5, 1)
+        layoutUser.addWidget( QLabel(_('RFID')), 6, 0)
+        layoutUser.addWidget(self.editRFID, 6, 1)
 
         groupUser = QGroupBox(_('Base data'))
         groupUser.setLayout(layoutUser)
@@ -110,6 +111,14 @@ class DlgClientInfo(QDialog):
         self.editFirstName.setText(data.get('first_name', ''))
         self.editLastName.setText(data.get('last_name', ''))
         self.editEmail.setText(data.get('email', ''))
+        self.editPhone.setText(data.get('phone', ''))
+        self.editDiscount.setText(str(data.get('discount', 0)))
+
+        def str2date(value):
+            import time
+            return datetime(*time.strptime(value, '%Y-%m-%d')[:3])
+
+        self.dateBirth.setDate(str2date(data['birthday']))
         self.editRFID.setText(data.get('rfid_code', ''))
 
         teams = data.get('team_list', [])
@@ -168,6 +177,9 @@ class DlgClientInfo(QDialog):
             'first_name': self.editFirstName.text().toUtf8(),
             'last_name': self.editLastName.text().toUtf8(),
             'email': self.editEmail.text().toUtf8(),
+            'phone': self.editPhone.text().toUtf8(),
+            'discount': self.editDiscount.text().toUtf8(),
+            'birthday': self.dateBirth.date().toPyDate(),
             'rfid_code': self.editRFID.text().toUtf8(),
             'team_assigned': assigned,
             'team_cancelled': cancelled,

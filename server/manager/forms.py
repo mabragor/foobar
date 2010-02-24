@@ -303,6 +303,9 @@ class UserInfo(AjaxForm):
 
 class ClientInfo(UserInfo):
     """ See parent. FIXME """
+    phone = forms.CharField(max_length=16)
+    discount = forms.IntegerField()
+    birthday = forms.DateField()
     rfid_code = forms.CharField(max_length=8)
     team_assigned = ListField(required=False)
     team_cancelled = ListField(required=False)

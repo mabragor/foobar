@@ -17,7 +17,8 @@ class ClientAdmin(admin.ModelAdmin):
     list_display = ('rfid_code', 'last_name', 'first_name', 'email', 'reg_date')
     search_fields = ('rfid_code', 'last_name', 'first_name')
     fieldsets = ((None, {'fields': ('first_name', 'last_name',
-                                    'email')}),)
+                                    'email', 'phone',
+                                    'discount', 'birthday')}),)
 admin.site.register(models.Client, ClientAdmin)
 
 class RenterAdmin(admin.ModelAdmin):
