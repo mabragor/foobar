@@ -40,6 +40,9 @@ class Coach(AbstractUser):
 
 class Client(AbstractUser):
     rfid_code = models.CharField(verbose_name=_(u'RFID'), max_length=8)
+    phone = models.CharField(verbose_name=_(u'Phone'), max_length=16)
+    discount = models.IntegerField(verbose_name=_(u'Discount'))
+    birthday = models.DateField(verbose_name=_(u'Birthday'))
 
     class Meta:
         verbose_name = _(u'Client')
