@@ -317,14 +317,24 @@ class DlgRenterInfo(QDialog):
         self.addOneRow(params)
 
     def applyDialog(self):
-        dontApply = False
-        for widget in [self.editLastName, self.editFirstName,
-                       self.editEmail, self.editPhoneMobile,
-                       self.editPhoneWork, self.editPhoneHome]:
+        errorHighlight = []
+        phones = 0
+        for title, widget in [(_('Last name'), self.editLastName),
+                              (_('First name'), self.editFirstName),
+                              (_('E-mail'), self.editEmail)]:
             if 0 == len(widget.text().toUtf8()):
-                dontApply = True
-                widget.setProperty('errorHighlight', QVariant(True))
-        if dontApply:
+                errorHighlight.append(title)
+        for title, widget in [(_('Mobile phone'), self.editPhoneMobile),
+                              (_('Work phone'), self.editPhoneWork),
+                              (_('Home phone'), self.editPhoneHome)]:
+            if 0 < len(widget.text().toUtf8()):
+                phones += 1
+        if phones == 0:
+            errorHighlight.append(_('Phones'))
+        if len(errorHighlight) > 0:
+            QMessageBox.critical(
+                self.parent, _('Dialog error'),
+                'Fields %s must be filled.' % ', '.join(errorHighlight))
             return
         params = {
             'user_id': self.user_id,

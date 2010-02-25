@@ -350,6 +350,13 @@ class RenterInfo(UserInfo):
     phone_work = forms.CharField(max_length=16, required=False)
     phone_home = forms.CharField(max_length=16, required=False)
 
+    def clean(self):
+        if len(self.param('phone_mobile')) == 0 and \
+                len(self.param('phone_work')) == 0 and \
+                len(self.param('phone_home')) == 0:
+            raise forms.ValidationError(_('At least one phone number must be filled.'))
+        return self.cleaned_data
+
     def save(self):
         data = self.cleaned_data
         user_id = data['user_id']; del(data['user_id'])
