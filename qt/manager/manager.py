@@ -24,6 +24,7 @@ from dlg_user_info import DlgClientInfo, DlgRenterInfo
 from dlg_event_assign import DlgEventAssign
 from dlg_event_info import DlgEventInfo
 from dlg_copy_week import DlgCopyWeek
+from dlg_accounting import DlgAccounting
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -210,6 +211,11 @@ class MainWindow(QMainWindow):
 	    (_('Calendar'), [
 		    (_('Copy week'), 'Ctrl+W',
 		     'copyWeek', _('Copy current week into other.')),
+                    ]
+             ),
+	    (_('Accounting'), [
+		    (_('Add resources'), '',
+		     'addResources', _('Add new set of resources into accounting.')),
                     ]
              ),
 	    ]
@@ -421,6 +427,22 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage(_('The week has been copied sucessfully.'))
 
 	self.dialog = DlgCopyWeek(self)
+	self.dialog.setModal(True)
+        self.dialog.setCallback(callback)
+	self.dialog.exec_()
+
+    def addResources(self):
+        def callback(selected_date):
+            model = self.scheduleModel
+            from_range = model.weekRange
+            to_range = model.date2range(selected_date)
+            ajax = HttpAjax(self, '/manager/copy_week/',
+                            {'from_date': from_range[0],
+                             'to_date': to_range[0]}, self.session_id)
+            response = ajax.parse_json()
+            self.statusBar().showMessage(_('The week has been copied sucessfully.'))
+
+	self.dialog = DlgAccounting(self)
 	self.dialog.setModal(True)
         self.dialog.setCallback(callback)
 	self.dialog.exec_()

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-26 00:21+0300\n"
+"POT-Creation-Date: 2010-02-27 00:45+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Ruslan Popov <ruslan.popov@gmail.com>\n"
 "Language-Team: LANGUAGE <RU@li.org>\n"
@@ -16,17 +16,62 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: dlg_copy_week.py:26 dlg_settings.py:25 dlg_user_info.py:72
-#: dlg_user_info.py:246
+#: dlg_accounting.py:23
+msgid "Resource"
+msgstr "Ресурс"
+
+#: dlg_accounting.py:23 dlg_accounting.py:108
+msgid "Count"
+msgstr "Количество"
+
+#: dlg_accounting.py:23
+msgid "Action"
+msgstr "Действие"
+
+#: dlg_accounting.py:32
+msgid "Resources"
+msgstr "Ресурсы"
+
+#: dlg_accounting.py:35 dlg_event_info.py:88 dlg_show_visitors.py:35
+msgid "Close"
+msgstr "Закрыть"
+
+#: dlg_accounting.py:50 manager.py:216
+msgid "Accounting"
+msgstr "Учёт"
+
+#: dlg_accounting.py:76
+msgid "Add"
+msgstr "Добавить"
+
+#: dlg_accounting.py:110 team_list.py:27
+msgid "Price"
+msgstr "Цена"
+
+#: dlg_accounting.py:113 dlg_copy_week.py:26 dlg_settings.py:25
+#: dlg_user_info.py:72 dlg_user_info.py:246
 msgid "Apply"
 msgstr "Применить"
 
-#: dlg_copy_week.py:27 dlg_event_assign.py:78 dlg_login.py:41
-#: dlg_rent_assign.py:73 dlg_searching.py:32 dlg_settings.py:26
-#: dlg_team_assign.py:65 dlg_user_info.py:73 dlg_user_info.py:247
-#: dlg_waiting_rfid.py:30
+#: dlg_accounting.py:114 dlg_copy_week.py:27 dlg_event_assign.py:78
+#: dlg_login.py:41 dlg_rent_assign.py:73 dlg_searching.py:32
+#: dlg_settings.py:26 dlg_team_assign.py:65 dlg_user_info.py:73
+#: dlg_user_info.py:247 dlg_waiting_rfid.py:30
 msgid "Cancel"
 msgstr "Отмена"
+
+#: dlg_accounting.py:131
+msgid "Add resource"
+msgstr "Добавить ресурс"
+
+#: dlg_accounting.py:141 dlg_event_assign.py:152 dlg_event_info.py:63
+#: http_ajax.py:75 http_ajax.py:81 manager.py:310
+msgid "Warning"
+msgstr "Внимание"
+
+#: dlg_accounting.py:141
+msgid "Improper values."
+msgstr "Неверные значения."
 
 #: dlg_copy_week.py:44
 msgid "Choose a week to copy to"
@@ -56,7 +101,7 @@ msgstr "Доступные группы"
 msgid "Assign"
 msgstr "Назначить"
 
-#: dlg_event_assign.py:86 manager.py:196
+#: dlg_event_assign.py:86 manager.py:197
 msgid "Renter"
 msgstr "Арендатор"
 
@@ -102,11 +147,6 @@ msgstr "Оплачено"
 msgid "Assign the event"
 msgstr "Назначить событие."
 
-#: dlg_event_assign.py:152 dlg_event_info.py:63 http_ajax.py:75
-#: http_ajax.py:81 manager.py:304
-msgid "Warning"
-msgstr "Внимание"
-
 #: dlg_event_assign.py:153
 msgid "What team do you want to assign?"
 msgstr "Какую команду вы собирались назначить?"
@@ -151,11 +191,7 @@ msgstr "Посещение"
 msgid "Remove"
 msgstr "Удалить"
 
-#: dlg_event_info.py:88 dlg_show_visitors.py:35
-msgid "Close"
-msgstr "Закрыть"
-
-#: dlg_event_info.py:104 manager.py:203
+#: dlg_event_info.py:104 manager.py:204
 msgid "Event"
 msgstr "Событие"
 
@@ -490,144 +526,152 @@ msgstr "Зарегистрируйтесь в системе."
 msgid "HTTP Error"
 msgstr "Ошибка HTTP"
 
-#: manager.py:56
+#: manager.py:57
 msgid "Manager's interface"
 msgstr "Интерфейс менеджера"
 
-#: manager.py:58
+#: manager.py:59
 msgid "Ready"
 msgstr "Готовность"
 
-#: manager.py:68 manager.py:273
+#: manager.py:69 manager.py:279
 msgid "Login to start session"
 msgstr "Зарегистрируйтесь для начала сессии"
 
-#: manager.py:72
+#: manager.py:73
 #, python-format
 msgid "Filter: Room \"%s\" is changed its state"
 msgstr "Фильтрация: Зал \"%s\" изменил своё состояние"
 
-#: manager.py:92
+#: manager.py:93
 msgid "<<"
 msgstr "<<"
 
-#: manager.py:93
+#: manager.py:94
 msgid ">>"
 msgstr ">>"
 
-#: manager.py:94
+#: manager.py:95
 msgid "Today"
 msgstr "Сегодня"
 
-#: manager.py:115
+#: manager.py:116
 msgid "Week:"
 msgstr "Неделя:"
 
-#: manager.py:174 manager.py:221
+#: manager.py:175 manager.py:227
 msgid "File"
 msgstr "Файл"
 
-#: manager.py:175
+#: manager.py:176
 msgid "Log in"
 msgstr "Подключить"
 
-#: manager.py:176
+#: manager.py:177
 msgid "Start user session."
 msgstr "Начать пользовательскую сессию"
 
-#: manager.py:177
+#: manager.py:178
 msgid "Log out"
 msgstr "Отключить"
 
-#: manager.py:178
+#: manager.py:179
 msgid "End user session."
 msgstr "Завершить пользовательскую сессию"
 
-#: manager.py:180
+#: manager.py:181
 msgid "Application settings"
 msgstr "Настройки приложения"
 
-#: manager.py:181
+#: manager.py:182
 msgid "Manage the application settings."
 msgstr "Управление настройками приложения."
 
-#: manager.py:183
+#: manager.py:184
 msgid "Exit"
 msgstr "Выход"
 
-#: manager.py:184
+#: manager.py:185
 msgid "Close the application."
 msgstr "Закрыть приложение"
 
-#: manager.py:187
+#: manager.py:188
 msgid "Client"
 msgstr "Клиент"
 
-#: manager.py:188 manager.py:197
+#: manager.py:189 manager.py:198
 msgid "New"
 msgstr "Новый"
 
-#: manager.py:189
+#: manager.py:190
 msgid "Register new client."
 msgstr "Регистрация нового клиента."
 
-#: manager.py:190
+#: manager.py:191
 msgid "Search by RFID"
 msgstr "Поиск по RFID"
 
-#: manager.py:191
+#: manager.py:192
 msgid "Search a client with its RFID card."
 msgstr "Поиск клиента по его RFID метке."
 
-#: manager.py:192 manager.py:199
+#: manager.py:193 manager.py:200
 msgid "Search by name"
 msgstr "Поиск по имени"
 
-#: manager.py:193
+#: manager.py:194
 msgid "Search a client with its name."
 msgstr "Найти клиента по его имени."
 
-#: manager.py:198
+#: manager.py:199
 msgid "Register new renter."
 msgstr "Регистрация нового арендатора."
 
-#: manager.py:200
+#: manager.py:201
 msgid "Search a renter with its name."
 msgstr "Найти арендатора по его имени."
 
-#: manager.py:204
+#: manager.py:205
 msgid "Training"
 msgstr "Тренировка"
 
-#: manager.py:205
+#: manager.py:206
 msgid "Assign a training event."
 msgstr "Назначить тренировку."
 
-#: manager.py:206
+#: manager.py:207
 msgid "Rent"
 msgstr "Аренда"
 
-#: manager.py:207
+#: manager.py:208
 msgid "Assign a rent event."
 msgstr "Назначить аренду."
 
-#: manager.py:210
+#: manager.py:211
 msgid "Calendar"
 msgstr "Календарь"
 
-#: manager.py:211
+#: manager.py:212
 msgid "Copy week"
 msgstr "Копировать неделю"
 
-#: manager.py:212
+#: manager.py:213
 msgid "Copy current week into other."
 msgstr "Копировать текущую неделю в другую."
 
-#: manager.py:305
+#: manager.py:217
+msgid "Add resources"
+msgstr "Добавить ресурсы"
+
+#: manager.py:218
+msgid "Add new set of resources into accounting."
+msgstr "Добавить новый набор ресурсов в учётную систему."
+
+#: manager.py:311
 msgid "This RFID belongs to nobody."
 msgstr "Данная RFID метка никому не принадлежит."
 
-#: manager.py:421
+#: manager.py:427 manager.py:443
 msgid "The week has been copied sucessfully."
 msgstr "Неделя была скопирована успешно."
 
@@ -642,10 +686,6 @@ msgstr "Обмен залов между выбранным и текущим с
 #: qtschedule.py:213
 msgid "Unable to exchange."
 msgstr "Невозможно обменять."
-
-#: team_list.py:27
-msgid "Price"
-msgstr "Цена"
 
 #: team_list.py:28
 msgid "Card"
