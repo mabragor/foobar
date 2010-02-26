@@ -46,4 +46,6 @@ urlpatterns += patterns(
     url(r'^get_visitors/$', 'get_visitors'),
     url(r'^get_rents/$', 'get_rents'),
     url(r'^get_coaches/$', 'get_coaches'),
+    url(r'^get_accounting/$', 'get_accounting'),
+    url(r'^add_resource/$', 'add_resource'),
     )

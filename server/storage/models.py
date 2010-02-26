@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from datetime import timedelta, datetime
 from django.conf import settings
+from django.contrib.auth.models import User
 
 class AbstractUser(models.Model):
     last_name = models.CharField(verbose_name=_(u'Last name'), max_length=64)
@@ -395,9 +396,73 @@ TYPICAL_GAIN = (
     ('7', _('Dance show')),
     )
 
-# Журналирование
+# Учёт средств
 
-from django.contrib.auth.models import User
+RFIDCARDS = '0'
+TYPE_STATUS = ((RFIDCARDS, _(u'RFID cards')), ('1', _(u'Unknown')),)
+
+class Accounting(models.Model):
+    id = models.CharField(verbose_name=_(u'Type'), max_length=4, choices=TYPE_STATUS, primary_key=True)
+    count = models.IntegerField(verbose_name=_(u'Count'), default=0)
+
+    class Meta:
+        verbose_name = _(u'Accounting')
+        verbose_name_plural = _(u'Accountings')
+
+    def __unicode__(self):
+        return '%s %i' % (self.get_id_display(), self.count)
+
+    def add(self, count):
+        self.count += count
+        self.save()
+
+    def sub(self, count):
+        if self.count < count:
+            raise
+        self.count -= count
+        self.save()
+
+    def about(self):
+        return {
+            'id': self.id,
+            'type': self.get_id_display(),
+            'count': self.count,
+            }
+
+class Flow(models.Model):
+    INFLOW = '0'
+    OUTFLOW = '1'
+    FLOW_STATUS = ((INFLOW, _(u'Inflow')), (OUTFLOW, _(u'Outflow')),)
+
+    user = models.ForeignKey(User, verbose_name=_(u'User'))
+    action = models.CharField(verbose_name=_(u'Action'), max_length=1, choices=FLOW_STATUS)
+    type = models.CharField(verbose_name=_(u'Type'), max_length=4, choices=TYPE_STATUS)
+    count = models.IntegerField(verbose_name=_(u'Count'))
+    price = models.FloatField(verbose_name=_(u'Price'), default=float(0.00))
+    total = models.FloatField(verbose_name=_(u'Total'), default=float(0.00))
+    reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _(u'Flow')
+        verbose_name_plural = _(u'Flows')
+
+    def __unicode__(self):
+        return '%s %s %s %f' % (self.user,
+                                self.get_action_display(),
+                                self.get_type_display(),
+                                self.total)
+
+    def save(self):
+        super(Flow, self).save()
+        accounting, created = Accounting.objects.get_or_create(id=self.type)
+        if self.action == self.INFLOW:
+            accounting.add(self.count)
+        elif self.action == self.OUTFLOW:
+            accounting.sub(self.count)
+        else:
+            raise
+
+# Журналирование
 
 class Log(models.Model):
     user = models.ForeignKey(User, verbose_name=_(u'User'), null=True, blank=True)

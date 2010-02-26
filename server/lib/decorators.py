@@ -32,6 +32,7 @@ def ajax_processor(form_object=None, javascript=True):
             if request.method == 'POST':
                 if form_object is not None:
                     form = form_object(request.POST)
+                    form.request = request
                     if form.is_valid():
                         result = func(request, form, *args, **kwargs)
                     else:

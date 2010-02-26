@@ -667,3 +667,25 @@ class GetVisitors(AjaxForm):
         event_id = self.cleaned_data['event_id']
         event = storage.Schedule.objects.get(id=event_id)
         return event.get_visitors()
+
+class AddResource(AjaxForm):
+    INFLOW = '0'
+
+    id = forms.CharField(max_length=4)
+    count = forms.IntegerField()
+    price = forms.FloatField()
+
+    def save(self):
+        res_type=self.cleaned_data['id']
+        res_count=self.cleaned_data['count']
+        res_price=self.cleaned_data['price']
+
+        resource = storage.Flow(user=self.request.user, # see deco
+                                action=self.INFLOW,
+                                type=res_type,
+                                count=res_count,
+                                price=res_price,
+                                total=float(res_price * res_count))
+        resource.save()
+        return resource.id
+

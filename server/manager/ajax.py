@@ -171,3 +171,17 @@ def get_coaches(request):
     coaches = storage.Coach.objects.all()
     coaches_list = [i.about() for i in coaches]
     return {'code': 200, 'desc': 'Ok', 'coaches_list': coaches_list}
+
+@login_required
+@ajax_processor(None, isJavaScript)
+def get_accounting(request):
+    accounting = storage.Accounting.objects.all()
+    accounting_list = [i.about() for i in accounting]
+    return {'code': 200, 'desc': 'Ok', 'accounting_list': accounting_list}
+
+@login_required
+@ajax_processor(forms.AddResource, isJavaScript)
+def add_resource(request, form):
+    signal_log_action.send(sender=request.user, action='add_resource')
+    return abstract_response(request, form)
+
