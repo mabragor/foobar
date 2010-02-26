@@ -16,3 +16,9 @@ PORT = {
     'parity': 'N',
     'stop_bits': 2
     }
+
+MODEL_PROPERTIES = {
+    'INFLOW': '0',
+    'OUTFLOW': '1',
+    'TYPE_RFIDCARDS': '0',
+    }
