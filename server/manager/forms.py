@@ -340,6 +340,17 @@ class ClientInfo(UserInfo):
                     price=team.price)
                 card.save()
 
+        OUTFLOW = '1'
+        RFIDCARDS = '0'
+
+        flow = storage.Flow(user=self.request.user, # see deco
+                            action=OUTFLOW,
+                            type=RFIDCARDS,
+                            count=1,
+                            price=30.00, # FIXME
+                            total=30.00 # FIXME
+                            )
+        flow.save()
         return user.id
 
 class RenterInfo(UserInfo):
@@ -682,6 +693,27 @@ class AddResource(AjaxForm):
 
         resource = storage.Flow(user=self.request.user, # see deco
                                 action=self.INFLOW,
+                                type=res_type,
+                                count=res_count,
+                                price=res_price,
+                                total=float(res_price * res_count))
+        resource.save()
+        return resource.id
+
+class SubResource(AjaxForm):
+    OUTFLOW = '1'
+
+    id = forms.CharField(max_length=4)
+    count = forms.IntegerField()
+    price = forms.FloatField()
+
+    def save(self):
+        res_type=self.cleaned_data['id']
+        res_count=self.cleaned_data['count']
+        res_price=self.cleaned_data['price']
+
+        resource = storage.Flow(user=self.request.user, # see deco
+                                action=self.OUTFLOW,
                                 type=res_type,
                                 count=res_count,
                                 price=res_price,

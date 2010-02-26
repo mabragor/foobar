@@ -185,3 +185,9 @@ def add_resource(request, form):
     signal_log_action.send(sender=request.user, action='add_resource')
     return abstract_response(request, form)
 
+@login_required
+@ajax_processor(forms.SubResource, isJavaScript)
+def add_resource(request, form):
+    signal_log_action.send(sender=request.user, action='sub_resource')
+    return abstract_response(request, form)
+
