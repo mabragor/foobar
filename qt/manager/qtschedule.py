@@ -361,6 +361,8 @@ class QtSchedule(QTableView):
                 pass
         return QTableView.viewportEvent(self, event)
 
+from settings import XPM_EVENT_CLOSED
+
 class QtScheduleDelegate(QItemDelegate):
 
     """ Делегат для ячеек расписания. """
@@ -428,6 +430,9 @@ class QtScheduleDelegate(QItemDelegate):
                     rx = x+w-rw-1
                     ry = y+h-rh-1
                     painter.drawRect(rx, ry, rw, rh)
+
+                #icon = QIcon(QPixmap(XPM_EVENT_CLOSED))
+                painter.drawPixmap(3, 3, 8, 8, QPixmap(XPM_EVENT_CLOSED))
 
         painter.restore()
         #QItemDelegate.paint(self, painter, option, index)
