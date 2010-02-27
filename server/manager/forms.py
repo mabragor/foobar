@@ -23,7 +23,7 @@ class StatusForm(forms.ModelForm):
 
     class Meta:
         model = storage.Schedule
-        exclude = ('room', 'team', 'begin', 'looking', 'places')
+        exclude = ('room', 'team', 'begin')
 
     def clean(self):
         data = self.cleaned_data
@@ -48,7 +48,7 @@ class ScheduleForm(forms.ModelForm):
 
     class Meta:
         model = storage.Schedule
-        exclude = ('looking', 'places', 'change', 'status')
+        exclude = ('change', 'status')
 
     def clean_begin(self):
         begin = self.cleaned_data['begin']

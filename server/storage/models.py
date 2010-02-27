@@ -273,9 +273,6 @@ class Schedule(models.Model):
     duration = models.FloatField(verbose_name=_(u'Duration'))
     status = models.CharField(verbose_name=_(u'Status'), max_length=1, choices=ACTION_STATUSES, null=True)
     change = models.ForeignKey(Coach, verbose_name=_(u'Change'), null=True, blank=True)
-    # НЕ НУЖНО
-    looking = models.BooleanField(verbose_name=_(u'Is looking for members?'), default=True)
-    places = models.BooleanField(verbose_name=_(u'Are there free places?'), default=True)
 
     class Meta:
         verbose_name = _(u'Schedule')
