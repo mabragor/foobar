@@ -5,7 +5,7 @@ import sys, re
 from datetime import datetime, timedelta
 
 from http_ajax import HttpAjax
-from event_storage import Event, EventStorage
+from event_storage import Event, EventStorage, EventTraining, EventRent
 
 import gettext
 gettext.bindtextdomain('project', './locale/')
@@ -411,5 +411,21 @@ class QtScheduleDelegate(QItemDelegate):
                     painter.drawLine(x, y+h, x+w, y+h)
                 else:
                     pass
+
+                # тип события: тренировка, аренда
+                if isinstance(event, EventRent) and event.show_type == 'tail':
+                    pen = QPen(Qt.black)
+                    pen.setWidth(1)
+                    painter.setPen(pen)
+                    brush = QBrush(Qt.blue)
+                    painter.setBrush(brush)
+
+                    lower = w if w < h else h
+                    SIDE = int(lower / 4)
+                    rw = rh = SIDE if lower > SIDE else w-2
+                    rx = x+w-rw-1
+                    ry = y+h-rh-1
+                    painter.drawRect(rx, ry, rw, rh)
+
         painter.restore()
         #QItemDelegate.paint(self, painter, option, index)
