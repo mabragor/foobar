@@ -256,7 +256,8 @@ class EventStorage(QAbstractTableModel):
                 begin = __(e['begin'])
                 end = __(e['end'])
                 duration = end - begin
-                event = EventTraining(e['event'], e['id'], begin, duration, e['status'])
+                object = EventTraining if e['type'] == 'training' else EventRent
+                event = object(e['event'], e['id'], begin, duration, e['status'])
                 self.insert( int(e['room']['id']), event )
             self.weekRange = week_range
             self.emit(SIGNAL('layoutChanged()'))
