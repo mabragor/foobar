@@ -88,7 +88,9 @@ class Renter(AbstractUser):
         return [rent.about(True) for rent in self.rent_set.all().order_by('-reg_date')]
 
 class Rent(models.Model):
-    RENT_STATUS = (('0', _(u'Reserved')), ('1', _(u'Piad partially')), ('2', _('Paid')))
+    RENT_STATUS = enumerate( (_(u'Reserved'),
+                              _(u'Piad partially'),
+                              _('Paid')) )
     renter = models.ForeignKey(Renter, verbose_name=_(u'Renter'))
     status = models.CharField(verbose_name=_(u'Status'), max_length=1, choices=RENT_STATUS, default=0)
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
@@ -205,7 +207,7 @@ class Team(models.Model):
             }
 
 class Card(models.Model):
-    CARD_TYPE = (('0', _(u'Normal card')), ('1', _(u'Club card')))
+    CARD_TYPE = enumerate( (_(u'Normal card'), _(u'Club card')) )
     team = models.ForeignKey(Team, verbose_name=_(u'Team'))
     client = models.ForeignKey(Client, verbose_name=_(u'Client'))
     type = models.CharField(verbose_name=_(u'Type'),
@@ -260,11 +262,9 @@ class Card(models.Model):
         return self.exp_date < datetime.now()
 
 class Schedule(models.Model):
-    ACTION_STATUSES = (
-        ('0', _('Waiting')),
-        ('1', _('Warning')),
-        ('2', _('Passed')),
-    )
+    ACTION_STATUSES = enumerate( (_('Waiting'),
+                                  _('Warning'),
+                                  _('Passed')) )
     room = models.ForeignKey(Room, verbose_name=_(u'Room'))
     team = models.ForeignKey(Team, verbose_name=_(u'Team'), null=True, blank=True)
     rent = models.ForeignKey(Rent, verbose_name=_(u'Rent'), null=True, blank=True)
