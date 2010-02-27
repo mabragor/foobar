@@ -369,6 +369,16 @@ class QtScheduleDelegate(QItemDelegate):
         QItemDelegate.__init__(self, parent)
         self.parent = parent
 
+    def prepare(self, painter, pen_tuple, brush=None):
+        pen_color, pen_width = pen_tuple
+        pen = QPen(pen_color)
+        pen.setWidth(pen_width)
+        painter.setPen(pen)
+        if brush is not None:
+            brush_color = brush
+            brush = QBrush(brush_color)
+            painter.setBrush(brush)
+
     def paint(self, painter, option, index):
         """ Метод для отрисовки ячейки. """
         painter.save()
@@ -395,12 +405,9 @@ class QtScheduleDelegate(QItemDelegate):
                 painter.fillRect(x, y, w, h, self.parent.string2color('#%s' % room_color));
                 # готовимся рисовать границы
                 if self.parent.selected_event == event:
-                    pen = QPen(Qt.blue)
-                    pen.setWidth(3)
+                    self.prepare( painter, (Qt.blue, 3) )
                 else:
-                    pen = QPen(Qt.black)
-                    pen.setWidth(1)
-                painter.setPen(pen)
+                    self.prepare( painter, (Qt.black, 1) )
 
                 # отрисовываем элементы в зависимости от типа ячейки
                 painter.drawLine(x, y+h, x, y)
@@ -414,15 +421,10 @@ class QtScheduleDelegate(QItemDelegate):
 
                 # тип события: тренировка, аренда
                 if isinstance(event, EventRent) and event.show_type == 'tail':
-                    pen = QPen(Qt.black)
-                    pen.setWidth(1)
-                    painter.setPen(pen)
-                    brush = QBrush(Qt.blue)
-                    painter.setBrush(brush)
-
+                    self.prepare( painter, (Qt.black, 1), Qt.blue )
                     lower = w if w < h else h
                     SIDE = int(lower / 4)
-                    rw = rh = SIDE if lower > SIDE else w-2
+                    rw = rh = SIDE if lower > SIDE else lower-2
                     rx = x+w-rw-1
                     ry = y+h-rh-1
                     painter.drawRect(rx, ry, rw, rh)
