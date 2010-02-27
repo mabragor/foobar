@@ -143,6 +143,8 @@ class CopyForm(forms.Form):
         for e in events:
             ne = storage.Schedule(room=e.room, team=e.team)
             ne.begin = e.begin+delta
+            ne.end = ne.begin + timedelta(minutes=int(60 * e.duration))
+            ne.duration = e.duration
             ne.save()
 
 class AjaxForm(forms.Form):

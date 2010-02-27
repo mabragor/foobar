@@ -285,12 +285,19 @@ class Schedule(models.Model):
         return u'%s(%s) %s' % (self.team, self.room, self.begin)
 
     def about(self):
+        now = datetime.now()
+        if self.end > now:
+            status = 0
+        elif self.end + timedelta(minutes=15) < now:
+            status = 2
+        else:
+            status = 1
         obj = {
             'id': self.pk,
             'room': self.room.about(),
             'begin': self.begin,
             'end': self.end,
-            'status': self.status,
+            'status': status,
         }
         if self.team:
             obj.update( {'type': 'training',

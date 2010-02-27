@@ -367,6 +367,11 @@ class QtScheduleDelegate(QItemDelegate):
 
     """ Делегат для ячеек расписания. """
 
+    HORIZONTAL = 0
+    VERTICAL = 1
+    PADDING = 2
+    STEP = 5
+
     def __init__(self, parent=None):
         QItemDelegate.__init__(self, parent)
         self.parent = parent
@@ -431,8 +436,29 @@ class QtScheduleDelegate(QItemDelegate):
                     ry = y+h-rh-1
                     painter.drawRect(rx, ry, rw, rh)
 
-                #icon = QIcon(QPixmap(XPM_EVENT_CLOSED))
-                painter.drawPixmap(3, 3, 8, 8, QPixmap(XPM_EVENT_CLOSED))
+                line_dir = self.direction(w, h)
+                if event.status == 1:
+                    self.prepare( painter, (Qt.red, 3) )
+                    if self.HORIZONTAL == line_dir:
+                        if event.show_type == 'head':
+                            painter.drawLine(x+self.PADDING, y+(self.STEP*1),
+                                             x+w-self.PADDING, y+(self.STEP*1))
+                    else:
+                        painter.drawLine(x+(self.STEP*1), y+self.PADDING,
+                                         x+(self.STEP*1), y+h-self.PADDING)
+                elif event.status == 2:
+                    self.prepare( painter, (self.parent.string2color('#888888'), 3) )
+                    if self.HORIZONTAL == line_dir:
+                        if event.show_type == 'head':
+                            painter.drawLine(x+self.PADDING, y+(self.STEP*2),
+                                             x+w-self.PADDING, y+(self.STEP*2))
+                    else:
+                        painter.drawLine(x+(self.STEP*2), y+self.PADDING,
+                                         x+(self.STEP*2), y+h-self.PADDING)
+                    #painter.drawPixmap(x+3, y+3, 8, 8, QPixmap(XPM_EVENT_CLOSED))
 
         painter.restore()
         #QItemDelegate.paint(self, painter, option, index)
+
+    def direction(self, width, height):
+        return self.HORIZONTAL if width < height else self.VERTICAL
