@@ -271,6 +271,12 @@ class MainWindow(QMainWindow):
                 self.loggedTitle(response['user_info'])
                 self.tree = self.getTeamsTree()
                 self.scheduleModel.showCurrWeek()
+
+                self.refreshTimer = QTimer(self)
+                from settings import SCHEDULE_REFRESH_TIMEOUT
+                self.refreshTimer.setInterval(SCHEDULE_REFRESH_TIMEOUT)
+                self.connect(self.refreshTimer, SIGNAL('timeout()'), self.schedule.model().update)
+                self.refreshTimer.start()
         else:
             print 'rejected'
 

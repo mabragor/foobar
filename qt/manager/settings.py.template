@@ -17,6 +17,8 @@ PORT = {
     'stop_bits': 2
     }
 
+SCHEDULE_REFRESH_TIMEOUT = 60000 # one minute
+
 MODEL_PROPERTIES = {
     'INFLOW': '0',
     'OUTFLOW': '1',

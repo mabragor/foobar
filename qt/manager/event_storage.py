@@ -206,11 +206,16 @@ class EventStorage(QAbstractTableModel):
         self.emit(SIGNAL('layoutChanged()'))
         return False
 
+    def update(self):
+        if 'week' == self.showMode:
+            print 'model update'
+            self.loadData()
+
     def showCurrWeek(self):
         if 'week' == self.showMode:
             now = datetime.now()
             self.weekRange = self.date2range(now)
-            self.loadData(now)
+            self.loadData()
             return self.weekRange
         else:
             return None
@@ -219,7 +224,9 @@ class EventStorage(QAbstractTableModel):
         if 'week' == self.showMode:
             current_monday, current_sunday = self.weekRange
             prev_monday = current_monday - timedelta(days=7)
-            self.loadData(prev_monday)
+            prev_sunday = current_sunday - timedelta(days=7)
+            self.weekRange = (prev_monday, prev_sunday)
+            self.loadData()
             return self.weekRange
         else:
             return None
@@ -228,17 +235,19 @@ class EventStorage(QAbstractTableModel):
         if 'week' == self.showMode:
             current_monday, current_sunday = self.weekRange
             next_monday = current_monday + timedelta(days=7)
-            self.loadData(next_monday)
+            next_sunday = current_sunday + timedelta(days=7)
+            self.weekRange = (next_monday, next_sunday)
+            self.loadData()
             return self.weekRange
         else:
             return None
 
-    def loadData(self, d):
+    def loadData(self):
         if 'day' == self.showMode:
             return False
 
         self.parent.statusBar().showMessage(_('Request information for the calendar.'))
-        monday, sunday = week_range = self.date2range(d)
+        monday, sunday = self.weekRange
 	ajax = HttpAjax(self.parent, '/manager/get_week/',
                         {'monday': monday,
                          'filter': []}, self.parent.session_id)
@@ -259,7 +268,6 @@ class EventStorage(QAbstractTableModel):
                 object = EventTraining if e['type'] == 'training' else EventRent
                 event = object(e['event'], e['id'], begin, duration, e['status'])
                 self.insert( int(e['room']['id']), event )
-            self.weekRange = week_range
             self.emit(SIGNAL('layoutChanged()'))
             self.parent.statusBar().showMessage(_('Done'), 2000)
             return True
