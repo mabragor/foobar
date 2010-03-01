@@ -283,12 +283,12 @@ class Schedule(models.Model):
 
     def about(self):
         now = datetime.now()
-        if self.end > now:
-            status = 0
-        elif self.end + timedelta(minutes=15) < now:
+        if self.begin + timedelta(minutes=15) < now:
             status = 2
-        else:
+        elif now > self.begin:
             status = 1
+        else:
+            status = 0
         obj = {
             'id': self.pk,
             'room': self.room.about(),
