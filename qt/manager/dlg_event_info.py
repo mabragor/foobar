@@ -26,61 +26,44 @@ class DlgEventInfo(QDialog):
         self.parent = parent
         self.setMinimumWidth(600)
 
-        labelTitle = QLabel(_('Title'))
-        self.editTitle = QLineEdit()
-        self.editTitle.setReadOnly(True)
-        labelTitle.setBuddy(self.editTitle)
-
-        labelCoach = QLabel(_('Coach'))
-        self.editCoach = QLineEdit()
-        self.editCoach.setReadOnly(True)
-        labelCoach.setBuddy(self.editCoach)
+        self.editTitle = QLineEdit(); self.editTitle.setReadOnly(True)
+        self.editCoach = QLineEdit(); self.editCoach.setReadOnly(True)
+        self.editBegin = QDateTimeEdit(); self.editBegin.setReadOnly(True)
+        self.editDuration = QLineEdit(); self.editDuration.setReadOnly(True)
+        self.comboRoom = QComboBox(); self.comboRoom.setDisabled(True)
 
         labelChange = QLabel(_('Coach change'))
         self.comboChange = QComboBox()
         self.comboChange.addItem(_('No change'), QVariant(None))
-        labelChange.setBuddy(self.comboChange)
         self.buttonChange = QPushButton(_('Change'))
 
-        labelBegin = QLabel(_('Begin'))
-        self.editBegin = QDateTimeEdit()
-        self.editBegin.setReadOnly(True)
-        labelBegin.setBuddy(self.editBegin)
-
-        labelDuration = QLabel(_('Duration'))
-        self.editDuration = QLineEdit()
-        self.editDuration.setReadOnly(True)
-        labelDuration.setBuddy(self.editDuration)
-
-        labelRoom = QLabel(_('Room'))
-        self.comboRoom = QComboBox()
-        self.comboRoom.setDisabled(True)
-        labelRoom.setBuddy(self.comboRoom)
-
-        labelStatus = QLabel(_('Status'))
-        self.comboStatus = QComboBox()
-        self.comboStatus.addItem(_('Waiting'), QVariant(0))
-        self.comboStatus.addItem(_('Warning'), QVariant(1))
-        self.comboStatus.addItem(_('Passed'), QVariant(2))
-        labelStatus.setBuddy(self.comboStatus)
+        self.comboFix = QComboBox()
+        self.comboFix.addItem(_('Waiting'), QVariant(0))
+        self.comboFix.addItem(_('Done'), QVariant(1))
+        self.comboFix.addItem(_('Cancelled'), QVariant(2))
+        self.buttonFix = QPushButton(_('Fix'))
 
         groupLayout = QGridLayout()
         groupLayout.setColumnStretch(1, 1)
         groupLayout.setColumnMinimumWidth(1, 250)
 
-        groupLayout.addWidget(labelTitle, 0, 0)
+        groupLayout.addWidget(QLabel(_('Title')), 0, 0)
         groupLayout.addWidget(self.editTitle, 0, 1)
-        groupLayout.addWidget(labelCoach, 1, 0)
+        groupLayout.addWidget(QLabel(_('Coach')), 1, 0)
         groupLayout.addWidget(self.editCoach, 1, 1)
-        groupLayout.addWidget(labelChange, 2, 0)
+        groupLayout.addWidget(QLabel(_('Begin')), 3, 0)
+        groupLayout.addWidget(self.editBegin, 3, 1)
+        groupLayout.addWidget(QLabel(_('Duration')), 4, 0)
+        groupLayout.addWidget(self.editDuration, 4, 1)
+        groupLayout.addWidget(QLabel(_('Room')), 5, 0)
+        groupLayout.addWidget(self.comboRoom, 5, 1)
+        groupLayout.addWidget(QLabel(_('Fix as')), 6, 0)
+        groupLayout.addWidget(self.comboFix, 6, 1)
+        groupLayout.addWidget(self.buttonFix, 6, 2)
+
+        groupLayout.addWidget(QLabel(_('Coach change')), 2, 0)
         groupLayout.addWidget(self.comboChange, 2, 1)
         groupLayout.addWidget(self.buttonChange, 2, 2)
-        groupLayout.addWidget(labelBegin, 3, 0)
-        groupLayout.addWidget(self.editBegin, 3, 1)
-        groupLayout.addWidget(labelDuration, 4, 0)
-        groupLayout.addWidget(self.editDuration, 4, 1)
-        groupLayout.addWidget(labelRoom, 5, 0)
-        groupLayout.addWidget(self.comboRoom, 5, 1)
 
         self.buttonVisitors = QPushButton(_('Visitors'))
         self.buttonVisit = QPushButton(_('Visit'))
@@ -121,10 +104,14 @@ class DlgEventInfo(QDialog):
                      self.eventRemove)
         self.connect(self.buttonChange, SIGNAL('clicked()'),
                      self.changeCoach)
+        self.connect(self.buttonFix, SIGNAL('clicked()'),
+                     self.fixEvent)
         self.connect(self.buttonClose, SIGNAL('clicked()'),
                      self, SLOT('reject()'))
         self.connect(self.comboChange, SIGNAL('currentIndexChanged(int)'),
                      self.enableComboChange)
+        self.connect(self.comboFix, SIGNAL('currentIndexChanged(int)'),
+                     self.enableComboFix)
 
     def initData(self, schedule, room_id):
         ajax = HttpAjax(self, '/manager/get_coaches/',
@@ -149,13 +136,21 @@ class DlgEventInfo(QDialog):
         duration = (end - begin).seconds / 60
         self.editDuration.setText(str(duration))
         self.initRooms(int(room['id']))
-        self.comboStatus.setCurrentIndex( int(schedule['status']) )
+
         try:
-            index = int(schedule['change'])
-        except:
+            index = int(schedule.get('change', 0))
+        except ValueError:
             index = 0
         self.comboChange.setCurrentIndex(index)
         self.buttonChange.setDisabled(True)
+
+        try:
+            index = int(schedule.get('fixed', 0))
+        except ValueError:
+            index = 0
+        self.comboFix.setCurrentIndex(index)
+        self.buttonFix.setDisabled(True)
+
         self.buttonRemove.setDisabled( begin < datetime.now() )
 
     def initRooms(self, current_id):
@@ -237,6 +232,9 @@ class DlgEventInfo(QDialog):
     def enableComboChange(self, index):
         self.buttonChange.setDisabled(False)
 
+    def enableComboFix(self, index):
+        self.buttonFix.setDisabled(False)
+
     def changeCoach(self):
         index = self.comboChange.currentIndex()
         coach_id, ok = self.comboChange.itemData(index).toInt()
@@ -251,3 +249,18 @@ class DlgEventInfo(QDialog):
         else:
             message = _('Unable to change a coach.')
         QMessageBox.information(self, _('Coach change registration'), message)
+
+    def fixEvent(self):
+        index = self.comboFix.currentIndex()
+        fix_id, ok = self.comboFix.itemData(index).toInt()
+
+        params = {'event_id': self.schedule['id'],
+                  'fix_id': fix_id}
+        ajax = HttpAjax(self, '/manager/register_fix/',
+                        params, self.parent.session_id)
+        response = ajax.parse_json()
+        if response:
+            message = _('The event has been fixed.')
+        else:
+            message = _('Unable to fix this event.')
+        QMessageBox.information(self, _('Event fix registration'), message)

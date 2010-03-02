@@ -262,9 +262,8 @@ class Card(models.Model):
         return self.exp_date < datetime.now()
 
 class Schedule(models.Model):
-    ACTION_STATUSES = enumerate( (_('Waiting'),
-                                  _('Warning'),
-                                  _('Passed')) )
+    ACTION_STATUSES = enumerate( (_('Waiting'), _('Warning'), _('Passed')) )
+    ACTION_FIXED = enumerate( (_('Waiting'), _('Done'), _('Cancelled')) )
     room = models.ForeignKey(Room, verbose_name=_(u'Room'))
     team = models.ForeignKey(Team, verbose_name=_(u'Team'), null=True, blank=True)
     rent = models.ForeignKey(Rent, verbose_name=_(u'Rent'), null=True, blank=True)
@@ -272,6 +271,7 @@ class Schedule(models.Model):
     end = models.DateTimeField(verbose_name=_(u'Ends'))
     duration = models.FloatField(verbose_name=_(u'Duration'))
     status = models.CharField(verbose_name=_(u'Status'), max_length=1, choices=ACTION_STATUSES, null=True)
+    fixed = models.CharField(verbose_name=_(u'Fixed'), max_length=1, choices=ACTION_FIXED, null=True)
     change = models.ForeignKey(Coach, verbose_name=_(u'Change'), null=True, blank=True)
 
     class Meta:
@@ -284,17 +284,18 @@ class Schedule(models.Model):
     def about(self):
         now = datetime.now()
         if self.begin + timedelta(minutes=15) < now:
-            status = 2
+            status = 2 # passed
         elif now > self.begin:
-            status = 1
+            status = 1 # warning
         else:
-            status = 0
+            status = 0 # waiting
         obj = {
             'id': self.pk,
             'room': self.room.about(),
             'begin': self.begin,
             'end': self.end,
             'status': status,
+            'fixed': self.fixed,
         }
         if self.team:
             obj.update( {'type': 'training',

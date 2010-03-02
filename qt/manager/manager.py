@@ -386,7 +386,7 @@ class MainWindow(QMainWindow):
                              'ev_type': 0}, self.session_id)
             response = ajax.parse_json()
             id = int(response['saved_id'])
-            event = EventTraining(team, id, begin, duration, 0)
+            event = EventTraining(team, id, begin, duration, 0, 0)
             self.schedule.insertEvent(room, event)
 
 	self.dialog = DlgEventAssign('training', self)
@@ -413,7 +413,7 @@ class MainWindow(QMainWindow):
             ajax = HttpAjax(self, '/manager/cal_event_add/', params, self.session_id)
             response = ajax.parse_json()
             id = int(response['saved_id'])
-            event = EventRent(rent_id, id, begin, duration, rent['title'])
+            event = EventRent(rent_id, id, begin, duration, 0, 0)
             self.schedule.insertEvent(room, event)
 	self.dialog = DlgEventAssign('rent', self)
 	self.dialog.setModal(True)

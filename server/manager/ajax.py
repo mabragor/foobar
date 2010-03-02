@@ -131,6 +131,12 @@ def register_change(request, form):
     return abstract_response(request, form)
 
 @login_required
+@ajax_processor(forms.RegisterFix, isJavaScript)
+def register_fix(request, form):
+    signal_log_action.send(sender=request.user, action='register_fix')
+    return abstract_response(request, form)
+
+@login_required
 @ajax_processor(forms.CalendarEventAdd, isJavaScript)
 def cal_event_add(request, form):
     signal_log_action.send(sender=request.user, action='cal_event_add')

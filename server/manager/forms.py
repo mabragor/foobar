@@ -458,6 +458,22 @@ class RegisterChange(AjaxForm):
         event.save()
         return event.id
 
+class RegisterFix(AjaxForm):
+    """ Form registers the event's fix status. """
+
+    event_id = forms.IntegerField()
+    fix_id = forms.IntegerField()
+
+    def clean_event_id(self):
+        return self.check_obj_existence(storage.Schedule, 'event_id')
+
+    def save(self):
+        event = self.get_object('event_id')
+        fix = self.param('fix_id')
+        event.fixed = fix
+        event.save()
+        return event.id
+
 class DateRange(AjaxForm):
     """ Form acquires a date range and return the list of events inside
     this range. """

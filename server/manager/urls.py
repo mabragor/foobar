@@ -43,6 +43,7 @@ urlpatterns += patterns(
     url(r'^register_visit/$', 'register_visit'),
     url(r'^register_rent/$', 'register_rent'),
     url(r'^register_change/$', 'register_change'),
+    url(r'^register_fix/$', 'register_fix'),
     url(r'^get_visitors/$', 'get_visitors'),
     url(r'^get_rents/$', 'get_rents'),
     url(r'^get_coaches/$', 'get_coaches'),

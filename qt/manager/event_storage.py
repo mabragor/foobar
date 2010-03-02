@@ -20,11 +20,12 @@ class Event(object):
 
     """ Класс события. """
 
-    def __init__(self, id, begin, duration, status):
+    def __init__(self, id, begin, duration, status, fixed):
         self.schedule_id = id
         self.begin = begin
         self.duration = duration
         self.status = status
+        self.fixed = int(fixed)
 
     def __unicode__(self):
         return self.title
@@ -45,8 +46,8 @@ class EventTraining(Event):
 
     """ Класс тренировки. """
 
-    def __init__(self, team, schedule_id, begin, duration, status):
-        Event.__init__(self, schedule_id, begin, duration, status)
+    def __init__(self, team, schedule_id, begin, duration, status, fixed):
+        Event.__init__(self, schedule_id, begin, duration, status, fixed)
         self.type = 'training'
         self.event = team
 
@@ -54,8 +55,8 @@ class EventRent(Event):
 
     """ Класс аренды. """
 
-    def __init__(self, rent, schedule_id, begin, duration, status):
-        Event.__init__(self, schedule_id, begin, duration, status)
+    def __init__(self, rent, schedule_id, begin, duration, status, fixed):
+        Event.__init__(self, schedule_id, begin, duration, status, fixed)
         self.type = 'rent'
         self.event = rent
 
@@ -266,7 +267,7 @@ class EventStorage(QAbstractTableModel):
                 end = __(e['end'])
                 duration = end - begin
                 object = EventTraining if e['type'] == 'training' else EventRent
-                event = object(e['event'], e['id'], begin, duration, e['status'])
+                event = object(e['event'], e['id'], begin, duration, e['status'], e['fixed'])
                 self.insert( int(e['room']['id']), event )
             self.emit(SIGNAL('layoutChanged()'))
             self.parent.statusBar().showMessage(_('Done'), 2000)

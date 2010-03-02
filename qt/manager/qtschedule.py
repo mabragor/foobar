@@ -436,6 +436,15 @@ class QtScheduleDelegate(QItemDelegate):
                     ry = y+h-rh-1
                     painter.drawRect(rx, ry, rw, rh)
 
+                if isinstance(event, EventTraining) and event.show_type == 'tail':
+                    if event.fixed in (1, 2):
+                        if event.fixed == 1:
+                            self.prepare( painter, (Qt.green, 3) )
+                        if event.fixed == 2:
+                            self.prepare( painter, (Qt.blue, 3) )
+                        painter.drawLine(x+self.PADDING, y+h-self.PADDING-5,
+                                         x+self.PADDING+5, y+h-self.PADDING)
+
                 line_dir = self.direction(w, h)
                 if event.status == 1:
                     self.prepare( painter, (Qt.red, 3) )
