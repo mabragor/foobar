@@ -10,7 +10,7 @@ setup(name='pyqounter-manager',
       maintainer='Ruslan Popov',
       maintainer_email='ruslan.popov@gmail.com',
       url='http://snegiri.dontexist.org/pyqounter',
-      packages=['manager'],
-      package_dir={'manager': 'src/manager'},
-      package_data={'manager': ['locale/ru/LC_MESSAGES/*mo', 'manager.css']}
+      packages=['pyqounter-manager'],
+      package_dir={'pyqounter-manager': 'src/manager'},
+      package_data={'pyqounter-manager': ['locale/ru/LC_MESSAGES/*mo', 'manager.css']}
      )

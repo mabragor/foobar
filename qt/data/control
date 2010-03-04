@@ -1,14 +1,13 @@
 Source: <PROJECT>
-Section: shells
-Priority: optional
+Section: python
+Priority: extra
 Maintainer: <FULLNAME> <EMAIL>
-Build-Depends: debhelper (>=6.0.0), python-support (>= 0.6), cdbs (>= 0.4.49)
+Build-Depends: debhelper (>=6.0.0), python-support (>= 0.6)
 Standards-Version: 3.8.1
 
 Package: <PROJECT>
 Architecture: all
 Homepage: http://snegiri.dontexist.org/pyqounter/
-XB-Python-Version: ${python:Versions}
 Depends: ${misc:Depends}, ${python:Depends}
 Description: Manager interface of <PROJECT> system
  A lot of description will be here later.
