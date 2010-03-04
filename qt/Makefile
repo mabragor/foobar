@@ -24,7 +24,7 @@ debianize:
 	cd $(DEBBASE)/$(PROJECT)-$(VERSION)/; \
 	test -d debian || mkdir -p debian; \
 	test -f debian/changelog || debchange --create --package $(PROJECT) -v $(VERSION); \
-	test -f debian/compat || echo "6" >> ./debian/compat; \
+	test -f debian/compat || (test -f /etc/debian_version && echo "7" || echo "6") >> ./debian/compat; \
 	cp ../../data/rules ./debian/rules; \
 	sed -e "s/<PROJECT>/$(PROJECT)/" \
 	    -e "s/<FULLNAME>/$(DEBFULLNAME)/" \
