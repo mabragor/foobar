@@ -12,6 +12,7 @@ all:
 
 distmanager:
 	mkdir -p $(DST) $(DST)/$(LCL)
+	cd ./manager; make pomo; cd -
 	cp ./manager/*.py ./manager/*.css $(DST)/
 	cp ./manager/$(LCL)/*mo $(DST)/$(LCL)/
 	cp ./manager/install/* $(BASE)/
