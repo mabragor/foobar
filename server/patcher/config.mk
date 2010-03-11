@@ -1,2 +1,2 @@
 
-APPNAME=patch
+APPNAME=patcher

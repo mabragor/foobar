@@ -2,7 +2,7 @@ TOP_DIR=../..
 
 include $(TOP_DIR)/config.mk
 
-CURRENT_INSTALL_DIR=$(INSTALL_DJANGO_DIR)/$(PROJECTNAME)/locale/ru
+CURRENT_INSTALL_DIR=$(DESTDIR)/$(PROJECTNAME)/locale/ru
 SUBDIRS=LC_MESSAGES
 
 all: subdirs

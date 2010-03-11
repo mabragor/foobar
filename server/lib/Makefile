@@ -2,7 +2,7 @@ TOP_DIR=..
 
 include $(TOP_DIR)/config.mk
 
-CURRENT_INSTALL_DIR=$(INSTALL_DJANGO_DIR)/$(PROJECTNAME)/lib
+CURRENT_INSTALL_DIR=$(DESTDIR)/$(PROJECTNAME)/lib
 FILES=$(wildcard *.py)
 
 all:

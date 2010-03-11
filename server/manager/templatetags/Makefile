@@ -4,7 +4,7 @@ APP_DIR=..
 include $(TOP_DIR)/config.mk
 include $(APP_DIR)/config.mk
 
-CURRENT_INSTALL_DIR=$(INSTALL_DJANGO_DIR)/$(PROJECTNAME)/$(APPNAME)/templatetags
+CURRENT_INSTALL_DIR=$(DESTDIR)/$(PROJECTNAME)/$(APPNAME)/templatetags
 TEMPLATES=$(wildcard *.py)
 
 all:

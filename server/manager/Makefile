@@ -4,13 +4,15 @@ APP_DIR=.
 include $(TOP_DIR)/config.mk
 include $(APP_DIR)/config.mk
 
-CURRENT_INSTALL_DIR=$(INSTALL_DJANGO_DIR)/$(PROJECTNAME)/$(APPNAME)
+CURRENT_INSTALL_DIR=$(DESTDIR)/$(PROJECTNAME)/$(APPNAME)
 SUBDIRS=templatetags
 FILES=$(wildcard *.py)
 
 all: subdirs
 
 install: create_dir install_files install_subdirs
+	echo "CURRENT_INSTALL_DIR"
+	echo $(CURRENT_INSTALL_DIR)
 
 fixtures:
 	python $(TOP_DIR)/manage.py loaddata fixtures/initial_data.json

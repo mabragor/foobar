@@ -2,7 +2,7 @@ TOP_DIR=../..
 
 include $(TOP_DIR)/config.mk
 
-CURRENT_INSTALL_DIR=$(INSTALL_DJANGO_DIR)/$(PROJECTNAME)/templates/manager
+CURRENT_INSTALL_DIR=$(DESTDIR)/$(PROJECTNAME)/templates/manager
 TEMPLATES=$(wildcard *.html)
 SUBDIRS=
 

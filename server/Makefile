@@ -1,9 +1,8 @@
 include config.mk
 
-CURRENT_INSTALL_DIR=$(INSTALL_DJANGO_DIR)/$(PROJECTNAME)
+CURRENT_INSTALL_DIR=$(DESTDIR)/$(PROJECTNAME)
 FILES=$(wildcard *.py) $(wildcard *.wsgi)
-SUBDIRS=js css media lib locale \
-	patcher rfid storage templates
+SUBDIRS=lib locale manager patcher storage templates
 
 all: subdirs
 
@@ -15,7 +14,7 @@ help:
 	echo "translate  - prepare i18n"; \
 	echo "postscript - create PS of code"; \
 	echo "dbcreate   - create project's database"; \
-	echo "dbdrop     - drop project's database"; 
+	echo "dbdrop     - drop project's database";
 
 install: create_dir install_files install_subdirs chown_all
 
@@ -26,7 +25,7 @@ clean: clean_subdirs
 translate:
 	mkdir -p ./locale
 	for i in ru; do \
-		django-admin.py makemessages --locale $$i; \
+		PYTHONPATH=$(DJANGO_BASE):$(PYTHONPATH) $(DJANGO_BIN)/django-admin.py makemessages --locale $$i; \
 	done
 
 postscript:
@@ -62,3 +61,4 @@ dump:
 	mysqldump -u $(PROJECTNAME) -p $(PROJECTNAME) > $(PROJECTNAME).mysql.dump
 
 include targets.mk
+

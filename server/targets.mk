@@ -12,7 +12,7 @@ subdirs:
 install_subdirs:
 	for i in $(SUBDIRS) end-of-subdirs-list; do \
 		if [ $$i != end-of-subdirs-list ]; then \
-			cd $$i; $(MAKE) install; cd -; \
+			cd $$i; $(MAKE) DESTDIR=$(DESTDIR) install; cd -; \
 		fi; \
 	done
 

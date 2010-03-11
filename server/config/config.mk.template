@@ -4,7 +4,7 @@ PROJECTNAME=foobar
 OWNER=rad
 GROUP=rad
 
-INSTALL_DJANGO_DIR=/home/$(OWNER)/django.apps
+DESTDIR=/home/$(OWNER)/django.apps
 
 REGEXP_DEVEL_URL=http:\/\/$(PROJECTNAME)
 
