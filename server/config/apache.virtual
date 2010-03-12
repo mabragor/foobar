@@ -1,19 +1,15 @@
 <VirtualHost *>
-        ServerAdmin ADMIN_EMAIL
-        ServerName foobar
+	ServerAdmin ruslan.popov@gmail.com
+	ServerName pyqounter
+	
+	WSGIScriptAlias / /etc/django/pyqounter/django.wsgi
+	WSGIDaemonProcess pyqounter processes=10 maximum-requests=50 threads=1
+	WSGIProcessGroup pyqounter
+	
+	LogLevel debug
+	ErrorLog /var/log/apache2/error-pyqounter.log
+	CustomLog /var/log/apache2/access-pyqounter.log combined
+	ServerSignature On
 
-        WSGIScriptAlias / /home/USER_NAME/django.apps/foobar/django.wsgi
-        WSGIDaemonProcess foobar processes=2 maximum-requests=1 threads=1
-        WSGIProcessGroup foobar
-
-        LogLevel debug
-        ErrorLog /var/log/apache2/error-5five.log
-        CustomLog /var/log/apache2/access-5five.log combined
-        ServerSignature On
-
-        Alias /css/             "/home/USER_NAME/django.apps/foobar/css/"
-        Alias /js/              "/home/USER_NAME/django.apps/foobar/js/"
-        Alias /pics/            "/home/USER_NAME/django.apps/foobar/pics/"
-        Alias /media/           "/home/USER_NAME/django.apps/foobar/media/"
-        Alias /adminmedia/      "/home/USER_NAME/django.engine/django/contrib/admin/media/"
+	Alias /adminmedia/	"/usr/share/python-support/python-django/django/contrib/admin/media/"
 </VirtualHost>

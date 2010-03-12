@@ -1,0 +1,14 @@
+Source: pyqounter-server
+Section: python
+Priority: extra
+Maintainer: Ruslan Popov <ruslan.popov@gmail.com>
+Build-Depends: debhelper (>=6.0.0), python-support (>= 0.6)
+Standards-Version: 3.8.1
+
+Package: pyqounter-server
+Architecture: all
+Homepage: http://snegiri.dontexist.org/pyqounter/
+Tag: implemented-in::python, interface::web, protocol::http, role::program, scope::application
+Depends: python (>=2.5), python-json (>= 3.4), python-django (>= 1.1), mysql-server (>= 5.0), python-mysqldb, libapache2-mod-wsgi, apache2 (>= 2.2)
+Description: Server for pyqounter-manager system
+ A lot of description will be here later.

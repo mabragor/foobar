@@ -7,29 +7,25 @@ from settings import MIDDLEWARE_CLASSES, INSTALLED_APPS, TEMPLATE_LOADERS, TEMPL
 ADMINS = (('ADMIN NAME HERE', 'ADMIN EMAIL HERE'), )
 MANAGERS = ADMINS
 
-USER_NAME = 'rad'
-PROJECT_NAME = 'foobar'
-
-DATABASE_NAME = 'foobar'
-DATABASE_USER = 'foobar'
+DATABASE_NAME = 'pyqounter'
+DATABASE_USER = 'pyqounter'
 DATABASE_PASSWORD = 'q1'
 DATABASE_HOST = ''
 
-MEDIA_ROOT = '/home/%s/django.apps/%s/media' % (USER_NAME, PROJECT_NAME)
-MEDIA_URL = 'http://%s/media' % (PROJECT_NAME, )
-ADMIN_MEDIA_PREFIX = 'http://%s/adminmedia/' % (PROJECT_NAME, )
+MEDIA_ROOT = '/var/lib/rad/pyqounter/media'
+MEDIA_URL = 'http://pyqounter/media'
+ADMIN_MEDIA_PREFIX = 'http://pyqounter/adminmedia/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '+&oxu(m-yg6#0am-pdcxb%^#ok(*w&w6gtrh8grdc3m3$=s(#j'
 
 TEMPLATE_DIRS = (
-    '/home/%s/django.apps/%s/templates' % (USER_NAME, PROJECT_NAME),
+    '/usr/lib/rad/pyqounter-server/templates',
     )
 
 INSTALLED_APPS += (
     'manager',
     'patcher',
-    'rfid',
     'storage',
 )
 
@@ -51,15 +47,3 @@ CALENDAR_OPTIONS = {
     'timeslotHeight': 30
 }
 CHECK_STATUS_INTERVAL = 15  #minetes
-
-GOOGLE_ANALYTICS = """
-<script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
-try {
-var pageTracker = _gat._getTracker("UA-3919032-XXX");
-pageTracker._trackPageview();
-} catch(err) {}</script>
-"""

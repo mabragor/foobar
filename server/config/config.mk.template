@@ -1,10 +1,9 @@
-
-PROJECTNAME=foobar
+PROJECTNAME=pyqounter-server
 
 OWNER=rad
 GROUP=rad
 
-DESTDIR=/home/$(OWNER)/django.apps
+DESTDIR=/home/$(OWNER)/django.apps/$(PROJECT_NAME)
 
 REGEXP_DEVEL_URL=http:\/\/$(PROJECTNAME)
 

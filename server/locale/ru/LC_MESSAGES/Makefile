@@ -16,6 +16,6 @@ locale: $(FILES)
 
 %.mo: %.po
 	cd $(TOP_DIR); \
-	PYTHONPATH=$(DJANGO_BASE):$(PYTHONPATH) $(DJANGO_BIN)/django-admin.py compilemessages
+	django-admin compilemessages
 
 include $(TOP_DIR)/targets.mk
