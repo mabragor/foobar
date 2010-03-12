@@ -1,17 +1,41 @@
 #!/bin/bash -e
 
-if [ "$1" = "configure" ]; then
-    # remove link to configuration
-    rm /etc/django/pyqounter/settings.py
-    rm /etc/django/pyqounter/django.wsgi
+case "$1" in
+    remove)
+	# This package is being removed but its configuration has not yet been purged.
 
-    # virtual domain
-    grep -v pyqounter < /etc/hosts > /etc/hosts.tmp
-    mv /etc/hosts.tmp /etc/hosts
+	# virtual domain
+	grep -v pyqounter < /etc/hosts > /etc/hosts.tmp
+	mv /etc/hosts.tmp /etc/hosts
 
-    # disable apache virtualhost
-    a2dissite pyqounter
-    invoke-rc.d apache2 reload
-    
-    mv /etc/apache2/sites-available/pyqounter /etc/apache2/sites-available/pyqounter.old
-fi
+	# disable apache virtualhost
+	a2dissite pyqounter
+	invoke-rc.d apache2 reload
+
+	;;
+
+    purge)
+	# This package has previously been removed and is now having
+	# its configuration purged from the system.
+
+	# remove link to configuration
+	rm -rf /etc/django/pyqounter
+
+	# virtual domain
+	grep -v pyqounter < /etc/hosts > /etc/hosts.tmp
+	mv /etc/hosts.tmp /etc/hosts
+
+	# disable apache virtualhost
+	a2dissite pyqounter
+	invoke-rc.d apache2 reload
+
+	rm /etc/apache2/sites-available/pyqounter
+
+	;;
+
+    *)
+	echo "$0: didn't understand being called with \`$1'" 1>&2
+
+esac
+
+exit 0

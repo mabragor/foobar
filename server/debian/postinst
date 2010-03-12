@@ -1,14 +1,22 @@
 #!/bin/bash -e
 
-if [ "$1" = "configure" ]; then
-    # create link to configuration
-    ln -s /usr/lib/rad/pyqounter-server/settings_local.py /etc/django/pyqounter/settings.py
-    ln -s /usr/lib/rad/pyqounter-server/django.wsgi /etc/django/pyqounter/django.wsgi
+PROJECT_DIR=/usr/lib/rad/pyqounter-server
+CONFIG_DIR=/etc/django/pyqounter
 
-    # virtual domain
-    echo "127.0.0.1		pyqounter" >> /etc/hosts
+case "$1" in
 
-    cat > /etc/apache2/sites-available/pyqounter <<EOF
+    configure)
+	# Configure this package.  If the package must prompt the user for
+	# information, do it here.
+
+	# create link to configuration
+	ln -s ${PROJECT_DIR}/settings_local.py ${CONFIG_DIR}/settings.py
+	ln -s ${PROJECT_DIR}/django.wsgi ${CONFIG_DIR}/django.wsgi
+
+	# virtual domain
+	echo "127.0.0.1		pyqounter" >> /etc/hosts
+
+	cat > /etc/apache2/sites-available/pyqounter <<EOF
 <VirtualHost *>
 	ServerAdmin ruslan.popov@gmail.com
 	ServerName pyqounter
@@ -26,7 +34,25 @@ if [ "$1" = "configure" ]; then
 </VirtualHost>
 EOF
 
-    # enable apache virtualhost
-    a2ensite pyqounter
-    invoke-rc.d apache2 reload
-fi
+	# enable apache virtualhost
+	a2ensite pyqounter
+	invoke-rc.d apache2 reload
+
+	echo '----------------------------------------------------'
+	echo '  Do not forget to create database and run SYNCDB!  '
+	echo '----------------------------------------------------'
+	echo "CREATE USER pyqounter@localhost IDENTIFIED BY 'XXX';"
+	echo "CREATE DATABASE pyqounter;"
+	echo "GRANT ALL ON pyqounter.* TO pyqounter@localhost;"
+	echo '----------------------------------------------------'
+
+	;;
+
+    *) 
+	echo "$0: didn't understand being called with \`$1'" 1>&2
+
+	;;
+
+esac
+
+exit 0;
