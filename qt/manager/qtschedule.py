@@ -361,7 +361,7 @@ class QtSchedule(QTableView):
                 pass
         return QTableView.viewportEvent(self, event)
 
-from settings import XPM_EVENT_CLOSED
+#from settings import XPM_EVENT_CLOSED
 
 class QtScheduleDelegate(QItemDelegate):
 
