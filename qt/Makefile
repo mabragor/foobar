@@ -10,6 +10,11 @@ DEBBASE=debianize
 all:
 	echo "Usage: make distmanager"
 
+clean:
+	rm -rf ./build ./debianize
+
+build: distmanager debianize
+
 distmanager:
 	mkdir -p $(DST) $(DST)/$(LCL)
 	cd ./manager; make pomo; cd -
