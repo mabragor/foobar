@@ -17,7 +17,7 @@ case "$1" in
 	echo "127.0.0.1		pyqounter" >> /etc/hosts
 
 	cat > /etc/apache2/sites-available/pyqounter <<EOF
-<VirtualHost *>
+<VirtualHost *:80>
 	ServerAdmin ruslan.popov@gmail.com
 	ServerName pyqounter
 
