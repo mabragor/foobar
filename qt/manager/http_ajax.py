@@ -32,9 +32,9 @@ class HttpAjax(QObject):
         hostport = '%s:%s' % (self.host, self.port)
         if DEBUG:
             print 'HttpAjax:', hostport, '\n', headers
-        conn = httplib.HTTPConnection(hostport)
-        conn.request('POST', url, params, headers)
-        self.response = conn.getresponse()
+        self.conn = httplib.HTTPConnection(hostport)
+        self.conn.request('POST', url, params, headers)
+        self.response = self.conn.getresponse()
 
         # sessionid=d5b2996237b9044ba98c5622d6311c43;
         # expires=Tue, 09-Feb-2010 16:32:24 GMT;
@@ -56,7 +56,8 @@ class HttpAjax(QObject):
                 print 'session id is', session_id
             self.parent.setSessionID(session_id)
 
-        conn.close()
+    def __del__(self):
+        self.conn.close()
 
     def get_settings(self):
         self.settings = QSettings()
