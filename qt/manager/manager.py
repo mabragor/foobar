@@ -261,7 +261,6 @@ class MainWindow(QMainWindow):
 	dlgStatus = self.dialog.exec_()
 
 	if QDialog.Accepted == dlgStatus:
-            print 'may login', self.login, self.password
             params = {'login': self.login,
                       'password': self.password}
 	    ajax = HttpAjax(self, '/manager/login/',
@@ -278,12 +277,16 @@ class MainWindow(QMainWindow):
                 self.connect(self.refreshTimer, SIGNAL('timeout()'), self.schedule.model().update)
                 self.refreshTimer.start()
         else:
-            print 'rejected'
+            QMessageBox.warning(self, _('Login failed'),
+                                _('It seems you\'ve entered wrong login/password.'))
 
     def logout(self):
+        # Деактивировать элементы меню
+        for menu in self.menus[1:]:
+            menu.setDisabled(True)
         self.session_id = None
         self.setWindowTitle('%s : %s' % (self.baseTitle, _('Login to start session')))
-        self.scheduleModel.initModel()
+        self.scheduleModel.storage.init()
 
     def setupApp(self):
 	self.dialog = DlgSettings(self)
