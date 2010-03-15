@@ -8,6 +8,6 @@ Standards-Version: 3.8.1
 Package: <PROJECT>
 Architecture: all
 Homepage: http://snegiri.dontexist.org/pyqounter/
-Depends: python-qt4 (>= 4.4), python-dateutil (>=1.4)
+Depends: python-qt4 (>= 4.4), python-dateutil (>=1.4), python-serial (>=2.3)
 Description: Manager interface of <PROJECT> system
  A lot of description will be here later.
