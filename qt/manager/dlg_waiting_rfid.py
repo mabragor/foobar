@@ -3,11 +3,9 @@
 
 import serial, random, time
 
-import gettext
-gettext.bindtextdomain('project', './locale/')
-gettext.textdomain('project')
-_ = lambda a: unicode(gettext.gettext(a), 'utf8')
+from os.path import dirname, join
 
+from settings import _
 from settings import DEBUG, PORT
 
 from PyQt4.QtGui import *

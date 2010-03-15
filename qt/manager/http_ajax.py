@@ -5,12 +5,8 @@ import httplib, urllib, json, base64, string
 
 from dlg_settings import TabNetwork
 
+from settings import _
 from settings import DEBUG
-
-import gettext
-gettext.bindtextdomain('project', './locale/')
-gettext.textdomain('project')
-_ = lambda a: unicode(gettext.gettext(a), 'utf8')
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *

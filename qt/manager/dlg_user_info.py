@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
+from settings import _
 from model_sorting import SortClientTeams
 from team_list import TeamListModel, TeamListDelegate, TeamList
 from http_ajax import HttpAjax
@@ -9,11 +10,6 @@ from dlg_team_assign import DlgTeamAssign
 from dlg_rent_assign import DlgRentAssign
 
 from datetime import datetime
-
-import gettext
-gettext.bindtextdomain('project', './locale/')
-gettext.textdomain('project')
-_ = lambda a: unicode(gettext.gettext(a), 'utf8')
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *

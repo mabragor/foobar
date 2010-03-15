@@ -4,13 +4,9 @@
 import sys, re
 from datetime import datetime, timedelta
 
+from settings import _
 from http_ajax import HttpAjax
 from event_storage import Event, EventStorage, EventTraining, EventRent
-
-import gettext
-gettext.bindtextdomain('project', './locale/')
-gettext.textdomain('project')
-_ = lambda a: unicode(gettext.gettext(a), 'utf8')
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *

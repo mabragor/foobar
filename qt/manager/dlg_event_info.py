@@ -4,15 +4,12 @@
 import time
 from datetime import datetime
 
+from settings import _
 from event_storage import Event
 from http_ajax import HttpAjax
 from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_show_visitors import DlgShowVisitors
 
-import gettext
-gettext.bindtextdomain('project', './locale/')
-gettext.textdomain('project')
-_ = lambda a: unicode(gettext.gettext(a), 'utf8')
 __ = lambda x: datetime(*time.strptime(str(x), '%Y-%m-%d %H:%M:%S')[:6])
 
 from PyQt4.QtGui import *

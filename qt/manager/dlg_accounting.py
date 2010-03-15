@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
+from settings import _
 from settings import MODEL_PROPERTIES
 from http_ajax import HttpAjax
-
-import gettext
-gettext.bindtextdomain('project', './locale/')
-gettext.textdomain('project')
-_ = lambda a: unicode(gettext.gettext(a), 'utf8')
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *

@@ -5,11 +5,10 @@
 import sys, re, time
 from datetime import datetime, timedelta
 
-import gettext
-gettext.bindtextdomain('project', './locale/')
-gettext.textdomain('project')
-_ = lambda a: unicode(gettext.gettext(a), 'utf8')
+from os.path import dirname, join
+from settings import _
 
+from settings import _
 from http_ajax import HttpAjax
 from event_storage import EventTraining, EventRent, EventStorage
 from qtschedule import QtScheduleDelegate, QtSchedule
@@ -486,7 +485,7 @@ if __name__=="__main__":
 
     def readStyleSheet(fileName) :
         css = QString()
-        file = QFile(fileName)
+        file = QFile(join(dirname(__file__), fileName))
         if file.open(QIODevice.ReadOnly) :
                 css = QString(file.readAll())
                 file.close()

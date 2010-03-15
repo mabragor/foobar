@@ -4,12 +4,9 @@
 import sys, re, time
 from datetime import datetime, date, timedelta
 
-import gettext
-gettext.bindtextdomain('project', './locale/')
-gettext.textdomain('project')
-_ = lambda a: unicode(gettext.gettext(a), 'utf8')
-__ = lambda x: datetime(*time.strptime(str(x), '%Y-%m-%d %H:%M:%S')[:6])
+from os.path import dirname, join
 
+from settings import _
 from settings import userRoles
 from http_ajax import HttpAjax
 

@@ -2,13 +2,10 @@
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
 
 import time
-from  datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 
-import gettext
-gettext.bindtextdomain('project', './locale/')
-gettext.textdomain('project')
-_ = lambda a: unicode(gettext.gettext(a), 'utf8')
+from settings import _
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *

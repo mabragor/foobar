@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 # (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
 
+from settings import _
 from settings import userRoles
 from team_tree import TeamTree
-
-import gettext
-gettext.bindtextdomain('project', './locale/')
-gettext.textdomain('project')
-_ = lambda a: unicode(gettext.gettext(a), 'utf8')
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
