@@ -10,6 +10,8 @@ from settings import _
 from settings import userRoles
 from http_ajax import HttpAjax
 
+__ = lambda x: datetime(*time.strptime(str(x), '%Y-%m-%d %H:%M:%S')[:6])
+
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
