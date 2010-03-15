@@ -2,12 +2,12 @@ Source: <PROJECT>
 Section: python
 Priority: extra
 Maintainer: <FULLNAME> <EMAIL>
-Build-Depends: debhelper (>=6.0.0), python-support (>= 0.6), python-qt4 (>= 4.4), python-dateutil (>=1.4)
+Build-Depends: debhelper (>=6.0.0), python-support (>= 0.6)
 Standards-Version: 3.8.1
 
 Package: <PROJECT>
 Architecture: all
 Homepage: http://snegiri.dontexist.org/pyqounter/
-Depends: ${misc:Depends}, ${python:Depends}
+Depends: python-qt4 (>= 4.4), python-dateutil (>=1.4)
 Description: Manager interface of <PROJECT> system
  A lot of description will be here later.
