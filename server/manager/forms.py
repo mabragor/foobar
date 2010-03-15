@@ -537,13 +537,13 @@ class CalendarEventAdd(AjaxForm):
             obj = storage.Team.objects.get(id=data['event_id'])
             end = begin + timedelta(minutes=(60 * obj.duration))
             event = storage.Schedule(
-                team= obj, room=room, status=0,
+                team= obj, room=room, status=0, fixed=0,
                 begin=begin, end=end, duration=obj.duration)
         else:
             end = begin + timedelta(minutes=(60 * data['duration']))
+            obj = storage.Rent.objects.get(id=data['event_id'])
             event = storage.Schedule(
-                rent=storage.Rent.objects.get(id=data['event_id']),
-                room=room, status=0,
+                rent=obj, room=room, status=0, fixed=0,
                 begin=begin, end=end, duration=data['duration'])
         event.save()
         return event.id
