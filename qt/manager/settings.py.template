@@ -9,6 +9,12 @@ userRoles = {
     'getObjectID': Qt.UserRole,
 }
 
+import gettext
+from os.path import dirname, join
+gettext.bindtextdomain('project', join(dirname(__file__), 'locale'))
+gettext.textdomain('project')
+_ = lambda a: unicode(gettext.gettext(a), 'utf8')
+
 PORT = {
     'name': '/dev/ttyUSB0',
     'rate': 38400,
