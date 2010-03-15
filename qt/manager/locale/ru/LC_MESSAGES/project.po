@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-27 00:45+0300\n"
+"POT-Creation-Date: 2010-03-16 01:00+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Ruslan Popov <ruslan.popov@gmail.com>\n"
 "Language-Team: LANGUAGE <RU@li.org>\n"
@@ -16,449 +16,472 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: dlg_accounting.py:23
+#: dlg_accounting.py:19
 msgid "Resource"
 msgstr "Ресурс"
 
-#: dlg_accounting.py:23 dlg_accounting.py:108
+#: dlg_accounting.py:19 dlg_accounting.py:104
 msgid "Count"
 msgstr "Количество"
 
-#: dlg_accounting.py:23
+#: dlg_accounting.py:19
 msgid "Action"
 msgstr "Действие"
 
-#: dlg_accounting.py:32
+#: dlg_accounting.py:28
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: dlg_accounting.py:35 dlg_event_info.py:88 dlg_show_visitors.py:35
+#: dlg_accounting.py:31 dlg_event_info.py:68 dlg_show_visitors.py:31
 msgid "Close"
 msgstr "Закрыть"
 
-#: dlg_accounting.py:50 manager.py:216
+#: dlg_accounting.py:46 manager.py:215
 msgid "Accounting"
 msgstr "Учёт"
 
-#: dlg_accounting.py:76
+#: dlg_accounting.py:72
 msgid "Add"
 msgstr "Добавить"
 
-#: dlg_accounting.py:110 team_list.py:27
+#: dlg_accounting.py:106 team_list.py:24
 msgid "Price"
 msgstr "Цена"
 
-#: dlg_accounting.py:113 dlg_copy_week.py:26 dlg_settings.py:25
-#: dlg_user_info.py:72 dlg_user_info.py:246
+#: dlg_accounting.py:109 dlg_copy_week.py:23 dlg_settings.py:22
+#: dlg_user_info.py:68 dlg_user_info.py:242
 msgid "Apply"
 msgstr "Применить"
 
-#: dlg_accounting.py:114 dlg_copy_week.py:27 dlg_event_assign.py:78
-#: dlg_login.py:41 dlg_rent_assign.py:73 dlg_searching.py:32
-#: dlg_settings.py:26 dlg_team_assign.py:65 dlg_user_info.py:73
-#: dlg_user_info.py:247 dlg_waiting_rfid.py:30
+#: dlg_accounting.py:110 dlg_copy_week.py:24 dlg_event_assign.py:74
+#: dlg_login.py:37 dlg_rent_assign.py:70 dlg_searching.py:28
+#: dlg_settings.py:23 dlg_team_assign.py:61 dlg_user_info.py:69
+#: dlg_user_info.py:243 dlg_waiting_rfid.py:28
 msgid "Cancel"
 msgstr "Отмена"
 
-#: dlg_accounting.py:131
+#: dlg_accounting.py:127
 msgid "Add resource"
 msgstr "Добавить ресурс"
 
-#: dlg_accounting.py:141 dlg_event_assign.py:152 dlg_event_info.py:63
-#: http_ajax.py:75 http_ajax.py:81 manager.py:310
+#: dlg_accounting.py:137 dlg_event_assign.py:148 http_ajax.py:72
+#: http_ajax.py:78 manager.py:318
 msgid "Warning"
 msgstr "Внимание"
 
-#: dlg_accounting.py:141
+#: dlg_accounting.py:137
 msgid "Improper values."
 msgstr "Неверные значения."
 
-#: dlg_copy_week.py:44
+#: dlg_copy_week.py:41
 msgid "Choose a week to copy to"
 msgstr "Выберите неделю для копирования в неё"
 
-#: dlg_event_assign.py:25
+#: dlg_event_assign.py:21
 msgid "Date"
 msgstr "Дата"
 
-#: dlg_event_assign.py:32
+#: dlg_event_assign.py:28
 msgid "Time"
 msgstr "Время"
 
-#: dlg_event_assign.py:39 dlg_event_info.py:55
+#: dlg_event_assign.py:35 dlg_event_info.py:55
 msgid "Room"
 msgstr "Зал"
 
-#: dlg_event_assign.py:55 dlg_event_info.py:50
+#: dlg_event_assign.py:51 dlg_event_info.py:53
 msgid "Duration"
 msgstr "Длительность"
 
-#: dlg_event_assign.py:73 dlg_team_assign.py:61
+#: dlg_event_assign.py:69 dlg_team_assign.py:57
 msgid "Available teams"
 msgstr "Доступные группы"
 
-#: dlg_event_assign.py:77 dlg_rent_assign.py:72 dlg_team_assign.py:64
+#: dlg_event_assign.py:73 dlg_rent_assign.py:69 dlg_team_assign.py:60
 msgid "Assign"
 msgstr "Назначить"
 
-#: dlg_event_assign.py:86 manager.py:197
+#: dlg_event_assign.py:82 manager.py:196
 msgid "Renter"
 msgstr "Арендатор"
 
-#: dlg_event_assign.py:86 dlg_event_info.py:60 dlg_rent_assign.py:33
-#: dlg_user_info.py:231
+#: dlg_event_assign.py:82 dlg_rent_assign.py:30 dlg_user_info.py:227
 msgid "Status"
 msgstr "Статус"
 
-#: dlg_event_assign.py:86 dlg_event_info.py:29 dlg_rent_assign.py:21
-#: dlg_user_info.py:231 team_list.py:27
+#: dlg_event_assign.py:82 dlg_event_info.py:47 dlg_rent_assign.py:18
+#: dlg_user_info.py:227 team_list.py:24
 msgid "Title"
 msgstr "Название"
 
-#: dlg_event_assign.py:87 dlg_event_info.py:45 dlg_rent_assign.py:45
-#: dlg_user_info.py:232 team_list.py:30
+#: dlg_event_assign.py:83 dlg_event_info.py:51 dlg_rent_assign.py:42
+#: dlg_user_info.py:228 team_list.py:27
 msgid "Begin"
 msgstr "Начало"
 
-#: dlg_event_assign.py:87 dlg_rent_assign.py:52 dlg_user_info.py:232
+#: dlg_event_assign.py:83 dlg_rent_assign.py:49 dlg_user_info.py:228
 msgid "End"
 msgstr "Конец"
 
-#: dlg_event_assign.py:93
+#: dlg_event_assign.py:89
 msgid "Rents"
 msgstr "Аренда"
 
-#: dlg_event_assign.py:100 dlg_event_assign.py:111 dlg_rent_assign.py:31
-#: dlg_user_info.py:288
+#: dlg_event_assign.py:96 dlg_event_assign.py:107 dlg_rent_assign.py:28
+#: dlg_user_info.py:284
 msgid "Reserved"
 msgstr "Забронировано"
 
-#: dlg_event_assign.py:101 dlg_event_assign.py:111 dlg_rent_assign.py:31
-#: dlg_user_info.py:288
+#: dlg_event_assign.py:97 dlg_event_assign.py:107 dlg_rent_assign.py:28
+#: dlg_user_info.py:284
 msgid "Paid partially"
 msgstr "Оплачено частично"
 
-#: dlg_event_assign.py:102 dlg_event_assign.py:111 dlg_rent_assign.py:31
-#: dlg_rent_assign.py:38 dlg_user_info.py:231 dlg_user_info.py:288
+#: dlg_event_assign.py:98 dlg_event_assign.py:107 dlg_rent_assign.py:28
+#: dlg_rent_assign.py:35 dlg_user_info.py:227 dlg_user_info.py:284
 msgid "Paid"
 msgstr "Оплачено"
 
-#: dlg_event_assign.py:122
+#: dlg_event_assign.py:118
 msgid "Assign the event"
 msgstr "Назначить событие."
 
-#: dlg_event_assign.py:153
+#: dlg_event_assign.py:149
 msgid "What team do you want to assign?"
 msgstr "Какую команду вы собирались назначить?"
 
-#: dlg_event_assign.py:154
+#: dlg_event_assign.py:150
 msgid "Choose the team on the team's tree."
 msgstr "Выберите команду на дереве команд."
 
-#: dlg_event_info.py:34
-msgid "Coach"
-msgstr "Тренер"
-
-#: dlg_event_info.py:39
+#: dlg_event_info.py:32 dlg_event_info.py:61
 msgid "Coach change"
 msgstr "Замена тренера"
 
-#: dlg_event_info.py:41
+#: dlg_event_info.py:34
 msgid "No change"
 msgstr "Нет замены"
 
-#: dlg_event_info.py:43
+#: dlg_event_info.py:35
 msgid "Change"
 msgstr "Замена"
 
-#: dlg_event_info.py:62
+#: dlg_event_info.py:38
 msgid "Waiting"
 msgstr "Ожидание"
 
-#: dlg_event_info.py:64
-msgid "Passed"
-msgstr "Пройдено"
+#: dlg_event_info.py:39 event_storage.py:272
+msgid "Done"
+msgstr "Завершено"
 
-#: dlg_event_info.py:85 dlg_show_visitors.py:32
+#: dlg_event_info.py:40 team_list.py:28
+msgid "Cancelled"
+msgstr "Отменено"
+
+#: dlg_event_info.py:41
+msgid "Fix"
+msgstr "Закрыть"
+
+#: dlg_event_info.py:49
+msgid "Coach"
+msgstr "Тренер"
+
+#: dlg_event_info.py:57
+msgid "Fix as"
+msgstr "Закрыть как"
+
+#: dlg_event_info.py:65 dlg_show_visitors.py:28
 msgid "Visitors"
 msgstr "Посетители"
 
-#: dlg_event_info.py:86
+#: dlg_event_info.py:66
 msgid "Visit"
 msgstr "Посещение"
 
-#: dlg_event_info.py:87
+#: dlg_event_info.py:67
 msgid "Remove"
 msgstr "Удалить"
 
-#: dlg_event_info.py:104 manager.py:204
+#: dlg_event_info.py:84 manager.py:203
 msgid "Event"
 msgstr "Событие"
 
-#: dlg_event_info.py:200
+#: dlg_event_info.py:192
 msgid "The client is registered on this event."
 msgstr "Клиент зарегистрирован на это событие."
 
-#: dlg_event_info.py:202
+#: dlg_event_info.py:194
 msgid "Unable to register the visit!"
 msgstr "Невозможно зарегистрировать посещение!"
 
-#: dlg_event_info.py:203
+#: dlg_event_info.py:195
 msgid "Client registration"
 msgstr "Регистрация клиента"
 
-#: dlg_event_info.py:209
+#: dlg_event_info.py:201
 msgid "Event remove"
 msgstr "Удаление события"
 
-#: dlg_event_info.py:210
+#: dlg_event_info.py:202
 msgid "Are you sure to remove this event from the calendar?"
 msgstr "Вы уверены, что желаете удалить это событие с календаря?"
 
-#: dlg_event_info.py:222 dlg_event_info.py:226
+#: dlg_event_info.py:214 dlg_event_info.py:218
 msgid "Event removing"
 msgstr "Удаление событие"
 
-#: dlg_event_info.py:223 qtschedule.py:211
+#: dlg_event_info.py:215 qtschedule.py:207
 msgid "Complete."
 msgstr "Выполнено."
 
-#: dlg_event_info.py:227
+#: dlg_event_info.py:219
 msgid "Unable to remove this event!"
 msgstr "Невозможно удалить это событие!"
 
-#: dlg_event_info.py:250
+#: dlg_event_info.py:245
 msgid "The coach of this event has been changed."
 msgstr "Тренер для данного события был заменён."
 
-#: dlg_event_info.py:252
+#: dlg_event_info.py:247
 msgid "Unable to change a coach."
 msgstr "Невозможно заменить тренера."
 
-#: dlg_event_info.py:253
+#: dlg_event_info.py:248
 msgid "Coach change registration"
 msgstr "Регистрация замены тренера"
 
-#: dlg_login.py:23
+#: dlg_event_info.py:260
+msgid "The event has been fixed."
+msgstr "Событие было закрыто."
+
+#: dlg_event_info.py:262
+msgid "Unable to fix this event."
+msgstr "Невозможно закрыть это событие."
+
+#: dlg_event_info.py:263
+msgid "Event fix registration"
+msgstr "Регистрация закрытия события"
+
+#: dlg_login.py:19
 msgid "Login"
 msgstr "Логин"
 
-#: dlg_login.py:28
+#: dlg_login.py:24
 msgid "Password"
 msgstr "Пароль"
 
-#: dlg_login.py:40
+#: dlg_login.py:36
 msgid "Ok"
 msgstr "ОК"
 
-#: dlg_login.py:58
+#: dlg_login.py:54
 msgid "Authentication"
 msgstr "Аутентификация"
 
-#: dlg_rent_assign.py:27
+#: dlg_rent_assign.py:24
 msgid "Description"
 msgstr "Описание"
 
-#: dlg_rent_assign.py:85
+#: dlg_rent_assign.py:82
 msgid "Rent registration"
 msgstr "Регистрация аренды"
 
-#: dlg_searching.py:23
+#: dlg_searching.py:19
 msgid "Search"
 msgstr "Поиск"
 
-#: dlg_searching.py:31
+#: dlg_searching.py:27
 msgid "Find"
 msgstr "Найти"
 
-#: dlg_searching.py:44 dlg_show_visitors.py:22 dlg_user_info.py:43
-#: dlg_user_info.py:215 dlg_user_info.py:322
+#: dlg_searching.py:40 dlg_show_visitors.py:18 dlg_user_info.py:39
+#: dlg_user_info.py:211 dlg_user_info.py:318
 msgid "Last name"
 msgstr "Фамилия"
 
-#: dlg_searching.py:45 dlg_show_visitors.py:23 dlg_user_info.py:45
-#: dlg_user_info.py:217 dlg_user_info.py:323
+#: dlg_searching.py:41 dlg_show_visitors.py:19 dlg_user_info.py:41
+#: dlg_user_info.py:213 dlg_user_info.py:319
 msgid "First name"
 msgstr "Имя"
 
-#: dlg_searching.py:46 dlg_user_info.py:47 dlg_user_info.py:219
-#: dlg_user_info.py:324
+#: dlg_searching.py:42 dlg_user_info.py:43 dlg_user_info.py:215
+#: dlg_user_info.py:320
 msgid "E-mail"
 msgstr "Е-почта"
 
-#: dlg_searching.py:57
+#: dlg_searching.py:53
 msgid "Results"
 msgstr "Результаты"
 
-#: dlg_searching.py:61
+#: dlg_searching.py:57
 msgid "Show"
 msgstr "Показать"
 
-#: dlg_searching.py:79
+#: dlg_searching.py:75
 msgid "Search client by name"
 msgstr "Найти клиента по имени"
 
-#: dlg_searching.py:81
+#: dlg_searching.py:77
 msgid "Search renter by name"
 msgstr "Найти арендатора по имени"
 
-#: dlg_settings.py:20
+#: dlg_settings.py:17
 msgid "General"
 msgstr "Общие"
 
-#: dlg_settings.py:21
+#: dlg_settings.py:18
 msgid "Network"
 msgstr "Сеть"
 
-#: dlg_settings.py:43
+#: dlg_settings.py:40
 msgid "Settings"
 msgstr "Настройки"
 
-#: dlg_settings.py:118
+#: dlg_settings.py:115
 msgid "HTTP server (address/port)"
 msgstr "HTTP сервер (адрес/порт)"
 
-#: dlg_settings.py:127
+#: dlg_settings.py:124
 msgid "Use HTTP proxy"
 msgstr "Использовать HTTP прокси"
 
-#: dlg_settings.py:130
+#: dlg_settings.py:127
 msgid "HTTP proxy settings"
 msgstr "Настройки HTTP прокси"
 
-#: dlg_settings.py:132
+#: dlg_settings.py:129
 msgid "Address and port"
 msgstr "Адрес и порт"
 
-#: dlg_settings.py:139
+#: dlg_settings.py:136
 msgid "Login and password"
 msgstr "Логин и пароль"
 
-#: dlg_show_visitors.py:24
+#: dlg_show_visitors.py:20
 msgid "Type"
 msgstr "Тип"
 
-#: dlg_show_visitors.py:48
+#: dlg_show_visitors.py:44
 msgid "Registered visitors"
 msgstr "Зарегистрированные посетители"
 
-#: dlg_team_assign.py:23
+#: dlg_team_assign.py:19
 msgid "Type of card"
 msgstr "Тип карты"
 
-#: dlg_team_assign.py:26 team_list.py:123
+#: dlg_team_assign.py:22 team_list.py:120
 msgid "Normal"
 msgstr "Обычная"
 
-#: dlg_team_assign.py:27 team_list.py:123
+#: dlg_team_assign.py:23 team_list.py:120
 msgid "Club"
 msgstr "Клубная"
 
-#: dlg_team_assign.py:29
+#: dlg_team_assign.py:25
 msgid "Team starts"
 msgstr "Команда начинается"
 
-#: dlg_team_assign.py:36
+#: dlg_team_assign.py:32
 msgid "Team ends after"
 msgstr "Курс завершается после"
 
-#: dlg_team_assign.py:39
+#: dlg_team_assign.py:35
 msgid "3 months"
 msgstr "3 месяцев"
 
-#: dlg_team_assign.py:40
+#: dlg_team_assign.py:36
 msgid "6 months"
 msgstr "6 месяцев"
 
-#: dlg_team_assign.py:41
+#: dlg_team_assign.py:37
 msgid "9 months"
 msgstr "9 месяцев"
 
-#: dlg_team_assign.py:42
+#: dlg_team_assign.py:38
 msgid "12 months"
 msgstr "12 месяцев"
 
-#: dlg_team_assign.py:78
+#: dlg_team_assign.py:74
 msgid "Choose the team"
 msgstr "Выберите команду"
 
-#: dlg_user_info.py:49
+#: dlg_user_info.py:45
 msgid "Phone"
 msgstr "Телефон"
 
-#: dlg_user_info.py:51
+#: dlg_user_info.py:47
 msgid "Discount"
 msgstr "Скидка"
 
-#: dlg_user_info.py:53
+#: dlg_user_info.py:49
 msgid "Date of birth"
 msgstr "Дата рождения"
 
-#: dlg_user_info.py:55
+#: dlg_user_info.py:51
 msgid "RFID"
 msgstr "RFID"
 
-#: dlg_user_info.py:58 dlg_user_info.py:228
+#: dlg_user_info.py:54 dlg_user_info.py:224
 msgid "Base data"
 msgstr "Общие данные"
 
-#: dlg_user_info.py:67
+#: dlg_user_info.py:63
 msgid "Teams' history"
 msgstr "История команд"
 
-#: dlg_user_info.py:70
+#: dlg_user_info.py:66
 msgid "Assign RFID"
 msgstr "Назначить RFID"
 
-#: dlg_user_info.py:71
+#: dlg_user_info.py:67
 msgid "Assign team"
 msgstr "Назначить команду"
 
-#: dlg_user_info.py:97
+#: dlg_user_info.py:93
 msgid "Client's information"
 msgstr "Информация о клиенте"
 
-#: dlg_user_info.py:221 dlg_user_info.py:327
+#: dlg_user_info.py:217 dlg_user_info.py:323
 msgid "Mobile phone"
 msgstr "Мобильный телефон"
 
-#: dlg_user_info.py:223 dlg_user_info.py:328
+#: dlg_user_info.py:219 dlg_user_info.py:324
 msgid "Work phone"
 msgstr "Рабочий телефон"
 
-#: dlg_user_info.py:225 dlg_user_info.py:329
+#: dlg_user_info.py:221 dlg_user_info.py:325
 msgid "Home phone"
 msgstr "Домашний телефон"
 
-#: dlg_user_info.py:232
+#: dlg_user_info.py:228
 msgid "Registered"
 msgstr "Зарегистрировано"
 
-#: dlg_user_info.py:242
+#: dlg_user_info.py:238
 msgid "Rents' history"
 msgstr "История аренды"
 
-#: dlg_user_info.py:245
+#: dlg_user_info.py:241
 msgid "Assign rent"
 msgstr "Назначить аренду"
 
-#: dlg_user_info.py:268
+#: dlg_user_info.py:264
 msgid "Renter's information"
 msgstr "Информация об арендаторе"
 
-#: dlg_user_info.py:333
+#: dlg_user_info.py:329
 msgid "Phones"
 msgstr "Телефоны"
 
-#: dlg_user_info.py:336
+#: dlg_user_info.py:332
 msgid "Dialog error"
 msgstr "Ошибка в диалоге"
 
-#: dlg_waiting_rfid.py:27
+#: dlg_waiting_rfid.py:25
 msgid "Put the RFID label on to the RFID reader, please."
 msgstr "Приложите RFID метку к считывателю, пожалуйста."
 
-#: dlg_waiting_rfid.py:34
+#: dlg_waiting_rfid.py:32
 msgid "RFID reader"
 msgstr "RFID считыватель"
 
@@ -498,227 +521,227 @@ msgstr "Воскресенье"
 msgid "Day"
 msgstr "День"
 
-#: event_storage.py:240
+#: event_storage.py:249
 msgid "Request information for the calendar."
 msgstr "Запрос информации для календаря."
 
-#: event_storage.py:246
+#: event_storage.py:255
 msgid "Parsing the response..."
 msgstr "Обработка результата..."
 
-#: event_storage.py:249
+#: event_storage.py:258
 msgid "No reply"
 msgstr "Нет отклика"
 
-#: event_storage.py:251
+#: event_storage.py:260
 msgid "Filling the calendar..."
 msgstr "Заполнение календаря..."
 
-#: event_storage.py:263
-msgid "Done"
-msgstr "Завершено"
-
-#: http_ajax.py:82
+#: http_ajax.py:79
 msgid "Authenticate yourself."
 msgstr "Зарегистрируйтесь в системе."
 
-#: http_ajax.py:88
+#: http_ajax.py:85
 msgid "HTTP Error"
 msgstr "Ошибка HTTP"
 
-#: manager.py:57
+#: manager.py:56
 msgid "Manager's interface"
 msgstr "Интерфейс менеджера"
 
-#: manager.py:59
+#: manager.py:58
 msgid "Ready"
 msgstr "Готовность"
 
-#: manager.py:69 manager.py:279
+#: manager.py:68 manager.py:287
 msgid "Login to start session"
 msgstr "Зарегистрируйтесь для начала сессии"
 
-#: manager.py:73
+#: manager.py:72
 #, python-format
 msgid "Filter: Room \"%s\" is changed its state"
 msgstr "Фильтрация: Зал \"%s\" изменил своё состояние"
 
-#: manager.py:93
+#: manager.py:92
 msgid "<<"
 msgstr "<<"
 
-#: manager.py:94
+#: manager.py:93
 msgid ">>"
 msgstr ">>"
 
-#: manager.py:95
+#: manager.py:94
 msgid "Today"
 msgstr "Сегодня"
 
-#: manager.py:116
+#: manager.py:115
 msgid "Week:"
 msgstr "Неделя:"
 
-#: manager.py:175 manager.py:227
+#: manager.py:174 manager.py:226
 msgid "File"
 msgstr "Файл"
 
-#: manager.py:176
+#: manager.py:175
 msgid "Log in"
 msgstr "Подключить"
 
-#: manager.py:177
+#: manager.py:176
 msgid "Start user session."
 msgstr "Начать пользовательскую сессию"
 
-#: manager.py:178
+#: manager.py:177
 msgid "Log out"
 msgstr "Отключить"
 
-#: manager.py:179
+#: manager.py:178
 msgid "End user session."
 msgstr "Завершить пользовательскую сессию"
 
-#: manager.py:181
+#: manager.py:180
 msgid "Application settings"
 msgstr "Настройки приложения"
 
-#: manager.py:182
+#: manager.py:181
 msgid "Manage the application settings."
 msgstr "Управление настройками приложения."
 
-#: manager.py:184
+#: manager.py:183
 msgid "Exit"
 msgstr "Выход"
 
-#: manager.py:185
+#: manager.py:184
 msgid "Close the application."
 msgstr "Закрыть приложение"
 
-#: manager.py:188
+#: manager.py:187
 msgid "Client"
 msgstr "Клиент"
 
-#: manager.py:189 manager.py:198
+#: manager.py:188 manager.py:197
 msgid "New"
 msgstr "Новый"
 
-#: manager.py:190
+#: manager.py:189
 msgid "Register new client."
 msgstr "Регистрация нового клиента."
 
-#: manager.py:191
+#: manager.py:190
 msgid "Search by RFID"
 msgstr "Поиск по RFID"
 
-#: manager.py:192
+#: manager.py:191
 msgid "Search a client with its RFID card."
 msgstr "Поиск клиента по его RFID метке."
 
-#: manager.py:193 manager.py:200
+#: manager.py:192 manager.py:199
 msgid "Search by name"
 msgstr "Поиск по имени"
 
-#: manager.py:194
+#: manager.py:193
 msgid "Search a client with its name."
 msgstr "Найти клиента по его имени."
 
-#: manager.py:199
+#: manager.py:198
 msgid "Register new renter."
 msgstr "Регистрация нового арендатора."
 
-#: manager.py:201
+#: manager.py:200
 msgid "Search a renter with its name."
 msgstr "Найти арендатора по его имени."
 
-#: manager.py:205
+#: manager.py:204
 msgid "Training"
 msgstr "Тренировка"
 
-#: manager.py:206
+#: manager.py:205
 msgid "Assign a training event."
 msgstr "Назначить тренировку."
 
-#: manager.py:207
+#: manager.py:206
 msgid "Rent"
 msgstr "Аренда"
 
-#: manager.py:208
+#: manager.py:207
 msgid "Assign a rent event."
 msgstr "Назначить аренду."
 
-#: manager.py:211
+#: manager.py:210
 msgid "Calendar"
 msgstr "Календарь"
 
-#: manager.py:212
+#: manager.py:211
 msgid "Copy week"
 msgstr "Копировать неделю"
 
-#: manager.py:213
+#: manager.py:212
 msgid "Copy current week into other."
 msgstr "Копировать текущую неделю в другую."
 
-#: manager.py:217
+#: manager.py:216
 msgid "Add resources"
 msgstr "Добавить ресурсы"
 
-#: manager.py:218
+#: manager.py:217
 msgid "Add new set of resources into accounting."
 msgstr "Добавить новый набор ресурсов в учётную систему."
 
-#: manager.py:311
+#: manager.py:279
+msgid "Login failed"
+msgstr "Логин не прошёл"
+
+#: manager.py:280
+msgid "It seems you've entered wrong login/password."
+msgstr "Кажется, вы ввели неправильный логин/пароль."
+
+#: manager.py:319
 msgid "This RFID belongs to nobody."
 msgstr "Данная RFID метка никому не принадлежит."
 
-#: manager.py:427 manager.py:443
+#: manager.py:435 manager.py:451
 msgid "The week has been copied sucessfully."
 msgstr "Неделя была скопирована успешно."
 
-#: qtschedule.py:72
+#: qtschedule.py:68
 msgid "Exchange rooms"
 msgstr "Обмен залов"
 
-#: qtschedule.py:73
+#: qtschedule.py:69
 msgid "Exchange rooms between selected and current events."
 msgstr "Обмен залов между выбранным и текущим событием."
 
-#: qtschedule.py:213
+#: qtschedule.py:209
 msgid "Unable to exchange."
 msgstr "Невозможно обменять."
 
-#: team_list.py:28
+#: team_list.py:25
 msgid "Card"
 msgstr "Карта"
 
-#: team_list.py:29
+#: team_list.py:26
 msgid "Sold"
 msgstr "Продано"
 
-#: team_list.py:29
+#: team_list.py:26
 msgid "Used"
 msgstr "Использовано"
 
-#: team_list.py:30
+#: team_list.py:27
 msgid "Assigned"
 msgstr "Назначено"
 
-#: team_list.py:31
+#: team_list.py:28
 msgid "Expired"
 msgstr "Конец"
 
-#: team_list.py:31
-msgid "Cancelled"
-msgstr "Отменено"
-
-#: team_list.py:258
+#: team_list.py:255
 msgid "Cancel team"
 msgstr "Отменить команду"
 
-#: team_list.py:259
+#: team_list.py:256
 msgid "Cancel current team."
 msgstr "Отменить текущую команду."
 
-#: tree_model.py:50
+#: tree_model.py:46
 msgid "Teams"
 msgstr "Команды"
