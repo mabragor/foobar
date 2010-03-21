@@ -5,8 +5,7 @@ import httplib, urllib, json, base64, string
 
 from dlg_settings import TabNetwork
 
-from settings import _
-from settings import DEBUG
+from settings import _, DEBUG
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *

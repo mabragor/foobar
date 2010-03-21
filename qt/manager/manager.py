@@ -6,9 +6,8 @@ import sys, re, time
 from datetime import datetime, timedelta
 
 from os.path import dirname, join
-from settings import _
 
-from settings import _
+from settings import _, DEBUG
 from http_ajax import HttpAjax
 from event_storage import EventTraining, EventRent, EventStorage
 from qtschedule import QtScheduleDelegate, QtSchedule
@@ -294,13 +293,11 @@ class MainWindow(QMainWindow):
         self.loadInitialData()
 
     def clientNew(self):
-	print 'register new client'
 	self.dialog = DlgClientInfo(self)
 	self.dialog.setModal(True)
 	self.dialog.exec_()
 
     def clientSearchRFID(self):
-	print 'search client by its rfid'
 	def callback(rfid):
 	    self.rfid_id = rfid
 
@@ -322,11 +319,8 @@ class MainWindow(QMainWindow):
                 self.dialog.setModal(True)
                 self.dialog.initData(response['info'])
                 self.dialog.exec_()
-	else:
-	    print 'dialog was rejected'
 
     def clientSearchName(self):
-	print 'search client by its name'
 	def callback(user_id):
 	    self.user_id = user_id
 
@@ -344,11 +338,8 @@ class MainWindow(QMainWindow):
 	    self.dialog.setModal(True)
 	    self.dialog.initData(response['info'])
 	    self.dialog.exec_()
-	else:
-	    print 'dialog was rejected'
 
     def renterNew(self):
-	print 'register new renter'
 	self.dialog = DlgRenterInfo(self)
 	self.dialog.setModal(True)
 	self.dialog.exec_()
@@ -371,8 +362,6 @@ class MainWindow(QMainWindow):
 	    self.dialog.setModal(True)
 	    self.dialog.initData(response['info'])
 	    self.dialog.exec_()
-	else:
-	    print 'dialog was rejected'
 
     def eventTraining(self):
         def callback(e_date, e_time, room_tuple, team):
@@ -474,10 +463,12 @@ class MainWindow(QMainWindow):
 
     # Drag'n'Drop section begins
     def mousePressEvent(self, event):
-	print 'press event', event.button()
+        if DEBUG:
+            print 'press event', event.button()
 
     def mouseMoveEvent(self, event):
-	print 'move event', event.pos()
+        if DEBUG:
+            print 'move event', event.pos()
     # Drag'n'Drop section ends
 
 

@@ -6,7 +6,7 @@ from datetime import datetime, date, timedelta
 
 from os.path import dirname, join
 
-from settings import _
+from settings import _, DEBUG
 from settings import userRoles
 from http_ajax import HttpAjax
 
@@ -208,7 +208,6 @@ class EventStorage(QAbstractTableModel):
 
     def update(self):
         if 'week' == self.showMode:
-            print 'model update'
             self.loadData()
 
     def showCurrWeek(self):
@@ -403,7 +402,6 @@ class EventStorage(QAbstractTableModel):
 
     def remove(self, event_id, room, emit_signal=False):
         """ Метод удаления информации о событии. """
-        print 'remove:', event_id, room, emit_signal
         event = self.storage.searchByID(event_id)
         if event is None:
             return
@@ -426,13 +424,15 @@ class EventStorage(QAbstractTableModel):
     def supportedDropActions(self):
         """ Метод для определения списка DnD действий, поддерживаемых
         моделью. """
-        print 'EventStorage::supportedDropActions'
+        if DEBUG:
+            print 'EventStorage::supportedDropActions'
         return (Qt.CopyAction | Qt.MoveAction)
 
     def flags(self, index):
         """ Метод для определения списка элементов, которые могут участвовать
         в DnD операциях. """
-        #print 'EventStorage::flags', index.row(), index.column()
+        if DEBUG:
+            print 'EventStorage::flags', index.row(), index.column()
         if index.isValid():
             res = (Qt.ItemIsEnabled | Qt.ItemIsSelectable
                    | Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled)
@@ -442,14 +442,12 @@ class EventStorage(QAbstractTableModel):
 
     def mimeTypes(self):
         """ Метод для декларации MIME типов, поддерживаемых моделью. """
-        print 'EventStorage::mimeTypes'
         types = QStringList()
         types << self.getMime('event') << self.getMime('team')
         return types
 
     def mimeData(self, indexes):
         """ Метод для конвертации объектов в поддерживаемый MIME формат. """
-        print 'EventStorage::mimeData'
         mimeData = QMimeData()
         encodedData = QByteArray()
 
@@ -457,18 +455,18 @@ class EventStorage(QAbstractTableModel):
 
         events = []
 
-        print indexes
+        if DEBUG:
+            print indexes
 
-        for index in indexes:
-            if index.isValid():
-                print dir(index)
-                print self.data(index, 100)
+            for index in indexes:
+                if index.isValid():
+                    print dir(index)
+                    print self.data(index, 100)
 
         mimeData.setData(self.getMime('event'), encodedData)
         return mimeData
 
     def dropMimeData(self, data, action, row, column, parent):
-        print 'EventStorage::dropMimeData'
         if action == Qt.IgnoreAction:
             return True
 
@@ -477,7 +475,6 @@ class EventStorage(QAbstractTableModel):
 
         if not data.hasFormat(event_mime) and \
                 not data.hasFormat(team_mime):
-            print 'badmime'
             return False
         if column > 0:
             return False
@@ -488,16 +485,13 @@ class EventStorage(QAbstractTableModel):
         id = QString()
         stream >> id
 
-        print id
         return True
 
     def setData(self, index, value, role):
         """ Перегруженный метод базового класса. Под ролью понимаем зал. """
-        print 'EventStorage::setData'
         return True
 
     def setHeaderData(self, section, orientation, value, role):
-        print 'EventStorage::setHeaderData'
         return True
 
 #     def removeRows(self, row, count, parent):

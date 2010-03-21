@@ -64,7 +64,6 @@ class AbstractTreeModel(QAbstractItemModel):
             item = index.internalPointer()
             return QVariant(item.data(index.column()))
         elif role == userRoles['getObjectID']:
-            print 'get object id role'
             item = index.internalPointer()
             return QVariant(item.itemData)
         else:

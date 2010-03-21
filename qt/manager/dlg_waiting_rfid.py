@@ -5,8 +5,7 @@ import serial, random, time
 
 from os.path import dirname, join
 
-from settings import _
-from settings import DEBUG, PORT
+from settings import _, DEBUG, PORT
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -59,14 +58,12 @@ class WaitingRFID(QThread):
         self.dispose()
 
     def timeToDie(self):
-        print 'thread prepare to die'
         self.die = True
 
     def hex(self, symbol):
         return '%02X' % ord(symbol)
 
     def dispose(self):
-        print 'dispose'
         if not self.disposed:
             self.disposed = True
             # закрываем порт

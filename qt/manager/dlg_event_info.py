@@ -4,7 +4,7 @@
 import time
 from datetime import datetime
 
-from settings import _
+from settings import _, DEBUG
 from event_storage import Event
 from http_ajax import HttpAjax
 from dlg_waiting_rfid import DlgWaitingRFID
@@ -121,7 +121,6 @@ class DlgEventInfo(QDialog):
                         {'id': schedule.id}, self.parent.session_id)
         response = ajax.parse_json()
         self.schedule = schedule = response['info']
-        print schedule
         event = schedule['event']
         room = schedule['room']
         self.editTitle.setText(event['title'])
@@ -193,8 +192,6 @@ class DlgEventInfo(QDialog):
             else:
                 message = _('Unable to register the visit!')
             QMessageBox.information(self, _('Client registration'), message)
-	else:
-	    print 'dialog was rejected'
 
     def eventRemove(self):
         reply = QMessageBox.question(
@@ -217,8 +214,6 @@ class DlgEventInfo(QDialog):
             else:
                 QMessageBox.information(self, _('Event removing'),
                                         _('Unable to remove this event!'))
-        else:
-            print 'just a joke'
 
     def showVisitors(self):
         dialog = DlgShowVisitors(self)

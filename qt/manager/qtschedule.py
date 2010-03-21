@@ -278,17 +278,14 @@ class QtSchedule(QTableView):
         event.accept()
 
     def mouseMoveEvent(self, event):
-        print 'QtSchedule::mouseMoveEvent'
+        pass
 
     def dragEnterEvent(self, event):
-        print 'QtSchedule::dragEnterEvent',
         if event.mimeData().hasFormat(self.getMime('event')) or \
                 event.mimeData().hasFormat(self.getMime('team')):
             event.acceptProposedAction()
-            print 'accept'
         else:
             event.ignore()
-            print 'ignore'
 
     def dragMoveEvent(self, event):
         """ Метод вызывается во время Drag'n'Drop. Здесь следует осуществлять
@@ -306,7 +303,6 @@ class QtSchedule(QTableView):
             event.ignore()
 
     def dropEvent(self, event):
-        print 'QtSchedule::dropEvent',
         event_mime = self.getMime('event')
         team_mime = self.getMime('team')
         if event.mimeData().hasFormat(event_mime):
@@ -317,22 +313,18 @@ class QtSchedule(QTableView):
             (row, col, room_id) = [int(i) for i in coordinates.split(',')]
 
             event.acceptProposedAction()
-            print event_mime, 'is dragged from', (row, col, room_id)
             drop_cell = self.cellRowColRelative(event.pos())
-            print self.emptyRoomAt(drop_cell)
 
         elif event.mimeData().hasFormat(team_mime):
             itemData = event.mimeData().data(team_mime)
             dataStream = QDataStream(itemData, QIODevice.ReadOnly)
             team = QString()
             dataStream >> team
-            #print team
 
             event.acceptProposedAction()
 
         else:
             event.ignore()
-            print 'unknown format'
 
     def viewportEvent(self, event):
         """ Reimplement ToolTip Event. """

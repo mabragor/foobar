@@ -56,6 +56,4 @@ class DlgShowVisitors(QDialog):
                     self.visitors.setItem(lastRow, 0, QTableWidgetItem(last_name))
                     self.visitors.setItem(lastRow, 1, QTableWidgetItem(first_name))
                     self.visitors.setItem(lastRow, 2, QTableWidgetItem(rfid_code))
-        else:
-            print 'Check response format!'
         return

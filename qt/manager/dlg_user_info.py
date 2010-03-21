@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
-from settings import _
+from settings import _, DEBUG
 from model_sorting import SortClientTeams
 from team_list import TeamListModel, TeamListDelegate, TeamList
 from http_ajax import HttpAjax
@@ -121,9 +121,10 @@ class DlgClientInfo(QDialog):
         self.teamsModel.initData(teams)
 
     def cancelTeam(self):
-        print 'cancel team'
         row = self.cardinfo.currentRow()
-        print row
+        if DEBUG:
+            print 'cancel team'
+            print row
         self.cardinfo.removeRow(row)
 
     def assignRFID(self):
@@ -153,12 +154,13 @@ class DlgClientInfo(QDialog):
             index = self.teamsModel.index(0, 0)
             self.teamsModel.setRow(index, data, Qt.EditRole, card_type, bgn_date, duration_index)
 
-        print 'DlgUserInfo::assignTeam DUMP:'
-        for item in self.teamsModel.storage:
-            print '\t',
-            for col in item:
-                print col,
-            print
+        if DEBUG:
+            print 'DlgUserInfo::assignTeam DUMP:'
+            for item in self.teamsModel.storage:
+                print '\t',
+                for col in item:
+                    print col,
+                print
 
     def applyDialog(self):
         """ Применить настройки. """

@@ -5,7 +5,7 @@ import time
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 
-from settings import _
+from settings import _, DEBUG
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -269,4 +269,5 @@ class TeamList(QTableView):
         menu.exec_(event.globalPos())
 
     def teamCancel(self):
-        print 'canceled [%i]' % self.contextRow
+        if DEBUG:
+            print 'canceled [%i]' % self.contextRow

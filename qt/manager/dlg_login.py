@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # (c) 2010 Ruslan Popov <ruslan.popov@gmail.com>
 
-from settings import _
+from settings import _, DEBUG
 from http_ajax import HttpAjax
 
 from PyQt4.QtGui import *
@@ -63,5 +63,6 @@ class DlgLogin(QDialog):
             self.callback(login, password)
             self.accept()
         else:
-            print '[DlgLogin::applyDialog]: Check callback!'
+            if DEBUG:
+                print '[DlgLogin::applyDialog]: Check callback!'
             self.reject()
