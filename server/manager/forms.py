@@ -679,7 +679,7 @@ class CopyWeek(AjaxForm):
         delta = to_date - from_date
         for e in events:
             ne = storage.Schedule(room=e.room, team=e.team,
-                                  rent=e.rent, status=0,
+                                  rent=e.rent, status=0, fixed=0,
                                   duration=e.duration)
             ne.begin = e.begin+delta
             ne.end = ne.begin + timedelta(minutes=(60 * e.duration))
