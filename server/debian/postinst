@@ -10,13 +10,13 @@ case "$1" in
 	# information, do it here.
 
 	# create link to configuration
-	ln -s ${PROJECT_DIR}/settings_local.py ${CONFIG_DIR}/settings.py
-	ln -s ${PROJECT_DIR}/django.wsgi ${CONFIG_DIR}/django.wsgi
+	test -L ${CONFIG_DIR}/settings.py || ln -s ${PROJECT_DIR}/settings_local.py ${CONFIG_DIR}/settings.py
+	test -L ${CONFIG_DIR}/django.wsgi || ln -s ${PROJECT_DIR}/django.wsgi ${CONFIG_DIR}/django.wsgi
 
 	# virtual domain
-	echo "127.0.0.1		pyqounter" >> /etc/hosts
+	grep -q pyqounter /etc/hosts || echo "127.0.0.1		pyqounter" >> /etc/hosts
 
-	cat > /etc/apache2/sites-available/pyqounter <<EOF
+	test -f /etc/apache2/sites-available/pyqounter || cat > /etc/apache2/sites-available/pyqounter <<EOF
 <VirtualHost *:80>
 	ServerAdmin ruslan.popov@gmail.com
 	ServerName pyqounter
