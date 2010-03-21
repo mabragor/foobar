@@ -423,7 +423,8 @@ class Accounting(models.Model):
 
     def sub(self, count):
         if self.count < count:
-            raise
+            print self.count, count
+            raise RuntimeWarning
         self.count -= count
         self.save()
 
@@ -465,7 +466,7 @@ class Flow(models.Model):
         elif self.action == self.OUTFLOW:
             accounting.sub(self.count)
         else:
-            raise
+            raise RuntimeWarning
 
 # Журналирование
 

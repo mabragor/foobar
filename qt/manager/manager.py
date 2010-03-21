@@ -211,11 +211,11 @@ class MainWindow(QMainWindow):
 		     'copyWeek', _('Copy current week into other.')),
                     ]
              ),
-	    (_('Accounting'), [
-		    (_('Add resources'), '',
-		     'addResources', _('Add new set of resources into accounting.')),
-                    ]
-             ),
+# 	    (_('Accounting'), [
+# 		    (_('Add resources'), '',
+# 		     'addResources', _('Add new set of resources into accounting.')),
+#                     ]
+#              ),
 	    ]
 
 
@@ -429,13 +429,10 @@ class MainWindow(QMainWindow):
 	self.dialog.exec_()
 
     def addResources(self):
-        def callback(selected_date):
-            model = self.scheduleModel
-            from_range = model.weekRange
-            to_range = model.date2range(selected_date)
-            ajax = HttpAjax(self, '/manager/copy_week/',
-                            {'from_date': from_range[0],
-                             'to_date': to_range[0]}, self.session_id)
+        def callback(count, price):
+#             ajax = HttpAjax(self, '/manager/add_resource/',
+#                             {'from_date': from_range[0],
+#                              'to_date': to_range[0]}, self.session_id)
             response = ajax.parse_json()
             self.statusBar().showMessage(_('The week has been copied sucessfully.'))
 
