@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-16 01:00+0300\n"
+"POT-Creation-Date: 2010-03-21 11:35+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -357,8 +357,8 @@ msgstr ""
 msgid "Login and password"
 msgstr ""
 
-#: dlg_show_visitors.py:20
-msgid "Type"
+#: dlg_show_visitors.py:20 dlg_user_info.py:51
+msgid "RFID"
 msgstr ""
 
 #: dlg_show_visitors.py:44
@@ -415,10 +415,6 @@ msgstr ""
 
 #: dlg_user_info.py:49
 msgid "Date of birth"
-msgstr ""
-
-#: dlg_user_info.py:51
-msgid "RFID"
 msgstr ""
 
 #: dlg_user_info.py:54 dlg_user_info.py:224

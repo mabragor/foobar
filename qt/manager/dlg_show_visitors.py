@@ -17,7 +17,7 @@ class DlgShowVisitors(QDialog):
 
         labels = QStringList([_('Last name'),
                               _('First name'),
-                              _('Type')])
+                              _('RFID')])
 
         self.visitors = QTableWidget(0, 3)
         self.visitors.setHorizontalHeaderLabels(labels)

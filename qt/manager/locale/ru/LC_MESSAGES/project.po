@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-16 01:00+0300\n"
+"POT-Creation-Date: 2010-03-21 11:35+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Ruslan Popov <ruslan.popov@gmail.com>\n"
 "Language-Team: LANGUAGE <RU@li.org>\n"
@@ -357,9 +357,9 @@ msgstr "Адрес и порт"
 msgid "Login and password"
 msgstr "Логин и пароль"
 
-#: dlg_show_visitors.py:20
-msgid "Type"
-msgstr "Тип"
+#: dlg_show_visitors.py:20 dlg_user_info.py:51
+msgid "RFID"
+msgstr "RFID"
 
 #: dlg_show_visitors.py:44
 msgid "Registered visitors"
@@ -416,10 +416,6 @@ msgstr "Скидка"
 #: dlg_user_info.py:49
 msgid "Date of birth"
 msgstr "Дата рождения"
-
-#: dlg_user_info.py:51
-msgid "RFID"
-msgstr "RFID"
 
 #: dlg_user_info.py:54 dlg_user_info.py:224
 msgid "Base data"
