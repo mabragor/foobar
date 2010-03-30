@@ -250,7 +250,9 @@ class TeamList(QTableView):
     def __init__(self, parent=None):
         QTableView.__init__(self, parent)
 
-        self.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
+        self.verticalHeader().setResizeMode(QHeaderView.Fixed)
+        self.horizontalHeader().setResizeMode(QHeaderView.Stretch)
+        self.resizeColumnsToContents()
 
         self.actionTeamCancel = QAction(_('Cancel team'), self)
         self.actionTeamCancel.setStatusTip(_('Cancel current team.'))
