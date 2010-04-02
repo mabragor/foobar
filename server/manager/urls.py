@@ -31,6 +31,7 @@ urlpatterns += patterns(
     url(r'^get_renter_info/$', 'get_renter_info'),
     url(r'^get_users_info_by_name/$', 'get_users_info_by_name'),
     url(r'^set_user_info/$', 'set_user_info'),
+    url(r'^set_client_card/$', 'set_client_card'),
     url(r'^set_renter_info/$', 'set_renter_info'),
     url(r'^set_rent/$', 'set_rent'),
     url(r'^available_teams/$', 'available_teams'),

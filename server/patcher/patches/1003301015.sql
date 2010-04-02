@@ -1,0 +1,1 @@
+alter table storage_card add column `paid` double precision not null after `price`;

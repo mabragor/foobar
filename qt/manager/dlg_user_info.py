@@ -3,7 +3,7 @@
 
 from settings import _, DEBUG
 from model_sorting import SortClientTeams
-from team_list import TeamListModel, TeamListDelegate, TeamList
+from team_list import TeamListModel, TeamList
 from http_ajax import HttpAjax
 from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_team_assign import DlgTeamAssign
@@ -20,17 +20,18 @@ class DlgClientInfo(QDialog):
         QDialog.__init__(self, parent)
 
         self.parent = parent
-        self.user_id = u'0'
+        self.client_id = u'0'
         self.setMinimumWidth(800)
 
         self.editLastName = QLineEdit()
         self.editFirstName = QLineEdit()
         self.editEmail = QLineEdit()
         self.editPhone = QLineEdit()
-        self.editDiscount = QLineEdit()
+        self.editDiscount = QLineEdit(); self.editDiscount.setText('0')
         self.dateBirth = QDateEdit()
-        self.editRFID = QLineEdit()
-        self.editRFID.setReadOnly(True)
+        self.editRFID = QLineEdit(); self.editRFID.setReadOnly(True)
+
+        self.buttonAssignRFID = QPushButton(_('Assign RFID'))
 
         layoutUser = QGridLayout()
         layoutUser.setColumnStretch(1, 1)
@@ -50,9 +51,20 @@ class DlgClientInfo(QDialog):
         layoutUser.addWidget(self.dateBirth, 5, 1)
         layoutUser.addWidget( QLabel(_('RFID')), 6, 0)
         layoutUser.addWidget(self.editRFID, 6, 1)
+        layoutUser.addWidget(self.buttonAssignRFID, 6, 2)
 
         groupUser = QGroupBox(_('Base data'))
         groupUser.setLayout(layoutUser)
+
+        self.buttonAssignTeam = QPushButton(_('Assign team'))
+        self.buttonApplyDialog = QPushButton(_('Apply'))
+        self.buttonCancelDialog = QPushButton(_('Cancel'))
+
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(self.buttonAssignTeam)
+        buttonLayout.addStretch(1)
+        buttonLayout.addWidget(self.buttonApplyDialog)
+        buttonLayout.addWidget(self.buttonCancelDialog)
 
         # купленные курсы
         self.cardinfo = TeamList(self)
@@ -63,31 +75,10 @@ class DlgClientInfo(QDialog):
         groupCard = QGroupBox(_('Teams\' history'))
         groupCard.setLayout(cardLayout)
 
-        buttonAssignRFID = QPushButton(_('Assign RFID'))
-        buttonAssignTeam = QPushButton(_('Assign team'))
-        buttonApplyDialog = QPushButton(_('Apply'))
-        buttonCancelDialog = QPushButton(_('Cancel'))
-
-        self.connect(buttonAssignRFID, SIGNAL('clicked()'),
-                     self.assignRFID)
-        self.connect(buttonAssignTeam, SIGNAL('clicked()'),
-                     self.showAssignTeamDlg)
-        self.connect(buttonApplyDialog, SIGNAL('clicked()'),
-                     self.applyDialog)
-        self.connect(buttonCancelDialog, SIGNAL('clicked()'),
-                     self, SLOT('reject()'))
-
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(buttonAssignRFID)
-        buttonLayout.addWidget(buttonAssignTeam)
-        buttonLayout.addStretch(1)
-        buttonLayout.addWidget(buttonApplyDialog)
-        buttonLayout.addWidget(buttonCancelDialog)
-
         layout = QVBoxLayout()
         layout.addWidget(groupUser)
-        layout.addWidget(groupCard)
         layout.addLayout(buttonLayout)
+        layout.addWidget(groupCard)
 
         self.setLayout(layout)
         self.setWindowTitle(_('Client\'s information'))
@@ -99,11 +90,31 @@ class DlgClientInfo(QDialog):
         #self.proxyModel.setSourceModel(self.teamsModel)
         # use proxy model to change data representation
         self.cardinfo.setModel(self.teamsModel)
-        self.delegate = TeamListDelegate()
-        #self.cardinfo.setItemDelegate(self.delegate)
+
+        self.setRequired()
+        self.setSignals()
+
+    def setRequired(self):
+        self.editLastName.setProperty('required', QVariant(True))
+        self.editFirstName.setProperty('required', QVariant(True))
+        self.editEmail.setProperty('required', QVariant(True))
+        self.editPhone.setProperty('required', QVariant(True))
+        self.editDiscount.setProperty('required', QVariant(True))
+        self.dateBirth.setProperty('required', QVariant(True))
+        self.editRFID.setProperty('required', QVariant(True))
+
+    def setSignals(self):
+        self.connect(self.buttonAssignRFID, SIGNAL('clicked()'),
+                     self.assignRFID)
+        self.connect(self.buttonAssignTeam, SIGNAL('clicked()'),
+                     self.showAssignTeamDlg)
+        self.connect(self.buttonApplyDialog, SIGNAL('clicked()'),
+                     self.applyDialog)
+        self.connect(self.buttonCancelDialog, SIGNAL('clicked()'),
+                     self, SLOT('reject()'))
 
     def initData(self, data):
-        self.user_id = data['id']
+        self.client_id = data['id']
         self.editFirstName.setText(data.get('first_name', ''))
         self.editLastName.setText(data.get('last_name', ''))
         self.editEmail.setText(data.get('email', ''))
@@ -114,11 +125,14 @@ class DlgClientInfo(QDialog):
             import time
             return datetime(*time.strptime(value, '%Y-%m-%d')[:3])
 
-        self.dateBirth.setDate(str2date(data['birthday']))
+        birthday = data['birthday'] # it could be none while testing
+        self.dateBirth.setDate(birthday and str2date(birthday) or \
+                               QDate.currentDate())
         self.editRFID.setText(data.get('rfid_code', ''))
 
         teams = data.get('team_list', [])
-        self.teamsModel.initData(teams)
+        import pprint; pprint.pprint(teams)
+        self.teamsModel.initData(self.client_id, teams)
 
     def cancelTeam(self):
         row = self.cardinfo.currentRow()
@@ -164,14 +178,16 @@ class DlgClientInfo(QDialog):
 
     def applyDialog(self):
         """ Применить настройки. """
-        team_changes = self.teamsModel.get_changes_and_clean()
-        self.saveSettings(team_changes)
-        self.accept()
-
-    def saveSettings(self, team_changes):
-        assigned, cancelled, changed = team_changes
-        params = {
-            'user_id': self.user_id,
+        userinfo, ok = self.checkFields()
+        if ok:
+            formset = self.teamsModel.get_model_as_formset()
+            self.saveSettings(userinfo, formset)
+            self.accept()
+        else:
+            QMessageBox.warning(self, _('Warning'),
+                                _('Please fill required fields.'))
+    def checkFields(self):
+        userinfo = {
             'first_name': self.editFirstName.text().toUtf8(),
             'last_name': self.editLastName.text().toUtf8(),
             'email': self.editEmail.text().toUtf8(),
@@ -179,14 +195,26 @@ class DlgClientInfo(QDialog):
             'discount': self.editDiscount.text().toUtf8(),
             'birthday': self.dateBirth.date().toPyDate(),
             'rfid_code': self.editRFID.text().toUtf8(),
-            'team_assigned': assigned,
-            'team_cancelled': cancelled,
-            'team_changed': changed
             }
-        #print 'DlgClientInfo::saveSettings', params
+        for k,v in userinfo.items():
+            if k is not 'birthday' and len(v) == 0:
+                return (userinfo, False)
+        return (userinfo, True)
+
+    def saveSettings(self, userinfo, formset):
+        params = {
+            'user_id': self.client_id,
+            }
+        params.update(userinfo)
         ajax = HttpAjax(self, '/manager/set_user_info/', params, self.parent.session_id)
         response = ajax.parse_json()
-        self.accept()
+        client_id = int( response['saved_id'] )
+        params = {
+            'client_id': client_id,
+            }
+        params.update(formset)
+        ajax = HttpAjax(self, '/manager/set_client_card/', params, self.parent.session_id)
+        response = ajax.parse_json()
 
 class DlgRenterInfo(QDialog):
 

@@ -54,3 +54,31 @@ def ajax_processor(form_object=None, javascript=True):
             return HttpResponse(json, mimetype="application/json")
         return wrapper
     return processor
+
+from django.forms.formsets import formset_factory
+
+def formset_processor(base_form):
+    def processor(func):
+        def wrapper(request, *args, **kwargs):
+            if request.method == 'POST':
+                factory = formset_factory(base_form)
+                formset = factory(request.POST)
+                if formset.is_valid():
+                    result = func(request, formset, *args, **kwargs)
+                else:
+                    import pprint; pprint.pprint( formset.errors )
+                    if settings.DEBUG:
+                        result = {'code': '301', 'desc': _(u'Form is not valid : %s') % formset.errors}
+                    else:
+                        result = {'code': '301', 'desc': _(u'Service is temporary unavailable. We appologize for any inconvinience.')}
+            else:
+                if settings.DEBUG:
+                    result = {'code': '401', 'desc': _(u'It must be POST')}
+                else:
+                    result = {'code': '401', 'desc': _(u'Please, do not break our code :)')}
+
+
+            json = simplejson.dumps(result, cls=DatetimeJSONEncoderQt)
+            return HttpResponse(json, mimetype="application/json")
+        return wrapper
+    return processor

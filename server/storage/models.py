@@ -2,13 +2,15 @@
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 # (c) 2009      Dmitry <alerion.um@gmail.com>
 
+from datetime import timedelta, datetime
+
+from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from datetime import timedelta, datetime
-from django.conf import settings
 from django.contrib.auth.models import User
 
 class AbstractUser(models.Model):
+
     last_name = models.CharField(verbose_name=_(u'Last name'), max_length=64)
     first_name = models.CharField(verbose_name=_(u'First name'), max_length=64)
     email = models.EmailField(verbose_name=_(u'E-mail'), max_length=64, blank=True, null=True)
@@ -40,6 +42,7 @@ class Coach(AbstractUser):
         return result
 
 class Client(AbstractUser):
+
     rfid_code = models.CharField(verbose_name=_(u'RFID'), max_length=8)
     phone = models.CharField(verbose_name=_(u'Phone'), max_length=16)
     discount = models.IntegerField(verbose_name=_(u'Discount'))
@@ -65,6 +68,7 @@ class Client(AbstractUser):
         return [card.about(True) for card in self.card_set.all().order_by('-reg_date')]
 
 class Renter(AbstractUser):
+
     phone_mobile = models.CharField(verbose_name=_(u'Mobile phone'), max_length=16, blank=True, null=True)
     phone_work = models.CharField(verbose_name=_(u'Work phone'), max_length=16, blank=True, null=True)
     phone_home = models.CharField(verbose_name=_(u'Home phone'), max_length=16, blank=True, null=True)
@@ -88,9 +92,11 @@ class Renter(AbstractUser):
         return [rent.about(True) for rent in self.rent_set.all().order_by('-reg_date')]
 
 class Rent(models.Model):
+
     RENT_STATUS = enumerate( (_(u'Reserved'),
                               _(u'Piad partially'),
                               _('Paid')) )
+
     renter = models.ForeignKey(Renter, verbose_name=_(u'Renter'))
     status = models.CharField(verbose_name=_(u'Status'), max_length=1, choices=RENT_STATUS, default=0)
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
@@ -122,6 +128,7 @@ class Rent(models.Model):
         return result
 
 class Room(models.Model):
+
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
     color = models.CharField(verbose_name=_(u'Color'), max_length=6)
 
@@ -140,6 +147,7 @@ class Room(models.Model):
         }
 
 class Group(models.Model):
+
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
 
     class Meta:
@@ -160,19 +168,9 @@ class Group(models.Model):
     def children(self):
         return [item.about() for item in self.team_set.all()]
 
-class PriceGroup(models.Model):
-    title = models.CharField(verbose_name=_(u'Group of price'), max_length=64)
-
-    class Meta:
-        verbose_name = _(u'Price group')
-        verbose_name_plural = _(u'Price groups')
-
-    def __unicode__(self):
-        return self.title
-
 class Team(models.Model):
+
     group = models.ManyToManyField(Group, verbose_name=_(u'Group'))
-    price_group = models.ForeignKey(PriceGroup, verbose_name=_(u'Price group'))
     coach = models.ForeignKey(Coach, verbose_name=_(u'Coach'))
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
     duration = models.FloatField(verbose_name=_(u'Duration'))
@@ -207,7 +205,9 @@ class Team(models.Model):
             }
 
 class Card(models.Model):
+
     CARD_TYPE = enumerate( (_(u'Normal card'), _(u'Club card')) )
+
     team = models.ForeignKey(Team, verbose_name=_(u'Team'))
     client = models.ForeignKey(Client, verbose_name=_(u'Client'))
     type = models.CharField(verbose_name=_(u'Type'),
@@ -222,6 +222,9 @@ class Card(models.Model):
     count_used = models.IntegerField(verbose_name=_(u'Exercises used'), default=0)
     price = models.FloatField(verbose_name=_(u'Price'),
                               help_text=_(u'The price of this team.'),
+                              default=float(0.00))
+    paid = models.FloatField(verbose_name=_(u'Paid'),
+                              help_text=_(u'Paid amount.'),
                               default=float(0.00))
 
     class Meta:
@@ -244,6 +247,7 @@ class Card(models.Model):
             'sold': self.count_sold,
             'used': self.count_used,
             'price': self.price,
+            'paid': self.paid,
             }
         if not short:
             obj.update( {'client': self.client.about(),} )
@@ -262,8 +266,10 @@ class Card(models.Model):
         return self.exp_date < datetime.now()
 
 class Schedule(models.Model):
+
     ACTION_STATUSES = enumerate( (_('Waiting'), _('Warning'), _('Passed')) )
     ACTION_FIXED = enumerate( (_('Waiting'), _('Done'), _('Cancelled')) )
+
     room = models.ForeignKey(Room, verbose_name=_(u'Room'))
     team = models.ForeignKey(Team, verbose_name=_(u'Team'), null=True, blank=True)
     rent = models.ForeignKey(Rent, verbose_name=_(u'Rent'), null=True, blank=True)
@@ -362,6 +368,7 @@ class Schedule(models.Model):
                  v.client.rfid_code) for v in self.visit_set.all()]
 
 class Visit(models.Model):
+
     client = models.ForeignKey(Client, verbose_name=_(u'Client'))
     schedule = models.ForeignKey(Schedule, verbose_name=_(u'Event'))
     card = models.ForeignKey(Card, verbose_name=_(u'Card'), null=True, blank=True)
@@ -407,6 +414,7 @@ RFIDCARDS = '0'
 TYPE_STATUS = ((RFIDCARDS, _(u'RFID cards')), ('1', _(u'Unknown')),)
 
 class Accounting(models.Model):
+
     id = models.CharField(verbose_name=_(u'Type'), max_length=4, choices=TYPE_STATUS, primary_key=True)
     count = models.IntegerField(verbose_name=_(u'Count'), default=0)
 
@@ -436,6 +444,7 @@ class Accounting(models.Model):
             }
 
 class Flow(models.Model):
+
     INFLOW = '0'
     OUTFLOW = '1'
     FLOW_STATUS = ((INFLOW, _(u'Inflow')), (OUTFLOW, _(u'Outflow')),)
@@ -471,6 +480,7 @@ class Flow(models.Model):
 # Журналирование
 
 class Log(models.Model):
+
     user = models.ForeignKey(User, verbose_name=_(u'User'), null=True, blank=True)
     action = models.CharField(verbose_name=_(u'Action'), max_length=64)
     model = models.CharField(verbose_name=_('Model'), max_length=256)

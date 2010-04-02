@@ -330,17 +330,17 @@ class ClientInfo(UserInfo):
                 setattr(user, key, value)
         user.save()
 
-        if len(assigned) > 0:
-            for id, card_type, bgn_date, exp_date in assigned:
-                bgn_date = date(*[int(i) for i in bgn_date.split('-')])
-                exp_date = date(*[int(i) for i in exp_date.split('-')])
-                team = storage.Team.objects.get(id=id)
-                card = storage.Card(
-                    team=team, client=user,type=card_type,
-                    bgn_date=bgn_date, exp_date=exp_date,
-                    count_sold=team.count,
-                    price=team.price)
-                card.save()
+#         if len(assigned) > 0:
+#             for id, card_type, bgn_date, exp_date in assigned:
+#                 bgn_date = date(*[int(i) for i in bgn_date.split('-')])
+#                 exp_date = date(*[int(i) for i in exp_date.split('-')])
+#                 team = storage.Team.objects.get(id=id)
+#                 card = storage.Card(
+#                     team=team, client=user,type=card_type,
+#                     bgn_date=bgn_date, exp_date=exp_date,
+#                     count_sold=team.count,
+#                     price=team.price)
+#                 card.save()
 
         OUTFLOW = '1'
         RFIDCARDS = '0'
@@ -354,6 +354,39 @@ class ClientInfo(UserInfo):
                             )
         flow.save()
         return user.id
+
+class ClientCard(forms.Form):
+    client_id = forms.IntegerField()
+    card_id = forms.IntegerField()
+    team_id = forms.IntegerField()
+    type_id = forms.IntegerField()
+    paid = forms.FloatField()
+    sold = forms.IntegerField()
+    begin = forms.DateTimeField()
+    expire = forms.DateTimeField()
+
+    def save(self):
+        data = self.cleaned_data
+        print data
+        client = storage.Client.objects.get(id=data['client_id'])
+        team = storage.Team.objects.get(id=data['team_id'])
+
+        if data['card_id'] == 0:
+            card = storage.Card(client=client, team=team,
+                                type=data['type_id'],
+                                bgn_date=data['begin'],
+                                exp_date=data['expire'],
+                                count_sold=data['sold'],
+                                price=team.price,
+                                paid=data['paid'])
+        else:
+            card = storage.Card.objects.get(id=data['card_id'])
+            card.paid = data['paid']
+            card.type = data['type_id']
+            card.count_sold = data['sold']
+            card.bgn_date=data['begin']
+            card.exp_date=data['expire']
+        card.save()
 
 class RenterInfo(UserInfo):
     """ See parent. Form saves and returns the ID of the created

@@ -9,14 +9,13 @@ from storage import models
 
 class CoachAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name', 'email', 'reg_date')
-    fieldsets = ((None, {'fields': ('first_name', 'last_name',
-                                    'email')}),)
+    fieldsets = ((None, {'fields': ('last_name', 'first_name', 'email')}),)
 admin.site.register(models.Coach, CoachAdmin)
 
 class ClientAdmin(admin.ModelAdmin):
     list_display = ('rfid_code', 'last_name', 'first_name', 'email', 'reg_date')
     search_fields = ('rfid_code', 'last_name', 'first_name')
-    fieldsets = ((None, {'fields': ('first_name', 'last_name',
+    fieldsets = ((None, {'fields': ('last_name', 'first_name',
                                     'email', 'phone',
                                     'discount', 'birthday')}),)
 admin.site.register(models.Client, ClientAdmin)
@@ -25,7 +24,8 @@ class RenterAdmin(admin.ModelAdmin):
     list_display = ('last_name', 'first_name', 'email', 'reg_date')
     search_fields = ('last_name', 'first_name')
     fieldsets = ((None, {'fields': ('last_name', 'first_name', 'email')}),
-                 (_('Phones'), {'fields': ('phone_mobile', 'phone_work', 'phone_home')}))
+                 (_('Phones'), {'fields': ('phone_mobile', 'phone_work', 'phone_home'),
+                                'description': _(u'Fill at least one field here.')}))
 admin.site.register(models.Renter, RenterAdmin)
 
 class RentAdmin(admin.ModelAdmin):
@@ -50,20 +50,13 @@ class GroupAdmin(admin.ModelAdmin):
     fieldsets = ((None, {'fields': ('title', )}),)
 admin.site.register(models.Group, GroupAdmin)
 
-class PriceGroupAdmin(admin.ModelAdmin):
-    list_display = ('title', )
-    ordering = ('title', )
-    search_fields = ('title',)
-    fieldsets = ((None, {'fields': ('title', )}),)
-admin.site.register(models.PriceGroup, PriceGroupAdmin)
-
 class TeamAdmin(admin.ModelAdmin):
     list_display = ('title', 'coach', 'groups', 'price', 'duration', 'reg_date')
     ordering = ('title',)
     search_fields = ('title',)
     fieldsets = (
         (None, {'fields': ('title', 'duration', 'count', 'price')}),
-        (_(u'Relation'), {'fields': ('group', 'price_group', 'coach')}),
+        (_(u'Relation'), {'fields': ('group', 'coach')}),
         )
 admin.site.register(models.Team, TeamAdmin)
 

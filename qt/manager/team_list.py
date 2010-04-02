@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
+# (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 import time
 from datetime import datetime, date, timedelta
@@ -10,6 +10,8 @@ from settings import _, DEBUG
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
+CARD_TYPE = [_('Normal'), _('Club')]
+
 class TeamListModel(QAbstractTableModel):
 
     def __init__(self, parent=None):
@@ -17,24 +19,21 @@ class TeamListModel(QAbstractTableModel):
 
         # хранилище данных модели
         self.storage = []
-        # хранилище временных данных, т.е. назначенные, но ещё не
-        # подтверждённые курсы
-        self.temporary_assigned = []
 
-        self.labels = [_('Title'), _('Price'),
-                       _('Card'),
-                       _('Sold'), _('Used'),
-                       _('Assigned'), _('Begin'),
-                       _('Expired'), _('Cancelled'),
+        self.labels = [_('Title'), _('Price'), _('Paid'),
+                       _('Card'), _('Sold'), _('Used'),
+                       _('Assigned'), _('Begin'), _('Expired'), _('Cancelled'),
                        'id', 'team_id']
-        self.model_fields = ['title', 'price', 'card_type', 'count_sold', 'count_used',
+        self.model_fields = ['title', 'price', 'paid',
+                             'card_type', 'count_sold', 'count_used',
                              'reg_date', 'bgn_date', 'exp_date', 'cnl_date',
                              'id', 'team_id']
 
-    def initData(self, data):
+    def initData(self, client_id, data):
         """
         Формат полученных данных: см. методы about() у моделей.
         """
+        self.client_id = client_id
         for rec in data:
             if type(rec) is not dict:
                 raise 'Check format'
@@ -42,6 +41,7 @@ class TeamListModel(QAbstractTableModel):
             self.storage.append( [
                 team['title'],
                 rec['price'],
+                rec['paid'],
                 rec['type'],
                 rec['sold'],
                 rec['used'],
@@ -61,21 +61,29 @@ class TeamListModel(QAbstractTableModel):
 #                   self.createIndex(0, 0),
 #                   self.createIndex(self.rowCount(), self.columnCount()))
 
-    def get_changes_and_clean(self):
-        assigned = []
-        cancelled = []
-        changed = []
-        for i in self.temporary_assigned:
-            obj = self.model_fields
-            team_id = i[ obj.index('team_id') ]
-            card_type = i[ obj.index('card_type') ]
-            bgn_date = i[ obj.index('bgn_date') ]
-            exp_date = i[ obj.index('exp_date') ]
-            assigned.append( (team_id, card_type,
-                              unicode(bgn_date),
-                              unicode(exp_date)) )
-        self.temporary_assigned = []
-        return (assigned, cancelled, changed)
+    def get_model_as_formset(self):
+        formset = {
+            'form-TOTAL_FORMS': str(len(self.storage)),
+            'form-INITIAL_FORMS': u'0',
+            }
+        for record in self.storage:
+            index = self.storage.index(record)
+
+            title, price, paid, type_id, sold, used, register,\
+                begin, expire, cancel, card_id, team_id = record
+
+            row = {
+                'form-%s-client_id' % index: self.client_id,
+                'form-%s-card_id' % index: card_id,
+                'form-%s-team_id' % index: team_id,
+                'form-%s-paid' % index: paid,
+                'form-%s-type_id' % index: type_id,
+                'form-%s-sold' % index: sold,
+                'form-%s-begin' % index: begin,
+                'form-%s-expire' % index: expire,
+                }
+            formset.update( row )
+        return formset
 
     def rowCount(self, parent=None): # base class method
         if parent and parent.isValid():
@@ -102,22 +110,22 @@ class TeamListModel(QAbstractTableModel):
     def flags(self, index):
         if not index.isValid():
             return Qt.ItemIsEnabled
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        return Qt.ItemIsEnabled | Qt.ItemIsEditable
 
     def _dtapply(self, value):
         if value is not None:
-            if type(value) is date:
+            if type(value) in [date, datetime]:
                 return value
-            if type(value) is datetime:
-                result = value
-            else:
-                result = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+            if type(value) is str:
+                if len(value) == 10:
+                    result = datetime.strptime(value, '%Y-%m-%d')
+                else:
+                    result = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
                 return result.date()
+            print 'dtapply', value
+            raise RuntimeWarning
         else:
             return None
-
-    def _card_type(self, value):
-        return [_('Normal'), _('Club')][int(value)]
 
     def data(self, index, role): # base class method
         if not index.isValid():
@@ -128,13 +136,23 @@ class TeamListModel(QAbstractTableModel):
         idx_col = index.column()
         record = list(self.storage[idx_row])
 
-        map = (unicode, float, self._card_type,
-               int, int,
-               self._dtapply, self._dtapply,
-               self._dtapply, self._dtapply,
-               int, int)
+        # Warning! This tuple describes field value types.
+        # Look at TeamListDelegate! These tuples must be synced.
+        map = ( unicode, # title
+                float, # price
+                float, # paid
+                lambda x: CARD_TYPE[int(x)], # card type
+                int, # sold
+                int, # used
+                self._dtapply, # registered
+                self._dtapply, # begin
+                self._dtapply, # expire
+                self._dtapply, # cancelled
+                int, # record id
+                int # team id
+                )
 
-        meta_func = map[idx_col]
+        object_type = map[idx_col]
         try:
             value = record[idx_col]
         except IndexError:
@@ -143,7 +161,7 @@ class TeamListModel(QAbstractTableModel):
         if value is None:
             return QVariant() # пустое значение
         else:
-            return QVariant(meta_func(value))
+            return QVariant(object_type(value))
 
     def setRow(self, index, record, role, card_type=1,
                bgn_date=date.today(), duration_index=0):
@@ -160,7 +178,8 @@ class TeamListModel(QAbstractTableModel):
                       )
                 exp_date = bgn_date + deltas[duration_index]
             title, team_id, count, price, coach, duration = record
-            record = [title, price, card_type, count, 0,
+            paid = 0
+            record = [title, price, paid, card_type, count, 0,
                       reg_date, bgn_date, exp_date, None, 0, team_id]
 
             idx_row = index.row()
@@ -169,21 +188,23 @@ class TeamListModel(QAbstractTableModel):
                 self.setData(self.createIndex(idx_row, idx_col), i, role)
                 idx_col += 1
 
-            self.temporary_assigned.append(record)
-
     def setData(self, index, value, role):
         if index.isValid() and role == Qt.EditRole:
             idx_row = index.row()
             idx_col = index.column()
+            print '[%i, %i] %s' % (idx_row, idx_col, value)
 
             record = list(self.storage[idx_row])
             if len(record) == 0: # init record in this case
                 for i in xrange(self.modelColumnCount()):
                     record.append(None)
+
+            # FIXME: I guess no convert is needed.
             if type(value) is QVariant:
-                v, ok = value.toInt()
+                v = value.toString()
             else:
                 v = value
+
             #print type(value), value
             record[idx_col] = v
             self.storage[idx_row] = tuple(record)
@@ -215,32 +236,77 @@ class TeamListModel(QAbstractTableModel):
 
 class TeamListDelegate(QItemDelegate):
 
-    """ Делегат, позволяющий пользователю изменять содержимое ячеек. """
+    """ The delegate allow to user to change the model values. """
+
+    # Warning! This tuple describes field value types.
+    # Look at TeamList::data method! These tuples must be synced.
+    map = ( None, # title
+            None, # price
+            QLineEdit, # paid
+            QComboBox, # card type
+            QLineEdit, # sold
+            None, # used
+            None, # registered
+            QDateEdit, # begin
+            QDateEdit, # expire
+            None, # cancelled
+            None, # record id
+            None # team id
+            )
 
     def __init__(self, parent=None):
         QItemDelegate.__init__(self, parent)
+        print 'TeamListDelegate: constructor'
 
 #     def eventFilter(obj, event):
 #         print 'event type', event.type()
 
     def createEditor(self, parent, option, index):
-        editor = QSpinBox(parent)
-        editor.setMinimum(0)
-        editor.setMaximum(64)
-        editor.installEventFilter(self)
-        return editor
+        print 'TeamListDelegate: createEditor'
+        delegate_editor = self.map[ index.column() ]
+        if delegate_editor:
+            return delegate_editor(parent)
+        else:
+            return None
 
-    def setEditorData(self, spinBox, index):
-        value, ok = index.model().data(index, Qt.DisplayRole).toInt()
+    def setEditorData(self, editor, index):
+        print 'TeamListDelegate: setEditorData'
+        raw_value = index.model().data(index, Qt.DisplayRole)
 
-        spinBox.setValue(value)
+        delegate_editor = self.map[ index.column() ]
+        if not delegate_editor or delegate_editor is QLineEdit:
+            value = raw_value.toString()
+            editor.setText(value)
+        elif delegate_editor is QComboBox:
+            for i in CARD_TYPE:
+                editor.addItem( i, QVariant(CARD_TYPE.index(i)) )
+            value = raw_value.toString()
+            item_index = editor.findText(value)
+            editor.setCurrentIndex( item_index )
+        elif delegate_editor is QDateEdit:
+            value = raw_value.toDate()
+            editor.setDate(value)
+        else:
+            return None
 
-    def setModelData(self, spinBox, model, index):
-        spinBox.interpretText()
-        value = spinBox.value()
-        model.setData(index, QVariant(value), Qt.EditRole)
+    def setModelData(self, editor, model, index):
+        print 'TeamListDelegate: setModelData'
+        # ??? lineEdit.interpretText()
+
+        delegate_editor = self.map[ index.column() ]
+        if not delegate_editor or delegate_editor is QLineEdit:
+            value = editor.text()
+        elif delegate_editor is QComboBox:
+            value = editor.currentIndex()
+        elif delegate_editor is QDateEdit:
+            value = str(editor.date().toPyDate())
+            print 'delegate setModelData', value, type(value)
+        else:
+            value = 'Not implemented'
+        model.setData(index, value, Qt.EditRole)
 
     def updateEditorGeometry(self, editor, option, index):
+        print 'TeamListDelegate: updateEditorGeometry'
         editor.setGeometry(option.rect)
 
 class TeamList(QTableView):
@@ -251,12 +317,16 @@ class TeamList(QTableView):
         QTableView.__init__(self, parent)
 
         self.verticalHeader().setResizeMode(QHeaderView.Fixed)
-        self.horizontalHeader().setResizeMode(QHeaderView.Stretch)
-        self.resizeColumnsToContents()
+        self.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
+        #self.horizontalHeader().setResizeMode(QHeaderView.Stretch)
+        #self.resizeColumnsToContents()
 
         self.actionTeamCancel = QAction(_('Cancel team'), self)
         self.actionTeamCancel.setStatusTip(_('Cancel current team.'))
         self.connect(self.actionTeamCancel, SIGNAL('triggered()'), self.teamCancel)
+
+        self.delegate = TeamListDelegate()
+        self.setItemDelegate(self.delegate)
 
 #     def mousePressEvent(self, event):
 #         if event.button() == Qt.LeftButton:

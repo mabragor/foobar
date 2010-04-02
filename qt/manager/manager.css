@@ -6,6 +6,11 @@ QMainWindow, QDialog {
    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #DD8888, stop:1.0 #FFAAAA);
 }
 
+*[required="true"] {
+   border: 3px solid #448844;
+   border-radius: 3px;
+}
+
 QTabWidget::pane {
    border-top: 2px solid qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #90a0e0, stop:1.0 #303070);
 }

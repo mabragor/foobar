@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 
 from datetime import datetime, date, timedelta
 
-from lib.decorators import ajax_processor
+from lib.decorators import ajax_processor, formset_processor
 
 import forms
 from storage import models as storage
@@ -40,6 +40,15 @@ def abstract_remove(request, form):
                 'errors': form.get_errors()}
     return {'code': 200, 'desc': 'Ok'}
 
+def abstract_formset(request, formset):
+    if formset.is_valid():
+        for form in formset.forms:
+            form.save()
+    else:
+        return {'code': 404, 'desc': 'Form is not valid',
+                'errors': formset.errors}
+    return {'code': 200, 'desc': 'Ok'}
+
 @ajax_processor(forms.Login, isJavaScript)
 def login(request, form):
     response, result = abstract_request(request, form)
@@ -67,10 +76,17 @@ def set_user_info(request, form):
     return abstract_response(request, form)
 
 @login_required
+@formset_processor(forms.ClientCard)
+def set_client_card(request, formset):
+    signal_log_action.send(sender=request.user, action='set_client_card')
+    return abstract_formset(request, formset)
+
+@login_required
 @ajax_processor(forms.UserIdRfid, isJavaScript)
 def get_client_info(request, form):
     response, info = abstract_request(request, form)
     response.update( {'info': info} )
+    #import pprint; pprint.pprint(response)
     return response
 
 @login_required
