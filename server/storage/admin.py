@@ -8,8 +8,8 @@ from django.utils.translation import ugettext_lazy as _
 from storage import models
 
 class CoachAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'email', 'reg_date')
-    fieldsets = ((None, {'fields': ('last_name', 'first_name', 'email')}),)
+    list_display = ('first_name', 'last_name', 'email', 'phone', 'birthday', 'reg_date')
+    fieldsets = ((None, {'fields': ('last_name', 'first_name', 'email', 'phone', 'birthday')}),)
 admin.site.register(models.Coach, CoachAdmin)
 
 class ClientAdmin(admin.ModelAdmin):

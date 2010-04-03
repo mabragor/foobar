@@ -31,6 +31,8 @@ class AbstractUser(models.Model):
             }
 
 class Coach(AbstractUser):
+    phone = models.CharField(verbose_name=_(u'Phone'), max_length=16)
+    birthday = models.DateField(verbose_name=_(u'Birthday'))
 
     class Meta:
         verbose_name = _(u'Coach')
@@ -38,7 +40,10 @@ class Coach(AbstractUser):
 
     def about(self):
         result = super(Coach, self).about()
-        #result.update( {} )
+        result.update( {
+                'phone': self.phone,
+                'birthday': self.birthday,
+                } )
         return result
 
 class Client(AbstractUser):
