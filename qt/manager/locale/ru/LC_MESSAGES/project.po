@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-03 01:47+0400\n"
+"POT-Creation-Date: 2010-04-03 23:22+0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Ruslan Popov <ruslan.popov@gmail.com>\n"
 "Language-Team: LANGUAGE <RU@li.org>\n"
@@ -181,7 +181,7 @@ msgstr "Отменено"
 
 #: dlg_event_info.py:41
 msgid "Fix"
-msgstr "Закрыть"
+msgstr "Зафиксировать"
 
 #: dlg_event_info.py:49
 msgid "Coach"

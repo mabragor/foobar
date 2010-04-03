@@ -281,8 +281,8 @@ class Schedule(models.Model):
     begin = models.DateTimeField(verbose_name=_(u'Begins'))
     end = models.DateTimeField(verbose_name=_(u'Ends'))
     duration = models.FloatField(verbose_name=_(u'Duration'))
-    status = models.CharField(verbose_name=_(u'Status'), max_length=1, choices=ACTION_STATUSES, null=True)
-    fixed = models.CharField(verbose_name=_(u'Fixed'), max_length=1, choices=ACTION_FIXED, null=True)
+    status = models.CharField(verbose_name=_(u'Status'), max_length=1, choices=ACTION_STATUSES, default='0')
+    fixed = models.CharField(verbose_name=_(u'Fixed'), max_length=1, choices=ACTION_FIXED, default='0')
     change = models.ForeignKey(Coach, verbose_name=_(u'Change'), null=True, blank=True)
 
     class Meta:
