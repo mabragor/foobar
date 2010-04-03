@@ -199,11 +199,11 @@ msgstr "Е-почта"
 
 #: storage/models.py:36 storage/models.py:174
 msgid "Coach"
-msgstr "Тренер"
+msgstr "Преподаватель"
 
 #: storage/models.py:37
 msgid "Coaches"
-msgstr "Тренеры"
+msgstr "Преподаватели"
 
 #: storage/models.py:46
 msgid "RFID"
@@ -418,7 +418,7 @@ msgstr "Конец"
 
 #: storage/models.py:280
 msgid "Fixed"
-msgstr ""
+msgstr "Закрыто"
 
 #: storage/models.py:281
 msgid "Change"
@@ -446,7 +446,7 @@ msgstr "Посещения"
 
 #: storage/models.py:392
 msgid "Coach change"
-msgstr "Замена тренера"
+msgstr "Замена преподавателя"
 
 #: storage/models.py:393
 msgid "Economic expenses"

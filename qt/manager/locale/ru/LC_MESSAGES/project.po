@@ -157,7 +157,7 @@ msgstr "Выберите команду на дереве команд."
 
 #: dlg_event_info.py:32 dlg_event_info.py:61
 msgid "Coach change"
-msgstr "Замена тренера"
+msgstr "Замена преподавателя"
 
 #: dlg_event_info.py:34
 msgid "No change"
@@ -185,7 +185,7 @@ msgstr "Закрыть"
 
 #: dlg_event_info.py:49
 msgid "Coach"
-msgstr "Тренер"
+msgstr "Преподаватель"
 
 #: dlg_event_info.py:57
 msgid "Fix as"
@@ -241,15 +241,15 @@ msgstr "Невозможно удалить это событие!"
 
 #: dlg_event_info.py:240
 msgid "The coach of this event has been changed."
-msgstr "Тренер для данного события был заменён."
+msgstr "Преподаватель для данного события был заменён."
 
 #: dlg_event_info.py:242
 msgid "Unable to change a coach."
-msgstr "Невозможно заменить тренера."
+msgstr "Невозможно заменить преподавателя."
 
 #: dlg_event_info.py:243
 msgid "Coach change registration"
-msgstr "Регистрация замены тренера"
+msgstr "Регистрация замены преподавателя"
 
 #: dlg_event_info.py:255
 msgid "The event has been fixed."
