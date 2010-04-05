@@ -398,21 +398,7 @@ class QtScheduleDelegate(QItemDelegate):
                     w * map(lambda x: x[2] == room_id, rooms).index(True)
                 y = dy + row * (option.rect.height() + 1)
                 painter.fillRect(x, y, w, h, self.parent.string2color('#%s' % room_color));
-                # готовимся рисовать границы
-                if self.parent.selected_event == event:
-                    self.prepare( painter, (Qt.blue, 3) )
-                else:
-                    self.prepare( painter, (Qt.black, 1) )
 
-                # отрисовываем элементы в зависимости от типа ячейки
-                painter.drawLine(x, y+h, x, y)
-                painter.drawLine(x+w, y+h, x+w, y)
-                if event.show_type == 'head':
-                    painter.drawLine(x, y, x+w, y)
-                elif event.show_type == 'tail':
-                    painter.drawLine(x, y+h, x+w, y+h)
-                else:
-                    pass
 
                 # тип события: тренировка, аренда
                 if isinstance(event, EventRent) and event.show_type == 'tail':
@@ -453,6 +439,27 @@ class QtScheduleDelegate(QItemDelegate):
                         painter.drawLine(x+(self.STEP*2), y+self.PADDING,
                                          x+(self.STEP*2), y+h-self.PADDING)
                     #painter.drawPixmap(x+3, y+3, 8, 8, QPixmap(XPM_EVENT_CLOSED))
+
+                # готовимся рисовать границы
+                if self.parent.selected_event == event:
+                    self.prepare( painter, (Qt.blue, 3) )
+                else:
+                    self.prepare( painter, (Qt.black, 1) )
+
+                # отрисовываем элементы в зависимости от типа ячейки
+                painter.drawLine(x, y+h, x, y)
+                painter.drawLine(x+w, y+h, x+w, y)
+                if event.show_type == 'head':
+                    painter.drawLine(x, y, x+w, y)
+
+                    self.prepare( painter, (Qt.black, 1) )
+                    painter.drawText(x+1, y+1, w-2, h-2,
+                                     Qt.AlignLeft | Qt.AlignTop,
+                                     event.title)
+                elif event.show_type == 'tail':
+                    painter.drawLine(x, y+h, x+w, y+h)
+                else:
+                    pass
 
         painter.restore()
         #QItemDelegate.paint(self, painter, option, index)
