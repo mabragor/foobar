@@ -39,6 +39,7 @@ class MainWindow(QMainWindow):
 		      }
         self.rooms = []
         self.tree = []
+        self.rfid_id = None
 
         self.menus = []
 	self.createMenus()
@@ -306,7 +307,7 @@ class MainWindow(QMainWindow):
 	self.dialog.setModal(True)
 	dlgStatus = self.dialog.exec_()
 
-	if QDialog.Accepted == dlgStatus:
+	if QDialog.Accepted == dlgStatus and self.rfid_id is not None:
 	    ajax = HttpAjax(self, '/manager/get_client_info/',
 			    {'rfid_code': self.rfid_id,
                              'mode': 'client'}, self.session_id)
@@ -319,6 +320,7 @@ class MainWindow(QMainWindow):
                 self.dialog.setModal(True)
                 self.dialog.initData(response['info'])
                 self.dialog.exec_()
+                self.rfid_id = None
 
     def clientSearchName(self):
 	def callback(user_id):

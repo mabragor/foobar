@@ -31,18 +31,18 @@ class DlgWaitingRFID(QDialog):
         self.setWindowTitle(_('RFID reader'))
 
         self.connect(self.cancel, SIGNAL('clicked()'),
-                     self.unlink)
+                     self.reject)
+
         self.reader.start()
+
+    def done(self, result_code):
+        QDialog.done(self, result_code)
+        #Посылаем потоку RFID считывателя команду тихо завершиться.
+        self.reader.timeToDie()
 
     def closeEvent(self, event):
         self.accept()
         event.accept()
-
-    def unlink(self):
-        #Посылаем потоку RFID считывателя команду тихо завершиться.
-        self.reader.timeToDie()
-        # закрываем диалог
-        self.reject()
 
 class WaitingRFID(QThread):
     def __init__(self, parent):
