@@ -131,7 +131,6 @@ class DlgClientInfo(QDialog):
         self.editRFID.setText(data.get('rfid_code', ''))
 
         teams = data.get('team_list', [])
-        import pprint; pprint.pprint(teams)
         self.teamsModel.initData(self.client_id, teams)
 
     def cancelTeam(self):
