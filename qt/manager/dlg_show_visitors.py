@@ -74,9 +74,6 @@ class DlgShowVisitors(QDialog):
                 response = ajax.parse_json()
                 if response:
                     self.initData(self.event_id)
-                else:
-                    QMessageBox.warning(self, _('Register manually'),
-                                        _('You\'ve entered wrong RFID code.'))
             else:
                 QMessageBox.warning(self, _('Register manually'),
                                     _('You\'ve entered empty string.'))
