@@ -109,8 +109,20 @@ class RegisterVisit(AjaxForm):
     def clean_event_id(self):
         return self.check_obj_existence(storage.Schedule, 'event_id')
 
+    def clean_rfid_code(self):
+        hex_values = [str(i) for i in xrange(10)] + [a for a in 'ABCDEF']
+        for i in self.cleaned_data['rfid_code']:
+            if i.upper() not in hex_values:
+                raise forms.ValidationError(_(u'RFID has to consist of HEX symbols.'))
+        return self.cleaned_data['rfid_code']
+
     def clean(self):
-        client = storage.Client.objects.get(rfid_code=self.cleaned_data['rfid_code'])
+        rfid_id = self.data['rfid_code']
+        try:
+            client = storage.Client.objects.get(rfid_code=rfid_id)
+        except storage.Client.DoesNotExist:
+            raise forms.ValidationError(_(u'No client for a given RFID.'))
+
         event = self.get_object('event_id')
 
         if event.begin <= datetime.now():
