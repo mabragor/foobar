@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-03 23:22+0400\n"
+"POT-Creation-Date: 2010-04-08 19:21+0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Ruslan Popov <ruslan.popov@gmail.com>\n"
 "Language-Team: LANGUAGE <RU@li.org>\n"
@@ -32,7 +32,7 @@ msgstr "Действие"
 msgid "Resources"
 msgstr "Ресурсы"
 
-#: dlg_accounting.py:31 dlg_event_info.py:68 dlg_show_visitors.py:31
+#: dlg_accounting.py:31 dlg_event_info.py:68 dlg_show_visitors.py:33
 msgid "Close"
 msgstr "Закрыть"
 
@@ -49,14 +49,14 @@ msgid "Price"
 msgstr "Цена"
 
 #: dlg_accounting.py:109 dlg_copy_week.py:23 dlg_settings.py:22
-#: dlg_user_info.py:60 dlg_user_info.py:272
+#: dlg_user_info.py:60 dlg_user_info.py:271
 msgid "Apply"
 msgstr "Применить"
 
 #: dlg_accounting.py:110 dlg_copy_week.py:24 dlg_event_assign.py:74
 #: dlg_login.py:37 dlg_rent_assign.py:70 dlg_searching.py:28
 #: dlg_settings.py:23 dlg_team_assign.py:61 dlg_user_info.py:61
-#: dlg_user_info.py:273 dlg_waiting_rfid.py:27
+#: dlg_user_info.py:272 dlg_waiting_rfid.py:27
 msgid "Cancel"
 msgstr "Отмена"
 
@@ -64,8 +64,8 @@ msgstr "Отмена"
 msgid "Add resource"
 msgstr "Добавить ресурс"
 
-#: dlg_accounting.py:137 dlg_event_assign.py:148 dlg_user_info.py:187
-#: http_ajax.py:71 http_ajax.py:77 manager.py:315
+#: dlg_accounting.py:137 dlg_event_assign.py:148 dlg_user_info.py:186
+#: http_ajax.py:71 http_ajax.py:77 manager.py:316
 msgid "Warning"
 msgstr "Внимание"
 
@@ -101,25 +101,25 @@ msgstr "Доступные группы"
 msgid "Assign"
 msgstr "Назначить"
 
-#: dlg_event_assign.py:82 manager.py:195
+#: dlg_event_assign.py:82 manager.py:196
 msgid "Renter"
 msgstr "Арендатор"
 
-#: dlg_event_assign.py:82 dlg_rent_assign.py:30 dlg_user_info.py:257
+#: dlg_event_assign.py:82 dlg_rent_assign.py:30 dlg_user_info.py:256
 msgid "Status"
 msgstr "Статус"
 
 #: dlg_event_assign.py:82 dlg_event_info.py:47 dlg_rent_assign.py:18
-#: dlg_user_info.py:257 team_list.py:23
+#: dlg_user_info.py:256 team_list.py:23
 msgid "Title"
 msgstr "Название"
 
 #: dlg_event_assign.py:83 dlg_event_info.py:51 dlg_rent_assign.py:42
-#: dlg_user_info.py:258 team_list.py:25
+#: dlg_user_info.py:257 team_list.py:25
 msgid "Begin"
 msgstr "Начало"
 
-#: dlg_event_assign.py:83 dlg_rent_assign.py:49 dlg_user_info.py:258
+#: dlg_event_assign.py:83 dlg_rent_assign.py:49 dlg_user_info.py:257
 msgid "End"
 msgstr "Конец"
 
@@ -128,17 +128,17 @@ msgid "Rents"
 msgstr "Аренда"
 
 #: dlg_event_assign.py:96 dlg_event_assign.py:107 dlg_rent_assign.py:28
-#: dlg_user_info.py:314
+#: dlg_user_info.py:313
 msgid "Reserved"
 msgstr "Забронировано"
 
 #: dlg_event_assign.py:97 dlg_event_assign.py:107 dlg_rent_assign.py:28
-#: dlg_user_info.py:314
+#: dlg_user_info.py:313
 msgid "Paid partially"
 msgstr "Оплачено частично"
 
 #: dlg_event_assign.py:98 dlg_event_assign.py:107 dlg_rent_assign.py:28
-#: dlg_rent_assign.py:35 dlg_user_info.py:257 dlg_user_info.py:314
+#: dlg_rent_assign.py:35 dlg_user_info.py:256 dlg_user_info.py:313
 #: team_list.py:23
 msgid "Paid"
 msgstr "Оплачено"
@@ -191,7 +191,7 @@ msgstr "Преподаватель"
 msgid "Fix as"
 msgstr "Закрыть как"
 
-#: dlg_event_info.py:65 dlg_show_visitors.py:28
+#: dlg_event_info.py:65 dlg_show_visitors.py:29
 msgid "Visitors"
 msgstr "Посетители"
 
@@ -203,7 +203,7 @@ msgstr "Посещение"
 msgid "Remove"
 msgstr "Удалить"
 
-#: dlg_event_info.py:84 manager.py:202
+#: dlg_event_info.py:84 manager.py:203
 msgid "Event"
 msgstr "Событие"
 
@@ -295,18 +295,18 @@ msgstr "Поиск"
 msgid "Find"
 msgstr "Найти"
 
-#: dlg_searching.py:40 dlg_show_visitors.py:18 dlg_user_info.py:40
-#: dlg_user_info.py:241 dlg_user_info.py:348
+#: dlg_searching.py:40 dlg_show_visitors.py:19 dlg_user_info.py:40
+#: dlg_user_info.py:240 dlg_user_info.py:347
 msgid "Last name"
 msgstr "Фамилия"
 
-#: dlg_searching.py:41 dlg_show_visitors.py:19 dlg_user_info.py:42
-#: dlg_user_info.py:243 dlg_user_info.py:349
+#: dlg_searching.py:41 dlg_show_visitors.py:20 dlg_user_info.py:42
+#: dlg_user_info.py:242 dlg_user_info.py:348
 msgid "First name"
 msgstr "Имя"
 
-#: dlg_searching.py:42 dlg_user_info.py:44 dlg_user_info.py:245
-#: dlg_user_info.py:350
+#: dlg_searching.py:42 dlg_user_info.py:44 dlg_user_info.py:244
+#: dlg_user_info.py:349
 msgid "E-mail"
 msgstr "Е-почта"
 
@@ -358,13 +358,25 @@ msgstr "Адрес и порт"
 msgid "Login and password"
 msgstr "Логин и пароль"
 
-#: dlg_show_visitors.py:20 dlg_user_info.py:52
+#: dlg_show_visitors.py:21 dlg_user_info.py:52
 msgid "RFID"
 msgstr "RFID"
 
-#: dlg_show_visitors.py:44
+#: dlg_show_visitors.py:32 dlg_show_visitors.py:66 dlg_show_visitors.py:78
+msgid "Register manually"
+msgstr "Регистрация вручную"
+
+#: dlg_show_visitors.py:50
 msgid "Registered visitors"
 msgstr "Зарегистрированные посетители"
+
+#: dlg_show_visitors.py:67
+msgid "Enter a client's RFID code."
+msgstr "Введите номер RFID карты клиента."
+
+#: dlg_show_visitors.py:79
+msgid "You've entered empty string."
+msgstr "Вы ввели пустую строку."
 
 #: dlg_team_assign.py:19
 msgid "Type of card"
@@ -422,7 +434,7 @@ msgstr "Скидка"
 msgid "Date of birth"
 msgstr "Дата рождения"
 
-#: dlg_user_info.py:56 dlg_user_info.py:254
+#: dlg_user_info.py:56 dlg_user_info.py:253
 msgid "Base data"
 msgstr "Общие данные"
 
@@ -438,43 +450,43 @@ msgstr "История команд"
 msgid "Client's information"
 msgstr "Информация о клиенте"
 
-#: dlg_user_info.py:188
+#: dlg_user_info.py:187
 msgid "Please fill required fields."
 msgstr "Пожалуйста, заполните обязательные поля."
 
-#: dlg_user_info.py:247 dlg_user_info.py:353
+#: dlg_user_info.py:246 dlg_user_info.py:352
 msgid "Mobile phone"
 msgstr "Мобильный телефон"
 
-#: dlg_user_info.py:249 dlg_user_info.py:354
+#: dlg_user_info.py:248 dlg_user_info.py:353
 msgid "Work phone"
 msgstr "Рабочий телефон"
 
-#: dlg_user_info.py:251 dlg_user_info.py:355
+#: dlg_user_info.py:250 dlg_user_info.py:354
 msgid "Home phone"
 msgstr "Домашний телефон"
 
-#: dlg_user_info.py:258
+#: dlg_user_info.py:257
 msgid "Registered"
 msgstr "Зарегистрировано"
 
-#: dlg_user_info.py:268
+#: dlg_user_info.py:267
 msgid "Rents' history"
 msgstr "История аренды"
 
-#: dlg_user_info.py:271
+#: dlg_user_info.py:270
 msgid "Assign rent"
 msgstr "Назначить аренду"
 
-#: dlg_user_info.py:294
+#: dlg_user_info.py:293
 msgid "Renter's information"
 msgstr "Информация об арендаторе"
 
-#: dlg_user_info.py:359
+#: dlg_user_info.py:358
 msgid "Phones"
 msgstr "Телефоны"
 
-#: dlg_user_info.py:362
+#: dlg_user_info.py:361
 msgid "Dialog error"
 msgstr "Ошибка в диалоге"
 
@@ -546,152 +558,152 @@ msgstr "Зарегистрируйтесь в системе."
 msgid "HTTP Error"
 msgstr "Ошибка HTTP"
 
-#: manager.py:55
+#: manager.py:56
 msgid "Manager's interface"
 msgstr "Интерфейс менеджера"
 
-#: manager.py:57
+#: manager.py:58
 msgid "Ready"
 msgstr "Готовность"
 
-#: manager.py:67 manager.py:286
+#: manager.py:68 manager.py:287
 msgid "Login to start session"
 msgstr "Зарегистрируйтесь для начала сессии"
 
-#: manager.py:71
+#: manager.py:72
 #, python-format
 msgid "Filter: Room \"%s\" is changed its state"
 msgstr "Фильтрация: Зал \"%s\" изменил своё состояние"
 
-#: manager.py:91
+#: manager.py:92
 msgid "<<"
 msgstr "<<"
 
-#: manager.py:92
+#: manager.py:93
 msgid ">>"
 msgstr ">>"
 
-#: manager.py:93
+#: manager.py:94
 msgid "Today"
 msgstr "Сегодня"
 
-#: manager.py:114
+#: manager.py:115
 msgid "Week:"
 msgstr "Неделя:"
 
-#: manager.py:173 manager.py:225
+#: manager.py:174 manager.py:226
 msgid "File"
 msgstr "Файл"
 
-#: manager.py:174
+#: manager.py:175
 msgid "Log in"
 msgstr "Подключить"
 
-#: manager.py:175
+#: manager.py:176
 msgid "Start user session."
 msgstr "Начать пользовательскую сессию"
 
-#: manager.py:176
+#: manager.py:177
 msgid "Log out"
 msgstr "Отключить"
 
-#: manager.py:177
+#: manager.py:178
 msgid "End user session."
 msgstr "Завершить пользовательскую сессию"
 
-#: manager.py:179
+#: manager.py:180
 msgid "Application settings"
 msgstr "Настройки приложения"
 
-#: manager.py:180
+#: manager.py:181
 msgid "Manage the application settings."
 msgstr "Управление настройками приложения."
 
-#: manager.py:182
+#: manager.py:183
 msgid "Exit"
 msgstr "Выход"
 
-#: manager.py:183
+#: manager.py:184
 msgid "Close the application."
 msgstr "Закрыть приложение"
 
-#: manager.py:186
+#: manager.py:187
 msgid "Client"
 msgstr "Клиент"
 
-#: manager.py:187 manager.py:196
+#: manager.py:188 manager.py:197
 msgid "New"
 msgstr "Новый"
 
-#: manager.py:188
+#: manager.py:189
 msgid "Register new client."
 msgstr "Регистрация нового клиента."
 
-#: manager.py:189
+#: manager.py:190
 msgid "Search by RFID"
 msgstr "Поиск по RFID"
 
-#: manager.py:190
+#: manager.py:191
 msgid "Search a client with its RFID card."
 msgstr "Поиск клиента по его RFID метке."
 
-#: manager.py:191 manager.py:198
+#: manager.py:192 manager.py:199
 msgid "Search by name"
 msgstr "Поиск по имени"
 
-#: manager.py:192
+#: manager.py:193
 msgid "Search a client with its name."
 msgstr "Найти клиента по его имени."
 
-#: manager.py:197
+#: manager.py:198
 msgid "Register new renter."
 msgstr "Регистрация нового арендатора."
 
-#: manager.py:199
+#: manager.py:200
 msgid "Search a renter with its name."
 msgstr "Найти арендатора по его имени."
 
-#: manager.py:203
+#: manager.py:204
 msgid "Training"
 msgstr "Тренировка"
 
-#: manager.py:204
+#: manager.py:205
 msgid "Assign a training event."
 msgstr "Назначить тренировку."
 
-#: manager.py:205
+#: manager.py:206
 msgid "Rent"
 msgstr "Аренда"
 
-#: manager.py:206
+#: manager.py:207
 msgid "Assign a rent event."
 msgstr "Назначить аренду."
 
-#: manager.py:209
+#: manager.py:210
 msgid "Calendar"
 msgstr "Календарь"
 
-#: manager.py:210
+#: manager.py:211
 msgid "Copy week"
 msgstr "Копировать неделю"
 
-#: manager.py:211
+#: manager.py:212
 msgid "Copy current week into other."
 msgstr "Копировать текущую неделю в другую."
 
-#: manager.py:278
+#: manager.py:279
 msgid "Login failed"
 msgstr "Логин не прошёл"
 
-#: manager.py:279
+#: manager.py:280
 msgid "It seems you've entered wrong login/password."
 msgstr "Кажется, вы ввели неправильный логин/пароль."
 
-#: manager.py:316
+#: manager.py:317
 msgid "This RFID belongs to nobody."
 msgstr "Данная RFID метка никому не принадлежит."
 
-#: manager.py:424 manager.py:437
+#: manager.py:426 manager.py:439
 msgid "The week has been copied sucessfully."
 msgstr "Неделя была скопирована успешно."
 
