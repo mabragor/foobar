@@ -123,7 +123,6 @@ class RegisterVisit(AjaxForm):
         cards = client.card_set.filter(bgn_date__lte=today,
                                        exp_date__gt=today,
                                        price__lte=event.team.price)
-        print cards
         if len(cards) == 0:
             raise forms.ValidationError(_(u'The client has no cards.'))
         else:
