@@ -25,6 +25,7 @@ class Event(object):
         self.duration = duration
         self.status = status
         self.fixed = int(fixed)
+        self.event = None # it will be overriden in successors
 
     def __unicode__(self):
         return self.title
@@ -34,7 +35,7 @@ class Event(object):
         return self.schedule_id
 
     @property
-    def event_id(self):
+    def event_id(self): # the same as schedule_id
         return self.event['id']
 
     @property
@@ -259,7 +260,7 @@ class EventStorage(QAbstractTableModel):
             self.parent.statusBar().showMessage(_('Filling the calendar...'))
             self.storage.init()
             for e in response['events']:
-                qApp.processEvents()
+                qApp.processEvents() # keep GUI active
 
                 begin = __(e['begin'])
                 end = __(e['end'])

@@ -379,7 +379,12 @@ class MainWindow(QMainWindow):
                              'ev_type': 0}, self.session_id)
             response = ajax.parse_json()
             id = int(response['saved_id'])
-            event = EventTraining(team, id, begin, duration, 0, 0)
+            event_info = {'id': id,
+                          'title': title, 'price': price,
+                          'count': count, 'coach': coach,
+                          'duration': duration,
+                          'groups': _('Waiting for update.')}
+            event = EventTraining(event_info, id, begin, duration, 0, 0)
             self.schedule.insertEvent(room, event)
 
 	self.dialog = DlgEventAssign('training', self)
