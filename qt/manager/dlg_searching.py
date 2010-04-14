@@ -84,8 +84,9 @@ class DlgSearchByName(QDialog):
         params = {'name': name, 'mode': self.mode}
         ajax = HttpAjax(self, '/manager/get_users_info_by_name/', params, self.parent.session_id)
         response = ajax.parse_json()
-        user_list = response['users']
-        self.showList(user_list)
+        if response:
+            user_list = response['users']
+            self.showList(user_list)
 
     def showList(self, user_list):
         self.user_list = user_list
