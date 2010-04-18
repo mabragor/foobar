@@ -4,6 +4,7 @@
 from settings import _, DEBUG
 from model_sorting import SortClientTeams
 from team_list import TeamListModel, TeamList
+from rent_list import RentListModel, RentList
 from http_ajax import HttpAjax
 from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_team_assign import DlgTeamAssign
@@ -205,7 +206,7 @@ class DlgClientInfo(QDialog):
             'user_id': self.client_id,
             }
         params.update(userinfo)
-        ajax = HttpAjax(self, '/manager/set_user_info/', params, self.parent.session_id)
+        ajax = HttpAjax(self, '/manager/set_client_info/', params, self.parent.session_id)
         response = ajax.parse_json()
         client_id = int( response['saved_id'] )
         params = {
@@ -253,13 +254,17 @@ class DlgRenterInfo(QDialog):
         groupUser = QGroupBox(_('Base data'))
         groupUser.setLayout(layoutUser)
 
-        labels = QStringList([_('Title'), _('Status'), _('Paid'),
-                              _('Begin'), _('End'), _('Registered')])
+        self.buttonAssignRent = QPushButton(_('Assign rent'))
+        self.buttonApplyDialog = QPushButton(_('Apply'))
+        self.buttonCancelDialog = QPushButton(_('Cancel'))
 
-        self.rentinfo = QTableWidget(0, 6)
-        self.rentinfo.setHorizontalHeaderLabels(labels)
-        self.rentinfo.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
-        #self.rentinfo.hideColumn(2)
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(self.buttonAssignRent)
+        buttonLayout.addStretch(1)
+        buttonLayout.addWidget(self.buttonApplyDialog)
+        buttonLayout.addWidget(self.buttonCancelDialog)
+
+        self.rentinfo = RentList(self)
 
         rentLayout = QVBoxLayout()
         rentLayout.addWidget(self.rentinfo)
@@ -267,35 +272,29 @@ class DlgRenterInfo(QDialog):
         groupRent = QGroupBox(_('Rents\' history'))
         groupRent.setLayout(rentLayout)
 
-        buttonAssignRent = QPushButton(_('Assign rent'))
-        buttonApplyDialog = QPushButton(_('Apply'))
-        buttonCancelDialog = QPushButton(_('Cancel'))
-
-        self.connect(buttonAssignRent, SIGNAL('clicked()'),
-                     self.showAssignRentDlg)
-        self.connect(buttonApplyDialog, SIGNAL('clicked()'),
-                     self.applyDialog)
-        self.connect(buttonCancelDialog, SIGNAL('clicked()'),
-                     self, SLOT('reject()'))
-
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(buttonAssignRent)
-        buttonLayout.addStretch(1)
-        buttonLayout.addWidget(buttonApplyDialog)
-        buttonLayout.addWidget(buttonCancelDialog)
-
         layout = QVBoxLayout()
         layout.addWidget(groupUser)
-        layout.addWidget(groupRent)
         layout.addLayout(buttonLayout)
+        layout.addWidget(groupRent)
 
         self.setLayout(layout)
         self.setWindowTitle(_('Renter\'s information'))
 
-        #self.editLastName.setProperty('errorHighlight', QVariant(True))
+        self.rentInfoModel = RentListModel(self)
+        self.rentinfo.setModel(self.rentInfoModel)
+
+        self.setSignals()
+
+    def setSignals(self):
+        self.connect(self.buttonAssignRent, SIGNAL('clicked()'),
+                     self.showAssignRentDlg)
+        self.connect(self.buttonApplyDialog, SIGNAL('clicked()'),
+                     self.applyDialog)
+        self.connect(self.buttonCancelDialog, SIGNAL('clicked()'),
+                     self, SLOT('reject()'))
 
     def initData(self, data):
-        self.user_id = data['id']
+        self.renter_id = data['id']
         self.editLastName.setText(data.get('last_name', ''))
         self.editFirstName.setText(data.get('first_name', ''))
         self.editEmail.setText(data.get('email', ''))
@@ -303,22 +302,8 @@ class DlgRenterInfo(QDialog):
         self.editPhoneWork.setText(data.get('phone_work', ''))
         self.editPhoneHome.setText(data.get('phone_home', ''))
 
-        self.fillRentList(data.get('rent_list', []))
-
-    def fillRentList(self, rent_list):
-        for rent in rent_list:
-            self.addOneRow(rent)
-
-    def addOneRow(self, row):
-        status = [_('Reserved'), _('Paid partially'), _('Paid')][int( row['status'] )]
-        lastRow = self.rentinfo.rowCount()
-        self.rentinfo.insertRow(lastRow)
-        self.rentinfo.setItem(lastRow, 0, QTableWidgetItem(row['title']))
-        self.rentinfo.setItem(lastRow, 1, QTableWidgetItem(status))
-        self.rentinfo.setItem(lastRow, 2, QTableWidgetItem(str(row['paid'])))
-        self.rentinfo.setItem(lastRow, 3, QTableWidgetItem(str(row['begin_date'])))
-        self.rentinfo.setItem(lastRow, 4, QTableWidgetItem(str(row['end_date'])))
-        self.rentinfo.setItem(lastRow, 5, QTableWidgetItem(str(row['reg_date'])))
+        rents = data.get('rent_list', [])
+        self.rentInfoModel.initData(self.renter_id, rents)
 
     def showAssignRentDlg(self):
         dialog = DlgRentAssign(self)
@@ -328,7 +313,7 @@ class DlgRenterInfo(QDialog):
 
     def assignRent(self, title, desc, status, paid, begin, end):
         params = {
-            'renter_id': self.user_id,
+            'renter_id': self.renter_id,
             'title': title,
             'desc': desc,
             'status': status,
@@ -337,11 +322,32 @@ class DlgRenterInfo(QDialog):
             'end_date': end,
             'reg_date': datetime.now()
             }
-        #print 'DlgRenterInfo::assignRent\n', params, '\n'
-        self.assigned.append(params)
-        self.addOneRow(params)
+        print 'DlgRenterInfo::assignRent\n', params, '\n'
+        lastRow = self.rentInfoModel.rowCount(QModelIndex())
+        if self.rentInfoModel.insertRows(lastRow, 1, QModelIndex()):
+            index = self.rentInfoModel.index(0, 0)
+            self.rentInfoModel.setRow(index, data, Qt.EditRole, params)
 
     def applyDialog(self):
+        userinfo, ok = self.checkFields()
+        if ok:
+            rents_info = self.rentInfoModel.get_model_as_formset()
+            self.saveSettings(userinfo, rents_info)
+            self.accept()
+        else:
+            QMessageBox.warning(self, _('Warning'),
+                                _('Please fill required fields.'))
+
+    def checkFields(self):
+        userinfo = {
+            'last_name': self.editLastName.text().toUtf8(),
+            'first_name': self.editFirstName.text().toUtf8(),
+            'email': self.editEmail.text().toUtf8(),
+            'phone_mobile': self.editPhoneMobile.text().toUtf8(),
+            'phone_work': self.editPhoneWork.text().toUtf8(),
+            'phone_home': self.editPhoneHome.text().toUtf8(),
+            }
+
         errorHighlight = []
         phones = 0
         for title, widget in [(_('Last name'), self.editLastName),
@@ -360,33 +366,37 @@ class DlgRenterInfo(QDialog):
             QMessageBox.critical(
                 self.parent, _('Dialog error'),
                 'Fields %s must be filled.' % ', '.join(errorHighlight))
-            return
+            return (userinfo, False)
+        return (userinfo, True)
+
+    def saveSettings(self, userinfo, formset):
         params = {
-            'user_id': self.user_id,
-            'last_name': self.editLastName.text().toUtf8(),
-            'first_name': self.editFirstName.text().toUtf8(),
-            'email': self.editEmail.text().toUtf8(),
-            'phone_mobile': self.editPhoneMobile.text().toUtf8(),
-            'phone_work': self.editPhoneWork.text().toUtf8(),
-            'phone_home': self.editPhoneHome.text().toUtf8(),
+            'renter_id': self.renter_id,
             }
-        #print 'DlgRentAssign::applyDialog\n', params, '\n';
+        params.update(userinfo)
         ajax = HttpAjax(self, '/manager/set_renter_info/', params, self.parent.session_id)
         response = ajax.parse_json()
         renter_id = int( response['saved_id'] )
+        params = {
+            'renter_id': client_id,
+            }
+        params.update(formset)
+        ajax = HttpAjax(self, '/manager/set_renter_card/', params, self.parent.session_id)
+        response = ajax.parse_json()
 
-        for rent in self.assigned:
-            params = {
-                'renter_id'  : renter_id,
-                'status'     : rent['status'],
-                'title'      : rent['title'].toUtf8(),
-                'desc'       : rent['desc'].toUtf8(),
-                'begin_date' : rent['begin_date'],
-                'end_date'   : rent['end_date'],
-                'paid'       : rent['paid'],
-                }
-            ajax = HttpAjax(self, '/manager/set_rent/', params, self.parent.session_id)
-            response = ajax.parse_json()
-            rent_id = int( response['saved_id'] )
 
-        self.accept()
+#         for rent in self.assigned:
+#             params = {
+#                 'renter_id'  : renter_id,
+#                 'status'     : rent['status'],
+#                 'title'      : rent['title'].toUtf8(),
+#                 'desc'       : rent['desc'].toUtf8(),
+#                 'begin_date' : rent['begin_date'],
+#                 'end_date'   : rent['end_date'],
+#                 'paid'       : rent['paid'],
+#                 }
+#             ajax = HttpAjax(self, '/manager/set_rent/', params, self.parent.session_id)
+#             response = ajax.parse_json()
+#             rent_id = int( response['saved_id'] )
+
+#         self.accept()

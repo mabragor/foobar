@@ -66,7 +66,6 @@ def formset_processor(base_form):
                 if formset.is_valid():
                     result = func(request, formset, *args, **kwargs)
                 else:
-                    import pprint; pprint.pprint( formset.errors )
                     if settings.DEBUG:
                         result = {'code': '301', 'desc': _(u'Form is not valid : %s') % formset.errors}
                     else:
@@ -76,8 +75,6 @@ def formset_processor(base_form):
                     result = {'code': '401', 'desc': _(u'It must be POST')}
                 else:
                     result = {'code': '401', 'desc': _(u'Please, do not break our code :)')}
-
-
             json = simplejson.dumps(result, cls=DatetimeJSONEncoderQt)
             return HttpResponse(json, mimetype="application/json")
         return wrapper

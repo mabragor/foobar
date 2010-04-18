@@ -71,8 +71,8 @@ def get_users_info_by_name(request, form):
 
 @login_required
 @ajax_processor(forms.ClientInfo, isJavaScript)
-def set_user_info(request, form):
-    signal_log_action.send(sender=request.user, action='set_user_info')
+def set_client_info(request, form):
+    signal_log_action.send(sender=request.user, action='set_client_info')
     return abstract_response(request, form)
 
 @login_required
@@ -96,9 +96,9 @@ def set_renter_info(request, form):
     return abstract_response(request, form)
 
 @login_required
-@ajax_processor(forms.RegisterRent, isJavaScript)
-def set_rent(request, form):
-    signal_log_action.send(sender=request.user, action='set_rent')
+@ajax_processor(forms.RenterCard, isJavaScript)
+def set_renter_card(request, form):
+    signal_log_action.send(sender=request.user, action='set_renter_card')
     return abstract_response(request, form)
 
 @login_required
@@ -135,7 +135,7 @@ def register_visit(request, form):
     return abstract_response(request, form)
 
 @login_required
-@ajax_processor(forms.RegisterRent, isJavaScript)
+@ajax_processor(forms.RenterCard, isJavaScript)
 def register_rent(request, form):
     signal_log_action.send(sender=request.user, action='register_rent')
     return abstract_response(request, form)

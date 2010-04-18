@@ -432,8 +432,8 @@ class EventStorage(QAbstractTableModel):
     def flags(self, index):
         """ Метод для определения списка элементов, которые могут участвовать
         в DnD операциях. """
-        if DEBUG:
-            print 'EventStorage::flags', index.row(), index.column()
+        #if DEBUG:
+        #    print 'EventStorage::flags', index.row(), index.column()
         if index.isValid():
             res = (Qt.ItemIsEnabled | Qt.ItemIsSelectable
                    | Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled)

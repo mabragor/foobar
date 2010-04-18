@@ -4,13 +4,10 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
-from lib.decorators import ajax_processor
+from lib.decorators import ajax_processor, render_to
 from django.shortcuts import get_object_or_404
-from lib import DatetimeJSONEncoder
-from lib.decorators import render_to
+#from lib import DatetimeJSONEncoder
 #from forms import ScheduleForm, UserRFID, StatusForm, CopyForm, UserCardForm
-
-from storage.models import Schedule, Room, Group, Client, Card, Coach
 
 #@render_to('manager/index.html')
 @render_to('manager.html')
@@ -21,6 +18,7 @@ def index(request):
 
 @ajax_processor()
 def ajax_get_rooms(request):
+    from storage.models import Room
     rooms = Room.objects.all()
     return {'rows': [item.about() for item in rooms]}
 

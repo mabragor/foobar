@@ -100,7 +100,7 @@ class Rent(models.Model):
 
     RENT_STATUS = enumerate( (_(u'Reserved'),
                               _(u'Piad partially'),
-                              _('Paid')) )
+                              _(u'Paid')) )
 
     renter = models.ForeignKey(Renter, verbose_name=_(u'Renter'))
     status = models.CharField(verbose_name=_(u'Status'), max_length=1, choices=RENT_STATUS, default=0)

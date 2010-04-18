@@ -187,6 +187,30 @@ class UserSearch(AjaxForm):
         users = model.objects.filter(Q(first_name=name)|Q(last_name=name))
         return [item.about() for item in users]
 
+class UserIdRfid(AjaxForm):
+    """ Form returns user's info using passed IDs and mode. """
+    user_id = forms.IntegerField(required=False)
+    rfid_code = forms.CharField(max_length=8, required=False)
+    mode = forms.CharField(max_length=6)
+
+    def query(self, request=None):
+        mode = self.param('mode')
+        user_id = self.param('user_id')
+        if mode == 'client':
+            try:
+                if user_id is None:
+                    user = storage.Client.objects.get(rfid_code=self.param('rfid_code'))
+                else:
+                    user = storage.Client.objects.get(id=user_id)
+            except storage.Client.DoesNotExist:
+                return None
+        elif mode == 'renter':
+            try:
+                user = storage.Renter.objects.get(id=user_id)
+            except storage.Renter.DoesNotExist:
+                return None
+        return user.about()
+
 class UserInfo(AjaxForm):
     """ Base form for Client and Renter. See below. """
     user_id = forms.IntegerField()
@@ -230,47 +254,49 @@ class ClientInfo(UserInfo):
         return user.id
 
 class ClientCard(AjaxForm):
-    client_id = forms.IntegerField()
-    card_id = forms.IntegerField()
-    team_id = forms.IntegerField()
-    type_id = forms.IntegerField()
+
+    client = forms.IntegerField()
+    card = forms.IntegerField()
+    team = forms.IntegerField()
+    type = forms.IntegerField()
     paid = forms.FloatField()
-    sold = forms.IntegerField()
-    begin = forms.DateTimeField()
-    expire = forms.DateTimeField()
+    count_sold = forms.IntegerField()
+    bgn_date = forms.DateTimeField()
+    exp_date = forms.DateTimeField()
 
-    def clean_client_id(self):
-        return self.check_obj_existence(storage.Client, 'client_id')
+    def clean_client(self):
+        return self.check_obj_existence(storage.Client, 'client')
 
-    def clean_team_id(self):
-        return self.check_obj_existence(storage.Team, 'team_id')
+    def clean_team(self):
+        return self.check_obj_existence(storage.Team, 'team')
 
     def save(self):
         data = self.cleaned_data
-        client = self.get_object('client_id')
-        team = self.get_object('team_id')
+        print data
+        client = self.get_object('client')
+        team = self.get_object('team')
 
-        card_id = data['card_id']
+        card_id = data['card']
         if card_id == 0:
             card = storage.Card(client=client, team=team,
-                                type=data['type_id'],
-                                bgn_date=data['begin'],
-                                exp_date=data['expire'],
-                                count_sold=data['sold'],
+                                type=data['type'],
+                                bgn_date=data['bgn_date'],
+                                exp_date=data['exp_date'],
+                                count_sold=data['count_sold'],
                                 price=team.price,
                                 paid=data['paid'])
         else:
             card = storage.Card.objects.get(id=card_id)
             card.paid = data['paid']
-            card.type = data['type_id']
-            card.count_sold = data['sold']
-            card.bgn_date=data['begin']
-            card.exp_date=data['expire']
+            card.type = data['type']
+            card.count_sold = data['count_sold']
+            card.bgn_date=data['bgn_date']
+            card.exp_date=data['exp_date']
         card.save()
 
 class RenterInfo(UserInfo):
     """ See parent. Form saves and returns the ID of the created
-    renter. Also it may just returns the user's info using passed
+    renter. Also it may just update the renter's info using passed
     ID. """
     phone_mobile = forms.CharField(max_length=16, required=False)
     phone_work = forms.CharField(max_length=16, required=False)
@@ -285,42 +311,18 @@ class RenterInfo(UserInfo):
 
     def save(self):
         data = self.cleaned_data
-        user_id = data['user_id']; del(data['user_id'])
-        if 0 == user_id:
-            user = storage.Renter(**data)
+        renter_id = data['renter_id']; del(data['renter_id'])
+        if 0 == renter_id:
+            renter = storage.Renter(**data)
         else:
-            user = storage.Renter.objects.get(id=user_id)
+            renter = storage.Renter.objects.get(id=renter_id)
             for key, value in data.items():
-                setattr(user, key, value)
-        user.save()
-        return user.id
+                setattr(renter, key, value)
+        renter.save()
+        return renter.id
 
-class UserIdRfid(AjaxForm):
-    """ Form returns user's info using passed IDs and mode. """
-    user_id = forms.IntegerField(required=False)
-    rfid_code = forms.CharField(max_length=8, required=False)
-    mode = forms.CharField(max_length=6)
-
-    def query(self, request=None):
-        mode = self.param('mode')
-        user_id = self.param('user_id')
-        if mode == 'client':
-            try:
-                if user_id is None:
-                    user = storage.Client.objects.get(rfid_code=self.param('rfid_code'))
-                else:
-                    user = storage.Client.objects.get(id=user_id)
-            except storage.Client.DoesNotExist:
-                return None
-        elif mode == 'renter':
-            try:
-                user = storage.Renter.objects.get(id=user_id)
-            except storage.Renter.DoesNotExist:
-                return None
-        return user.about()
-
-class RegisterRent(AjaxForm):
-    """ Form registers the rent and returns its ID. """
+class RenterCard(AjaxForm):
+    """ Form registers/updates the rent and returns its ID. """
 
     renter_id = forms.IntegerField()
     status = forms.IntegerField()
@@ -346,10 +348,11 @@ class RegisterRent(AjaxForm):
         return self.cleaned_data
 
     def save(self):
-        data = self.cleaned_data
-        data.update( {'renter': self.obj_by_id(storage.Renter, 'renter_id')} )
-        rent = storage.Rent(**data)
-        rent.save()
+        #data = self.cleaned_data
+        #data.update( {'renter': self.obj_by_id(storage.Renter, 'renter_id')} )
+        rent = super(RenterCard, self).save(commit=False)
+        #rent = storage.Rent(**data)
+        #rent.save()
         return rent.id
 
 class RegisterChange(AjaxForm):
