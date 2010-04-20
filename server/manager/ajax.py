@@ -96,10 +96,10 @@ def set_renter_info(request, form):
     return abstract_response(request, form)
 
 @login_required
-@ajax_processor(forms.RenterCard, isJavaScript)
-def set_renter_card(request, form):
+@formset_processor(forms.RenterCard)
+def set_renter_card(request, formset):
     signal_log_action.send(sender=request.user, action='set_renter_card')
-    return abstract_response(request, form)
+    return abstract_formset(request, formset)
 
 @login_required
 @ajax_processor(forms.UserIdRfid, isJavaScript)

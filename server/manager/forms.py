@@ -272,7 +272,6 @@ class ClientCard(AjaxForm):
 
     def save(self):
         data = self.cleaned_data
-        print data
         client = self.get_object('client')
         team = self.get_object('team')
 
@@ -311,7 +310,7 @@ class RenterInfo(UserInfo):
 
     def save(self):
         data = self.cleaned_data
-        renter_id = data['renter_id']; del(data['renter_id'])
+        renter_id = data['user_id'];
         if 0 == renter_id:
             renter = storage.Renter(**data)
         else:
@@ -324,7 +323,8 @@ class RenterInfo(UserInfo):
 class RenterCard(AjaxForm):
     """ Form registers/updates the rent and returns its ID. """
 
-    renter_id = forms.IntegerField()
+    renter = forms.IntegerField()
+    id = forms.IntegerField() # rent_id
     status = forms.IntegerField()
     title = forms.CharField(max_length=64)
     desc = forms.CharField()
@@ -332,27 +332,47 @@ class RenterCard(AjaxForm):
     end_date = forms.DateField()
     paid = forms.FloatField()
 
-    def clean_renter_id(self):
-        return self.check_obj_existence(storage.Renter, 'renter_id')
+    def clean_renter(self):
+        return self.check_obj_existence(storage.Renter, 'renter')
 
     # FIXME: Add the status range check
 
     def clean(self):
-        data = self.cleaned_data
-        begin = data['begin_date']
-        end = data['end_date']
-        if begin < date.today():
+        rent_id = self.cleaned_data['id']
+        begin = self.cleaned_data['begin_date']
+        end = self.cleaned_data['end_date']
+
+        # don't allow to create rent for dates in the past
+        if rent_id == 0 and begin < date.today():
             raise forms.ValidationError(_(u'Avoid a rent assignment in the past.'))
+
+        # check dates
         if end < begin:
             raise forms.ValidationError(_(u'Exchange the dates.'))
         return self.cleaned_data
 
     def save(self):
-        #data = self.cleaned_data
-        #data.update( {'renter': self.obj_by_id(storage.Renter, 'renter_id')} )
-        rent = super(RenterCard, self).save(commit=False)
-        #rent = storage.Rent(**data)
-        #rent.save()
+        data = self.cleaned_data
+        renter = self.get_object('renter')
+
+        rent_id = data['id']
+        if rent_id == 0:
+            rent = storage.Rent(renter=renter,
+                                status=data['status'],
+                                title=data['title'],
+                                desc=data['desc'],
+                                begin_date=data['begin_date'],
+                                end_date=data['end_date'],
+                                paid=data['paid'])
+        else:
+            rent = storage.Rent.objects.get(id=rent_id)
+            rent.status = data['status']
+            rent.title=data['title']
+            rent.desc=data['desc']
+            rent.begin_date=data['begin_date']
+            rent.end_date=data['end_date']
+            rent.paid=data['paid']
+        rent.save()
         return rent.id
 
 class RegisterChange(AjaxForm):

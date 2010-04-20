@@ -13,48 +13,96 @@ from PyQt4.QtCore import *
 RENT_STATUS = [_('Reserved'), _('Paid partially'),
                _('Paid'), _('Cancelled')]
 
+def _dtapply(value):
+    if value is not None:
+        if type(value) in [date, datetime]:
+            return value
+        if type(value) is str:
+            if len(value) == 10:
+                result = datetime.strptime(value, '%Y-%m-%d')
+            else:
+                result = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+            return result.date()
+        raise RuntimeWarning
+    else:
+        return None
+
+MODEL_MAP = ( # describes all fields in the model
+    # title
+    {'type': unicode,
+     'delegate': None},
+    # rent status
+    {'type': lambda x: RENT_STATUS[int(x)],
+     'delegate': QComboBox},
+    # paid
+    {'type': float,
+     'delegate': QLineEdit},
+    # begin_data
+    {'type': _dtapply,
+     'delegate': QDateEdit},
+    # end_data
+    {'type': _dtapply,
+     'delegate': QDateEdit},
+    # reg_data
+    {'type': _dtapply,
+     'delegate': None},
+    # record id
+    {'type': int,
+     'delegate': None},
+    # desc
+    {'type': unicode,
+     'delegate': None}
+    )
+
 class RentListModel(QAbstractTableModel):
 
     def __init__(self, parent=None):
         QAbstractTableModel.__init__(self, parent)
 
-        # here the data is stored
-        self.storage = []
-        self.hidden_fields = 1
+        self.storage = [] # here the data is stored
+        self.hidden_fields = 2 # from end of following lists
 
         self.labels = [_('Title'), _('Status'), _('Paid'),
-                       _('Begin'), _('Expired'), _('Register'),
-                       'id', 'team_id']
+                       _('Begin'), _('Expired'), _('Assigned'),
+                       'id', 'desc']
         self.model_fields = ['title', 'status', 'paid',
                              'begin_date', 'end_date', 'reg_date',
-                             'id']
+                             'id', 'desc']
 
     def initData(self, renter_id, data):
         """ The format of received data: see about() method of the model. """
         self.renter_id = renter_id
         for rec in data:
             if type(rec) is dict:
-                row = []
-                for field in self.model_fields:
-                    row.append( rec[field] )
-                self.storage.append( row )
-                self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
-                          QModelIndex(), 1, self.rowCount())
+                self.storage.append( [ rec[field] for field in self.model_fields] )
             else:
                 raise 'Check format'
+
+        # this signal must be emitted after initializing the model
+        self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
+                  QModelIndex(), 1, self.rowCount())
 
     def get_model_as_formset(self):
         formset = {
             'form-TOTAL_FORMS': str(len(self.storage)),
             'form-INITIAL_FORMS': u'0',
             }
+
         for record in self.storage:
             index = self.storage.index(record)
             row = {}
-            for i in record:
-                rec_idx = record.index(i)
-                field_name = self.model_fields[rec_idx]
-                row.update( {'form-%s-%s' % (index, field_name): i} )
+            for field_name in self.model_fields:
+                rec_idx = self.model_fields.index(field_name)
+                value = record[rec_idx]
+
+                # unicode objects have to be converted into utf-8
+                if unicode == MODEL_MAP[rec_idx]['type']:
+                    if type(value) is QString:
+                        value = value.toUtf8()
+                    else:
+                        value = value.encode('utf-8')
+
+                row.update( {'form-%s-%s' % (index, field_name): value} )
             formset.update( row )
         return formset
 
@@ -64,11 +112,11 @@ class RentListModel(QAbstractTableModel):
         else:
             return len(self.storage)
 
-    def columnCount(self, parent=None):# base class method
+    def columnCount(self, parent=None): # base class method
         if parent and parent.isValid():
             return 0
         else:
-            return len(self.labels) - self.hidden_fields
+            return len(self.model_fields) - self.hidden_fields
 
     def modelColumnCount(self):
         return len(self.model_fields)
@@ -85,21 +133,6 @@ class RentListModel(QAbstractTableModel):
             return Qt.ItemIsEnabled
         return Qt.ItemIsEnabled | Qt.ItemIsEditable
 
-    def _dtapply(self, value):
-        if value is not None:
-            if type(value) in [date, datetime]:
-                return value
-            if type(value) is str:
-                if len(value) == 10:
-                    result = datetime.strptime(value, '%Y-%m-%d')
-                else:
-                    result = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
-                return result.date()
-            print 'dtapply', value
-            raise RuntimeWarning
-        else:
-            return None
-
     def data(self, index, role): # base class method
         if not index.isValid():
             return QVariant()
@@ -109,18 +142,7 @@ class RentListModel(QAbstractTableModel):
         idx_col = index.column()
         record = list(self.storage[idx_row])
 
-        # Warning! This tuple describes field value types.
-        # Look at RentListDelegate! These tuples must be synced.
-        map = ( unicode, # title
-                lambda x: RENT_STATUS[int(x)], # rent status
-                float, # paid
-                self._dtapply, # begin_data
-                self._dtapply, # end_data
-                self._dtapply, # reg_data
-                int, # record id
-                )
-
-        object_type = map[idx_col]
+        object_type = MODEL_MAP[idx_col]['type']
         try:
             value = record[idx_col]
         except IndexError:
@@ -131,29 +153,19 @@ class RentListModel(QAbstractTableModel):
         else:
             return QVariant(object_type(value))
 
-    def setRow(self, index, record, role, card_type=1,
-               bgn_date=date.today(), duration_index=0):
+    def setRow(self, index, record, role):
         if index.isValid() and role == Qt.EditRole:
-            import pprint; pprint.pprint(record)
-            return
-            #########
-            title, team_id, count, price, coach, duration = record
-            paid = 0
-            record = [title, price, paid, card_type, count, 0,
-                      reg_date, bgn_date, exp_date, None, 0, team_id]
-
             idx_row = index.row()
             idx_col = 0
             # set each field
-            for i in record:
-                self.setData(self.createIndex(idx_row, idx_col), i, role)
+            for i in self.model_fields:
+                self.setData(self.createIndex(idx_row, idx_col), record[i], role)
                 idx_col += 1
 
     def setData(self, index, value, role):
         if index.isValid() and role == Qt.EditRole:
             idx_row = index.row()
             idx_col = index.column()
-            print '[%i, %i] %s' % (idx_row, idx_col, value)
 
             record = list(self.storage[idx_row])
             if len(record) == 0: # init record in this case
@@ -166,10 +178,8 @@ class RentListModel(QAbstractTableModel):
             else:
                 v = value
 
-            #print type(value), value
             record[idx_col] = v
-            self.storage[idx_row] = tuple(record)
-
+            self.storage[idx_row] = list(record)
             self.emit(SIGNAL('dataChanged(QModelIndex, QModelIndex)'),
                       index, index)
             return True
@@ -193,37 +203,22 @@ class RentListDelegate(QItemDelegate):
 
     """ The delegate allow to user to change the model values. """
 
-    # Warning! This tuple describes field value types.
-    # Look at TeamList::data method! These tuples must be synced.
-    map = ( None, # title
-            QComboBox, # rent status
-            QLineEdit, # paid
-            QDateEdit, # begin_data
-            QDateEdit, # end_data
-            None, # reg_data
-            None, # record id
-            )
-
     def __init__(self, parent=None):
         QItemDelegate.__init__(self, parent)
-        print 'RentListDelegate: constructor'
-
-#     def eventFilter(obj, event):
-#         print 'event type', event.type()
 
     def createEditor(self, parent, option, index):
-        print 'RentListDelegate: createEditor'
-        delegate_editor = self.map[ index.column() ]
+        delegate_editor = MODEL_MAP[ index.column() ]['delegate']
+
         if delegate_editor:
             return delegate_editor(parent)
         else:
             return None
 
     def setEditorData(self, editor, index):
-        print 'RentListDelegate: setEditorData'
         raw_value = index.model().data(index, Qt.DisplayRole)
 
-        delegate_editor = self.map[ index.column() ]
+        delegate_editor = MODEL_MAP[ index.column() ]['delegate']
+
         if not delegate_editor or delegate_editor is QLineEdit:
             value = raw_value.toString()
             editor.setText(value)
@@ -240,22 +235,20 @@ class RentListDelegate(QItemDelegate):
             return None
 
     def setModelData(self, editor, model, index):
-        print 'RentListDelegate: setModelData'
+        delegate_editor = MODEL_MAP[ index.column() ]['delegate']
 
-        delegate_editor = self.map[ index.column() ]
         if not delegate_editor or delegate_editor is QLineEdit:
             value = editor.text()
         elif delegate_editor is QComboBox:
             value = editor.currentIndex()
         elif delegate_editor is QDateEdit:
             value = str(editor.date().toPyDate())
-            print 'delegate setModelData', value, type(value)
+            #print 'delegate setModelData', value, type(value)
         else:
             value = 'Not implemented'
         model.setData(index, value, Qt.EditRole)
 
     def updateEditorGeometry(self, editor, option, index):
-        print 'RentListDelegate: updateEditorGeometry'
         editor.setGeometry(option.rect)
 
 class RentList(QTableView):

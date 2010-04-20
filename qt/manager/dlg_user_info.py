@@ -225,8 +225,6 @@ class DlgRenterInfo(QDialog):
         self.user_id = u'0'
         self.setMinimumWidth(800)
 
-        self.assigned = []
-
         self.editFirstName = QLineEdit()
         self.editLastName = QLineEdit()
         self.editEmail = QLineEdit()
@@ -265,6 +263,8 @@ class DlgRenterInfo(QDialog):
         buttonLayout.addWidget(self.buttonCancelDialog)
 
         self.rentinfo = RentList(self)
+        self.rentInfoModel = RentListModel(self)
+        self.rentinfo.setModel(self.rentInfoModel)
 
         rentLayout = QVBoxLayout()
         rentLayout.addWidget(self.rentinfo)
@@ -279,9 +279,6 @@ class DlgRenterInfo(QDialog):
 
         self.setLayout(layout)
         self.setWindowTitle(_('Renter\'s information'))
-
-        self.rentInfoModel = RentListModel(self)
-        self.rentinfo.setModel(self.rentInfoModel)
 
         self.setSignals()
 
@@ -313,7 +310,7 @@ class DlgRenterInfo(QDialog):
 
     def assignRent(self, title, desc, status, paid, begin, end):
         params = {
-            'renter_id': self.renter_id,
+            'id': '0', # rent_id
             'title': title,
             'desc': desc,
             'status': status,
@@ -322,11 +319,11 @@ class DlgRenterInfo(QDialog):
             'end_date': end,
             'reg_date': datetime.now()
             }
-        print 'DlgRenterInfo::assignRent\n', params, '\n'
+        #print 'DlgRenterInfo::assignRent\n', params, '\n'
         lastRow = self.rentInfoModel.rowCount(QModelIndex())
         if self.rentInfoModel.insertRows(lastRow, 1, QModelIndex()):
             index = self.rentInfoModel.index(0, 0)
-            self.rentInfoModel.setRow(index, data, Qt.EditRole, params)
+            self.rentInfoModel.setRow(index, params, Qt.EditRole)
 
     def applyDialog(self):
         userinfo, ok = self.checkFields()
@@ -371,32 +368,16 @@ class DlgRenterInfo(QDialog):
 
     def saveSettings(self, userinfo, formset):
         params = {
-            'renter_id': self.renter_id,
+            'user_id': self.renter_id,
             }
         params.update(userinfo)
         ajax = HttpAjax(self, '/manager/set_renter_info/', params, self.parent.session_id)
         response = ajax.parse_json()
         renter_id = int( response['saved_id'] )
-        params = {
-            'renter_id': client_id,
-            }
+
+        params = {}
+        for i in xrange( int( formset['form-TOTAL_FORMS'] ) ):
+            params.update( { 'form-%s-renter' % i: renter_id } )
         params.update(formset)
         ajax = HttpAjax(self, '/manager/set_renter_card/', params, self.parent.session_id)
         response = ajax.parse_json()
-
-
-#         for rent in self.assigned:
-#             params = {
-#                 'renter_id'  : renter_id,
-#                 'status'     : rent['status'],
-#                 'title'      : rent['title'].toUtf8(),
-#                 'desc'       : rent['desc'].toUtf8(),
-#                 'begin_date' : rent['begin_date'],
-#                 'end_date'   : rent['end_date'],
-#                 'paid'       : rent['paid'],
-#                 }
-#             ajax = HttpAjax(self, '/manager/set_rent/', params, self.parent.session_id)
-#             response = ajax.parse_json()
-#             rent_id = int( response['saved_id'] )
-
-#         self.accept()
