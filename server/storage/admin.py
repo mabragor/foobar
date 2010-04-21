@@ -55,8 +55,8 @@ class TeamAdmin(admin.ModelAdmin):
     ordering = ('title',)
     search_fields = ('title',)
     fieldsets = (
-        (None, {'fields': ('title', 'duration', 'count', 'price')}),
-        (_(u'Relation'), {'fields': ('group', 'coach')}),
+        (None, {'fields': ('group', 'title', 'coach',
+                           'duration', 'count', 'price')}),
         )
 admin.site.register(models.Team, TeamAdmin)
 

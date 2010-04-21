@@ -178,8 +178,10 @@ class Team(models.Model):
     group = models.ManyToManyField(Group, verbose_name=_(u'Group'))
     coach = models.ForeignKey(Coach, verbose_name=_(u'Coach'))
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
-    duration = models.FloatField(verbose_name=_(u'Duration'))
-    count = models.IntegerField(verbose_name=_(u'Count'))
+    duration = models.FloatField(verbose_name=_(u'Duration'),
+                                 help_text=_(u'The duration of an event.'))
+    count = models.IntegerField(verbose_name=_(u'Count'),
+                                help_text=_(u'The initial number of training per month.'))
     price = models.FloatField(verbose_name=_(u'Price'),
                               help_text=_(u'The price of this team.'),
                               default=float(0.00))
