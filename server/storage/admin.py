@@ -9,7 +9,7 @@ from storage import models
 
 class CoachAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name', 'birthday', 'phone', 'email', 'reg_date')
-    fieldsets = ((None, {'fields': ('last_name', 'first_name', 'birthday', 'phone', 'email')}),)
+    fieldsets = ((None, {'fields': ('last_name', 'first_name', 'birthday', 'phone', 'email', 'desc')}),)
 admin.site.register(models.Coach, CoachAdmin)
 
 class ClientAdmin(admin.ModelAdmin):

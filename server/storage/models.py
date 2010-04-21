@@ -33,6 +33,7 @@ class AbstractUser(models.Model):
 class Coach(AbstractUser):
     phone = models.CharField(verbose_name=_(u'Phone'), max_length=16)
     birthday = models.DateField(verbose_name=_(u'Birthday'))
+    desc = models.TextField(verbose_name=_(u'Description'), blank=True, default=u'')
 
     class Meta:
         verbose_name = _(u'Coach')
