@@ -49,9 +49,13 @@ class Coach(AbstractUser):
 
 class Client(AbstractUser):
 
+    DISCOUNT = enumerate( (_(u'No discount'),
+                           _(u'Exists'),) )
+
     rfid_code = models.CharField(verbose_name=_(u'RFID'), max_length=8)
     phone = models.CharField(verbose_name=_(u'Phone'), max_length=16)
-    discount = models.IntegerField(verbose_name=_(u'Discount'))
+    discount = models.CharField(verbose_name=_(u'Discount'), max_length=1,
+                                choices=DISCOUNT, default=0)
     birthday = models.DateField(verbose_name=_(u'Birthday'))
 
     class Meta:
