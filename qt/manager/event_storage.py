@@ -42,10 +42,6 @@ class Event(object):
     def title(self):
         return self.event['title']
 
-    @property
-    def coach(self):
-        return self.event['coach']
-
 class EventTraining(Event):
 
     """ Класс тренировки. """
@@ -160,9 +156,6 @@ class EventStorage(QAbstractTableModel):
                 return self.cols_count
             else:
                 return 1
-
-    def getShowMode(self):
-        return self.showMode
 
     def changeShowMode(self, column):
         if 'week' == self.showMode:
@@ -309,8 +302,7 @@ class EventStorage(QAbstractTableModel):
         event = self.get_event_by_cell(row, col, room_id)
         if event:
             if role == Qt.ToolTipRole:
-                tooltip = '%s\n%s' % (event.title, event.coach)
-                return QVariant(tooltip)
+                return QVariant(event.title)
             if role == Qt.DisplayRole:
                 cells = self.get_cells_by_event(event, room_id)
                 if cells:

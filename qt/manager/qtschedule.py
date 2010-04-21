@@ -452,20 +452,12 @@ class QtScheduleDelegate(QItemDelegate):
                 if event.show_type == 'head':
                     painter.drawLine(x, y, x+w, y)
 
-                    # draw event's title
                     self.prepare( painter, (Qt.black, 1) )
                     painter.drawText(x+1, y+1, w-2, h-2,
                                      Qt.AlignLeft | Qt.AlignTop,
                                      event.title)
-
                 elif event.show_type == 'tail':
                     painter.drawLine(x, y+h, x+w, y+h)
-
-                    # draw event's coach
-                    self.prepare( painter, (Qt.black, 1) )
-                    painter.drawText(x+1, y+1, w-2, h-2,
-                                     Qt.AlignLeft | Qt.AlignTop,
-                                     event.coach)
                 else:
                     pass
 
