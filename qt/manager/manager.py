@@ -141,9 +141,10 @@ class MainWindow(QMainWindow):
         self.bpSunday.setText(self.scheduleModel.getSunday().strftime('%d/%m/%Y'))
 
     def showWeekRange(self, week_range):
-        monday, sunday = week_range
-        self.bpMonday.setText(monday.strftime('%d/%m/%Y'))
-        self.bpSunday.setText(sunday.strftime('%d/%m/%Y'))
+        if self.schedule.model().getShowMode() == 'week':
+            monday, sunday = week_range
+            self.bpMonday.setText(monday.strftime('%d/%m/%Y'))
+            self.bpSunday.setText(sunday.strftime('%d/%m/%Y'))
 
     def getMime(self, name):
 	return self.mimes.get(name, None)
