@@ -223,7 +223,10 @@ class CalendarItem(models.Model):
                                _(u'Friday'), _(u'Saturday'),
                                _(u'Sunday')) )
 
-    team = models.ForeignKey(Team, verbose_name=_(u'Team'))
+    team = models.ForeignKey(Team, verbose_name=_(u'Team'),
+                             null=True, blank=True)
+    rent = models.ForeignKey(Rent, verbose_name=_(u'Rent'),
+                             null=True, blank=True)
     room = models.ForeignKey(Room, verbose_name=_(u'Room'))
     time = models.TimeField(verbose_name=_(u'Time'),
                             help_text=_(u'Time of the event'))

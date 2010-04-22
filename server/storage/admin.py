@@ -4,6 +4,7 @@
 
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
+from django import forms
 
 from storage import models
 
@@ -27,14 +28,6 @@ class RenterAdmin(admin.ModelAdmin):
                  (_('Phones'), {'fields': ('phone_mobile', 'phone_work', 'phone_home'),
                                 'description': _(u'Fill at least one field here.')}))
 admin.site.register(models.Renter, RenterAdmin)
-
-class RentAdmin(admin.ModelAdmin):
-    list_display = ('renter', 'status', 'title', 'begin_date', 'end_date', 'reg_date')
-    search_fields = ('renter', 'title')
-    fieldsets = ((None, {'fields': ('renter', 'paid', 'status')}),
-                 (_('Info'), {'fields': ('title', 'desc')}),
-                 (_('Dates'), {'fields': ('begin_date', 'end_date')}))
-admin.site.register(models.Rent, RentAdmin)
 
 class RoomAdmin(admin.ModelAdmin):
     list_display = ('title', 'color')
@@ -61,10 +54,16 @@ class CardAdmin(admin.ModelAdmin):
 admin.site.register(models.Card, CardAdmin)
 
 
+### Interface for Team Model : Begin
 
+class TeamInlineForm(forms.ModelForm):
+    class Meta:
+        model = models.CalendarItem
+        exclude = ('rent')
 
-class CalendarItemInline(admin.TabularInline):
+class CalTeamItemInline(admin.TabularInline):
     model = models.CalendarItem
+    form = TeamInlineForm
     extra = 1
 
 class TeamAdmin(admin.ModelAdmin):
@@ -75,6 +74,31 @@ class TeamAdmin(admin.ModelAdmin):
         (None, {'fields': ('group', 'title', 'coach',
                            'duration', 'count', 'price')}),
         )
-    inlines = [CalendarItemInline]
+    inlines = [CalTeamItemInline]
 admin.site.register(models.Team, TeamAdmin)
 
+### Interface for Team Model : End
+
+
+### Interface for Rent Model : Begin
+
+class RentInlineForm(forms.ModelForm):
+    class Meta:
+        model = models.CalendarItem
+        exclude = ('team')
+
+class CalRentItemInline(admin.TabularInline):
+    model = models.CalendarItem
+    form = RentInlineForm
+    extra = 1
+
+class RentAdmin(admin.ModelAdmin):
+    list_display = ('renter', 'status', 'title', 'begin_date', 'end_date', 'reg_date')
+    search_fields = ('renter', 'title')
+    fieldsets = ((None, {'fields': ('renter', 'paid', 'status')}),
+                 (_('Info'), {'fields': ('title', 'desc')}),
+                 (_('Dates'), {'fields': ('begin_date', 'end_date')}))
+    inlines = [CalRentItemInline]
+admin.site.register(models.Rent, RentAdmin)
+
+### Interface for Rent Model : End
