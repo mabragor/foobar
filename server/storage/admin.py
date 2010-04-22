@@ -50,16 +50,6 @@ class GroupAdmin(admin.ModelAdmin):
     fieldsets = ((None, {'fields': ('title', )}),)
 admin.site.register(models.Group, GroupAdmin)
 
-class TeamAdmin(admin.ModelAdmin):
-    list_display = ('title', 'coach', 'groups', 'price', 'duration', 'reg_date')
-    ordering = ('title',)
-    search_fields = ('title',)
-    fieldsets = (
-        (None, {'fields': ('group', 'title', 'coach',
-                           'duration', 'count', 'price')}),
-        )
-admin.site.register(models.Team, TeamAdmin)
-
 class CardAdmin(admin.ModelAdmin):
     list_display = ('team', 'client', 'type', 'count_sold', 'count_used',
                     'price','reg_date', 'bgn_date', 'exp_date')
@@ -69,3 +59,22 @@ class CardAdmin(admin.ModelAdmin):
         (_('Links'), {'fields': ('team', 'client')}),
         )
 admin.site.register(models.Card, CardAdmin)
+
+
+
+
+class CalendarItemInline(admin.TabularInline):
+    model = models.CalendarItem
+    extra = 1
+
+class TeamAdmin(admin.ModelAdmin):
+    list_display = ('title', 'coach', 'groups', 'price', 'duration', 'reg_date')
+    ordering = ('title',)
+    search_fields = ('title',)
+    fieldsets = (
+        (None, {'fields': ('group', 'title', 'coach',
+                           'duration', 'count', 'price')}),
+        )
+    inlines = [CalendarItemInline]
+admin.site.register(models.Team, TeamAdmin)
+

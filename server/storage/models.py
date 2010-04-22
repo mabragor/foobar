@@ -216,6 +216,25 @@ class Team(models.Model):
             'price': self.price,
             }
 
+class CalendarItem(models.Model):
+
+    DAYS_OF_WEEK = enumerate( (_(u'Monday'), _(u'Tuesday'),
+                               _(u'Wednesday'), _('Thursday'),
+                               _(u'Friday'), _(u'Saturday'),
+                               _(u'Sunday')) )
+
+    team = models.ForeignKey(Team, verbose_name=_(u'Team'))
+    room = models.ForeignKey(Room, verbose_name=_(u'Room'))
+    time = models.TimeField(verbose_name=_(u'Time'),
+                            help_text=_(u'Time of the event'))
+    day = models.CharField(verbose_name=_(u'Week day'),
+                           help_text=_(u'The day of a week.'),
+                           max_length=1, choices=DAYS_OF_WEEK,
+                           default=0)
+
+    def __unicode__(self):
+        return _(u'%s at %s in %s') % (self.get_day_display(), self.time, self.room)
+
 class Card(models.Model):
 
     CARD_TYPE = enumerate( (_(u'Normal card'), _(u'Club card')) )
