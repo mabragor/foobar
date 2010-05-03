@@ -430,7 +430,8 @@ class MainWindow(QMainWindow):
             ajax = HttpAjax(self, '/manager/fill_week/',
                             {'to_date': to_range[0]}, self.session_id)
             response = ajax.parse_json()
-            self.statusBar().showMessage(_('The week has been filled sucessfully.'))
+            info = response['saved_id']
+            self.statusBar().showMessage(_('The week has been filled sucessfully. Copied: %(copied)i. Passed: %(passed)i.' % info))
 
 	self.dialog = DlgCopyWeek(self)
 	self.dialog.setModal(True)

@@ -650,6 +650,9 @@ schedule. """
     def save(self):
         week_start = self.cleaned_data.get('to_date')
         calendar = storage.Calendar.objects.all()
+
+        count_copied = count_passed = 0
+
         for e in calendar:
             ne = storage.Schedule(team=e.team, rent=e.rent,
                                   room=e.room, event_fixed=0)
@@ -662,7 +665,16 @@ schedule. """
             ne.duration = object.duration
             ne.begin_datetime = datetime.combine(week_start, e.time) + timedelta(days=int(e.day))
             ne.end_datetime = ne.begin_datetime + timedelta(minutes=(60 * object.duration))
-            ne.save()
+
+            # check for existent event
+            if 0 == storage.Schedule.objects.filter(room=e.room,
+                                                    begin_datetime=ne.begin_datetime,
+                                                    end_datetime=ne.end_datetime).count():
+                ne.save()
+                count_copied += 1
+            else:
+                count_passed += 1
+        return {'copied': count_copied, 'passed': count_passed}
 
 class GetVisitors(AjaxForm):
     """ Form acquires an event ID and returns the list of visitors. """
