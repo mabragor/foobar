@@ -201,18 +201,18 @@ class MainWindow(QMainWindow):
 		     'renterSearchName', _('Search a renter with its name.')),
 		    ]
 	     ),
-	    (_('Event'), [
-		    (_('Training'), 'Ctrl+T',
-		     'eventTraining', _('Assign a training event.')),
-		    (_('Rent'), 'Ctrl+R',
-		     'eventRent', _('Assign a rent event.')),
-                    ]
-             ),
+# 	    (_('Event'), [
+# 		    (_('Training'), 'Ctrl+T',
+# 		     'eventTraining', _('Assign a training event.')),
+# 		    (_('Rent'), 'Ctrl+R',
+# 		     'eventRent', _('Assign a rent event.')),
+#                     ]
+#              ),
 	    (_('Calendar'), [
 		    (_('Fill week'), 'Ctrl+L',
 		     'fillWeek', _('Fill current week.')),
-		    (_('Copy week'), 'Ctrl+W',
-		     'copyWeek', _('Copy current week into other.')),
+# 		    (_('Copy week'), 'Ctrl+W',
+# 		     'copyWeek', _('Copy current week into other.')),
                     ]
              ),
 # 	    (_('Accounting'), [
