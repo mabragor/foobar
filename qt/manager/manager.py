@@ -9,7 +9,7 @@ from os.path import dirname, join
 
 from settings import _, DEBUG
 from http_ajax import HttpAjax
-from event_storage import EventTraining, EventRent, EventStorage
+from event_storage import Event, EventStorage
 from qtschedule import QtScheduleDelegate, QtSchedule
 
 from team_tree import TeamTree, TreeModel
@@ -66,6 +66,15 @@ class MainWindow(QMainWindow):
 
     def logoutTitle(self):
 	self.setWindowTitle('%s : %s' % (self.baseTitle, _('Login to start session')))
+
+    def loadInitialData(self):
+        #self.tree = self.getTeamsTree()
+        self.scheduleModel = EventStorage(
+            (8, 24), timedelta(minutes=30), self.rooms, 'week', self
+            )
+        self.schedule.setModel(self.scheduleModel)
+        self.bpMonday.setText(self.scheduleModel.getMonday().strftime('%d/%m/%Y'))
+        self.bpSunday.setText(self.scheduleModel.getSunday().strftime('%d/%m/%Y'))
 
     def prepareFilter(self, id, title):
         def handler():
@@ -131,15 +140,6 @@ class MainWindow(QMainWindow):
 
 	self.setCentralWidget(mainWidget)
 
-    def loadInitialData(self):
-        #self.tree = self.getTeamsTree()
-        self.scheduleModel = EventStorage(
-            (8, 24), timedelta(minutes=30), self.rooms, 'week', self
-            )
-        self.schedule.setModel(self.scheduleModel)
-        self.bpMonday.setText(self.scheduleModel.getMonday().strftime('%d/%m/%Y'))
-        self.bpSunday.setText(self.scheduleModel.getSunday().strftime('%d/%m/%Y'))
-
     def showWeekRange(self, week_range):
         if self.schedule.model().getShowMode() == 'week':
             monday, sunday = week_range
@@ -164,7 +164,7 @@ class MainWindow(QMainWindow):
 
     def getTeamsTree(self):
 	ajax = HttpAjax(self, '/manager/available_teams/', {}, self.session_id)
-	response = ajax.parse_json() # see format at teams_tree.py
+	response = ajax.parse_json() # see format at team_tree.py
 	return TreeModel(response)
 
     def createMenus(self):
@@ -209,6 +209,8 @@ class MainWindow(QMainWindow):
                     ]
              ),
 	    (_('Calendar'), [
+		    (_('Fill week'), 'Ctrl+L',
+		     'fillWeek', _('Fill current week.')),
 		    (_('Copy week'), 'Ctrl+W',
 		     'copyWeek', _('Copy current week into other.')),
                     ]
@@ -385,8 +387,8 @@ class MainWindow(QMainWindow):
                           'count': count, 'coach': coach,
                           'duration': duration,
                           'groups': _('Waiting for update.')}
-            event = EventTraining(event_info, id, begin, duration, 0, 0)
-            self.schedule.insertEvent(room, event)
+            eventObj = Event({}) # FIXME
+            self.schedule.insertEvent(room, eventObj)
 
 	self.dialog = DlgEventAssign('training', self)
 	self.dialog.setModal(True)
@@ -412,12 +414,27 @@ class MainWindow(QMainWindow):
             ajax = HttpAjax(self, '/manager/cal_event_add/', params, self.session_id)
             response = ajax.parse_json()
             id = int(response['saved_id'])
-            event = EventRent(rent_id, id, begin, duration, 0, 0)
-            self.schedule.insertEvent(room, event)
+            eventObj = Event({}) # FIXME
+            self.schedule.insertEvent(room, eventObj)
 	self.dialog = DlgEventAssign('rent', self)
 	self.dialog.setModal(True)
         self.dialog.setCallback(callback)
         self.dialog.setRooms(self.rooms)
+	self.dialog.exec_()
+
+    def fillWeek(self):
+        def callback(selected_date):
+            model = self.scheduleModel
+            from_range = model.weekRange
+            to_range = model.date2range(selected_date)
+            ajax = HttpAjax(self, '/manager/fill_week/',
+                            {'to_date': to_range[0]}, self.session_id)
+            response = ajax.parse_json()
+            self.statusBar().showMessage(_('The week has been filled sucessfully.'))
+
+	self.dialog = DlgCopyWeek(self)
+	self.dialog.setModal(True)
+        self.dialog.setCallback(callback)
 	self.dialog.exec_()
 
     def copyWeek(self):

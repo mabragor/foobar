@@ -419,7 +419,7 @@ class ListField(forms.Field):
 
 class DateRange(AjaxForm):
     """ Form acquires a date range and return the list of events inside
-    this range. """
+    this range. See manager:event_storage:loadData(). """
     monday = forms.DateField()
     filter = ListField(required=False)
 
@@ -427,7 +427,8 @@ class DateRange(AjaxForm):
         filter = self.param('filter')
         monday = self.param('monday')
         limit = monday + timedelta(days=7)
-        schedules = storage.Schedule.objects.filter(begin__range=(monday, limit))
+        schedules = storage.Schedule.objects.filter(begin_datetime__range=(monday, limit))
+
         if len(filter) > 0:
             schedules = schedules.filter(room__in=filter)
         events = [item.about() for item in schedules]
@@ -626,6 +627,41 @@ class CopyWeek(AjaxForm):
                                   duration=e.duration)
             ne.begin = e.begin+delta
             ne.end = ne.begin + timedelta(minutes=(60 * e.duration))
+            ne.save()
+
+class FillWeek(AjaxForm):
+    """ Form acquires a date and makes a copy from calendar to
+schedule. """
+    to_date = forms.DateField()
+
+    def validate_date(self, date):
+        if not date.weekday() ==  0:
+            raise forms.ValidationError(_(u'Date must be Monday.'))
+        return date
+
+    def clean_to_date(self):
+        to_date = self.validate_date(self.cleaned_data['to_date'])
+#         if to_date < date.today():
+#             raise forms.ValidationError(_(u'It is impossible to copy events to the past.'))
+#         if storage.Schedule.objects.filter(begin__range=(to_date, to_date+timedelta(days=7))).count():
+#             raise forms.ValidationError(u'Week must be empty to paste events.')
+        return to_date
+
+    def save(self):
+        week_start = self.cleaned_data.get('to_date')
+        calendar = storage.Calendar.objects.all()
+        for e in calendar:
+            ne = storage.Schedule(team=e.team, rent=e.rent,
+                                  room=e.room, event_fixed=0)
+
+            if e.team is not None:
+                object = e.team
+            else:
+                object = e.rent
+
+            ne.duration = object.duration
+            ne.begin_datetime = datetime.combine(week_start, e.time) + timedelta(days=int(e.day))
+            ne.end_datetime = ne.begin_datetime + timedelta(minutes=(60 * object.duration))
             ne.save()
 
 class GetVisitors(AjaxForm):

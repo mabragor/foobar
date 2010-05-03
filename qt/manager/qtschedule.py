@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 
 from settings import _
 from http_ajax import HttpAjax
-from event_storage import Event, EventStorage, EventTraining, EventRent
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -351,6 +350,8 @@ class QtSchedule(QTableView):
 
 #from settings import XPM_EVENT_CLOSED
 
+from event_storage import Event
+
 class QtScheduleDelegate(QItemDelegate):
 
     """ Делегат для ячеек расписания. """
@@ -401,7 +402,7 @@ class QtScheduleDelegate(QItemDelegate):
 
 
                 # тип события: тренировка, аренда
-                if isinstance(event, EventRent) and event.show_type == 'tail':
+                if event.isRent() and event.show_type == 'tail':
                     self.prepare( painter, (Qt.black, 1), Qt.blue )
                     lower = w if w < h else h
                     SIDE = int(lower / 4)
@@ -410,7 +411,8 @@ class QtScheduleDelegate(QItemDelegate):
                     ry = y+h-rh-1
                     painter.drawRect(rx, ry, rw, rh)
 
-                if isinstance(event, EventTraining) and event.show_type == 'tail':
+# FIXME
+                if event.isTeam() and event.show_type == 'tail':
                     if event.fixed in (1, 2):
                         if event.fixed == 1:
                             self.prepare( painter, (Qt.green, 3) )
@@ -420,25 +422,26 @@ class QtScheduleDelegate(QItemDelegate):
                                          x+self.PADDING+5, y+h-self.PADDING)
 
                 line_dir = self.direction(w, h)
-                if event.status == 1:
-                    self.prepare( painter, (Qt.red, 3) )
-                    if self.HORIZONTAL == line_dir:
-                        if event.show_type == 'head':
-                            painter.drawLine(x+self.PADDING, y+(self.STEP*1),
-                                             x+w-self.PADDING, y+(self.STEP*1))
-                    else:
-                        painter.drawLine(x+(self.STEP*1), y+self.PADDING,
-                                         x+(self.STEP*1), y+h-self.PADDING)
-                elif event.status == 2:
-                    self.prepare( painter, (self.parent.string2color('#888888'), 3) )
-                    if self.HORIZONTAL == line_dir:
-                        if event.show_type == 'head':
-                            painter.drawLine(x+self.PADDING, y+(self.STEP*2),
-                                             x+w-self.PADDING, y+(self.STEP*2))
-                    else:
-                        painter.drawLine(x+(self.STEP*2), y+self.PADDING,
-                                         x+(self.STEP*2), y+h-self.PADDING)
-                    #painter.drawPixmap(x+3, y+3, 8, 8, QPixmap(XPM_EVENT_CLOSED))
+# FIXME
+#                 if event.status == 1:
+#                     self.prepare( painter, (Qt.red, 3) )
+#                     if self.HORIZONTAL == line_dir:
+#                         if event.show_type == 'head':
+#                             painter.drawLine(x+self.PADDING, y+(self.STEP*1),
+#                                              x+w-self.PADDING, y+(self.STEP*1))
+#                     else:
+#                         painter.drawLine(x+(self.STEP*1), y+self.PADDING,
+#                                          x+(self.STEP*1), y+h-self.PADDING)
+#                 elif event.status == 2:
+#                     self.prepare( painter, (self.parent.string2color('#888888'), 3) )
+#                     if self.HORIZONTAL == line_dir:
+#                         if event.show_type == 'head':
+#                             painter.drawLine(x+self.PADDING, y+(self.STEP*2),
+#                                              x+w-self.PADDING, y+(self.STEP*2))
+#                     else:
+#                         painter.drawLine(x+(self.STEP*2), y+self.PADDING,
+#                                          x+(self.STEP*2), y+h-self.PADDING)
+#                     #painter.drawPixmap(x+3, y+3, 8, 8, QPixmap(XPM_EVENT_CLOSED))
 
                 # готовимся рисовать границы
                 if self.parent.selected_event == event:

@@ -123,6 +123,12 @@ def get_week(request, form):
     return response
 
 @login_required
+@ajax_processor(forms.FillWeek, isJavaScript)
+def fill_week(request, form):
+    signal_log_action.send(sender=request.user, action='fill_week')
+    return abstract_response(request, form)
+
+@login_required
 @ajax_processor(forms.CopyWeek, isJavaScript)
 def copy_week(request, form):
     signal_log_action.send(sender=request.user, action='copy_week')

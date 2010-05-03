@@ -121,13 +121,14 @@ class DlgEventInfo(QDialog):
                         {'id': schedule.id}, self.parent.session_id)
         response = ajax.parse_json()
         self.schedule = schedule = response['info']
+
         event = schedule['event']
         room = schedule['room']
         self.editTitle.setText(event['title'])
         if schedule['type'] == 'training':
-            self.editCoach.setText(event['coach'])
-        begin = __(schedule['begin'])
-        end = __(schedule['end'])
+            self.editCoach.setText(event['coach']['name'])
+        begin = __(schedule['begin_datetime'])
+        end = __(schedule['end_datetime'])
         self.editBegin.setDateTime(QDateTime(begin))
         duration = (end - begin).seconds / 60
         self.editDuration.setText(str(duration))

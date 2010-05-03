@@ -1,2 +1,4 @@
-insert into storage_coach (last_name, first_name, email, reg_date) values
-('Внешняя', 'замена', 'external.change@gmail.com', NOW());
+insert into storage_coach (`last_name`, `first_name`, `phone`,
+       	    		   `email`, `desc`, `birth_date`, `reg_date`) values
+('Внешняя', 'замена', '911',
+'external.change@gmail.com', 'виртуальный тренер', '2001-09-11', NOW());

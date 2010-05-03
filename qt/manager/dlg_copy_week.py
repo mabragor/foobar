@@ -38,7 +38,7 @@ class DlgCopyWeek(QDialog):
         layout.addLayout(buttonLayout)
 
         self.setLayout(layout)
-        self.setWindowTitle(_('Choose a week to copy to'))
+        self.setWindowTitle(_('Choose a week to fill'))
 
     def setCallback(self, callback):
         self.callback = callback

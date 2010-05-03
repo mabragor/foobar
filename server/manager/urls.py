@@ -37,7 +37,8 @@ urlpatterns += patterns(
     url(r'^available_teams/$', 'available_teams'),
     url(r'^get_event_info/$', 'get_event_info'),
     url(r'^get_week/$', 'get_week'),
-    url(r'^copy_week/$', 'copy_week'),
+    url(r'^copy_week/$', 'copy_week'), # REMOVEIT
+    url(r'^fill_week/$', 'fill_week'),
     url(r'^cal_event_add/$', 'cal_event_add'),
     url(r'^cal_event_del/$', 'cal_event_del'),
     url(r'^exchange_room/$', 'exchange_room'),

@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
-import sys, re, time
-from datetime import datetime, date, timedelta
+import sys, re, time, operator
+from datetime import datetime, date, time as dtime, timedelta
 
 from os.path import dirname, join
 
 from settings import _, DEBUG
 from settings import userRoles
 from http_ajax import HttpAjax
-
-__ = lambda x: datetime(*time.strptime(str(x), '%Y-%m-%d %H:%M:%S')[:6])
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -19,50 +17,69 @@ class Event(object):
 
     """ Класс события. """
 
-    def __init__(self, id, begin, duration, status, fixed):
-        self.schedule_id = id
-        self.begin = begin
-        self.duration = duration
-        self.status = status
-        self.fixed = int(fixed)
-        self.event = None # it will be overriden in successors
+    def __init__(self, monday, data_dict):
+        self.monday = monday
+        self.data = data_dict
+
+        self.dump(self.data)
+
+        __ = lambda x: \
+             datetime(*time.strptime(x, '%Y-%m-%d %H:%M:%S')[:6])
+
+        self.begin_datetime = __( self.data['begin_datetime'] )
+        self.end_datetime = __( self.data['begin_datetime'] )
+
+        minutes = int( self.data['event']['duration'] * 60 )
+        self.duration = timedelta(minutes=minutes)
+
+        demo = {'id': 10,
+                'room': {'color': 'FFAAAA', 'id': 1, 'title': 'red'},
+                'begin_datetime': '2010-04-28 17:00:00',
+                'end_datetime': '2010-04-28 18:00:00',
+                'event': {'coach': {'birth_date': '2010-04-30',
+                                    'desc': u'\u0431\u0443\u0445\u0430\u0435\u0442',
+                                    'email': 'ivan@jet.ru',
+                                    'first_name': u'\u0418\u0432\u0430\u043d',
+                                    'id': 2,
+                                    'last_name': u'\u041f\u0435\u0442\u0440\u043e\u043f\u043e\u043b\u044c\u0441\u043a\u0438\u0439',
+                                    'name': u'\u041f\u0435\u0442\u0440\u043e\u043f\u043e\u043b\u044c\u0441\u043a\u0438\u0439 \u0418\u0432\u0430\u043d',
+                                    'phone': '1234567890'},
+                          'duration': 1.0,
+                          'groups': u'\u0421\u043e\u0432\u0440\u0435\u043c\u0435\u043d\u043d\u044b\u0435 \u0442\u0430\u043d\u0446\u044b',
+                          'id': 1,
+                          'price_category': '0',
+                          'title': u'\u0411\u0440\u0435\u0439\u043a-\u0434\u0430\u043d\u0441 \u0438 free style'},
+                'event_fixed': '0',
+                'type': 'training'}
+
+    def dump(self, value):
+        import pprint
+        pprint.pprint(value)
 
     def __unicode__(self):
         return self.title
 
-    @property
-    def id(self):
-        return self.schedule_id
+    def isTeam(self):
+        return 'training' == self.data['type']
+
+    def isRent(self):
+        return 'rent' == self.data['type']
 
     @property
-    def event_id(self): # the same as schedule_id
-        return self.event['id']
+    def id(self):
+        return int( self.data['id'] )
 
     @property
     def title(self):
-        return self.event['title']
+        return self.data['event']['title']
 
     @property
     def coach(self):
-        return self.event['coach']
+        return self.data['event']['coach']['name']
 
-class EventTraining(Event):
-
-    """ Класс тренировки. """
-
-    def __init__(self, team, schedule_id, begin, duration, status, fixed):
-        Event.__init__(self, schedule_id, begin, duration, status, fixed)
-        self.type = 'training'
-        self.event = team
-
-class EventRent(Event):
-
-    """ Класс аренды. """
-
-    def __init__(self, rent, schedule_id, begin, duration, status, fixed):
-        Event.__init__(self, schedule_id, begin, duration, status, fixed)
-        self.type = 'rent'
-        self.event = rent
+    @property
+    def fixed(self):
+        return int( self.data['event_fixed'] )
 
 class ModelStorage:
 
@@ -75,6 +92,11 @@ class ModelStorage:
         self.column = None
         self.rc2e = {} # (row, col, room): event
         self.e2rc = {} # (event, room): [(row, col), (row, col), ...]
+
+    def dump(self):
+        import pprint
+        pprint.pprint(self.rc2e)
+        pprint.pprint(self.e2rc)
 
     def setFilter(self, column):
         self.column = column
@@ -249,6 +271,42 @@ class EventStorage(QAbstractTableModel):
         else:
             return None
 
+    def insert(self, room_id, event, emit_signal=False):
+        """ Метод регистрации нового события. """
+        self.emit(SIGNAL('layoutAboutToBeChanged()'))
+
+        row, col = self.datetime2rowcol(event.begin_datetime)
+        #self.beginInsertRows(QModelIndex(), row, row)
+        cells = []
+        for i in xrange(event.duration.seconds / self.quant.seconds):
+            cells.append( (row + i, col) )
+            self.storage.byRCR(ModelStorage.SET,
+                               (row + i, col, room_id), event)
+        self.storage.setByER( (event, room_id), cells )
+        #self.endInsertRows()
+
+        if emit_signal:
+            self.emit(SIGNAL('layoutChanged()'))
+
+    def remove(self, event_id, room, emit_signal=False):
+        """ Метод удаления информации о событии. """
+        event = self.storage.searchByID(event_id)
+        if event is None:
+            return
+        cell_list = self.get_cells_by_event(event, room)
+        if cell_list:
+            for row, col in cell_list:
+                self.storage.byRCR(ModelStorage.DEL,
+                                   (row, col, room))
+            self.storage.delByER( (event, room) )
+            if emit_signal:
+                self.emit(SIGNAL('layoutChanged()'))
+
+    def move(self, row, col, room, event):
+        """ Метод перемещения события по координатной сетке. """
+        self.remove(event, room)
+        self.insert(row, col, room, event)
+
     def loadData(self):
         if 'day' == self.showMode:
             return False
@@ -266,17 +324,16 @@ class EventStorage(QAbstractTableModel):
                 return False
             self.parent.statusBar().showMessage(_('Filling the calendar...'))
             self.storage.init()
-            for e in response['events']:
+            for eventInfo in response['events']:
                 qApp.processEvents() # keep GUI active
-
-                begin = __(e['begin'])
-                end = __(e['end'])
-                duration = end - begin
-                object = EventTraining if e['type'] == 'training' else EventRent
-                event = object(e['event'], e['id'], begin, duration, e['status'], e['fixed'])
-                self.insert( int(e['room']['id']), event )
+                roomId = int( eventInfo['room']['id'] )
+                eventObj = Event(monday, eventInfo)
+                self.insert( roomId , eventObj )
             self.emit(SIGNAL('layoutChanged()'))
             self.parent.statusBar().showMessage(_('Done'), 2000)
+
+            self.storage.dump()
+
             return True
 	return False
 
@@ -353,6 +410,7 @@ class EventStorage(QAbstractTableModel):
         if dt.minute >= 30:
             row += 1
         col = dt.weekday()
+        print '%s %s %s' % (dt, row, col)
         return (row, col)
 
     def may_insert(self, event, room_id):
@@ -391,42 +449,6 @@ class EventStorage(QAbstractTableModel):
 #             if reduce( lambda x,y: x and y, free ):
 #                 result.append(room_id)
 #         return result
-
-    def insert(self, room_id, event, emit_signal=False):
-        """ Метод регистрации нового события. """
-        self.emit(SIGNAL('layoutAboutToBeChanged()'))
-
-        row, col = self.datetime2rowcol(event.begin)
-        #self.beginInsertRows(QModelIndex(), row, row)
-        cells = []
-        for i in xrange(event.duration.seconds / self.quant.seconds):
-            cells.append( (row + i, col) )
-            self.storage.byRCR(ModelStorage.SET,
-                               (row + i, col, room_id), event)
-        self.storage.setByER( (event, room_id), cells )
-        #self.endInsertRows()
-
-        if emit_signal:
-            self.emit(SIGNAL('layoutChanged()'))
-
-    def remove(self, event_id, room, emit_signal=False):
-        """ Метод удаления информации о событии. """
-        event = self.storage.searchByID(event_id)
-        if event is None:
-            return
-        cell_list = self.get_cells_by_event(event, room)
-        if cell_list:
-            for row, col in cell_list:
-                self.storage.byRCR(ModelStorage.DEL,
-                                   (row, col, room))
-            self.storage.delByER( (event, room) )
-            if emit_signal:
-                self.emit(SIGNAL('layoutChanged()'))
-
-    def move(self, row, col, room, event):
-        """ Метод перемещения события по координатной сетке. """
-        self.remove(event, room)
-        self.insert(row, col, room, event)
 
     # Поддержка Drag'n'Drop - начало секции
 

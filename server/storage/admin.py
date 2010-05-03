@@ -9,22 +9,29 @@ from django import forms
 from storage import models
 
 class CoachAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'birthday', 'phone', 'email', 'reg_date')
-    fieldsets = ((None, {'fields': ('last_name', 'first_name', 'birthday', 'phone', 'email', 'desc')}),)
+    list_display = ('first_name', 'last_name',
+                    'phone', 'email', 'reg_date')
+    search_fields = ('last_name', 'first_name')
+    fieldsets = ((None, {'fields': ('last_name', 'first_name',
+                                    'phone', 'email',
+                                    'birth_date', 'desc')}),)
 admin.site.register(models.Coach, CoachAdmin)
 
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ('rfid_code', 'last_name', 'first_name', 'email', 'reg_date')
-    search_fields = ('rfid_code', 'last_name', 'first_name')
+    list_display = ('last_name', 'first_name', 'rfid_code',
+                    'phone', 'email', 'reg_date')
+    search_fields = ('last_name', 'first_name')
     fieldsets = ((None, {'fields': ('last_name', 'first_name',
-                                    'email', 'phone',
-                                    'discount', 'birthday')}),)
+                                    'phone', 'email',
+                                    'discount', 'birth_date')}),)
 admin.site.register(models.Client, ClientAdmin)
 
 class RenterAdmin(admin.ModelAdmin):
-    list_display = ('last_name', 'first_name', 'email', 'reg_date')
+    list_display = ('last_name', 'first_name',
+                    'phone', 'email', 'reg_date')
     search_fields = ('last_name', 'first_name')
-    fieldsets = ((None, {'fields': ('last_name', 'first_name', 'email')}),
+    fieldsets = ((None, {'fields': ('last_name', 'first_name',
+                                    'phone', 'email', 'birth_date')}),
                  (_('Phones'), {'fields': ('phone_mobile', 'phone_work', 'phone_home'),
                                 'description': _(u'Fill at least one field here.')}))
 admin.site.register(models.Renter, RenterAdmin)
@@ -43,36 +50,37 @@ class GroupAdmin(admin.ModelAdmin):
     fieldsets = ((None, {'fields': ('title', )}),)
 admin.site.register(models.Group, GroupAdmin)
 
-class CardAdmin(admin.ModelAdmin):
-    list_display = ('team', 'client', 'type', 'count_sold', 'count_used',
-                    'price','reg_date', 'bgn_date', 'exp_date')
-    ordering = ('reg_date', 'exp_date', 'count_sold', 'client')
-    fieldsets = (
-        (None, {'fields': ('type', 'exp_date', 'count_sold', 'price')}),
-        (_('Links'), {'fields': ('team', 'client')}),
-        )
-admin.site.register(models.Card, CardAdmin)
+# class CardAdmin(admin.ModelAdmin):
+#     list_display = ('team', 'client', 'type', 'count_sold', 'count_used',
+#                     'price','reg_date', 'bgn_date', 'exp_date')
+#     ordering = ('reg_date', 'exp_date', 'count_sold', 'client')
+#     fieldsets = (
+#         (None, {'fields': ('type', 'exp_date', 'count_sold', 'price')}),
+#         (_('Links'), {'fields': ('team', 'client')}),
+#         )
+# admin.site.register(models.Card, CardAdmin)
 
 
 ### Interface for Team Model : Begin
 
 class TeamInlineForm(forms.ModelForm):
     class Meta:
-        model = models.CalendarItem
+        model = models.Calendar
         exclude = ('rent')
 
 class CalTeamItemInline(admin.TabularInline):
-    model = models.CalendarItem
+    model = models.Calendar
     form = TeamInlineForm
     extra = 1
 
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ('title', 'coach', 'groups', 'price', 'duration', 'reg_date')
+    list_display = ('title', 'coach', 'price_category', 'groups',
+                    'duration', 'reg_date')
     ordering = ('title',)
     search_fields = ('title',)
     fieldsets = (
         (None, {'fields': ('group', 'title', 'coach',
-                           'duration', 'count', 'price')}),
+                           'duration', 'price_category')}),
         )
     inlines = [CalTeamItemInline]
 admin.site.register(models.Team, TeamAdmin)
@@ -84,20 +92,20 @@ admin.site.register(models.Team, TeamAdmin)
 
 class RentInlineForm(forms.ModelForm):
     class Meta:
-        model = models.CalendarItem
+        model = models.Calendar
         exclude = ('team')
 
 class CalRentItemInline(admin.TabularInline):
-    model = models.CalendarItem
+    model = models.Calendar
     form = RentInlineForm
     extra = 1
 
 class RentAdmin(admin.ModelAdmin):
-    list_display = ('renter', 'status', 'title', 'begin_date', 'end_date', 'reg_date')
+    list_display = ('title', 'renter', 'duration',
+                    'paid', 'paid_status', 'reg_date')
     search_fields = ('renter', 'title')
-    fieldsets = ((None, {'fields': ('renter', 'paid', 'status')}),
-                 (_('Info'), {'fields': ('title', 'desc')}),
-                 (_('Dates'), {'fields': ('begin_date', 'end_date')}))
+    fieldsets = ((None, {'fields': ('renter', 'paid', 'paid_status')}),
+                 (_('Info'), {'fields': ('title', 'duration', 'desc')}))
     inlines = [CalRentItemInline]
 admin.site.register(models.Rent, RentAdmin)
 
