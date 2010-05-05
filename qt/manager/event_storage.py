@@ -21,7 +21,7 @@ class Event(object):
         self.monday = monday
         self.data = data_dict
 
-        self.dump(self.data)
+        #self.dump(self.data)
 
         __ = lambda x: \
              datetime(*time.strptime(x, '%Y-%m-%d %H:%M:%S')[:6])
@@ -332,7 +332,7 @@ class EventStorage(QAbstractTableModel):
             self.emit(SIGNAL('layoutChanged()'))
             self.parent.statusBar().showMessage(_('Done'), 2000)
 
-            self.storage.dump()
+            # self.storage.dump()
 
             return True
 	return False
@@ -410,7 +410,7 @@ class EventStorage(QAbstractTableModel):
         if dt.minute >= 30:
             row += 1
         col = dt.weekday()
-        print '%s %s %s' % (dt, row, col)
+        #print '%s %s %s' % (dt, row, col)
         return (row, col)
 
     def may_insert(self, event, room_id):

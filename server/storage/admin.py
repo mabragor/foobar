@@ -50,6 +50,13 @@ class GroupAdmin(admin.ModelAdmin):
     fieldsets = ((None, {'fields': ('title', )}),)
 admin.site.register(models.Group, GroupAdmin)
 
+class PriceAdmin(admin.ModelAdmin):
+    list_display = ('title', 'price_category', 'cost', 'count', 'discount', 'special')
+    ordering = ('price_category', 'special', 'cost', 'discount', 'title')
+    search_fields = ('title',)
+    fieldsets = ((None, {'fields': ('title', 'price_category', 'cost', 'count', 'discount', 'special')}),)
+admin.site.register(models.Price, PriceAdmin)
+
 # class CardAdmin(admin.ModelAdmin):
 #     list_display = ('team', 'client', 'type', 'count_sold', 'count_used',
 #                     'price','reg_date', 'bgn_date', 'exp_date')

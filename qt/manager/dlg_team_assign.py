@@ -22,14 +22,7 @@ class DlgTeamAssign(QDialog):
         self.comboCardType.addItem(_('Normal'))
         self.comboCardType.addItem(_('Club'))
 
-        labelBeginning = QLabel(_('Team starts'))
-        self.editBeginning = QDateEdit()
-        labelBeginning.setBuddy(self.editBeginning)
-        current = QDate.currentDate()
-        self.editBeginning.setDate(current)
-        self.editBeginning.setMinimumDate(current)
-
-        labelFinish = QLabel(_('Team ends after'))
+        labelFinish = QLabel(_('Team expiress after'))
         self.comboDuration = QComboBox()
         labelFinish.setBuddy(self.comboDuration)
         self.comboDuration.addItem(_('3 months'))
@@ -44,8 +37,6 @@ class DlgTeamAssign(QDialog):
 
         groupLayout.addWidget(labelCardType, 0, 0)
         groupLayout.addWidget(self.comboCardType, 0, 1)
-        groupLayout.addWidget(labelBeginning, 1, 0)
-        groupLayout.addWidget(self.editBeginning, 1, 1)
         groupLayout.addWidget(labelFinish, 2, 0)
         groupLayout.addWidget(self.comboDuration, 2, 1)
 
@@ -92,10 +83,11 @@ class DlgTeamAssign(QDialog):
         self.comboDuration.setDisabled(index == 0)
 
     def applyDialog(self):
-        card_type = self.comboCardType.currentIndex()
-        bgn_date = self.editBeginning.date().toPyDate()
-        duration = self.comboDuration.currentIndex()
         index = self.tree.currentIndex()
-        team_data = index.data(userRoles['getObjectID']).toPyObject()
-        self.callback(card_type, bgn_date, duration, team_data)
+        data = {
+            'card_type': self.comboCardType.currentIndex(),
+            'duration': self.comboDuration.currentIndex(),
+            'team': index.data(userRoles['getObjectID']).toPyObject()
+            }
+        self.callback(data)
         self.accept()

@@ -126,8 +126,8 @@ class DlgClientInfo(QDialog):
             import time
             return datetime(*time.strptime(value, '%Y-%m-%d')[:3])
 
-        birthday = data['birthday'] # it could be none while testing
-        self.dateBirth.setDate(birthday and str2date(birthday) or \
+        birth_date = data['birth_date'] # it could be none while testing
+        self.dateBirth.setDate(birth_date and str2date(birth_date) or \
                                QDate.currentDate())
         self.editRFID.setText(data.get('rfid_code', ''))
 
@@ -161,12 +161,12 @@ class DlgClientInfo(QDialog):
         dialog.setModal(True)
         dlgStatus = dialog.exec_()
 
-    def assignTeam(self, card_type, bgn_date, duration_index, data):
+    def assignTeam(self, data):
         # duration matters for club card only
         lastRow = self.teamsModel.rowCount(QModelIndex())
         if self.teamsModel.insertRows(lastRow, 1, QModelIndex()):
             index = self.teamsModel.index(0, 0)
-            self.teamsModel.setRow(index, data, Qt.EditRole, card_type, bgn_date, duration_index)
+            self.teamsModel.setRow(index, data, Qt.EditRole)
 
         if DEBUG:
             print 'DlgUserInfo::assignTeam DUMP:'
@@ -188,16 +188,16 @@ class DlgClientInfo(QDialog):
                                 _('Please fill required fields.'))
     def checkFields(self):
         userinfo = {
-            'first_name': self.editFirstName.text().toUtf8(),
             'last_name': self.editLastName.text().toUtf8(),
-            'email': self.editEmail.text().toUtf8(),
+            'first_name': self.editFirstName.text().toUtf8(),
             'phone': self.editPhone.text().toUtf8(),
-            'discount': self.editDiscount.text().toUtf8(),
-            'birthday': self.dateBirth.date().toPyDate(),
+            'email': self.editEmail.text().toUtf8(),
+            'birth_date': self.dateBirth.date().toPyDate(),
             'rfid_code': self.editRFID.text().toUtf8(),
+            'discount': self.editDiscount.text().toUtf8(),
             }
         for k,v in userinfo.items():
-            if k is not 'birthday' and len(v) == 0:
+            if k is not 'birth_date' and len(v) == 0:
                 return (userinfo, False)
         return (userinfo, True)
 
@@ -206,6 +206,7 @@ class DlgClientInfo(QDialog):
             'user_id': self.client_id,
             }
         params.update(userinfo)
+
         ajax = HttpAjax(self, '/manager/set_client_info/', params, self.parent.session_id)
         response = ajax.parse_json()
         client_id = int( response['saved_id'] )

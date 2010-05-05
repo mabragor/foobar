@@ -76,7 +76,7 @@ class WaitingRFID(QThread):
             # отладочный код, на случай отсутствия считывателя
             print 'debugging part of code, in case of RFID '\
                 'reader absence. See rfid.py\'s DEBUG variable.'
-            demo_rfids = ['008365B0', '0083AD33', '00836012']
+            demo_rfids = ['008365B0', ]#'0083AD33', '00836012']
             index = random.randint(0, len(demo_rfids) - 1)
             rfid_code = demo_rfids[index]
             time.sleep(1)

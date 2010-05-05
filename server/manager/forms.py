@@ -225,13 +225,13 @@ class ClientInfo(UserInfo):
     """ See parent. FIXME """
     phone = forms.CharField(max_length=16)
     discount = forms.IntegerField()
-    birthday = forms.DateField()
+    birth_date = forms.DateField()
     rfid_code = forms.CharField(max_length=8)
 
     def save(self):
         data = self.cleaned_data
 
-        user_id = data['user_id']
+        user_id = data['user_id']; del( data['user_id'] )
         if 0 == user_id:
             user = storage.Client(**data)
         else:
@@ -243,6 +243,7 @@ class ClientInfo(UserInfo):
         OUTFLOW = '1'
         RFIDCARDS = '0'
 
+        print 'Saving client info'
         flow = storage.Flow(user=self.request.user, # see deco
                             action=OUTFLOW,
                             type=RFIDCARDS,
@@ -250,7 +251,7 @@ class ClientInfo(UserInfo):
                             price=30.00, # FIXME
                             total=30.00 # FIXME
                             )
-        flow.save()
+        #flow.save()
         return user.id
 
 class ClientCard(AjaxForm):
@@ -258,11 +259,12 @@ class ClientCard(AjaxForm):
     client = forms.IntegerField()
     card = forms.IntegerField()
     team = forms.IntegerField()
-    type = forms.IntegerField()
+    price = forms.FloatField()
     paid = forms.FloatField()
+    paid_status = forms.IntegerField()
+    card_type = forms.IntegerField()
     count_sold = forms.IntegerField()
-    bgn_date = forms.DateTimeField()
-    exp_date = forms.DateTimeField()
+    duration = forms.IntegerField()
 
     def clean_client(self):
         return self.check_obj_existence(storage.Client, 'client')
@@ -278,19 +280,20 @@ class ClientCard(AjaxForm):
         card_id = data['card']
         if card_id == 0:
             card = storage.Card(client=client, team=team,
-                                type=data['type'],
-                                bgn_date=data['bgn_date'],
-                                exp_date=data['exp_date'],
+                                paid=data['paid'],
+                                paid_status=data['paid_status'],
+                                card_type=data['card_type'],
                                 count_sold=data['count_sold'],
-                                price=team.price,
-                                paid=data['paid'])
+                                duration=data['duration'],
+                                price=data['price'],
+                                )
         else:
             card = storage.Card.objects.get(id=card_id)
             card.paid = data['paid']
-            card.type = data['type']
+            card.paid_status = data['paid_status']
+            card.card_type = data['card_type']
             card.count_sold = data['count_sold']
-            card.bgn_date=data['bgn_date']
-            card.exp_date=data['exp_date']
+            card.duration=data['duration']
         card.save()
 
 class RenterInfo(UserInfo):
@@ -700,6 +703,7 @@ class AddResource(AjaxForm):
         res_count=self.cleaned_data['count']
         res_price=self.cleaned_data['price']
 
+        print 'Add resource'
         resource = storage.Flow(user=self.request.user, # see deco
                                 action=self.INFLOW,
                                 type=res_type,
@@ -721,6 +725,7 @@ class SubResource(AjaxForm):
         res_count=self.cleaned_data['count']
         res_price=self.cleaned_data['price']
 
+        print 'Sub resource'
         resource = storage.Flow(user=self.request.user, # see deco
                                 action=self.OUTFLOW,
                                 type=res_type,

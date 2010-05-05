@@ -77,7 +77,7 @@ class Client(AbstractUser):
         return result
 
     def team_list(self):
-        return [card.about(True) for card in self.card_set.all().order_by('-reg_date')]
+        return [card.about(True) for card in self.card_set.all().order_by('-reg_datetime')]
 
 class Renter(AbstractUser):
 
@@ -177,6 +177,21 @@ class Group(models.Model):
 
 PRICE_CATEGORY = enumerate( (_(u'Normal'), _(u'High')) )
 
+class Price(models.Model):
+    title = models.CharField(max_length=64)
+    cost = models.FloatField()
+    count = models.IntegerField()
+    discount = models.IntegerField()
+    price_category = models.CharField(verbose_name=_(u'Price category'), max_length=1, choices=PRICE_CATEGORY, default=0)
+    special = models.BooleanField(verbose_name=_(u'Is this a special record?'))
+
+    class Meta:
+        verbose_name = _(u'Price')
+        verbose_name_plural = _(u'Prices')
+
+    def __unicode__(self):
+        return self.title
+
 class Team(models.Model):
 
     group = models.ManyToManyField(Group, verbose_name=_(u'Group'))
@@ -195,6 +210,9 @@ class Team(models.Model):
 
     def groups(self):
         return ','.join([unicode(a) for a in self.group.all()])
+
+    def price(self):
+        return Price.objects.filter(price_category=self.price_category)
 
     def about(self):
         return {
@@ -249,16 +267,18 @@ class Card(models.Model):
 
     team = models.ForeignKey(Team, verbose_name=_(u'Team'))
     client = models.ForeignKey(Client, verbose_name=_(u'Client'))
-    type = models.CharField(verbose_name=_(u'Type'), help_text=_(u'Type of client\'s card'), max_length=1, choices=CARD_TYPE, default=0)
+    card_type = models.CharField(verbose_name=_(u'Type'), help_text=_(u'Type of client\'s card'), max_length=1, choices=CARD_TYPE, default=0)
     state = models.CharField(verbose_name=_(u'State'), help_text=_(u'State of record'), max_length=1, choices=CARD_STATE, default=0)
-    begin_date = models.DateField(verbose_name=_(u'Begin'))
-    end_date = models.DateField(verbose_name=_(u'Expired'))
+    begin_date = models.DateField(verbose_name=_(u'Begin'), null=True)
+    end_date = models.DateField(verbose_name=_(u'Expired'), null=True)
+    duration = models.IntegerField(default=0)
     count_sold = models.IntegerField(verbose_name=_(u'Exercises sold'))
     count_used = models.IntegerField(verbose_name=_(u'Exercises used'), default=0)
     price = models.FloatField(verbose_name=_(u'Price'), help_text=_(u'Price.'), default=float(0.00))
     paid = models.FloatField(verbose_name=_(u'Paid'), help_text=_(u'Paid amount.'), default=float(0.00))
     paid_status = models.CharField(verbose_name=_(u'Paid status'), max_length=1, choices=PAID_STATUS, default=0)
-    reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
+    reg_datetime = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
+    cancel_datetime = models.DateTimeField(verbose_name=_(u'Registered'), null=True)
 
     class Meta:
         verbose_name = _(u'Card')
@@ -272,16 +292,18 @@ class Card(models.Model):
         obj = {
             'id': self.pk,
             'team': self.team.about(),
-            'type': self.type,
+            'card_type': self.card_type,
             'state': self.state,
             'begin_date': self.begin_date,
             'end_date': self.end_date,
+            'duration': self.duration,
             'count_sold': self.count_sold,
             'count_used': self.count_used,
             'price': self.price,
             'paid': self.paid,
             'paid_status': self.paid_status,
-            'reg_date': self.reg_date,
+            'reg_datetime': self.reg_datetime,
+            'cancel_datetime': self.cancel_datetime,
             }
         if not short:
             obj.update( {'client': self.client.about(),} )
@@ -457,7 +479,7 @@ class Flow(models.Model):
         elif self.action == self.OUTFLOW:
             accounting.sub(self.count)
         else:
-            raise RuntimeWarning
+            raise RuntimeWarning('Action is %i.' % self.action)
 
 # Журналирование
 
