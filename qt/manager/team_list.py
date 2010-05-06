@@ -40,7 +40,7 @@ MODEL_MAP = ( # describes all fields in the model
      'delegate': None},
     # paid
     {'type': float,
-     'delegate': None},
+     'delegate': QLineEdit},
     # paid status
     {'type': lambda x: PAID_STATUS[int(x)],
      'delegate': QComboBox},
