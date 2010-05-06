@@ -283,7 +283,7 @@ class Card(models.Model):
     class Meta:
         verbose_name = _(u'Card')
         verbose_name_plural = _(u'Card')
-        ordering = ['-reg_date']
+        ordering = ['-reg_datetime']
 
     def __unicode__(self):
         return self.team.title

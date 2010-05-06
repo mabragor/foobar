@@ -14,6 +14,10 @@ class AjaxForm(forms.Form):
 
     # TODO: check symbols of RFID code
 
+    def dump(self, value):
+        import pprint
+        pprint.pprint(value)
+
     def param(self, name):
         """ This method gets the value from cleaned_data by its keyword. """
         try:
@@ -245,7 +249,6 @@ class ClientInfo(UserInfo):
         OUTFLOW = '1'
         RFIDCARDS = '0'
 
-        print 'Saving client info'
         flow = storage.Flow(user=self.request.user, # see deco
                             action=OUTFLOW,
                             type=RFIDCARDS,
@@ -276,6 +279,7 @@ class ClientCard(AjaxForm):
 
     def save(self):
         data = self.cleaned_data
+
         client = self.get_object('client')
         team = self.get_object('team')
 
