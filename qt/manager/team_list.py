@@ -93,11 +93,11 @@ class TeamListModel(QAbstractTableModel):
                              'reg_datetime', 'begin_date', 'end_date', 'cancel_datetime',
                              'id', 'team_id']
 
-    def initData(self, client_id, data):
+    def initData(self, data):
         """
         Формат полученных данных: см. методы about() у моделей.
+        Вызывается из DlgClientInfo::initData()
         """
-        self.client_id = client_id
         for rec in data:
             if type(rec) is not dict:
                 raise 'Check format'
@@ -127,7 +127,7 @@ class TeamListModel(QAbstractTableModel):
 #                   self.createIndex(0, 0),
 #                   self.createIndex(self.rowCount(), self.columnCount()))
 
-    def get_model_as_formset(self):
+    def get_model_as_formset(self, client_id):
         formset = {
             'form-TOTAL_FORMS': str(len(self.storage)),
             'form-INITIAL_FORMS': u'0',
@@ -141,7 +141,7 @@ class TeamListModel(QAbstractTableModel):
             card_id, team_id = record
 
             row = {
-                'form-%s-client' % index: self.client_id,
+                'form-%s-client' % index: client_id,
                 'form-%s-card' % index: card_id,
                 'form-%s-team' % index: team_id,
                 'form-%s-price' % index: price,

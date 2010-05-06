@@ -196,10 +196,12 @@ class UserIdRfid(AjaxForm):
     def query(self, request=None):
         mode = self.param('mode')
         user_id = self.param('user_id')
+        rfid = self.param('rfid_code')
+
         if mode == 'client':
             try:
                 if user_id is None:
-                    user = storage.Client.objects.get(rfid_code=self.param('rfid_code'))
+                    user = storage.Client.objects.get(rfid_code=rfid)
                 else:
                     user = storage.Client.objects.get(id=user_id)
             except storage.Client.DoesNotExist:

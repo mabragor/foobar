@@ -94,6 +94,7 @@ class DlgClientInfo(QDialog):
 
         self.setRequired()
         self.setSignals()
+        self.initData( {} )
 
     def setRequired(self):
         self.editLastName.setProperty('required', QVariant(True))
@@ -115,7 +116,7 @@ class DlgClientInfo(QDialog):
                      self, SLOT('reject()'))
 
     def initData(self, data):
-        self.client_id = data['id']
+        self.client_id = data.get('id', '0')
         self.editFirstName.setText(data.get('first_name', ''))
         self.editLastName.setText(data.get('last_name', ''))
         self.editEmail.setText(data.get('email', ''))
@@ -126,13 +127,13 @@ class DlgClientInfo(QDialog):
             import time
             return datetime(*time.strptime(value, '%Y-%m-%d')[:3])
 
-        birth_date = data['birth_date'] # it could be none while testing
+        birth_date = data.get('birth_date', None) # it could be none while testing
         self.dateBirth.setDate(birth_date and str2date(birth_date) or \
                                QDate.currentDate())
         self.editRFID.setText(data.get('rfid_code', ''))
 
         teams = data.get('team_list', [])
-        self.teamsModel.initData(self.client_id, teams)
+        self.teamsModel.initData(teams)
 
     def cancelTeam(self):
         row = self.cardinfo.currentRow()
@@ -180,8 +181,7 @@ class DlgClientInfo(QDialog):
         """ Применить настройки. """
         userinfo, ok = self.checkFields()
         if ok:
-            formset = self.teamsModel.get_model_as_formset()
-            self.saveSettings(userinfo, formset)
+            self.saveSettings(userinfo)
             self.accept()
         else:
             QMessageBox.warning(self, _('Warning'),
@@ -201,19 +201,15 @@ class DlgClientInfo(QDialog):
                 return (userinfo, False)
         return (userinfo, True)
 
-    def saveSettings(self, userinfo, formset):
-        params = {
-            'user_id': self.client_id,
-            }
+    def saveSettings(self, userinfo):
+        params = { 'user_id': self.client_id, }
         params.update(userinfo)
 
         ajax = HttpAjax(self, '/manager/set_client_info/', params, self.parent.session_id)
         response = ajax.parse_json()
-        client_id = int( response['saved_id'] )
-        params = {
-            'client_id': client_id,
-            }
-        params.update(formset)
+
+        self.client_id = int( response['saved_id'] )
+        params = self.teamsModel.get_model_as_formset(self.client_id)
         ajax = HttpAjax(self, '/manager/set_client_card/', params, self.parent.session_id)
         response = ajax.parse_json()
 
