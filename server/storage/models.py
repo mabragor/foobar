@@ -277,8 +277,13 @@ class Calendar(models.Model):
 
 class Card(models.Model):
 
-    CARD_TYPE = enumerate( (_(u'Normal card'), _(u'Club card')) )
-    CARD_STATE = enumerate( (_(u'Wait'), _(u'Active'), _(u'Expired'), _(u'Used'), _(u'Cancel')) )
+    CARD_TYPE = ( ('0', _(u'Normal card')),
+                  ('1', _(u'Club card')) )
+    CARD_STATE = ( ('0', _(u'Wait')),
+                   ('1', _(u'Active')),
+                   ('2', _(u'Expired')),
+                   ('3', _(u'Used')),
+                   ('4', _(u'Cancel')) )
 
     team = models.ForeignKey(Team, verbose_name=_(u'Team'))
     client = models.ForeignKey(Client, verbose_name=_(u'Client'))
@@ -326,7 +331,9 @@ class Card(models.Model):
 
 class Schedule(models.Model):
 
-    EVENT_FIXED = enumerate( (_('Waiting'), _('Done'), _('Cancelled')) )
+    EVENT_FIXED = ( ('0', _('Waiting')),
+                    ('1', _('Done')),
+                    ('2', _('Cancelled')) )
 
     change = models.ForeignKey(Coach, verbose_name=_(u'Change'), null=True, blank=True)
     team = models.ForeignKey(Team, verbose_name=_(u'Team'), null=True, blank=True)
