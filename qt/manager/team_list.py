@@ -14,8 +14,7 @@ PAID_STATUS = [_('Reserved'),
                _('Piad partially'),
                _('Paid')]
 CARD_TYPE = [_('Normal'), _('Club')]
-DURATION_TYPE = [_('30 days'), _('3 months'), _('6 months'),
-                 _('9 months'), _('12 months')]
+DURATION_TYPE = [30, 90, 180, 270, 360]
 
 def _dtapply(value):
     if value is not None:
@@ -54,7 +53,7 @@ MODEL_MAP = ( # describes all fields in the model
     {'type': int,
      'delegate': None},
     # duration in days
-    {'type': int,
+    {'type': lambda x: DURATION_TYPE[int(x)],
      'delegate': QComboBox},
     # reg_date
     {'type': _dtapply,
@@ -294,17 +293,27 @@ class TeamListDelegate(QItemDelegate):
 
     """ The delegate allow to user to change the model values. """
 
+    COUNT_USED_INDEX = 6
+    PRICE_CAT_INDEX = 14
+
     def __init__(self, parent=None):
         QItemDelegate.__init__(self, parent)
         print 'TeamListDelegate: constructor'
 
     def createEditor(self, parent, option, index):
         delegate_editor = MODEL_MAP[ index.column() ]['delegate']
+
+        # get the state of used trainings
+        model = index.model()
+        idx_count_used = model.index(index.row(), self.COUNT_USED_INDEX)
+        count_used, ok = model.data(idx_count_used, Qt.DisplayRole).toInt()
+        # if the card is already used, deny to edit its price
+        if 1 == index.column() and 0 < count_used:
+            delegate_editor = None
+
         if delegate_editor:
-            print 'return editor', delegate_editor
             return delegate_editor(parent)
-        else:
-            return None
+        return None
 
     def setEditorData(self, editor, index):
         model = index.model()
@@ -314,9 +323,13 @@ class TeamListDelegate(QItemDelegate):
         if not delegate_editor or delegate_editor is QLineEdit:
             value = raw_value.toString()
             editor.setText(value)
+        elif delegate_editor is QDateEdit:
+            value = raw_value.toDate()
+            editor.setDate(value)
         elif delegate_editor is QComboBox:
             if 1 == index.column(): #price
-                idx_price_cat = model.index(index.row(), 14)
+                # get the pice category of this team
+                idx_price_cat = model.index(index.row(), self.PRICE_CAT_INDEX)
                 price_cat, ok = model.data(idx_price_cat, Qt.DisplayRole).toInt()
                 for i in model.prices:
                     if price_cat == int( i['price_category'] ):
@@ -328,12 +341,12 @@ class TeamListDelegate(QItemDelegate):
             elif 4 == index.column(): # card type
                 for i in CARD_TYPE:
                     editor.addItem( i, QVariant(CARD_TYPE.index(i)) )
+            elif 7 == index.column(): # duration
+                for i in DURATION_TYPE:
+                    editor.addItem( str(i), QVariant(DURATION_TYPE.index(i)) )
             value = raw_value.toString()
             item_index = editor.findText(value)
             editor.setCurrentIndex( item_index )
-        elif delegate_editor is QDateEdit:
-            value = raw_value.toDate()
-            editor.setDate(value)
         else:
             return None
 
