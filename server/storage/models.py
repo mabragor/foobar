@@ -9,11 +9,12 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 
-PAID_STATUS = enumerate( (_(u'Reserved'),
-                          _(u'Piad partially'),
-                          _(u'Paid')) )
+PAID_STATUS = ( ('0', _(u'Reserved')),
+                ('1', _(u'Piad partially')),
+                ('2', _(u'Paid')) )
 
-PRICE_CATEGORY = enumerate( (_(u'Normal'), _(u'High')) )
+PRICE_CATEGORY = ( ('0', _(u'Normal')),
+                   ('1', _(u'High')) )
 
 class Price(models.Model):
     title = models.CharField(max_length=64)
@@ -80,12 +81,8 @@ class Coach(AbstractUser):
 
 class Client(AbstractUser):
 
-    DISCOUNT = enumerate( (_(u'No discount'),
-                           _(u'Exists'),) )
-
     rfid_code = models.CharField(verbose_name=_(u'RFID'), max_length=8)
-    discount = models.CharField(verbose_name=_(u'Discount'), max_length=1,
-                                choices=DISCOUNT, default=0)
+    discount = models.IntegerField(verbose_name=_(u'Discount'), default=0)
 
     class Meta:
         verbose_name = _(u'Client')
@@ -241,10 +238,13 @@ class Team(models.Model):
 
 class Calendar(models.Model):
 
-    DAYS_OF_WEEK = enumerate( (_(u'Monday'), _(u'Tuesday'),
-                               _(u'Wednesday'), _('Thursday'),
-                               _(u'Friday'), _(u'Saturday'),
-                               _(u'Sunday')) )
+    DAYS_OF_WEEK = ( ('0', _(u'Monday')),
+                     ('1', _(u'Tuesday')),
+                     ('2', _(u'Wednesday')),
+                     ('3', _('Thursday')),
+                     ('4', _(u'Friday')),
+                     ('5', _(u'Saturday')),
+                     ('6', _(u'Sunday')) )
 
     team = models.ForeignKey(Team, verbose_name=_(u'Team'),
                              null=True, blank=True)
