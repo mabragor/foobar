@@ -299,7 +299,8 @@ class ClientCard(AjaxForm):
             card.paid_status = data['paid_status']
             card.card_type = data['card_type']
             card.count_sold = data['count_sold']
-            card.duration=data['duration']
+            card.duration = data['duration']
+            card.price = data['price']
         card.save()
 
 class RenterInfo(UserInfo):

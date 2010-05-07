@@ -84,14 +84,6 @@ class DlgClientInfo(QDialog):
         self.setLayout(layout)
         self.setWindowTitle(_('Client\'s information'))
 
-        # source model
-        self.teamsModel = TeamListModel(self)
-        # proxy model
-        #self.proxyModel = SortClientTeams(self)
-        #self.proxyModel.setSourceModel(self.teamsModel)
-        # use proxy model to change data representation
-        self.cardinfo.setModel(self.teamsModel)
-
         self.setRequired()
         self.setSignals()
         self.initData( {} )
@@ -132,8 +124,10 @@ class DlgClientInfo(QDialog):
                                QDate.currentDate())
         self.editRFID.setText(data.get('rfid_code', ''))
 
+        self.prices = data.get('prices', [])
+
         teams = data.get('team_list', [])
-        self.teamsModel.initData(teams)
+        self.cardinfo.model().initData(teams, self.prices)
 
     def cancelTeam(self):
         row = self.cardinfo.currentRow()
@@ -163,19 +157,11 @@ class DlgClientInfo(QDialog):
         dlgStatus = dialog.exec_()
 
     def assignTeam(self, data):
-        # duration matters for club card only
-        lastRow = self.teamsModel.rowCount(QModelIndex())
-        if self.teamsModel.insertRows(lastRow, 1, QModelIndex()):
-            index = self.teamsModel.index(0, 0)
-            self.teamsModel.setRow(index, data, Qt.EditRole)
-
-        if DEBUG:
-            print 'DlgUserInfo::assignTeam DUMP:'
-            for item in self.teamsModel.storage:
-                print '\t',
-                for col in item:
-                    print col,
-                print
+        model = self.cardinfo.model()
+        lastRow = model.rowCount(QModelIndex())
+        if model.insertRows(lastRow, 1, QModelIndex()):
+            index = model.index(0, 0)
+            model.setRow(index, data, Qt.EditRole)
 
     def applyDialog(self):
         """ Применить настройки. """
@@ -209,7 +195,8 @@ class DlgClientInfo(QDialog):
         response = ajax.parse_json()
 
         self.client_id = int( response['saved_id'] )
-        params = self.teamsModel.get_model_as_formset(self.client_id)
+        model = self.cardinfo.model()
+        params = model.get_model_as_formset(self.client_id)
         ajax = HttpAjax(self, '/manager/set_client_card/', params, self.parent.session_id)
         response = ajax.parse_json()
 

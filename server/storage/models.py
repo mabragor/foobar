@@ -13,6 +13,31 @@ PAID_STATUS = enumerate( (_(u'Reserved'),
                           _(u'Piad partially'),
                           _(u'Paid')) )
 
+PRICE_CATEGORY = enumerate( (_(u'Normal'), _(u'High')) )
+
+class Price(models.Model):
+    title = models.CharField(max_length=64)
+    cost = models.FloatField()
+    count = models.IntegerField()
+    discount = models.IntegerField()
+    price_category = models.CharField(verbose_name=_(u'Price category'), max_length=1, choices=PRICE_CATEGORY, default=0)
+    special = models.BooleanField(verbose_name=_(u'Is this a special record?'))
+
+    class Meta:
+        verbose_name = _(u'Price')
+        verbose_name_plural = _(u'Prices')
+
+    def __unicode__(self):
+        return self.title
+
+    def about(self): # используем генератор
+        exclude_fields = []
+        field_vals = {}
+        for i in self._meta.fields:
+            if i.name not in exclude_fields:
+                field_vals.update( {i.name: getattr(self, i.name)} )
+        return field_vals
+
 class AbstractUser(models.Model):
 
     last_name = models.CharField(verbose_name=_(u'Last name'), max_length=64)
@@ -66,11 +91,21 @@ class Client(AbstractUser):
         verbose_name = _(u'Client')
         verbose_name_plural = _(u'Clients')
 
+    def prices(self):
+        prices = Price.objects.exclude(~models.Q(discount=self.discount),
+                                        models.Q(special=False))
+        prices = prices.order_by( '-price_category', '-cost',)
+        result = []
+        for pinfo in prices:
+            result.append(pinfo.about())
+        return result
+
     def about(self, short=False):
         result = super(Client, self).about()
         result.update( {
                 'rfid_code': self.rfid_code,
                 'discount': self.discount,
+                'prices': self.prices()
                 } )
         if not short:
             result.update( {'team_list': self.team_list()} )
@@ -175,23 +210,6 @@ class Group(models.Model):
     def children(self):
         return [item.about() for item in self.team_set.all()]
 
-PRICE_CATEGORY = enumerate( (_(u'Normal'), _(u'High')) )
-
-class Price(models.Model):
-    title = models.CharField(max_length=64)
-    cost = models.FloatField()
-    count = models.IntegerField()
-    discount = models.IntegerField()
-    price_category = models.CharField(verbose_name=_(u'Price category'), max_length=1, choices=PRICE_CATEGORY, default=0)
-    special = models.BooleanField(verbose_name=_(u'Is this a special record?'))
-
-    class Meta:
-        verbose_name = _(u'Price')
-        verbose_name_plural = _(u'Prices')
-
-    def __unicode__(self):
-        return self.title
-
 class Team(models.Model):
 
     group = models.ManyToManyField(Group, verbose_name=_(u'Group'))
@@ -210,9 +228,6 @@ class Team(models.Model):
 
     def groups(self):
         return ','.join([unicode(a) for a in self.group.all()])
-
-    def price(self):
-        return Price.objects.filter(price_category=self.price_category)
 
     def about(self):
         return {

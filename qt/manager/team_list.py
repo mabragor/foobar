@@ -37,7 +37,7 @@ MODEL_MAP = ( # describes all fields in the model
      'delegate': None},
     # price
     {'type': float,
-     'delegate': None},
+     'delegate': QComboBox},
     # paid
     {'type': float,
      'delegate': QLineEdit},
@@ -49,7 +49,7 @@ MODEL_MAP = ( # describes all fields in the model
      'delegate': QComboBox},
     # count sold
     {'type': int,
-     'delegate': QLineEdit},
+     'delegate': None},
     # count used
     {'type': int,
      'delegate': None},
@@ -81,23 +81,25 @@ class TeamListModel(QAbstractTableModel):
     def __init__(self, parent=None):
         QAbstractTableModel.__init__(self, parent)
 
-        # хранилище данных модели
-        self.storage = []
+        self.storage = [] # here the data is stored
+        self.hidden_fields = 3 # from end of following lists
 
-        self.labels = [_('Title'), _('Price'), _('Paid'), _('Paid status'),
+        self.labels = [_('Title'), _('Price, rub'), _('Paid, rub'), _('Paid status'),
                        _('Card'), _('Sold'), _('Used'), _('Duration'),
                        _('Assigned'), _('Begin'), _('Expired'), _('Cancelled'),
-                       'id', 'team_id']
+                       'id', 'team_id', 'price_category']
         self.model_fields = ['title', 'price', 'paid', 'paid_status',
                              'card_type', 'count_sold', 'count_used', 'duration',
                              'reg_datetime', 'begin_date', 'end_date', 'cancel_datetime',
-                             'id', 'team_id']
+                             'id', 'team_id', 'price_category']
 
-    def initData(self, data):
+    def initData(self, data, prices):
         """
         Формат полученных данных: см. методы about() у моделей.
         Вызывается из DlgClientInfo::initData()
         """
+        self.prices = prices
+
         for rec in data:
             if type(rec) is not dict:
                 raise 'Check format'
@@ -116,7 +118,8 @@ class TeamListModel(QAbstractTableModel):
                 rec['end_date'],
                 rec['cancel_datetime'],
                 rec['id'],
-                team['id']
+                team['id'],
+                team['price_category'],
                 ] )
         self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
                   QModelIndex(), 1, self.rowCount())
@@ -138,7 +141,7 @@ class TeamListModel(QAbstractTableModel):
             title, price, paid, paid_status, card_type, \
             count_sold, count_used, duration, \
             reg_datetime, begin_date, exp_date, cancel_datetime, \
-            card_id, team_id = record
+            card_id, team_id, price_category = record
 
             row = {
                 'form-%s-client' % index: client_id,
@@ -164,7 +167,7 @@ class TeamListModel(QAbstractTableModel):
         if parent and parent.isValid():
             return 0
         else:
-            return len(self.labels) - 2
+            return len(self.model_fields) - self.hidden_fields
 
     def modelColumnCount(self):
         return len(self.model_fields)
@@ -245,7 +248,7 @@ class TeamListModel(QAbstractTableModel):
         if index.isValid() and role == Qt.EditRole:
             idx_row = index.row()
             idx_col = index.column()
-            print '[%i, %i] %s' % (idx_row, idx_col, value)
+            #print '[%i, %i] %s' % (idx_row, idx_col, value)
 
             record = list(self.storage[idx_row])
             if len(record) == 0: # init record in this case
@@ -295,11 +298,7 @@ class TeamListDelegate(QItemDelegate):
         QItemDelegate.__init__(self, parent)
         print 'TeamListDelegate: constructor'
 
-#     def eventFilter(obj, event):
-#         print 'event type', event.type()
-
     def createEditor(self, parent, option, index):
-        print 'TeamListDelegate: createEditor'
         delegate_editor = MODEL_MAP[ index.column() ]['delegate']
         if delegate_editor:
             print 'return editor', delegate_editor
@@ -308,15 +307,22 @@ class TeamListDelegate(QItemDelegate):
             return None
 
     def setEditorData(self, editor, index):
-        print 'TeamListDelegate: setEditorData'
-        raw_value = index.model().data(index, Qt.DisplayRole)
+        model = index.model()
+        raw_value = model.data(index, Qt.DisplayRole)
 
         delegate_editor = MODEL_MAP[ index.column() ]['delegate']
         if not delegate_editor or delegate_editor is QLineEdit:
             value = raw_value.toString()
             editor.setText(value)
         elif delegate_editor is QComboBox:
-            if 3 == index.column(): # paid status
+            if 1 == index.column(): #price
+                idx_price_cat = model.index(index.row(), 14)
+                price_cat, ok = model.data(idx_price_cat, Qt.DisplayRole).toInt()
+                for i in model.prices:
+                    if price_cat == int( i['price_category'] ):
+                        cost = unicode( int( float( i['cost'] ) ) )
+                        editor.addItem( cost, QVariant(i['id']) )
+            elif 3 == index.column(): # paid status
                 for i in PAID_STATUS:
                     editor.addItem( i, QVariant(PAID_STATUS.index(i)) )
             elif 4 == index.column(): # card type
@@ -332,23 +338,21 @@ class TeamListDelegate(QItemDelegate):
             return None
 
     def setModelData(self, editor, model, index):
-        print 'TeamListDelegate: setModelData'
-        # ??? lineEdit.interpretText()
-
         delegate_editor = MODEL_MAP[ index.column() ]['delegate']
         if not delegate_editor or delegate_editor is QLineEdit:
             value = editor.text()
         elif delegate_editor is QComboBox:
-            value = editor.currentIndex()
+            if 1 == index.column():
+                value = editor.currentText()
+            else:
+                value = editor.currentIndex()
         elif delegate_editor is QDateEdit:
             value = str(editor.date().toPyDate())
-            print 'delegate setModelData', value, type(value)
         else:
             value = 'Not implemented'
         model.setData(index, value, Qt.EditRole)
 
     def updateEditorGeometry(self, editor, option, index):
-        print 'TeamListDelegate: updateEditorGeometry'
         editor.setGeometry(option.rect)
 
 class TeamList(QTableView):
@@ -366,6 +370,10 @@ class TeamList(QTableView):
         self.actionTeamCancel = QAction(_('Cancel team'), self)
         self.actionTeamCancel.setStatusTip(_('Cancel current team.'))
         self.connect(self.actionTeamCancel, SIGNAL('triggered()'), self.teamCancel)
+
+        # source model
+        self.model_obj = TeamListModel(self)
+        self.setModel(self.model_obj)
 
         self.delegate = TeamListDelegate()
         self.setItemDelegate(self.delegate)
