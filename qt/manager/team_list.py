@@ -98,7 +98,7 @@ class TeamListModel(QAbstractTableModel):
         Формат полученных данных: см. методы about() у моделей.
         Вызывается из DlgClientInfo::initData()
         """
-        self.prices = prices
+        self.prices = prices # save prices info
 
         for rec in data:
             if type(rec) is not dict:
@@ -337,6 +337,9 @@ class TeamListDelegate(QItemDelegate):
         else:
             return None
 
+    def generator_price(self, field_name, value):
+        return lambda x: int( value ) == int( x[field_name] )
+
     def setModelData(self, editor, model, index):
         delegate_editor = MODEL_MAP[ index.column() ]['delegate']
         if not delegate_editor or delegate_editor is QLineEdit:
@@ -344,6 +347,10 @@ class TeamListDelegate(QItemDelegate):
         elif delegate_editor is QComboBox:
             if 1 == index.column():
                 value = editor.currentText()
+                # fill count_sold
+                g = self.generator_price('cost', value)
+                price_info = filter(g, model.prices)[0]
+                model.setData(model.index(index.row(), 5), price_info['count'], Qt.EditRole)
             else:
                 value = editor.currentIndex()
         elif delegate_editor is QDateEdit:
