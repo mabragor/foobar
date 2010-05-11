@@ -151,12 +151,15 @@ class DlgClientInfo(QDialog):
 
     def showAssignTeamDlg(self):
         dialog = DlgTeamAssign(self)
-        dialog.setCallback(self.assignTeam)
+        dialog.setCallback(self.assignTeam) # see next method
         dialog.setModel(self.parent.tree)
         dialog.setModal(True)
         dlgStatus = dialog.exec_()
 
-    def assignTeam(self, data):
+    def assignTeam(self, data): # data goes from DlgTeamAssign
+        # add user's discount
+        data.update( {'discount': self.editDiscount.text().toUtf8()} )
+        # send data to user's model
         model = self.cardinfo.model()
         lastRow = model.rowCount(QModelIndex())
         if model.insertRows(lastRow, 1, QModelIndex()):

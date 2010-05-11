@@ -129,18 +129,15 @@ class RegisterVisit(AjaxForm):
 
         event = self.get_object('event_id')
 
-        if event.begin <= datetime.now():
+        if event.begin_datetime <= datetime.now():
             raise forms.ValidationError(_(u'Avoid the appointment in the past.'))
         if storage.Visit.objects.filter(client=client, schedule=event).count() > 0:
             raise forms.ValidationError(_(u'The client is already registered on this event.'))
 
         # search for card
-        today = date.today()
-        cards = client.card_set.filter(bgn_date__lte=today,
-                                       exp_date__gt=today,
-                                       price__lte=event.team.price)
+        cards = client.card_set.filter(price_category__lte=event.team.price_category)
         if len(cards) == 0:
-            raise forms.ValidationError(_(u'The client has no cards.'))
+            raise forms.ValidationError(_(u'The client has no card of needed category.'))
         else:
             # save the first card as check_obj_existence does
             card = cards[0]
@@ -151,6 +148,8 @@ class RegisterVisit(AjaxForm):
         return self.cleaned_data
 
     def save(self):
+        DURATION_TYPE = [30, 90, 180, 270, 360]
+
         client = storage.Client.objects.get(rfid_code=self.cleaned_data['rfid_code'])
         event = self.get_object('event_id')
         card = self.get_object('card_id')
@@ -160,6 +159,9 @@ class RegisterVisit(AjaxForm):
         visit.save()
         # increment visits on client's card
         card.count_used += 1
+        card.begin_date = date.today()
+        duration = DURATION_TYPE[card.duration]
+        card.end_date = date.today() + timedelta(days=duration)
         card.save()
         return visit.id
 
@@ -265,6 +267,7 @@ class ClientCard(AjaxForm):
     card = forms.IntegerField()
     team = forms.IntegerField()
     price = forms.FloatField()
+    price_category = forms.IntegerField()
     paid = forms.FloatField()
     paid_status = forms.IntegerField()
     card_type = forms.IntegerField()
@@ -292,6 +295,7 @@ class ClientCard(AjaxForm):
                                 count_sold=data['count_sold'],
                                 duration=data['duration'],
                                 price=data['price'],
+                                price_category=data['price_category'],
                                 )
         else:
             card = storage.Card.objects.get(id=card_id)
@@ -301,6 +305,7 @@ class ClientCard(AjaxForm):
             card.count_sold = data['count_sold']
             card.duration = data['duration']
             card.price = data['price']
+            card.price_category=data['price_category']
         card.save()
 
 class RenterInfo(UserInfo):

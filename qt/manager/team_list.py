@@ -73,6 +73,9 @@ MODEL_MAP = ( # describes all fields in the model
     # team id
     {'type': int,
      'delegate': None},
+    # price category
+    {'type': int,
+     'delegate': None},
 )
 
 class TeamListModel(QAbstractTableModel):
@@ -147,6 +150,7 @@ class TeamListModel(QAbstractTableModel):
                 'form-%s-card' % index: card_id,
                 'form-%s-team' % index: team_id,
                 'form-%s-price' % index: price,
+                'form-%s-price_category' % index: int(price_category), #FIXME
                 'form-%s-paid' % index: paid,
                 'form-%s-paid_status' % index: paid_status,
                 'form-%s-card_type' % index: card_type,
@@ -204,27 +208,12 @@ class TeamListModel(QAbstractTableModel):
             return QVariant(object_type(value))
 
     def setRow(self, index, data, role):
-        data_demo = {
-            'card_type': 0,
-            'duration': 0,
-            'team': [u'\u0411\u0440\u0435\u0439\u043a-\u0434\u0430\u043d\u0441 \u0438 free style',
-                     1,
-                     '0',
-                     {'birth_date': '2010-04-30',
-                      'desc': u'\u0431\u0443\u0445\u0430\u0435\u0442',
-                      'email': 'ivan@jet.ru',
-                      'first_name': u'\u0418\u0432\u0430\u043d',
-                      'id': 2,
-                      'last_name': u'\u041f\u0435\u0442\u0440\u043e\u043f\u043e\u043b\u044c\u0441\u043a\u0438\u0439',
-                      'name': u'\u041f\u0435\u0442\u0440\u043e\u043f\u043e\u043b\u044c\u0441\u043a\u0438\u0439 \u0418\u0432\u0430\u043d',
-                      'phone': '1234567890'},
-                     1.0]}
-
         if index.isValid() and role == Qt.EditRole:
             reg_datetime = datetime.now()
             team_id = data['team'][1]
             title = data['team'][0]
-            price = data['team'][2]
+            price = 0.0
+            price_category = data['team'][2]
             paid = 0
             paid_status = 0
             card_type = data['card_type']
@@ -235,7 +224,7 @@ class TeamListModel(QAbstractTableModel):
             record = [title, price, paid, paid_status, card_type,
                       count_sold, count_used, duration,
                       reg_datetime, begin_date, exp_date, cancel_datetime,
-                      0, team_id]
+                      0, team_id, price_category]
 
             idx_row = index.row()
             idx_col = 0

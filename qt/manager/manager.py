@@ -12,7 +12,7 @@ from http_ajax import HttpAjax
 from event_storage import Event, EventStorage
 from qtschedule import QtScheduleDelegate, QtSchedule
 
-from team_tree import TeamTree, TreeModel
+from team_tree import TreeModel
 
 from dlg_settings import DlgSettings
 from dlg_login import DlgLogin
@@ -68,7 +68,6 @@ class MainWindow(QMainWindow):
 	self.setWindowTitle('%s : %s' % (self.baseTitle, _('Login to start session')))
 
     def loadInitialData(self):
-        #self.tree = self.getTeamsTree()
         self.scheduleModel = EventStorage(
             (8, 24), timedelta(minutes=30), self.rooms, 'week', self
             )
@@ -161,11 +160,6 @@ class MainWindow(QMainWindow):
 		  ...]}
 	"""
 	return json_like
-
-    def getTeamsTree(self):
-	ajax = HttpAjax(self, '/manager/available_teams/', {}, self.session_id)
-	response = ajax.parse_json() # see format at team_tree.py
-	return TreeModel(response)
 
     def createMenus(self):
 	""" Метод для генерации меню приложения. """
@@ -270,7 +264,11 @@ class MainWindow(QMainWindow):
 	    response = ajax.parse_json()
             if response and 'user_info' in response:
                 self.loggedTitle(response['user_info'])
-                self.tree = self.getTeamsTree()
+
+                ajax = HttpAjax(self, '/manager/available_teams/', {}, self.session_id)
+                response = ajax.parse_json() # see format at team_tree.py
+                self.tree = TreeModel(response)
+
                 self.scheduleModel.showCurrWeek()
 
                 self.refreshTimer = QTimer(self)

@@ -13,15 +13,15 @@ PAID_STATUS = ( ('0', _(u'Reserved')),
                 ('1', _(u'Piad partially')),
                 ('2', _(u'Paid')) )
 
-PRICE_CATEGORY = ( ('0', _(u'Normal')),
-                   ('1', _(u'High')) )
+PRICE_CATEGORY = ( (0, _(u'Normal')),
+                   (1, _(u'High')) )
 
 class Price(models.Model):
     title = models.CharField(max_length=64)
     cost = models.FloatField()
     count = models.IntegerField()
     discount = models.IntegerField()
-    price_category = models.CharField(verbose_name=_(u'Price category'), max_length=1, choices=PRICE_CATEGORY, default=0)
+    price_category = models.IntegerField(verbose_name=_(u'Price category'), max_length=1, choices=PRICE_CATEGORY, default=0)
     special = models.BooleanField(verbose_name=_(u'Is this a special record?'))
 
     class Meta:
@@ -213,7 +213,7 @@ class Team(models.Model):
     coach = models.ForeignKey(Coach, verbose_name=_(u'Coach'))
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
     duration = models.FloatField(verbose_name=_(u'Duration'), help_text=_(u'The duration of an event.'))
-    price_category = models.CharField(verbose_name=_(u'Price category'), max_length=1, choices=PRICE_CATEGORY, default=0)
+    price_category = models.IntegerField(verbose_name=_(u'Price category'), max_length=1, choices=PRICE_CATEGORY, default=0)
     reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
 
     class Meta:
@@ -295,6 +295,7 @@ class Card(models.Model):
     count_sold = models.IntegerField(verbose_name=_(u'Exercises sold'))
     count_used = models.IntegerField(verbose_name=_(u'Exercises used'), default=0)
     price = models.FloatField(verbose_name=_(u'Price'), help_text=_(u'Price.'), default=float(0.00))
+    price_category = models.IntegerField(verbose_name=_(u'Price category'), max_length=1, choices=PRICE_CATEGORY, default=0)
     paid = models.FloatField(verbose_name=_(u'Paid'), help_text=_(u'Paid amount.'), default=float(0.00))
     paid_status = models.CharField(verbose_name=_(u'Paid status'), max_length=1, choices=PAID_STATUS, default=0)
     reg_datetime = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
@@ -326,7 +327,7 @@ class Card(models.Model):
             'cancel_datetime': self.cancel_datetime,
             }
         if not short:
-            obj.update( {'client': self.client.about(),} )
+            obj.update( {'client': self.client.about(True),} )
         return obj
 
 class Schedule(models.Model):
