@@ -28,6 +28,9 @@ class Http:
         # close server's connection
         self.conn.close()
 
+    def is_session_open(self):
+        return self.session_id is not None
+
     def get_settings(self): # private
         """ Use this method to obtain application's network settings. """
         self.settings = QSettings()
@@ -40,7 +43,7 @@ class Http:
 
         return (host, port)
 
-    def request(self, url, params):
+    def request(self, url, params): # public
         if self.session_id and self.session_id not in self.headers:
             self.headers.update( { 'Cookie': 'sessionid=%s' % self.session_id } )
 
@@ -67,7 +70,7 @@ class Http:
             if DEBUG:
                 print 'session id is', self.session_id
 
-    def parse(self):
+    def parse(self, default={}): # public
         if self.response.status == 200: # http status
             data = self.response.read()
             response = json.read(data)
@@ -77,7 +80,7 @@ class Http:
                     QMessageBox.warning(self.parent, _('Warning'), msg)
                 else:
                     print msg
-                return None
+                return default
             return response
         elif self.response.status == 302: # authentication
             msg = _('Authenticate yourself.')
@@ -85,7 +88,7 @@ class Http:
                 QMessageBox.warning(self.parent, _('Warning'), msg)
             else:
                 print msg
-            return None
+            return default
         elif self.response.status == 500: # error
             open('./dump.html', 'w').write(self.response.read())
         else:
@@ -94,7 +97,7 @@ class Http:
                 QMessageBox.critical(self.parent, _('HTTP Error'), msg)
             else:
                 print msg
-            return None
+            return default
 
 # Test part of module
 
