@@ -6,7 +6,7 @@ from datetime import datetime
 
 from settings import _, DEBUG
 from event_storage import Event
-from http_ajax import HttpAjax
+from http import Http
 from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_show_visitors import DlgShowVisitors
 

@@ -3,7 +3,7 @@
 
 from settings import _
 from settings import MODEL_PROPERTIES
-from http_ajax import HttpAjax
+from http import Http
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *

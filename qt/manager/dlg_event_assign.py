@@ -4,7 +4,7 @@
 from settings import _
 from settings import userRoles
 from team_tree import TeamTree
-from http_ajax import HttpAjax
+from http import Http
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *

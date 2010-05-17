@@ -2,7 +2,7 @@
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 from settings import _
-from http_ajax import HttpAjax
+from http import Http
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *

@@ -2,10 +2,10 @@
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 from settings import _, DEBUG
-from model_sorting import SortClientTeams
-from team_list import TeamListModel, TeamList
+#from model_sorting import SortClientTeams
+from team_list import TeamList
 from rent_list import RentListModel, RentList
-from http_ajax import HttpAjax
+from http import Http
 from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_team_assign import DlgTeamAssign
 from dlg_rent_assign import DlgRentAssign
