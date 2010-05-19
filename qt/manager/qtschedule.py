@@ -5,7 +5,7 @@ import sys, re
 from datetime import datetime, timedelta
 
 from settings import _
-from http_ajax import HttpAjax
+from event_storage import EventStorage
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -14,20 +14,30 @@ class QtSchedule(QTableView):
 
     """ Класс календаря. """
 
-    def __init__(self, work_hours, quant, rooms, parent=None):
+    def __init__(self, parent=None, params=dict()):
         QTableView.__init__(self, parent)
 
         self.parent = parent
+        self.params = params # {http, work_hours, quant, rooms}
+
+        self.rooms = self.params.get('rooms', tuple())
+
+        # Определяем и назначаем модель
+        storage_params = self.params
+        storage_params.update( { 'mode': 'week' } )
+        self.__model = EventStorage(self, storage_params)
+        self.setModel(self.__model)
+
+        # Назначаем делегата для ячеек
+        delegate = QtScheduleDelegate(self)
+        self.setItemDelegate(delegate)
+
         self.events = {}
         self.cells = {}
-        self.rooms = rooms
         self.scrolledCellX = 0
         self.scrolledCellY = 0
 
-        self.getMime = parent.getMime
-
-        self.work_hours = work_hours
-        self.quant = quant
+        # NOT USED YET: self.getMime = parent.getMime
 
         self.current_event = None
         self.current_data = None
@@ -58,10 +68,6 @@ class QtSchedule(QTableView):
         self.setGridStyle(Qt.DotLine)
         self.resizeColumnsToContents()
         self.verticalHeader().setStretchLastSection(True)
-
-        # Назначаем делегата для ячеек
-        delegate = QtScheduleDelegate(self)
-        self.setItemDelegate(delegate)
 
         # Контекстное меню
         self.ctxMenuExchange = QAction(_('Exchange rooms'), self)

@@ -8,9 +8,9 @@ from datetime import datetime, timedelta
 from os.path import dirname, join
 
 from settings import _, DEBUG
-from http_ajax import HttpAjax
-from event_storage import Event, EventStorage
-from qtschedule import QtScheduleDelegate, QtSchedule
+from http import Http
+from event_storage import Event
+from qtschedule import QtSchedule
 
 from team_tree import TreeModel
 
@@ -32,8 +32,6 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
 	QMainWindow.__init__(self, parent)
 
-        self.session_id = None
-
 	self.mimes = {'team': 'application/x-team-item',
 		      'event':  'application/x-calendar-event',
 		      }
@@ -41,9 +39,13 @@ class MainWindow(QMainWindow):
         self.tree = []
         self.rfid_id = None
 
+        self.http = None
+        self.work_hours = (8, 24)
+        self.schedule_quant = timedelta(minutes=30)
+
         self.menus = []
-	self.createMenus()
-	self.setupViews()
+	self.create_menus()
+	self.setup_views()
 
         settings = QSettings()
         settings.beginGroup('network')
@@ -59,7 +61,7 @@ class MainWindow(QMainWindow):
 	self.resize(640, 480)
 
         # start here event loading thread
-        self.loadInitialData()
+        self.get_dynamic()
 
     def loggedTitle(self, name):
 	self.setWindowTitle('%s : %s' % (self.baseTitle, name))
@@ -67,33 +69,59 @@ class MainWindow(QMainWindow):
     def logoutTitle(self):
 	self.setWindowTitle('%s : %s' % (self.baseTitle, _('Login to start session')))
 
-    def loadInitialData(self):
-        self.scheduleModel = EventStorage(
-            (8, 24), timedelta(minutes=30), self.rooms, 'week', self
-            )
-        self.schedule.setModel(self.scheduleModel)
-        self.bpMonday.setText(self.scheduleModel.getMonday().strftime('%d/%m/%Y'))
-        self.bpSunday.setText(self.scheduleModel.getSunday().strftime('%d/%m/%Y'))
+    def get_dynamic(self):
+        self.schedule.model().update()
 
-    def prepareFilter(self, id, title):
-        def handler():
-            self.statusBar().showMessage(_('Filter: Room "%s" is changed its state') % title)
-        return handler
+        self.bpMonday.setText(self.schedule.model().getMonday().strftime('%d/%m/%Y'))
+        self.bpSunday.setText(self.schedule.model().getSunday().strftime('%d/%m/%Y'))
 
-    def setupViews(self):
-        self.rooms = tuple( [ (a['title'], a['color'], a['id']) for a in self.getRooms()['rows'] ] )
+    def get_static(self):
+        """ This methods get static information from server. """
+        # get rooms
+        self.http.request('/manager/get_rooms/', {})
+        default_response = {'rows': []}
+        response = self.http.parse(default_response)
+	"""
+	{'rows': [{'color': 'FFAAAA', 'text': 'red', 'id': 1},
+		  {'color': 'AAFFAA', 'text': 'green', 'id': 2},
+		  ...]}
+	"""
+        self.rooms = tuple( [ (a['title'], a['color'], a['id']) for a in response['rows'] ] )
+        # available teams
+        self.http.request('/manager/available_teams/', {})
+        response = self.http.parse() # see format at team_tree.py
+        self.tree = TreeModel(response)
 
-	self.schedule = QtSchedule((8, 24), timedelta(minutes=30), self.rooms, self)
 
-        headerPanel = QHBoxLayout()
+    def update_interface(self):
+        """ This method updates application's interface using static
+        information obtained in previous method. """
+        # rooms
         if self.rooms and len(self.rooms) > 0:
             for title, color, id in self.rooms:
                 buttonFilter = QPushButton(title)
                 buttonFilter.setCheckable(True)
                 buttonFilter.setDisabled(True) # BUG #28
-                headerPanel.addWidget(buttonFilter)
+                self.panelRooms.addWidget(buttonFilter)
                 self.connect(buttonFilter, SIGNAL('clicked()'),
-                             self.prepareFilter(id, title))
+                             self.prepare_filter(id, title))
+
+
+    def prepare_filter(self, id, title):
+        def handler():
+            self.statusBar().showMessage(_('Filter: Room "%s" is changed its state') % title)
+        return handler
+
+    def setup_views(self):
+        self.panelRooms = QHBoxLayout()
+
+        schedule_params = {
+            'http': self.http,
+            'work_hours': self.work_hours,
+            'quant': self.schedule_quant,
+            'rooms': self.rooms,
+            }
+	self.schedule = QtSchedule(self, schedule_params)
 
         self.bpMonday = QLabel('--/--/----')
         self.bpSunday = QLabel('--/--/----')
@@ -130,7 +158,7 @@ class MainWindow(QMainWindow):
         bottomPanel.addWidget(self.buttonNext)
 
         mainLayout = QVBoxLayout()
-        mainLayout.addLayout(headerPanel)
+        mainLayout.addLayout(self.panelRooms)
         mainLayout.addWidget(self.schedule)
         mainLayout.addLayout(bottomPanel)
 
@@ -148,20 +176,7 @@ class MainWindow(QMainWindow):
     def getMime(self, name):
 	return self.mimes.get(name, None)
 
-    def getRooms(self):
-	ajax = HttpAjax(self, '/manager/get_rooms/', {}, self.session_id)
-	if ajax:
-	    json_like = ajax.parse_json()
-	else:
-	    json_like = {'rows': []}
-	"""
-	{'rows': [{'color': 'FFAAAA', 'text': 'red', 'id': 1},
-		  {'color': 'AAFFAA', 'text': 'green', 'id': 2},
-		  ...]}
-	"""
-	return json_like
-
-    def createMenus(self):
+    def create_menus(self):
 	""" Метод для генерации меню приложения. """
 	""" Использование: Описать меню со всеми действиями в блоке
 	data. Создать обработчики для каждого действия. """
@@ -234,8 +249,7 @@ class MainWindow(QMainWindow):
 		menu.addAction(action)
             self.menus.append(menu)
 
-    def setSessionID(self, id):
-        self.session_id = id
+    def activate_interface(self):
         # Активировать элементы меню
         for menu in self.menus:
             menu.setDisabled(False)
@@ -247,9 +261,10 @@ class MainWindow(QMainWindow):
     # Обработчики меню: начало
 
     def login(self):
-	def callback(login, password):
-	    self.login = login
-            self.password = password
+	def callback(credentials):
+	    self.credentials = credentials
+
+        self.http = Http(self)
 
 	self.dialog = DlgLogin(self)
 	self.dialog.setCallback(callback)
@@ -257,25 +272,26 @@ class MainWindow(QMainWindow):
 	dlgStatus = self.dialog.exec_()
 
 	if QDialog.Accepted == dlgStatus:
-            params = {'login': self.login,
-                      'password': self.password}
-	    ajax = HttpAjax(self, '/manager/login/',
-                            params, self.session_id)
-	    response = ajax.parse_json()
+            self.http.request('/manager/login/', self.credentials)
+            default_response = None
+	    response = self.http.parse(default_response)
             if response and 'user_info' in response:
                 self.loggedTitle(response['user_info'])
 
-                ajax = HttpAjax(self, '/manager/available_teams/', {}, self.session_id)
-                response = ajax.parse_json() # see format at team_tree.py
-                self.tree = TreeModel(response)
+                # update application's interface
+                self.get_static()
+                self.update_interface()
 
-                self.scheduleModel.showCurrWeek()
+                self.schedule.model().showCurrWeek()
 
+                # run refresh timer
                 self.refreshTimer = QTimer(self)
                 from settings import SCHEDULE_REFRESH_TIMEOUT
                 self.refreshTimer.setInterval(SCHEDULE_REFRESH_TIMEOUT)
                 self.connect(self.refreshTimer, SIGNAL('timeout()'), self.schedule.model().update)
                 self.refreshTimer.start()
+
+                self.activate_interface() # CHECK THIS
         else:
             QMessageBox.warning(self, _('Login failed'),
                                 _('It seems you\'ve entered wrong login/password.'))
@@ -284,15 +300,14 @@ class MainWindow(QMainWindow):
         # Деактивировать элементы меню
         for menu in self.menus[1:]:
             menu.setDisabled(True)
-        self.session_id = None
         self.setWindowTitle('%s : %s' % (self.baseTitle, _('Login to start session')))
-        self.scheduleModel.storage.init()
+        self.schedule.model().storage.init()
 
     def setupApp(self):
 	self.dialog = DlgSettings(self)
 	self.dialog.setModal(True)
 	self.dialog.exec_()
-        self.loadInitialData()
+        self.get_dynamic()
 
     def clientNew(self):
 	self.dialog = DlgClientInfo(self)

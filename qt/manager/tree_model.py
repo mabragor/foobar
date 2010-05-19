@@ -56,6 +56,17 @@ class AbstractTreeModel(QAbstractItemModel):
         else:
             return self.rootItem.columnCount()
 
+    def rowCount(self, parent):
+        if parent.column() > 0:
+            return 0
+
+        if not parent.isValid():
+            parentItem = self.rootItem
+        else:
+            parentItem = parent.internalPointer()
+
+        return parentItem.childCount()
+
     def data(self, index, role):
         if not index.isValid():
             return QVariant()
@@ -107,15 +118,4 @@ class AbstractTreeModel(QAbstractItemModel):
             return QModelIndex()
 
         return self.createIndex(parentItem.row(), 0, parentItem)
-
-    def rowCount(self, parent):
-        if parent.column() > 0:
-            return 0
-
-        if not parent.isValid():
-            parentItem = self.rootItem
-        else:
-            parentItem = parent.internalPointer()
-
-        return parentItem.childCount()
 

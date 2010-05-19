@@ -16,6 +16,18 @@ PAID_STATUS = ( ('0', _(u'Reserved')),
 PRICE_CATEGORY = ( (0, _(u'Normal')),
                    (1, _(u'High')) )
 
+class PriceCategory(models.Model):
+    title = models.CharField(max_length=64)
+    max_price = models.FloatField(verbose_name=_(u'Maximum price.'))
+
+    class Meta:
+
+        verbose_name = _(u'Price category')
+        verbose_name_plural = _(u'Price categories')
+
+    def __unicode__(self):
+        return self.title
+
 class Price(models.Model):
     title = models.CharField(max_length=64)
     cost = models.FloatField()
@@ -52,7 +64,7 @@ class AbstractUser(models.Model):
         abstract = True
 
     def __unicode__(self):
-        return '%s %s' % (self.first_name, self.last_name)
+        return '%s %s' % (self.last_name, self.first_name)
 
     def about(self):
         return {

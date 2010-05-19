@@ -2,7 +2,6 @@
 # (c) 2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 from settings import _, DEBUG
-from http import Http
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -57,10 +56,10 @@ class DlgLogin(QDialog):
         self.callback = callback
 
     def applyDialog(self):
-        login = self.editLogin.text()
-        password = self.editPassword.text()
         if self.callback:
-            self.callback(login, password)
+            result = {'login': self.editLogin.text(),
+                      'password': self.editPassword.text()}
+            self.callback(result)
             self.accept()
         else:
             if DEBUG:

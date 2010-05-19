@@ -6,9 +6,8 @@ from datetime import datetime, date, time as dtime, timedelta
 
 from os.path import dirname, join
 
-from settings import _, DEBUG
-from settings import userRoles
-from http_ajax import HttpAjax
+from settings import _, DEBUG, userRoles
+from http import Http
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -137,24 +136,18 @@ class ModelStorage:
 
 class EventStorage(QAbstractTableModel):
 
-    def __init__(self, work_hours,
-                 quant=timedelta(minutes=30),
-                 room_list=tuple(), mode='week', parent=None):
+    def __init__(self, parent=None, params={}):
         QAbstractTableModel.__init__(self, parent)
 
         self.parent = parent
-        self.work_hours = work_hours
-        self.quant = quant
-        self.rooms = room_list
-        self.multiplier = timedelta(hours=1).seconds / self.quant.seconds
+        self.params = params
 
-        self.getMime = parent.getMime
+        self.work_hours = self.params.get('work_hours', None)
+        self.quant = self.params.get('quant', None)
+        self.rooms = self.params.get('rooms', None)
+        self.mode = self.params.get('mode', 'week') # 'week' or 'day'
 
-        self.storage = ModelStorage()
-        self.showMode = mode # 'week' or 'day'
-
-        self.weekRange = self.date2range(datetime.now())
-        if 'week' == self.showMode:
+        if 'week' == self.mode:
             self.week_days = [ _('Monday'), _('Tuesday'),
                                _('Wednesday'), _('Thursday'),
                                _('Friday'), _('Saturday'),
@@ -162,114 +155,22 @@ class EventStorage(QAbstractTableModel):
         else:
             self.week_days = [ _('Day') ]
 
-        begin_hour, end_hour = work_hours
-        self.rows_count = (end_hour - begin_hour) * timedelta(hours=1).seconds / quant.seconds
+        begin_hour, end_hour = self.work_hours
+        self.multiplier = timedelta(hours=1).seconds / self.quant.seconds
+        self.rows_count = (end_hour - begin_hour) * self.multiplier
         self.cols_count = len(self.week_days)
 
-        self.storage.init()
+        self.weekRange = self.date2range(datetime.now())
 
-    def rowCount(self, parent):
-        if parent.isValid():
-            return 0
-        else:
-            return self.rows_count
+        # NOT USED YET: self.getMime = parent.getMime
 
-    def columnCount(self, parent):
-        if parent.isValid():
-            return 0
-        else:
-            if 'week' == self.showMode:
-                return self.cols_count
-            else:
-                return 1
-
-    def getShowMode(self):
-        return self.showMode
-
-    def changeShowMode(self, column):
-        if 'week' == self.showMode:
-            self.showMode = 'day'
-            self.storage.setFilter(column)
-        else:
-            self.showMode = 'week'
-            self.storage.setFilter(None)
-        self.emit(SIGNAL('layoutChanged()'))
-
-    def colByMode(self, column):
-        if self.showMode == 'week':
-            return column
-        else:
-            return self.dayColumn
-
-    def exchangeRoom(self, data_a, data_b):
-        # params содержит идентификаторы событий
-        room_a = data_a[2]
-        room_b = data_b[2]
-        # получить данные о событиях
-        event_a = self.storage.byRCR(ModelStorage.GET, data_a)
-        event_b = self.storage.byRCR(ModelStorage.GET, data_b)
-        # получить списки ячеек для каждого события
-        items_a = self.storage.getByER( (event_a, room_a) )
-        items_b = self.storage.getByER( (event_b, room_b) )
-        # удалить все записи о каждом событии
-        self.remove(event_a, room_a)
-        self.remove(event_b, room_b)
-        # проверить возможность обмена
-        if self.may_insert(event_a, room_b) and \
-                self.may_insert(event_b, room_a):
-            # отправить инфо на сервер
-            params = {'id_a': event_a.id,
-                      'id_b': event_b.id}
-            ajax = HttpAjax(self.parent, '/manager/exchange_room/',
-                            params, self.parent.session_id)
-            if ajax:
-                response = ajax.parse_json()
-                if response is not None:
-                    # добавить события, обменяв залы
-                    self.insert(room_a, event_b)
-                    self.insert(room_b, event_a)
-                    self.emit(SIGNAL('layoutChanged()'))
-                    return True
-        # вертать взад
-        self.insert(room_a, event_a)
-        self.insert(room_b, event_b)
-        self.emit(SIGNAL('layoutChanged()'))
-        return False
+        # Хранилище элементов
+        self.storage = ModelStorage()
+        self.storage.init() # очистка
 
     def update(self):
-        if 'week' == self.showMode:
-            self.loadData()
-
-    def showCurrWeek(self):
-        if 'week' == self.showMode:
-            now = datetime.now()
-            self.weekRange = self.date2range(now)
-            self.loadData()
-            return self.weekRange
-        else:
-            return None
-
-    def showPrevWeek(self):
-        if 'week' == self.showMode:
-            current_monday, current_sunday = self.weekRange
-            prev_monday = current_monday - timedelta(days=7)
-            prev_sunday = current_sunday - timedelta(days=7)
-            self.weekRange = (prev_monday, prev_sunday)
-            self.loadData()
-            return self.weekRange
-        else:
-            return None
-
-    def showNextWeek(self):
-        if 'week' == self.showMode:
-            current_monday, current_sunday = self.weekRange
-            next_monday = current_monday + timedelta(days=7)
-            next_sunday = current_sunday + timedelta(days=7)
-            self.weekRange = (next_monday, next_sunday)
-            self.loadData()
-            return self.weekRange
-        else:
-            return None
+        if 'week' == self.mode:
+            self.load_data()
 
     def insert(self, room_id, event, emit_signal=False):
         """ Метод регистрации нового события. """
@@ -307,42 +208,143 @@ class EventStorage(QAbstractTableModel):
         self.remove(event, room)
         self.insert(row, col, room, event)
 
-    def loadData(self):
-        if 'day' == self.showMode:
+    def load_data(self):
+        if 'day' == self.mode:
             return False
 
-        self.parent.statusBar().showMessage(_('Request information for the calendar.'))
+        self.parent.parent.statusBar().showMessage(_('Request information for the calendar.'))
         monday, sunday = self.weekRange
-	ajax = HttpAjax(self.parent, '/manager/get_week/',
-                        {'monday': monday,
-                         'filter': []}, self.parent.session_id)
-	if ajax:
-            self.parent.statusBar().showMessage(_('Parsing the response...'))
-	    response = ajax.parse_json()
-            if response is None:
-                self.parent.statusBar().showMessage(_('No reply'))
+
+        http = self.params.get('http', None)
+        if http:
+            params = { 'monday': monday, 'filter': [] }
+            http.request('/manager/get_week/', params)
+            self.parent.parent.statusBar().showMessage(_('Parsing the response...'))
+            response = http.parse(None)
+            # обработка результатов
+            if response and 'events' in response:
+                self.parent.parent.statusBar().showMessage(_('Filling the calendar...'))
+                self.storage.init()
+                # размещаем событие в модели
+                for event_info in response['events']:
+                    qApp.processEvents() # keep GUI active
+                    room_id = int( event_info['room']['id'] )
+                    event_obj = Event(monday, event_info)
+                    self.insert( room_id , event_obj )
+                # отображаем события
+                self.emit(SIGNAL('layoutChanged()'))
+                self.parent.parent.statusBar().showMessage(_('Done'), 2000)
+                # self.storage.dump()
+                return True
+            else:
+                self.parent.parent.statusBar().showMessage(_('No reply'))
                 return False
-            self.parent.statusBar().showMessage(_('Filling the calendar...'))
-            self.storage.init()
-            for eventInfo in response['events']:
-                qApp.processEvents() # keep GUI active
-                roomId = int( eventInfo['room']['id'] )
-                eventObj = Event(monday, eventInfo)
-                self.insert( roomId , eventObj )
-            self.emit(SIGNAL('layoutChanged()'))
-            self.parent.statusBar().showMessage(_('Done'), 2000)
 
-            # self.storage.dump()
+    def rowCount(self, parent): # protected
+        if parent.isValid():
+            return 0
+        else:
+            return self.rows_count
 
-            return True
-	return False
+    def columnCount(self, parent): # protected
+        if parent.isValid():
+            return 0
+        else:
+            if 'week' == self.mode:
+                return self.cols_count
+            else:
+                return 1
+
+    def getShowMode(self):
+        return self.mode
+
+    def changeShowMode(self, column):
+        if 'week' == self.mode:
+            selfmode = 'day'
+            self.storage.setFilter(column)
+        else:
+            self.mode = 'week'
+            self.storage.setFilter(None)
+        self.emit(SIGNAL('layoutChanged()'))
+
+    def colByMode(self, column):
+        if self.mode == 'week':
+            return column
+        else:
+            return self.dayColumn
+
+    def exchangeRoom(self, data_a, data_b):
+        # paramsсодержит идентификаторы событий
+        room_a = data_a[2]
+        room_b = data_b[2]
+        # получить данные о событиях
+        event_a = self.storage.byRCR(ModelStorage.GET, data_a)
+        event_b = self.storage.byRCR(ModelStorage.GET, data_b)
+        # получить списки ячеек для каждого события
+        items_a = self.storage.getByER( (event_a, room_a) )
+        items_b = self.storage.getByER( (event_b, room_b) )
+        # удалить все записи о каждом событии
+        self.remove(event_a, room_a)
+        self.remove(event_b, room_b)
+        # проверить возможность обмена
+        if self.may_insert(event_a, room_b) and \
+                self.may_insert(event_b, room_a):
+            # отправить инфо на сервер
+            params = {'id_a': event_a.id,
+                      'id_b': event_b.id}
+            ajax = HttpAjax(self.parent, '/manager/exchange_room/',
+                            params, self.parent.session_id)
+            if ajax:
+                response = ajax.parse_json()
+                if response is not None:
+                    # добавить события, обменяв залы
+                    self.insert(room_a, event_b)
+                    self.insert(room_b, event_a)
+                    self.emit(SIGNAL('layoutChanged()'))
+                    return True
+        # вертать взад
+        self.insert(room_a, event_a)
+        self.insert(room_b, event_b)
+        self.emit(SIGNAL('layoutChanged()'))
+        return False
+
+    def showCurrWeek(self):
+        if 'week' == self.mode:
+            now = datetime.now()
+            self.weekRange = self.date2range(now)
+            self.load_data()
+            return self.weekRange
+        else:
+            return None
+
+    def showPrevWeek(self):
+        if 'week' == self.mode:
+            current_monday, current_sunday = self.weekRange
+            prev_monday = current_monday - timedelta(days=7)
+            prev_sunday = current_sunday - timedelta(days=7)
+            self.weekRange = (prev_monday, prev_sunday)
+            self.load_data()
+            return self.weekRange
+        else:
+            return None
+
+    def showNextWeek(self):
+        if 'week' == self.mode:
+            current_monday, current_sunday = self.weekRange
+            next_monday = current_monday + timedelta(days=7)
+            next_sunday = current_sunday + timedelta(days=7)
+            self.weekRange = (next_monday, next_sunday)
+            self.load_data()
+            return self.weekRange
+        else:
+            return None
 
     def headerData(self, section, orientation, role):
         """ Метод для определения вертикальных и горизонтальных меток для
         рядов и колонок таблицы. """
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             mon, sun = self.weekRange
-            if 'week' == self.showMode:
+            if 'week' == self.mode:
                 delta = section
             else:
                 delta = self.storage.column
