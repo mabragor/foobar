@@ -19,7 +19,7 @@ class Http:
         (self.host, self.port) = self.get_settings()
         hostport = '%s:%s' % (self.host, self.port)
         if DEBUG:
-            print 'Http:', hostport, '\n', headers
+            print 'Http:', hostport, '\n', self.headers
 
         # open connection to server
         self.conn = httplib.HTTPConnection(hostport)

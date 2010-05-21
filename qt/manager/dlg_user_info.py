@@ -5,7 +5,6 @@ from settings import _, DEBUG
 #from model_sorting import SortClientTeams
 from team_list import TeamList
 from rent_list import RentListModel, RentList
-from http import Http
 from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_team_assign import DlgTeamAssign
 from dlg_rent_assign import DlgRentAssign
@@ -17,10 +16,11 @@ from PyQt4.QtCore import *
 
 class DlgClientInfo(QDialog):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, params=dict()):
         QDialog.__init__(self, parent)
 
         self.parent = parent
+        self.http = params.get('http', None)
         self.client_id = u'0'
         self.setMinimumWidth(800)
 
@@ -191,17 +191,19 @@ class DlgClientInfo(QDialog):
         return (userinfo, True)
 
     def saveSettings(self, userinfo):
+        # save client's information
         params = { 'user_id': self.client_id, }
         params.update(userinfo)
-
-        ajax = HttpAjax(self, '/manager/set_client_info/', params, self.parent.session_id)
-        response = ajax.parse_json()
-
+        self.http.request('/manager/set_client_info/', params)
+        default_response = None
+        response = self.http.parse(default_response)
         self.client_id = int( response['saved_id'] )
+
+        # save client's card
         model = self.cardinfo.model()
         params = model.get_model_as_formset(self.client_id)
-        ajax = HttpAjax(self, '/manager/set_client_card/', params, self.parent.session_id)
-        response = ajax.parse_json()
+        self.http.request('/manager/set_client_card/', params)
+        response = self.http.parse(default_response)
 
 class DlgRenterInfo(QDialog):
 

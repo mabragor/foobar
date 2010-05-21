@@ -318,7 +318,7 @@ class MainWindow(QMainWindow):
         self.get_dynamic()
 
     def clientNew(self):
-	self.dialog = DlgClientInfo(self)
+        self.dialog = DlgClientInfo(self, {'http': self.http})
 	self.dialog.setModal(True)
 	self.dialog.exec_()
 
