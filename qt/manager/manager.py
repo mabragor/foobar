@@ -39,7 +39,8 @@ class MainWindow(QMainWindow):
         self.tree = []
         self.rfid_id = None
 
-        self.http = None
+        self.http = Http(self)
+
         self.work_hours = (8, 24)
         self.schedule_quant = timedelta(minutes=30)
 
@@ -59,9 +60,6 @@ class MainWindow(QMainWindow):
 	self.logoutTitle()
 	self.statusBar().showMessage(_('Ready'), 2000)
 	self.resize(640, 480)
-
-        # start here event loading thread
-        self.get_dynamic()
 
     def loggedTitle(self, name):
 	self.setWindowTitle('%s : %s' % (self.baseTitle, name))
@@ -87,6 +85,8 @@ class MainWindow(QMainWindow):
 		  ...]}
 	"""
         self.rooms = tuple( [ (a['title'], a['color'], a['id']) for a in response['rows'] ] )
+        self.schedule.update_static( {'rooms': self.rooms} )
+
         # available teams
         self.http.request('/manager/available_teams/', {})
         response = self.http.parse() # see format at team_tree.py
@@ -134,13 +134,13 @@ class MainWindow(QMainWindow):
 
         # callback helper function
         def prev_week():
-            week_range = self.scheduleModel.showPrevWeek()
+            week_range = self.schedule.model().showPrevWeek()
             self.showWeekRange(week_range)
         def next_week():
-            week_range = self.scheduleModel.showNextWeek()
+            week_range = self.schedule.model().showNextWeek()
             self.showWeekRange(week_range)
         def today():
-            week_range = self.scheduleModel.showCurrWeek()
+            week_range = self.schedule.model().showCurrWeek()
             self.showWeekRange(week_range)
 
         self.connect(self.buttonPrev, SIGNAL('clicked()'), prev_week)
@@ -258,13 +258,20 @@ class MainWindow(QMainWindow):
         self.buttonNext.setDisabled(False)
         self.buttonToday.setDisabled(False)
 
+    def refresh_data(self):
+        """ Метод для получения данных от сервера. Вызывается
+        периодически с помощью таймера."""
+        # если пользователь не аутентифицирован, ничего не делаем
+        if not self.http.is_session_open():
+            return
+        # пока обновляем только модель календаря
+        self.schedule.model().update
+
     # Обработчики меню: начало
 
     def login(self):
 	def callback(credentials):
 	    self.credentials = credentials
-
-        self.http = Http(self)
 
 	self.dialog = DlgLogin(self)
 	self.dialog.setCallback(callback)
@@ -280,6 +287,7 @@ class MainWindow(QMainWindow):
 
                 # update application's interface
                 self.get_static()
+                self.get_dynamic()
                 self.update_interface()
 
                 self.schedule.model().showCurrWeek()
@@ -288,7 +296,7 @@ class MainWindow(QMainWindow):
                 self.refreshTimer = QTimer(self)
                 from settings import SCHEDULE_REFRESH_TIMEOUT
                 self.refreshTimer.setInterval(SCHEDULE_REFRESH_TIMEOUT)
-                self.connect(self.refreshTimer, SIGNAL('timeout()'), self.schedule.model().update)
+                self.connect(self.refreshTimer, SIGNAL('timeout()'), self.refresh_data)
                 self.refreshTimer.start()
 
                 self.activate_interface() # CHECK THIS
@@ -437,14 +445,21 @@ class MainWindow(QMainWindow):
 
     def fillWeek(self):
         def callback(selected_date):
-            model = self.scheduleModel
+            model = self.schedule.model()
             from_range = model.weekRange
             to_range = model.date2range(selected_date)
-            ajax = HttpAjax(self, '/manager/fill_week/',
-                            {'to_date': to_range[0]}, self.session_id)
-            response = ajax.parse_json()
-            info = response['saved_id']
-            self.statusBar().showMessage(_('The week has been filled sucessfully. Copied: %(copied)i. Passed: %(passed)i.' % info))
+
+            self.http.request('/manager/fill_week/', {'to_date': to_range[0]})
+            default_response = None
+            response = self.http.parse(default_response)
+            if response and 'saved_id' in response:
+                # inform user
+                info = response['saved_id']
+                msg = _('The week has been filled sucessfully. Copied: %(copied)i. Passed: %(passed)i.')
+                self.statusBar().showMessage(msg % info)
+                # FIXME: pause here, but not just sleep, use timer
+                # update view
+                self.schedule.model().update()
 
 	self.dialog = DlgCopyWeek(self)
 	self.dialog.setModal(True)

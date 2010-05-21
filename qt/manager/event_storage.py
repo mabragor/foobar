@@ -216,11 +216,12 @@ class EventStorage(QAbstractTableModel):
         monday, sunday = self.weekRange
 
         http = self.params.get('http', None)
-        if http:
+        if http and http.is_session_open():
             params = { 'monday': monday, 'filter': [] }
             http.request('/manager/get_week/', params)
             self.parent.parent.statusBar().showMessage(_('Parsing the response...'))
             response = http.parse(None)
+
             # обработка результатов
             if response and 'events' in response:
                 self.parent.parent.statusBar().showMessage(_('Filling the calendar...'))
@@ -234,7 +235,8 @@ class EventStorage(QAbstractTableModel):
                 # отображаем события
                 self.emit(SIGNAL('layoutChanged()'))
                 self.parent.parent.statusBar().showMessage(_('Done'), 2000)
-                # self.storage.dump()
+                # отладочный вывод
+                #self.storage.dump()
                 return True
             else:
                 self.parent.parent.statusBar().showMessage(_('No reply'))

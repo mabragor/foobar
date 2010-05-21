@@ -8,6 +8,25 @@ from django import forms
 
 from storage import models
 
+class PriceCategoryAdmin(admin.ModelAdmin):
+    list_display = ('title', 'max_price')
+    search_fields = ('title',)
+    fieldsets = ((None, {'fields': ('title', 'max_price')}),)
+admin.site.register(models.PriceCategory, PriceCategoryAdmin)
+
+class PriceAdmin(admin.ModelAdmin):
+    list_display = ('title', 'price_category', 'cost', 'count', 'discount', 'special')
+    ordering = ('price_category', 'special', 'cost', 'discount', 'title')
+    search_fields = ('title',)
+    fieldsets = ((None, {'fields': ('title', 'price_category', 'cost', 'count', 'discount', 'special')}),)
+admin.site.register(models.Price, PriceAdmin)
+
+class PaidReasonAdmin(admin.ModelAdmin):
+    list_display = ('title',)
+    search_fields = ('title',)
+    fieldsets = ((None, {'fields': ('title',)}),)
+admin.site.register(models.PaidReason, PaidReasonAdmin)
+
 class CoachAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name',
                     'phone', 'email', 'reg_date')
@@ -49,13 +68,6 @@ class GroupAdmin(admin.ModelAdmin):
     search_fields = ('title',)
     fieldsets = ((None, {'fields': ('title', )}),)
 admin.site.register(models.Group, GroupAdmin)
-
-class PriceAdmin(admin.ModelAdmin):
-    list_display = ('title', 'price_category', 'cost', 'count', 'discount', 'special')
-    ordering = ('price_category', 'special', 'cost', 'discount', 'title')
-    search_fields = ('title',)
-    fieldsets = ((None, {'fields': ('title', 'price_category', 'cost', 'count', 'discount', 'special')}),)
-admin.site.register(models.Price, PriceAdmin)
 
 # class CardAdmin(admin.ModelAdmin):
 #     list_display = ('team', 'client', 'type', 'count_sold', 'count_used',

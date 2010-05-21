@@ -13,10 +13,20 @@ PAID_STATUS = ( ('0', _(u'Reserved')),
                 ('1', _(u'Piad partially')),
                 ('2', _(u'Paid')) )
 
-PRICE_CATEGORY = ( (0, _(u'Normal')),
-                   (1, _(u'High')) )
+# TODO
+class AbstractModel(models.Model):
 
-class PriceCategory(models.Model):
+    class Meta:
+        abstract = True
+
+    def about(self, exclude_fields=tuple()):
+        field_vals = {}
+        for i in self._meta.fields:
+            if i.name not in exclude_fields:
+                field_vals.update( {i.name: getattr(self, i.name)} )
+        return field_vals
+
+class PriceCategory(AbstractModel):
     title = models.CharField(max_length=64)
     max_price = models.FloatField(verbose_name=_(u'Maximum price.'))
 
@@ -29,11 +39,11 @@ class PriceCategory(models.Model):
         return self.title
 
 class Price(models.Model):
+    price_category = models.ForeignKey(PriceCategory)
     title = models.CharField(max_length=64)
     cost = models.FloatField()
     count = models.IntegerField()
     discount = models.IntegerField()
-    price_category = models.IntegerField(verbose_name=_(u'Price category'), max_length=1, choices=PRICE_CATEGORY, default=0)
     special = models.BooleanField(verbose_name=_(u'Is this a special record?'))
 
     class Meta:
@@ -44,12 +54,26 @@ class Price(models.Model):
         return self.title
 
     def about(self): # используем генератор
-        exclude_fields = []
+        exclude_fields = ()
         field_vals = {}
         for i in self._meta.fields:
+            #print dir(i)
+            print i.name, '=', i.column, i.get_internal_type()
+            print dir(i.formfield)
             if i.name not in exclude_fields:
-                field_vals.update( {i.name: getattr(self, i.name)} )
+                obj = getattr(self, i.name)
+                if 'ForeignKey' == i.get_internal_type() and hasattr(obj, 'about'):
+                    field_vals.update( {i.name: obj.about()} )
+                else:
+                    value = obj
+                    field_vals.update( {i.name: value} )
         return field_vals
+
+class PaidReason(models.Model):
+    title = models.CharField(max_length=64)
+
+    def __unicode__(self):
+        return self.title
 
 class AbstractUser(models.Model):
 
@@ -180,8 +204,10 @@ class Rent(models.Model):
 
 class Room(models.Model):
 
-    title = models.CharField(verbose_name=_(u'Title'), max_length=64)
-    color = models.CharField(verbose_name=_(u'Color'), max_length=6)
+    title = models.CharField(verbose_name=_(u'Title'), max_length=64,
+                             help_text=_(u'Visible title for a room'))
+    color = models.CharField(verbose_name=_(u'Color'), max_length=6,
+                             help_text=_(u'HEX color, as RRGGBB'))
 
     class Meta:
         verbose_name = _(u'Room')
@@ -223,9 +249,9 @@ class Team(models.Model):
 
     group = models.ManyToManyField(Group, verbose_name=_(u'Group'))
     coach = models.ForeignKey(Coach, verbose_name=_(u'Coach'))
+    price_category = models.ForeignKey(PriceCategory)
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
     duration = models.FloatField(verbose_name=_(u'Duration'), help_text=_(u'The duration of an event.'))
-    price_category = models.IntegerField(verbose_name=_(u'Price category'), max_length=1, choices=PRICE_CATEGORY, default=0)
     reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
 
     class Meta:
@@ -245,7 +271,7 @@ class Team(models.Model):
             'coach': self.coach.about(),
             'title': self.title,
             'duration': self.duration,
-            'price_category': self.price_category,
+            'price_category': self.price_category.about(),
             }
 
 class Calendar(models.Model):
@@ -307,7 +333,9 @@ class Card(models.Model):
     count_sold = models.IntegerField(verbose_name=_(u'Exercises sold'))
     count_used = models.IntegerField(verbose_name=_(u'Exercises used'), default=0)
     price = models.FloatField(verbose_name=_(u'Price'), help_text=_(u'Price.'), default=float(0.00))
-    price_category = models.IntegerField(verbose_name=_(u'Price category'), max_length=1, choices=PRICE_CATEGORY, default=0)
+    # ???
+    price_category = models.ForeignKey(PriceCategory)
+    # ???
     paid = models.FloatField(verbose_name=_(u'Paid'), help_text=_(u'Paid amount.'), default=float(0.00))
     paid_status = models.CharField(verbose_name=_(u'Paid status'), max_length=1, choices=PAID_STATUS, default=0)
     reg_datetime = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)

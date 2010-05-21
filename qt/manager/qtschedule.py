@@ -25,8 +25,8 @@ class QtSchedule(QTableView):
         # Определяем и назначаем модель
         storage_params = self.params
         storage_params.update( { 'mode': 'week' } )
-        self.__model = EventStorage(self, storage_params)
-        self.setModel(self.__model)
+        self.model_object = EventStorage(self, storage_params)
+        self.setModel(self.model_object)
 
         # Назначаем делегата для ячеек
         delegate = QtScheduleDelegate(self)
@@ -76,9 +76,15 @@ class QtSchedule(QTableView):
         self.contextMenu = QMenu(self)
         self.contextMenu.addAction(self.ctxMenuExchange)
 
+    def update_static(self, params=dict()):
+        """ params = {'rooms',} """
+        self.rooms = params.get('rooms', tuple())
+        self.model().rooms = self.rooms
+
     def string2color(self, color):
-        """ Метод для преобразования #RRGGBB в QColor. """
-        regexp = re.compile(r'#(?P<red_component>[0-9a-fA-F]{2})(?P<green_component>[0-9a-fA-F]{2})(?P<blue_component>[0-9a-fA-F]{2})')
+        """ Метод для преобразования RRGGBB в QColor. """
+
+        regexp = re.compile(r'(?P<red_component>[0-9a-fA-F]{2})(?P<green_component>[0-9a-fA-F]{2})(?P<blue_component>[0-9a-fA-F]{2})')
         groups = re.match(regexp, color)
         if groups:
             return QColor(int(groups.group('red_component'), 16),
@@ -233,7 +239,7 @@ class QtSchedule(QTableView):
             pixmap = QPixmap(100, 60)
             pixmap.fill(Qt.white)
             painter = QPainter(pixmap)
-            painter.fillRect(2,2,96,56, self.string2color('#%s' % room_color))
+            painter.fillRect(2,2,96,56, self.string2color(room_color))
 
             pen = QPen(Qt.black)
             pen.setWidth(2)
@@ -362,6 +368,7 @@ class QtScheduleDelegate(QItemDelegate):
 
     """ Делегат для ячеек расписания. """
 
+    DEBUG = True
     HORIZONTAL = 0
     VERTICAL = 1
     PADDING = 2
@@ -370,6 +377,10 @@ class QtScheduleDelegate(QItemDelegate):
     def __init__(self, parent=None):
         QItemDelegate.__init__(self, parent)
         self.parent = parent
+
+    def debug(self, msg):
+        if self.DEBUG:
+            print '[QtScheduleDelegate] %s' % msg
 
     def prepare(self, painter, pen_tuple, brush=None):
         pen_color, pen_width = pen_tuple
@@ -397,6 +408,7 @@ class QtScheduleDelegate(QItemDelegate):
 
         for room_name, room_color, room_id in rooms:
             event = model.data(index, Qt.DisplayRole, room_id).toPyObject()
+
             if isinstance(event, Event):
                 # заполняем тело события
                 w = option.rect.width() / count
@@ -404,7 +416,7 @@ class QtScheduleDelegate(QItemDelegate):
                 x = dx + col * (option.rect.width() + 1) + \
                     w * map(lambda x: x[2] == room_id, rooms).index(True)
                 y = dy + row * (option.rect.height() + 1)
-                painter.fillRect(x, y, w, h, self.parent.string2color('#%s' % room_color));
+                painter.fillRect(x, y, w, h, self.parent.string2color(room_color));
 
 
                 # тип события: тренировка, аренда
