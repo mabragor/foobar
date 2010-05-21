@@ -73,7 +73,10 @@ class Http:
     def parse(self, default={}): # public
         if self.response.status == 200: # http status
             data = self.response.read()
-            response = json.read(data)
+            if hasattr(json, 'read'):
+                response = json.read(data) # 2.5
+            else:
+                response = json.loads(data) # 2.6
             if 'code' in response and response['code'] != 200:
                 msg = '[%(code)s] %(desc)s' % response
                 if self.parent:
