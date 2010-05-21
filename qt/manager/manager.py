@@ -182,7 +182,7 @@ class MainWindow(QMainWindow):
 	data. Создать обработчики для каждого действия. """
 	data = [
 	    (_('File'), [
-		    (_('Log in'), '',
+		    (_('Log in'), 'Ctrl+I',
 		     'login', _('Start user session.')),
 		    (_('Log out'), '',
 		     'logout', _('End user session.')),
@@ -196,9 +196,9 @@ class MainWindow(QMainWindow):
 	     ),
 	    (_('Client'), [
 		    (_('New'), 'Ctrl+N',
-		     'clientNew', _('Register new client.')),
+		     'client_new', _('Register new client.')),
 		    (_('Search by RFID'), 'Ctrl+D',
-		     'clientSearchRFID', _('Search a client with its RFID card.')),
+		     'client_search_rfid', _('Search a client with its RFID card.')),
 		    (_('Search by name'), 'Ctrl+F',
 		     'clientSearchName', _('Search a client with its name.')),
 		    ]
@@ -317,12 +317,12 @@ class MainWindow(QMainWindow):
 	self.dialog.exec_()
         self.get_dynamic()
 
-    def clientNew(self):
+    def client_new(self):
         self.dialog = DlgClientInfo(self, {'http': self.http})
 	self.dialog.setModal(True)
 	self.dialog.exec_()
 
-    def clientSearchRFID(self):
+    def client_search_rfid(self):
 	def callback(rfid):
 	    self.rfid_id = rfid
 
@@ -332,11 +332,12 @@ class MainWindow(QMainWindow):
 	dlgStatus = self.dialog.exec_()
 
 	if QDialog.Accepted == dlgStatus and self.rfid_id is not None:
-	    ajax = HttpAjax(self, '/manager/get_client_info/',
-			    {'rfid_code': self.rfid_id,
-                             'mode': 'client'}, self.session_id)
-	    response = ajax.parse_json()
-            if response['info'] is None:
+	    self.http.request('/manager/get_client_info/',
+                              {'rfid_code': self.rfid_id,
+                               'mode': 'client'})
+            default_response = None
+	    response = self.http.parse(default_response)
+            if not response or response['info'] is None:
                 QMessageBox.warning(self, _('Warning'),
                                     _('This RFID belongs to nobody.'))
             else:
