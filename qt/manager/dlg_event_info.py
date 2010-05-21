@@ -6,7 +6,6 @@ from datetime import datetime
 
 from settings import _, DEBUG
 from event_storage import Event
-from http import Http
 from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_show_visitors import DlgShowVisitors
 
@@ -17,10 +16,12 @@ from PyQt4.QtCore import *
 
 class DlgEventInfo(QDialog):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, params=dict()):
         QDialog.__init__(self, parent)
 
         self.parent = parent
+        self.http = params.get('http', None)
+
         self.setMinimumWidth(600)
 
         self.editTitle = QLineEdit(); self.editTitle.setReadOnly(True)
@@ -110,39 +111,46 @@ class DlgEventInfo(QDialog):
         self.connect(self.comboFix, SIGNAL('currentIndexChanged(int)'),
                      self.enableComboFix)
 
-    def initData(self, schedule, room_id):
-        ajax = HttpAjax(self, '/manager/get_coaches/',
-                        {}, self.parent.session_id)
-        response = ajax.parse_json()
+    def initData(self, schedule):
+        """ Use this method to initialize the dialog. """
+        # get the coaches list first
+        self.http.request('/manager/get_coaches/', {})
+        default_response = {'coaches_list': dict()}
+        response = self.http.parse(default_response)
         for i in response['coaches_list']:
-            self.comboChange.addItem('%s %s' % (i['last_name'], i['first_name']), QVariant(int(i['id'])))
+            item = '%s %s' % (i['last_name'], i['first_name'])
+            self.comboChange.addItem(item, QVariant(int(i['id'])))
 
-        ajax = HttpAjax(self, '/manager/get_event_info/',
-                        {'id': schedule.id}, self.parent.session_id)
-        response = ajax.parse_json()
-        self.schedule = schedule = response['info']
+        # get the event's information
+        self.http.request('/manager/get_event_info/', {'id': schedule.id})
+        default_response = None
+        response = self.http.parse(default_response)
 
-        event = schedule['event']
-        room = schedule['room']
+        self.schedule = response['info']
+
+        event = self.schedule['event']
+        room = self.schedule['room']
         self.editTitle.setText(event['title'])
-        if schedule['type'] == 'training':
+
+        if schedule.isTeam():
             self.editCoach.setText(event['coach']['name'])
-        begin = __(schedule['begin_datetime'])
-        end = __(schedule['end_datetime'])
+
+        begin = __(self.schedule['begin_datetime'])
+        end = __(self.schedule['end_datetime'])
         self.editBegin.setDateTime(QDateTime(begin))
         duration = (end - begin).seconds / 60
         self.editDuration.setText(str(duration))
         self.initRooms(int(room['id']))
 
         try:
-            index = int(schedule.get('change', 0))
+            index = int(self.schedule.get('change', 0))
         except ValueError:
             index = 0
         self.comboChange.setCurrentIndex(index)
         self.buttonChange.setDisabled(True)
 
         try:
-            index = int(schedule.get('fixed', 0))
+            index = int(self.schedule.get('fixed', 0))
         except ValueError:
             index = 0
         self.comboFix.setCurrentIndex(index)

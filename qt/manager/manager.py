@@ -506,10 +506,10 @@ class MainWindow(QMainWindow):
 # 	print 'USER INFO:', json_like
 # 	return json_like
 
-    def showEventProperties(self, calendar_event, room_id):
-	self.dialog = DlgEventInfo(self)
+    def showEventProperties(self, calendar_event): #, room_id):
+        self.dialog = DlgEventInfo(self, {'http': self.http})
 	self.dialog.setModal(True)
-        self.dialog.initData(calendar_event, room_id)
+        self.dialog.initData(calendar_event)
 	self.dialog.exec_()
 
     # Drag'n'Drop section begins
