@@ -37,7 +37,7 @@ class QtSchedule(QTableView):
         self.scrolledCellX = 0
         self.scrolledCellY = 0
 
-        # NOT USED YET: self.getMime = parent.getMime
+        self.getMime = parent.getMime
 
         self.current_event = None
         self.current_data = None
