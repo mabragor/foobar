@@ -20,7 +20,10 @@ class DlgClientInfo(QDialog):
         QDialog.__init__(self, parent)
 
         self.parent = parent
-        self.http = params.get('http', None)
+
+        for key, value in params.items():
+            setattr(self, key, value)
+
         self.client_id = u'0'
         self.setMinimumWidth(800)
 
@@ -28,7 +31,7 @@ class DlgClientInfo(QDialog):
         self.editFirstName = QLineEdit()
         self.editEmail = QLineEdit()
         self.editPhone = QLineEdit()
-        self.editDiscount = QLineEdit(); self.editDiscount.setText('0')
+        self.comboDiscount = QComboBox()
         self.dateBirth = QDateEdit()
         self.editRFID = QLineEdit(); self.editRFID.setReadOnly(True)
 
@@ -47,7 +50,7 @@ class DlgClientInfo(QDialog):
         layoutUser.addWidget(QLabel(_('Phone')), 3, 0)
         layoutUser.addWidget(self.editPhone, 3, 1)
         layoutUser.addWidget(QLabel(_('Discount')), 4, 0)
-        layoutUser.addWidget(self.editDiscount, 4, 1)
+        layoutUser.addWidget(self.comboDiscount, 4, 1)
         layoutUser.addWidget(QLabel(_('Date of birth')), 5, 0)
         layoutUser.addWidget(self.dateBirth, 5, 1)
         layoutUser.addWidget( QLabel(_('RFID')), 6, 0)
@@ -93,7 +96,7 @@ class DlgClientInfo(QDialog):
         self.editFirstName.setProperty('required', QVariant(True))
         self.editEmail.setProperty('required', QVariant(True))
         self.editPhone.setProperty('required', QVariant(True))
-        self.editDiscount.setProperty('required', QVariant(True))
+        self.comboDiscount.setProperty('required', QVariant(True))
         self.dateBirth.setProperty('required', QVariant(True))
         self.editRFID.setProperty('required', QVariant(True))
 
@@ -113,7 +116,10 @@ class DlgClientInfo(QDialog):
         self.editLastName.setText(data.get('last_name', ''))
         self.editEmail.setText(data.get('email', ''))
         self.editPhone.setText(data.get('phone', ''))
-        self.editDiscount.setText(str(data.get('discount', 0)))
+        for i in self.discount: # see params
+            id = i['id']
+            title = u'%s - %s%%' % (i['title'], i['percent'])
+            self.comboDiscount.addItem(title, QVariant(id))
 
         def str2date(value):
             import time
@@ -158,7 +164,7 @@ class DlgClientInfo(QDialog):
 
     def assignTeam(self, data): # data goes from DlgTeamAssign
         # add user's discount
-        data.update( {'discount': self.editDiscount.text().toUtf8()} )
+        data.update( {'discount': self.comboDiscount.currentIndex()} )
         # send data to user's model
         model = self.cardinfo.model()
         lastRow = model.rowCount(QModelIndex())
@@ -183,10 +189,14 @@ class DlgClientInfo(QDialog):
             'email': self.editEmail.text().toUtf8(),
             'birth_date': self.dateBirth.date().toPyDate(),
             'rfid_code': self.editRFID.text().toUtf8(),
-            'discount': self.editDiscount.text().toUtf8(),
+            'discount': self.comboDiscount.currentIndex()
             }
         for k,v in userinfo.items():
-            if k is not 'birth_date' and len(v) == 0:
+            if k is 'birth_date':
+                continue
+            if type(v) is int:
+                continue
+            if len(v) == 0:
                 return (userinfo, False)
         return (userinfo, True)
 

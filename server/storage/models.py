@@ -29,12 +29,9 @@ class AbstractModel(models.Model):
     def about(self, short=False, exclude_fields=tuple()):
         field_vals = {}
 
-        print 'fields:', self._meta.fields
-
         for i in self._meta.fields:
             if i.name not in exclude_fields:
                 value = getattr(self, i.name)
-                print 'Field:', i.name, value
                 if 'ForeignKey' == i.get_internal_type() and hasattr(value, 'about'):
                     short = True
                     field_vals.update( {i.name: value.about(short)} )
@@ -46,6 +43,7 @@ class AbstractModel(models.Model):
                     field_vals.update( {i.name: value.strftime('%H%M%S')} )
                 else:
                     field_vals.update( {i.name: value} )
+
         return field_vals
 
 class PriceCategoryTeam(AbstractModel):
@@ -76,9 +74,9 @@ class Discount(AbstractModel):
     percent = models.IntegerField(verbose_name=_(u'The percent of a discount.'), default=0)
 
     class Meta:
-
         verbose_name = _(u'Discount')
         verbose_name_plural = _(u'Discounts')
+        ordering = ('percent', 'title')
 
 class Room(AbstractModel):
 

@@ -59,8 +59,15 @@ def login(request, form):
 @login_required
 @ajax_processor(None, isJavaScript)
 def available_teams(request):
-    styles = storage.DanceStyle.objects.all()
+    styles = storage.DanceStyle.objects.filter(is_active=True)
     return [item.about() for item in styles]
+
+@login_required
+@ajax_processor(None, isJavaScript)
+def get_discount(request):
+    data = storage.Discount.objects.filter(is_active=True)
+    print 'ajax:get_discount', data
+    return [item.about() for item in data]
 
 @login_required
 @ajax_processor(forms.UserSearch, isJavaScript)

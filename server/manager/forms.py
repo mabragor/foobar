@@ -240,6 +240,9 @@ class ClientInfo(UserInfo):
         data = self.cleaned_data
 
         user_id = data['user_id']; del( data['user_id'] )
+
+        data['discount'] = storage.Discount.objects.get(id=data['discount'])
+
         if 0 == user_id:
             user = storage.Client(**data)
         else:

@@ -92,6 +92,10 @@ class MainWindow(QMainWindow):
         response = self.http.parse() # see format at team_tree.py
         self.tree = TreeModel(response)
 
+        # discount
+        self.http.request('/manager/get_discount/', {})
+        self.discount = self.http.parse()
+        print 'discount', self.discount
 
     def update_interface(self):
         """ This method updates application's interface using static
@@ -318,7 +322,11 @@ class MainWindow(QMainWindow):
         self.get_dynamic()
 
     def client_new(self):
-        self.dialog = DlgClientInfo(self, {'http': self.http})
+        params = {
+            'http': self.http,
+            'discount': self.discount,
+            }
+        self.dialog = DlgClientInfo(self, params)
 	self.dialog.setModal(True)
 	self.dialog.exec_()
 
