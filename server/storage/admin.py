@@ -8,76 +8,90 @@ from django import forms
 
 from storage import models
 
-class PriceCategoryAdmin(admin.ModelAdmin):
-    list_display = ('title', 'max_price')
+class __PriceCategoryTeam(admin.ModelAdmin):
+    list_display = ('title', 'once_price', 'full_price', 'is_active', 'reg_datetime')
     search_fields = ('title',)
-    fieldsets = ((None, {'fields': ('title', 'max_price')}),)
-admin.site.register(models.PriceCategory, PriceCategoryAdmin)
+    fieldsets = ((None, {'fields': ('title', 'once_price', 'full_price', 'is_active')}),)
+admin.site.register(models.PriceCategoryTeam, __PriceCategoryTeam)
 
-class PriceAdmin(admin.ModelAdmin):
-    list_display = ('title', 'price_category', 'cost', 'count', 'discount', 'special')
-    ordering = ('price_category', 'special', 'cost', 'discount', 'title')
+class __PriceCategoryRent(admin.ModelAdmin):
+    list_display = ('title', 'once_price', 'full_price', 'is_active', 'reg_datetime')
     search_fields = ('title',)
-    fieldsets = ((None, {'fields': ('title', 'price_category', 'cost', 'count', 'discount', 'special')}),)
-admin.site.register(models.Price, PriceAdmin)
+    fieldsets = ((None, {'fields': ('title', 'once_price', 'full_price', 'is_active')}),)
+admin.site.register(models.PriceCategoryRent, __PriceCategoryRent)
 
-class PaidReasonAdmin(admin.ModelAdmin):
-    list_display = ('title',)
+class __Discount(admin.ModelAdmin):
+    list_display = ('title', 'percent', 'is_active', 'reg_datetime')
+    ordering = ('percent', 'title')
     search_fields = ('title',)
-    fieldsets = ((None, {'fields': ('title',)}),)
-admin.site.register(models.PaidReason, PaidReasonAdmin)
+    fieldsets = ((None, {'fields': ('title', 'percent', 'is_active')}),)
+admin.site.register(models.Discount, __Discount)
 
-class CoachAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name',
-                    'phone', 'email', 'reg_date')
-    search_fields = ('last_name', 'first_name')
-    fieldsets = ((None, {'fields': ('last_name', 'first_name',
-                                    'phone', 'email',
-                                    'birth_date', 'desc')}),)
-admin.site.register(models.Coach, CoachAdmin)
-
-class ClientAdmin(admin.ModelAdmin):
-    list_display = ('last_name', 'first_name', 'rfid_code',
-                    'phone', 'email', 'reg_date')
-    search_fields = ('last_name', 'first_name')
-    fieldsets = ((None, {'fields': ('last_name', 'first_name',
-                                    'phone', 'email',
-                                    'discount', 'birth_date')}),)
-admin.site.register(models.Client, ClientAdmin)
-
-class RenterAdmin(admin.ModelAdmin):
-    list_display = ('last_name', 'first_name',
-                    'phone', 'email', 'reg_date')
-    search_fields = ('last_name', 'first_name')
-    fieldsets = ((None, {'fields': ('last_name', 'first_name',
-                                    'phone', 'email', 'birth_date')}),
-                 (_('Phones'), {'fields': ('phone_mobile', 'phone_work', 'phone_home'),
-                                'description': _(u'Fill at least one field here.')}))
-admin.site.register(models.Renter, RenterAdmin)
-
-class RoomAdmin(admin.ModelAdmin):
-    list_display = ('title', 'color')
+class __Room(admin.ModelAdmin):
+    list_display = ('title', 'color', 'is_active', 'reg_datetime')
     ordering = ('title', )
     search_fields = ('title',)
-    fieldsets = ((None, {'fields': ('title', 'color')}),)
-admin.site.register(models.Room, RoomAdmin)
+    fieldsets = ((None, {'fields': ('title', 'color', 'is_active')}),)
+admin.site.register(models.Room, __Room)
 
-class GroupAdmin(admin.ModelAdmin):
-    list_display = ('title', )
+class __DanceStyle(admin.ModelAdmin):
+    list_display = ('title', 'is_active', 'reg_datetime')
     ordering = ('title', )
     search_fields = ('title',)
-    fieldsets = ((None, {'fields': ('title', )}),)
-admin.site.register(models.Group, GroupAdmin)
+    fieldsets = ((None, {'fields': ('title', 'is_active')}),)
+admin.site.register(models.DanceStyle, __DanceStyle)
 
-# class CardAdmin(admin.ModelAdmin):
-#     list_display = ('team', 'client', 'type', 'count_sold', 'count_used',
-#                     'price','reg_date', 'bgn_date', 'exp_date')
-#     ordering = ('reg_date', 'exp_date', 'count_sold', 'client')
-#     fieldsets = (
-#         (None, {'fields': ('type', 'exp_date', 'count_sold', 'price')}),
-#         (_('Links'), {'fields': ('team', 'client')}),
-#         )
-# admin.site.register(models.Card, CardAdmin)
+class __Coach(admin.ModelAdmin):
+    def name(self, user):
+        return u'%s %s' % (user.last_name, user.first_name)
+    name.short_description = _(u'Name')
+    name.allow_tags = False
+
+    list_display = ('name', 'phone', 'email', 'is_active', 'reg_datetime')
+    search_fields = ('last_name', 'first_name')
+    fieldsets = ((None, {
+        'fields': ('last_name', 'first_name', 'phone', 'email',
+                   'birth_date', 'desc', 'is_active')}),)
+admin.site.register(models.Coach, __Coach)
+
+class __Client(admin.ModelAdmin):
+    def name(self, user):
+        return u'%s %s' % (user.last_name, user.first_name)
+    name.short_description = _(u'Name')
+    name.allow_tags = False
+
+    list_display = ('name', 'rfid_code',
+                    'phone', 'email', 'is_active', 'reg_datetime')
+    search_fields = ('last_name', 'first_name')
+    fieldsets = ((None, {
+        'fields': ('last_name', 'first_name', 'phone', 'email',
+                   'discount', 'birth_date', 'is_active')}),)
+admin.site.register(models.Client, __Client)
+
+class __Renter(admin.ModelAdmin):
+    def name(self, user):
+        return u'%s %s' % (user.last_name, user.first_name)
+    name.short_description = _(u'Name')
+    name.allow_tags = False
+
+    list_display = ('name', 'phone', 'email', 'is_active', 'reg_datetime')
+    search_fields = ('last_name', 'first_name')
+    fieldsets = ((None, {
+        'fields': ('last_name', 'first_name', 'phone', 'email',
+                   'birth_date', 'desc', 'is_active')}),)
+admin.site.register(models.Renter, __Renter)
+
+class __Card(admin.ModelAdmin):
+    list_display = ('price_category', 'client', 'card_type', 'state',
+                    'begin_date', 'end_date', 'duration',
+                    'count_sold', 'count_used',
+                    'price','paid', 'paid_status',
+                    'is_active', 'reg_datetime', 'cancel_datetime')
+    fieldsets = (
+        (None, {'fields': ('price_category', 'client', 'card_type', 'duration',
+                           'count_sold', 'paid', 'paid_status', 'is_active', 'cancel_datetime')}),
+        )
+admin.site.register(models.Card, __Card)
 
 
 ### Interface for Team Model : Begin
@@ -92,17 +106,27 @@ class CalTeamItemInline(admin.TabularInline):
     form = TeamInlineForm
     extra = 1
 
-class TeamAdmin(admin.ModelAdmin):
-    list_display = ('title', 'coach', 'price_category', 'groups',
-                    'duration', 'reg_date')
-    ordering = ('title',)
+class __Team(admin.ModelAdmin):
+    def description(self, team):
+        calendar_items = models.Calendar.objects.filter(team=team)
+        cal_desc = u'<br>'.join([c.__unicode__() for c in calendar_items])
+        return u'%s - %s - %s<hr/>%s' % (team.price_category,
+                                         team.title,
+                                         team.coach,
+                                         cal_desc)
+    description.short_description = _(u'Description')
+    description.allow_tags = True
+
+    list_display = ('description', 'dance_styles',
+                    'duration', 'is_active', 'reg_datetime')
+    ordering = ('price_category', 'title', 'coach')
     search_fields = ('title',)
     fieldsets = (
-        (None, {'fields': ('group', 'title', 'coach',
-                           'duration', 'price_category')}),
+        (None, {'fields': ('price_category', 'dance_style', 'title',
+                           'coach', 'duration', 'is_active')}),
         )
     inlines = [CalTeamItemInline]
-admin.site.register(models.Team, TeamAdmin)
+admin.site.register(models.Team, __Team)
 
 ### Interface for Team Model : End
 
@@ -119,13 +143,35 @@ class CalRentItemInline(admin.TabularInline):
     form = RentInlineForm
     extra = 1
 
-class RentAdmin(admin.ModelAdmin):
-    list_display = ('title', 'renter', 'duration',
-                    'paid', 'paid_status', 'reg_date')
+class __Rent(admin.ModelAdmin):
+    list_display = ('price_category', 'title', 'renter', 'duration',
+                    'paid', 'paid_status', 'is_active', 'reg_datetime')
     search_fields = ('renter', 'title')
-    fieldsets = ((None, {'fields': ('renter', 'paid', 'paid_status')}),
-                 (_('Info'), {'fields': ('title', 'duration', 'desc')}))
+    fieldsets = ((None, {
+                    'fields': ('price_category', 'renter', 'paid', 'paid_status', 'is_active')}),
+                 (_('Info'), {
+                    'fields': ('title', 'duration', 'desc')}))
     inlines = [CalRentItemInline]
-admin.site.register(models.Rent, RentAdmin)
+admin.site.register(models.Rent, __Rent)
 
 ### Interface for Rent Model : End
+
+class __Calendar(admin.ModelAdmin):
+    def description(self, item):
+        return item.__unicode__()
+    description.short_description = _(u'Description')
+    description.allow_tags = False
+
+    list_display = ('description', 'team', 'rent')
+    ordering = ('day', 'time', 'room')
+admin.site.register(models.Calendar, __Calendar)
+
+class __Schedule(admin.ModelAdmin):
+    list_display = ('room', 'begin_datetime', 'end_datetime',
+                    'status', 'team', 'rent', 'change')
+admin.site.register(models.Schedule, __Schedule)
+
+class __Visit(admin.ModelAdmin):
+    list_display = ('client', 'schedule', 'card')
+admin.site.register(models.Visit, __Visit)
+

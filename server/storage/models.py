@@ -58,8 +58,8 @@ class PriceCategoryRent(AbstractModel):
 
     class Meta:
 
-        verbose_name = _(u'Price category of a team')
-        verbose_name_plural = _(u'Price categories of a team')
+        verbose_name = _(u'Price category of a rent')
+        verbose_name_plural = _(u'Price categories of a rent')
 
 class Discount(AbstractModel):
 
@@ -209,8 +209,8 @@ class Team(AbstractModel):
         result.update( { 'groups': self.groups(), } )
         return result
 
-    def groups(self):
-        return ','.join([unicode(a) for a in self.group.all()])
+    def dance_styles(self):
+        return ','.join([unicode(a) for a in self.dance_style.all()])
 
 class Rent(AbstractModel):
 
@@ -326,7 +326,7 @@ class Schedule(models.Model):
                  v.client.first_name,
                  v.client.rfid_code) for v in self.visit_set.all()]
 
-class Visit(AbstractModel):
+class Visit(AbstractModel): # FIXME models
 
     client = models.ForeignKey(Client, verbose_name=_(u'Client'))
     schedule = models.ForeignKey(Schedule, verbose_name=_(u'Event'))
