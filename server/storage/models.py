@@ -16,193 +16,62 @@ PAID_STATUS = ( ('0', _(u'Reserved')),
 # TODO
 class AbstractModel(models.Model):
 
+    is_active = models.BooleanField(verbose_name=_(u'Is this record active?'), default=True)
+    reg_datetime = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
+
     class Meta:
         abstract = True
+        ordering = ['-reg_datetime']
+
+    def __unicode__(self):
+        return self.title
 
     def about(self, exclude_fields=tuple()):
         field_vals = {}
         for i in self._meta.fields:
             if i.name not in exclude_fields:
-                field_vals.update( {i.name: getattr(self, i.name)} )
-        return field_vals
-
-class PriceCategory(AbstractModel):
-    title = models.CharField(max_length=64)
-    max_price = models.FloatField(verbose_name=_(u'Maximum price.'))
-
-    class Meta:
-
-        verbose_name = _(u'Price category')
-        verbose_name_plural = _(u'Price categories')
-
-    def __unicode__(self):
-        return self.title
-
-class Price(models.Model):
-    price_category = models.ForeignKey(PriceCategory)
-    title = models.CharField(max_length=64)
-    cost = models.FloatField()
-    count = models.IntegerField()
-    discount = models.IntegerField()
-    special = models.BooleanField(verbose_name=_(u'Is this a special record?'))
-
-    class Meta:
-        verbose_name = _(u'Price')
-        verbose_name_plural = _(u'Prices')
-
-    def __unicode__(self):
-        return self.title
-
-    def about(self): # используем генератор
-        exclude_fields = ()
-        field_vals = {}
-        for i in self._meta.fields:
-            #print dir(i)
-            print i.name, '=', i.column, i.get_internal_type()
-            print dir(i.formfield)
-            if i.name not in exclude_fields:
                 obj = getattr(self, i.name)
                 if 'ForeignKey' == i.get_internal_type() and hasattr(obj, 'about'):
-                    field_vals.update( {i.name: obj.about()} )
+                    short = True
+                    field_vals.update( {i.name: obj.about(short)} )
                 else:
                     value = obj
                     field_vals.update( {i.name: value} )
         return field_vals
 
-class PaidReason(models.Model):
+class PriceCategoryTeam(AbstractModel):
+
     title = models.CharField(max_length=64)
-
-    def __unicode__(self):
-        return self.title
-
-class AbstractUser(models.Model):
-
-    last_name = models.CharField(verbose_name=_(u'Last name'), max_length=64)
-    first_name = models.CharField(verbose_name=_(u'First name'), max_length=64)
-    phone = models.CharField(verbose_name=_(u'Phone'), max_length=16)
-    email = models.EmailField(verbose_name=_(u'E-mail'), max_length=64, blank=True, null=True)
-    birth_date = models.DateField(verbose_name=_(u'Birth date'))
-    reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
+    full_price = models.FloatField(verbose_name=_(u'Full price.'), default=0.00)
+    once_price = models.FloatField(verbose_name=_(u'One visit price.'), default=0.00)
 
     class Meta:
-        abstract = True
 
-    def __unicode__(self):
-        return '%s %s' % (self.last_name, self.first_name)
+        verbose_name = _(u'Price category of a team')
+        verbose_name_plural = _(u'Price categories of a team')
 
-    def about(self):
-        return {
-            'id': self.pk,
-            'name': '%s %s' % (self.last_name, self.first_name),
-            'last_name': self.last_name,
-            'first_name': self.first_name,
-            'phone': self.phone,
-            'email': self.email,
-            'birth_date': self.birth_date,
-            }
+class PriceCategoryRent(AbstractModel):
 
-class Coach(AbstractUser):
-    desc = models.TextField(verbose_name=_(u'Description'), blank=True, default=u'')
+    title = models.CharField(max_length=64)
+    full_price = models.FloatField(verbose_name=_(u'Full price.'), default=0.00)
+    once_price = models.FloatField(verbose_name=_(u'One visit price.'), default=0.00)
 
     class Meta:
-        verbose_name = _(u'Coach')
-        verbose_name_plural = _(u'Coaches')
 
-    def about(self):
-        result = super(Coach, self).about()
-        result.update( {
-                'desc': self.desc,
-                } )
-        return result
+        verbose_name = _(u'Price category of a team')
+        verbose_name_plural = _(u'Price categories of a team')
 
-class Client(AbstractUser):
+class Discount(AbstractModel):
 
-    rfid_code = models.CharField(verbose_name=_(u'RFID'), max_length=8)
-    discount = models.IntegerField(verbose_name=_(u'Discount'), default=0)
+    title = models.CharField(max_length=64)
+    percent = models.IntegerField(verbose_name=_(u'The percent of a discount.'), default=0)
 
     class Meta:
-        verbose_name = _(u'Client')
-        verbose_name_plural = _(u'Clients')
 
-    def prices(self):
-        prices = Price.objects.exclude(~models.Q(discount=self.discount),
-                                        models.Q(special=False))
-        prices = prices.order_by( '-price_category', '-cost',)
-        result = []
-        for pinfo in prices:
-            result.append(pinfo.about())
-        return result
+        verbose_name = _(u'Discount')
+        verbose_name_plural = _(u'Discounts')
 
-    def about(self, short=False):
-        result = super(Client, self).about()
-        result.update( {
-                'rfid_code': self.rfid_code,
-                'discount': self.discount,
-                'prices': self.prices()
-                } )
-        if not short:
-            result.update( {'team_list': self.team_list()} )
-        return result
-
-    def team_list(self):
-        return [card.about(True) for card in self.card_set.all().order_by('-reg_datetime')]
-
-class Renter(AbstractUser):
-
-    phone_mobile = models.CharField(verbose_name=_(u'Mobile phone'), max_length=16, blank=True, null=True)
-    phone_work = models.CharField(verbose_name=_(u'Work phone'), max_length=16, blank=True, null=True)
-    phone_home = models.CharField(verbose_name=_(u'Home phone'), max_length=16, blank=True, null=True)
-
-    class Meta:
-        verbose_name = _(u'Renter')
-        verbose_name_plural = _(u'Renters')
-
-    def about(self, short=False):
-        result = super(Renter, self).about()
-        result.update( {
-                'phone_mobile': self.phone_mobile,
-                'phone_work': self.phone_work,
-                'phone_home': self.phone_home,
-                } )
-        if not short:
-            result.update( {'rent_list': self.rent_list()} )
-        return result
-
-    def rent_list(self):
-        return [rent.about(True) for rent in self.rent_set.all().order_by('-reg_date')]
-
-class Rent(models.Model):
-
-
-    renter = models.ForeignKey(Renter, verbose_name=_(u'Renter'))
-    title = models.CharField(verbose_name=_(u'Title'), max_length=64)
-    desc = models.TextField(verbose_name=_(u'Description'), blank=True, default=u'')
-    duration = models.FloatField(verbose_name=_(u'Duration'), help_text=_(u'The duration of an event.'))
-    paid = models.FloatField(verbose_name=_(u'Paid amount'))
-    paid_status = models.CharField(verbose_name=_(u'Paid status'), max_length=1, choices=PAID_STATUS, default=0)
-    reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
-
-    class Meta:
-        verbose_name = _(u'Rent')
-        verbose_name_plural = _(u'Rents')
-
-    def __unicode__(self):
-        return self.title
-
-    def about(self, short=False):
-        result = {
-            'id': self.pk,
-            'renter': self.renter.about(short),
-            'title': self.title,
-            'desc': self.desc,
-            'duration': self.duration,
-            'paid': self.paid,
-            'paid_status': self.paid_status,
-            'reg_date': self.reg_date,
-            }
-        return result
-
-class Room(models.Model):
+class Room(AbstractModel):
 
     title = models.CharField(verbose_name=_(u'Title'), max_length=64,
                              help_text=_(u'Visible title for a room'))
@@ -213,17 +82,7 @@ class Room(models.Model):
         verbose_name = _(u'Room')
         verbose_name_plural = _(u'Rooms')
 
-    def __unicode__(self):
-        return self.title
-
-    def about(self):
-        return {
-            'id': self.pk,
-            'title': self.title,
-            'color': self.color,
-        }
-
-class Group(models.Model):
+class DanceStyle(AbstractModel):
 
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
 
@@ -231,48 +90,141 @@ class Group(models.Model):
         verbose_name = _(u'Style')
         verbose_name_plural = _(u'Styles')
 
-    def __unicode__(self):
-        return self.title
-
     def about(self):
-        return {
-            'id': self.pk,
-            'title': self.title,
-            'children': self.children,
-            }
+        result = super(DanceStyle, self).about()
+        result.update( { 'children': self.children(), } )
+        return result
 
-    @property
     def children(self):
         return [item.about() for item in self.team_set.all()]
 
-class Team(models.Model):
+class AbstractUser(AbstractModel):
 
-    group = models.ManyToManyField(Group, verbose_name=_(u'Group'))
+    last_name = models.CharField(verbose_name=_(u'Last name'), max_length=64)
+    first_name = models.CharField(verbose_name=_(u'First name'), max_length=64)
+    phone = models.CharField(verbose_name=_(u'Phone'), max_length=16)
+    email = models.EmailField(verbose_name=_(u'E-mail'), max_length=64)
+    birth_date = models.DateField(verbose_name=_(u'Birth date'))
+
+    class Meta:
+        abstract = True
+
+    def __unicode__(self):
+        return '%s %s' % (self.last_name, self.first_name)
+
+    def about(self):
+        result = super(AbstractUser, self).about()
+        result.update( { 'name': self.__unicode__(), } )
+        return result
+
+class Coach(AbstractUser):
+
+    desc = models.TextField(verbose_name=_(u'Description'), blank=True, default=u'')
+
+    class Meta:
+        verbose_name = _(u'Coach')
+        verbose_name_plural = _(u'Coaches')
+
+class Client(AbstractUser):
+
+    rfid_code = models.CharField(verbose_name=_(u'RFID'), max_length=8)
+    discount = models.ForeignKey(Discount)
+
+    class Meta:
+        verbose_name = _(u'Client')
+        verbose_name_plural = _(u'Clients')
+
+    def about(self, short=False):
+        result = super(Client, self).about()
+        if not short:
+            result.update( {'team_list': self.team_list()} )
+        return result
+
+    def team_list(self):
+        short = True
+        return [card.about(short) for card in self.card_set.all().order_by('-reg_datetime')]
+
+class Renter(AbstractUser):
+
+    desc = models.TextField(verbose_name=_(u'Description'), blank=True, default=u'')
+
+    class Meta:
+        verbose_name = _(u'Renter')
+        verbose_name_plural = _(u'Renters')
+
+    def about(self, short=False):
+        result = super(Renter, self).about()
+        if not short:
+            result.update( {'rent_list': self.rent_list()} )
+        return result
+
+    def rent_list(self):
+        short = True
+        return [rent.about(short) for rent in self.rent_set.all().order_by('-reg_datetime')]
+
+class Card(AbstractModel):
+
+    CARD_TYPE = ( ('0', _(u'Normal card')),
+                  ('1', _(u'Club card')) )
+    CARD_STATE = ( ('0', _(u'Wait')),
+                   ('1', _(u'Active')),
+                   ('2', _(u'Expired')),
+                   ('3', _(u'Used')),
+                   ('4', _(u'Cancel')) )
+
+    price_category = models.ForeignKey(PriceCategoryTeam)
+    client = models.ForeignKey(Client, verbose_name=_(u'Client'))
+    card_type = models.CharField(verbose_name=_(u'Type'), help_text=_(u'Type of client\'s card'),
+                                 max_length=1, choices=CARD_TYPE, default=0)
+    state = models.CharField(verbose_name=_(u'State'), help_text=_(u'State of record'), max_length=1, choices=CARD_STATE, default=0)
+    begin_date = models.DateField(verbose_name=_(u'Begin'), null=True)
+    end_date = models.DateField(verbose_name=_(u'Expired'), null=True)
+    duration = models.IntegerField(default=0)
+    count_sold = models.IntegerField(verbose_name=_(u'Exercises sold'))
+    count_used = models.IntegerField(verbose_name=_(u'Exercises used'), default=0)
+    price = models.FloatField(verbose_name=_(u'Price'), help_text=_(u'Price with all discounts.'), default=float(0.00))
+    paid = models.FloatField(verbose_name=_(u'Paid'), help_text=_(u'Paid amount.'), default=float(0.00))
+    paid_status = models.CharField(verbose_name=_(u'Paid status'), max_length=1, choices=PAID_STATUS, default=0)
+    cancel_datetime = models.DateTimeField(verbose_name=_(u'Registered'), null=True)
+
+    class Meta:
+        verbose_name = _(u'Card')
+        verbose_name_plural = _(u'Cards')
+
+class Team(AbstractModel):
+
+    price_category = models.ForeignKey(PriceCategoryTeam)
+    dance_style = models.ManyToManyField(DanceStyle, verbose_name=_(u'Dance style'))
     coach = models.ForeignKey(Coach, verbose_name=_(u'Coach'))
-    price_category = models.ForeignKey(PriceCategory)
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
     duration = models.FloatField(verbose_name=_(u'Duration'), help_text=_(u'The duration of an event.'))
-    reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
 
     class Meta:
         verbose_name = _(u'Team')
         verbose_name_plural = _(u'Teams')
 
-    def __unicode__(self):
-        return self.title
+    def about(self):
+        exclude_fields = ('group')
+        result = super(Team, self).about(exclude_fields)
+        result.update( { 'groups': self.groups(), } )
+        return result
 
     def groups(self):
         return ','.join([unicode(a) for a in self.group.all()])
 
-    def about(self):
-        return {
-            'id': self.pk,
-            'groups': self.groups(),
-            'coach': self.coach.about(),
-            'title': self.title,
-            'duration': self.duration,
-            'price_category': self.price_category.about(),
-            }
+class Rent(AbstractModel):
+
+    price_category = models.ForeignKey(PriceCategoryRent)
+    renter = models.ForeignKey(Renter, verbose_name=_(u'Renter'))
+    title = models.CharField(verbose_name=_(u'Title'), max_length=64)
+    desc = models.TextField(verbose_name=_(u'Description'), blank=True, default=u'')
+    duration = models.FloatField(verbose_name=_(u'Duration'), help_text=_(u'The duration of an event.'))
+    paid = models.FloatField(verbose_name=_(u'Paid amount'))
+    paid_status = models.CharField(verbose_name=_(u'Paid status'), max_length=1, choices=PAID_STATUS, default=0)
+
+    class Meta:
+        verbose_name = _(u'Rent')
+        verbose_name_plural = _(u'Rents')
 
 class Calendar(models.Model):
 
@@ -313,63 +265,6 @@ class Calendar(models.Model):
             result.update( {'whatis': 'rent'} )
         return result
 
-class Card(models.Model):
-
-    CARD_TYPE = ( ('0', _(u'Normal card')),
-                  ('1', _(u'Club card')) )
-    CARD_STATE = ( ('0', _(u'Wait')),
-                   ('1', _(u'Active')),
-                   ('2', _(u'Expired')),
-                   ('3', _(u'Used')),
-                   ('4', _(u'Cancel')) )
-
-    team = models.ForeignKey(Team, verbose_name=_(u'Team'))
-    client = models.ForeignKey(Client, verbose_name=_(u'Client'))
-    card_type = models.CharField(verbose_name=_(u'Type'), help_text=_(u'Type of client\'s card'), max_length=1, choices=CARD_TYPE, default=0)
-    state = models.CharField(verbose_name=_(u'State'), help_text=_(u'State of record'), max_length=1, choices=CARD_STATE, default=0)
-    begin_date = models.DateField(verbose_name=_(u'Begin'), null=True)
-    end_date = models.DateField(verbose_name=_(u'Expired'), null=True)
-    duration = models.IntegerField(default=0)
-    count_sold = models.IntegerField(verbose_name=_(u'Exercises sold'))
-    count_used = models.IntegerField(verbose_name=_(u'Exercises used'), default=0)
-    price = models.FloatField(verbose_name=_(u'Price'), help_text=_(u'Price.'), default=float(0.00))
-    # ???
-    price_category = models.ForeignKey(PriceCategory)
-    # ???
-    paid = models.FloatField(verbose_name=_(u'Paid'), help_text=_(u'Paid amount.'), default=float(0.00))
-    paid_status = models.CharField(verbose_name=_(u'Paid status'), max_length=1, choices=PAID_STATUS, default=0)
-    reg_datetime = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
-    cancel_datetime = models.DateTimeField(verbose_name=_(u'Registered'), null=True)
-
-    class Meta:
-        verbose_name = _(u'Card')
-        verbose_name_plural = _(u'Card')
-        ordering = ['-reg_datetime']
-
-    def __unicode__(self):
-        return self.team.title
-
-    def about(self, short=False):
-        obj = {
-            'id': self.pk,
-            'team': self.team.about(),
-            'card_type': self.card_type,
-            'state': self.state,
-            'begin_date': self.begin_date,
-            'end_date': self.end_date,
-            'duration': self.duration,
-            'count_sold': self.count_sold,
-            'count_used': self.count_used,
-            'price': self.price,
-            'paid': self.paid,
-            'paid_status': self.paid_status,
-            'reg_datetime': self.reg_datetime,
-            'cancel_datetime': self.cancel_datetime,
-            }
-        if not short:
-            obj.update( {'client': self.client.about(True),} )
-        return obj
-
 class Schedule(models.Model):
 
     EVENT_FIXED = ( ('0', _('Waiting')),
@@ -382,7 +277,7 @@ class Schedule(models.Model):
     room = models.ForeignKey(Room, verbose_name=_(u'Room'))
     begin_datetime = models.DateTimeField(verbose_name=_(u'Begins'))
     end_datetime = models.DateTimeField(verbose_name=_(u'Ends'))
-    event_fixed = models.CharField(verbose_name=_(u'Event fixed'), max_length=1, choices=EVENT_FIXED, default='0')
+    status = models.CharField(verbose_name=_(u'Event fixed'), max_length=1, choices=EVENT_FIXED, default='0')
 
     class Meta:
         verbose_name = _(u'Schedule')
@@ -416,15 +311,12 @@ class Schedule(models.Model):
         return obj
 
     @property
-    def typeof(self):
-        if self.team is None:
-            return 1
-        else:
-            return 0
+    def is_team(self):
+        return self.team is not None and self.rent is None
 
     @property
     def object(self):
-        if self.team is not None:
+        if self.is_team:
             return self.team
         else:
             return self.rent
@@ -434,26 +326,16 @@ class Schedule(models.Model):
                  v.client.first_name,
                  v.client.rfid_code) for v in self.visit_set.all()]
 
-class Visit(models.Model):
+class Visit(AbstractModel):
 
     client = models.ForeignKey(Client, verbose_name=_(u'Client'))
     schedule = models.ForeignKey(Schedule, verbose_name=_(u'Event'))
     card = models.ForeignKey(Card, verbose_name=_(u'Card'), null=True, blank=True)
-    reg_date = models.DateTimeField(verbose_name=_(u'Registered'), auto_now_add=True)
 
     class Meta:
         verbose_name = _(u'Visit')
         verbose_name_plural = _(u'Visits')
         unique_together = ('client', 'schedule')
-
-    def about(self):
-        return {
-            'id': self.pk,
-            'client': self.client.about(),
-            'event': self.schedule.about(),
-            'card': self.card.about(),
-            'reg_date': self.reg_date,
-            }
 
 TYPICAL_CHARGES = (
     ('0', _('Coach change')),
@@ -574,8 +456,9 @@ def logging_postsave(instance, created, **kwargs):
 def logging_postdelete(instance, **kwargs):
     logging_abstract(instance, 'delete', **kwargs)
 
-for i in [Client, Renter, Rent, Room, Group, Team, Card,
-          Schedule, Visit]:
+for i in [PriceCategoryTeam, PriceCategoryRent, Discount, DanceStyle,
+          Coach, Client, Renter, Rent, Room, Team,
+          Card, Calendar, Schedule, Visit]:
     models.signals.post_save.connect(logging_postsave, sender=i)
     models.signals.post_delete.connect(logging_postdelete, sender=i)
 
