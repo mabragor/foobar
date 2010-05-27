@@ -77,8 +77,8 @@ class Event(object):
         return self.data['event']['coach']['name']
 
     @property
-    def fixed(self):
-        return int( self.data['event_fixed'] )
+    def fixed(self): #FIXME
+        return int( self.data['status'] )
 
 class ModelStorage:
 

@@ -59,8 +59,8 @@ def login(request, form):
 @login_required
 @ajax_processor(None, isJavaScript)
 def available_teams(request):
-    groups = storage.Group.objects.all()
-    return [item.about() for item in groups]
+    styles = storage.DanceStyle.objects.all()
+    return [item.about() for item in styles]
 
 @login_required
 @ajax_processor(forms.UserSearch, isJavaScript)

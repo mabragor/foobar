@@ -26,16 +26,25 @@ class AbstractModel(models.Model):
     def __unicode__(self):
         return self.title
 
-    def about(self, exclude_fields=tuple()):
+    def about(self, short=False, exclude_fields=tuple()):
         field_vals = {}
+
+        print 'fields:', self._meta.fields
+
         for i in self._meta.fields:
             if i.name not in exclude_fields:
-                obj = getattr(self, i.name)
-                if 'ForeignKey' == i.get_internal_type() and hasattr(obj, 'about'):
+                value = getattr(self, i.name)
+                print 'Field:', i.name, value
+                if 'ForeignKey' == i.get_internal_type() and hasattr(value, 'about'):
                     short = True
-                    field_vals.update( {i.name: obj.about(short)} )
+                    field_vals.update( {i.name: value.about(short)} )
+                elif 'DateTimeField' == i.get_internal_type():
+                    field_vals.update( {i.name: value.strftime('%Y%m%d%H%M%S')} )
+                elif 'DateField' == i.get_internal_type():
+                    field_vals.update( {i.name: value.strftime('%Y%m%d')} )
+                elif 'TimeField' == i.get_internal_type():
+                    field_vals.update( {i.name: value.strftime('%H%M%S')} )
                 else:
-                    value = obj
                     field_vals.update( {i.name: value} )
         return field_vals
 
@@ -90,8 +99,8 @@ class DanceStyle(AbstractModel):
         verbose_name = _(u'Style')
         verbose_name_plural = _(u'Styles')
 
-    def about(self):
-        result = super(DanceStyle, self).about()
+    def about(self, short=False, exclude_fields=tuple()):
+        result = super(DanceStyle, self).about(short, exclude_fields)
         result.update( { 'children': self.children(), } )
         return result
 
@@ -112,7 +121,7 @@ class AbstractUser(AbstractModel):
     def __unicode__(self):
         return '%s %s' % (self.last_name, self.first_name)
 
-    def about(self):
+    def about(self, short=False, exclude_fields=tuple()):
         result = super(AbstractUser, self).about()
         result.update( { 'name': self.__unicode__(), } )
         return result
@@ -134,7 +143,7 @@ class Client(AbstractUser):
         verbose_name = _(u'Client')
         verbose_name_plural = _(u'Clients')
 
-    def about(self, short=False):
+    def about(self, short=False, exclude_fields=tuple()):
         result = super(Client, self).about()
         if not short:
             result.update( {'team_list': self.team_list()} )
@@ -152,7 +161,7 @@ class Renter(AbstractUser):
         verbose_name = _(u'Renter')
         verbose_name_plural = _(u'Renters')
 
-    def about(self, short=False):
+    def about(self, short=False, exclude_fields=tuple()):
         result = super(Renter, self).about()
         if not short:
             result.update( {'rent_list': self.rent_list()} )
@@ -203,10 +212,10 @@ class Team(AbstractModel):
         verbose_name = _(u'Team')
         verbose_name_plural = _(u'Teams')
 
-    def about(self):
-        exclude_fields = ('group')
-        result = super(Team, self).about(exclude_fields)
-        result.update( { 'groups': self.groups(), } )
+    def about(self, short=False, exclude_fields=tuple()):
+        exclude_fields = ('group',)
+        result = super(Team, self).about(short, exclude_fields)
+        result.update( { 'dance_styles': self.dance_styles(), } )
         return result
 
     def dance_styles(self):
@@ -226,7 +235,7 @@ class Rent(AbstractModel):
         verbose_name = _(u'Rent')
         verbose_name_plural = _(u'Rents')
 
-class Calendar(models.Model):
+class Calendar(AbstractModel):
 
     DAYS_OF_WEEK = ( ('0', _(u'Monday')),
                      ('1', _(u'Tuesday')),
@@ -251,12 +260,9 @@ class Calendar(models.Model):
     def __unicode__(self):
         return _(u'%s at %s in %s') % (self.get_day_display(), self.time, self.room)
 
-    def about(self):
-        result = {
-            'room': self.room.about(),
-            'time': self.time,
-            'day': self.day,
-            }
+    def about(self, short=False, exclude_fields=tuple()):
+        exclude_fields = ('team', 'rent')
+        result = super(Calendar, self).about(short, exclude_fields)
         if self.team is not None:
             result.update( self.team.about() )
             result.update( {'whatis': 'team'} )
@@ -277,7 +283,7 @@ class Schedule(models.Model):
     room = models.ForeignKey(Room, verbose_name=_(u'Room'))
     begin_datetime = models.DateTimeField(verbose_name=_(u'Begins'))
     end_datetime = models.DateTimeField(verbose_name=_(u'Ends'))
-    status = models.CharField(verbose_name=_(u'Event fixed'), max_length=1, choices=EVENT_FIXED, default='0')
+    status = models.CharField(verbose_name=_(u'Event status'), max_length=1, choices=EVENT_FIXED, default='0')
 
     class Meta:
         verbose_name = _(u'Schedule')
@@ -286,7 +292,7 @@ class Schedule(models.Model):
     def __unicode__(self):
         return u'%s(%s) %s' % (self.team, self.room, self.begin_datetime)
 
-    def about(self):
+    def about(self, short=False, exclude_fields=tuple()):
         now = datetime.now()
         if self.begin_datetime + timedelta(minutes=15) < now:
             status = 2 # passed
@@ -299,7 +305,7 @@ class Schedule(models.Model):
             'room': self.room.about(),
             'begin_datetime': self.begin_datetime,
             'end_datetime': self.end_datetime,
-            'event_fixed': self.event_fixed,
+            'status': self.status,
         }
         if self.team:
             obj.update( {'type': 'training',
@@ -385,7 +391,7 @@ class Accounting(models.Model):
         self.count -= count
         self.save()
 
-    def about(self):
+    def about(self, short=False, exclude_fields=tuple()):
         return {
             'id': self.id,
             'type': self.get_id_display(),
@@ -446,8 +452,16 @@ class Log(models.Model):
 def logging_abstract(instance, action, **kwargs):
     from django.utils import simplejson
     from lib import DatetimeJSONEncoderQt
-    json = simplejson.dumps(instance.__dict__, cls=DatetimeJSONEncoderQt)
-    log = Log(model=instance, data=json, action=action)
+
+    data = {}
+    for i in instance.__dict__.keys():
+        if '_' == i[0]:
+            continue
+        data.update( {i: instance.__dict__[i]} )
+
+    response = simplejson.dumps(data, cls=DatetimeJSONEncoderQt)
+
+    log = Log(model=instance, data=response, action=action)
     log.save()
 
 def logging_postsave(instance, created, **kwargs):
@@ -456,9 +470,10 @@ def logging_postsave(instance, created, **kwargs):
 def logging_postdelete(instance, **kwargs):
     logging_abstract(instance, 'delete', **kwargs)
 
-for i in [PriceCategoryTeam, PriceCategoryRent, Discount, DanceStyle,
-          Coach, Client, Renter, Rent, Room, Team,
-          Card, Calendar, Schedule, Visit]:
+# for i in [PriceCategoryTeam, PriceCategoryRent, Discount, DanceStyle,
+#           Coach, Client, Renter, Rent, Room, Team,
+#           Card, Calendar, Schedule, Visit]:
+for i in [Client, Renter, Rent, Card, Calendar, Schedule, Visit]:
     models.signals.post_save.connect(logging_postsave, sender=i)
     models.signals.post_delete.connect(logging_postdelete, sender=i)
 

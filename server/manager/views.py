@@ -20,7 +20,8 @@ def index(request):
 def ajax_get_rooms(request):
     from storage.models import Room
     rooms = Room.objects.all()
-    return {'rows': [item.about() for item in rooms]}
+    response = {'rows': [item.about() for item in rooms]}
+    return response
 
 # @ajax_processor()
 # def ajax_get_team_tree(request):

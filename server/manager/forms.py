@@ -670,7 +670,7 @@ schedule. """
 
         for e in calendar:
             ne = storage.Schedule(team=e.team, rent=e.rent,
-                                  room=e.room, event_fixed=0)
+                                  room=e.room, status='0')
 
             if e.team is not None:
                 object = e.team

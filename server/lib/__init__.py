@@ -35,4 +35,7 @@ class DatetimeJSONEncoderQt(simplejson.JSONEncoder):
         elif hasattr(o, '__unicode__'):
             return o.__unicode__()
         else:
+            print '====='
+            print o
+            print '====='
             return super(DatetimeJSONEncoderQt, self).default(o)
