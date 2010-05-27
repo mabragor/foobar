@@ -17,16 +17,18 @@ class Http:
         self.headers = {'Content-type': 'application/x-www-form-urlencoded',
                    'Accept': 'text/plain'}
         (self.host, self.port) = self.get_settings()
-        hostport = '%s:%s' % (self.host, self.port)
+        self.hostport = '%s:%s' % (self.host, self.port)
         if DEBUG:
-            print 'Http:', hostport, '\n', self.headers
+            print 'Http:', self.hostport, '\n', self.headers
 
-        # open connection to server
-        self.conn = httplib.HTTPConnection(hostport)
+        self.connect()
 
     def __del__(self):
         # close server's connection
         self.conn.close()
+
+    def connect(self):
+        self.conn = httplib.HTTPConnection(self.hostport)
 
     def is_session_open(self):
         return self.session_id is not None
@@ -48,7 +50,14 @@ class Http:
             self.headers.update( { 'Cookie': 'sessionid=%s' % self.session_id } )
 
         params = urllib.urlencode(params)
-        self.conn.request('POST', url, params, self.headers)
+        while True:
+            try:
+                self.conn.request('POST', url, params, self.headers)
+                break
+            except httplib.CannotSendRequest:
+                print 'reconnect'
+                self.connect()
+
         self.response = self.conn.getresponse()
 
         # sessionid=d5b2996237b9044ba98c5622d6311c43;
