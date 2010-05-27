@@ -200,7 +200,7 @@ class MainWindow(QMainWindow):
 		    (_('Search by RFID'), 'Ctrl+D',
 		     'client_search_rfid', _('Search a client with its RFID card.')),
 		    (_('Search by name'), 'Ctrl+F',
-		     'clientSearchName', _('Search a client with its name.')),
+		     'client_search_name', _('Search a client with its name.')),
 		    ]
 	     ),
 	    (_('Renter'), [
@@ -347,7 +347,7 @@ class MainWindow(QMainWindow):
                 self.dialog.exec_()
                 self.rfid_id = None
 
-    def clientSearchName(self):
+    def client_search_name(self):
 	def callback(user_id):
 	    self.user_id = user_id
 
@@ -357,14 +357,19 @@ class MainWindow(QMainWindow):
 	dlgStatus = self.dialog.exec_()
 
 	if QDialog.Accepted == dlgStatus:
-	    ajax = HttpAjax(self, '/manager/get_client_info/',
-			    {'user_id': self.user_id,
-                             'mode': 'client'}, self.session_id)
-	    response = ajax.parse_json()
-	    self.dialog = DlgClientInfo(self)
-	    self.dialog.setModal(True)
-	    self.dialog.initData(response['info'])
-	    self.dialog.exec_()
+	    self.http.request('/manager/get_client_info/',
+                              {'user_id': self.user_id,
+                               'mode': 'client'})
+            default_response = None
+	    response = self.http.parse(default_response)
+            if not response or response['info'] is None:
+                QMessageBox.warning(self, _('Warning'),
+                                    _('This RFID belongs to nobody.'))
+            else:
+                self.dialog = DlgClientInfo(self)
+                self.dialog.setModal(True)
+                self.dialog.initData(response['info'])
+                self.dialog.exec_()
 
     def renterNew(self):
 	self.dialog = DlgRenterInfo(self)
