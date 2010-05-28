@@ -36,11 +36,11 @@ class AbstractModel(models.Model):
                     short = True
                     field_vals.update( {i.name: value.about(short)} )
                 elif 'DateTimeField' == i.get_internal_type():
-                    field_vals.update( {i.name: value.strftime('%Y%m%d%H%M%S')} )
+                    field_vals.update( {i.name: value.strftime('%Y-%m-%d %H:%M:%S')} )
                 elif 'DateField' == i.get_internal_type():
-                    field_vals.update( {i.name: value.strftime('%Y%m%d')} )
+                    field_vals.update( {i.name: value.strftime('%Y-%m-%d')} )
                 elif 'TimeField' == i.get_internal_type():
-                    field_vals.update( {i.name: value.strftime('%H%M%S')} )
+                    field_vals.update( {i.name: value.strftime('%H:%M:%S')} )
                 else:
                     field_vals.update( {i.name: value} )
 
