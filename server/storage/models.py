@@ -140,6 +140,7 @@ class Client(AbstractUser):
     class Meta:
         verbose_name = _(u'Client')
         verbose_name_plural = _(u'Clients')
+        ordering = ('last_name', 'first_name')
 
     def about(self, short=False, exclude_fields=tuple()):
         result = super(Client, self).about()

@@ -60,7 +60,7 @@ class __Client(admin.ModelAdmin):
     name.short_description = _(u'Name')
     name.allow_tags = False
 
-    list_display = ('name', 'rfid_code',
+    list_display = ('name', 'discount', 'rfid_code',
                     'phone', 'email', 'is_active', 'reg_datetime')
     search_fields = ('last_name', 'first_name')
     fieldsets = ((None, {
