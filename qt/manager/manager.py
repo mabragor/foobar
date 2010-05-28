@@ -330,6 +330,9 @@ class MainWindow(QMainWindow):
 	self.dialog.exec_()
 
     def client_search_rfid(self):
+        if not self.http or not self.http.is_session_open():
+            return # login first
+
 	def callback(rfid):
 	    self.rfid_id = rfid
 
@@ -360,6 +363,9 @@ class MainWindow(QMainWindow):
                 self.rfid_id = None
 
     def client_search_name(self):
+        if not self.http or not self.http.is_session_open():
+            return # login first
+
 	def callback(user_id):
 	    self.user_id = user_id
 
