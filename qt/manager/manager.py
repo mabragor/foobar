@@ -95,7 +95,6 @@ class MainWindow(QMainWindow):
         # discount
         self.http.request('/manager/get_discount/', {})
         self.discount = self.http.parse()
-        print 'discount', self.discount
 
     def update_interface(self):
         """ This method updates application's interface using static
@@ -340,18 +339,23 @@ class MainWindow(QMainWindow):
 	dlgStatus = self.dialog.exec_()
 
 	if QDialog.Accepted == dlgStatus and self.rfid_id is not None:
-	    self.http.request('/manager/get_client_info/',
-                              {'rfid_code': self.rfid_id,
-                               'mode': 'client'})
+            params = {'rfid_code': self.rfid_id, 'mode': 'client'}
+	    self.http.request('/manager/get_client_info/', params)
             default_response = None
 	    response = self.http.parse(default_response)
+
             if not response or response['info'] is None:
                 QMessageBox.warning(self, _('Warning'),
                                     _('This RFID belongs to nobody.'))
             else:
-                self.dialog = DlgClientInfo(self)
+                user_info = response['info']
+                params = {
+                    'http': self.http,
+                    'discount': self.discount,
+                    }
+                self.dialog = DlgClientInfo(self, params)
                 self.dialog.setModal(True)
-                self.dialog.initData(response['info'])
+                self.dialog.initData(user_info)
                 self.dialog.exec_()
                 self.rfid_id = None
 
@@ -374,7 +378,11 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(self, _('Warning'),
                                     _('This RFID belongs to nobody.'))
             else:
-                self.dialog = DlgClientInfo(self)
+                params = {
+                    'http': self.http,
+                    'discount': self.discount,
+                    }
+                self.dialog = DlgClientInfo(self, params)
                 self.dialog.setModal(True)
                 self.dialog.initData(response['info'])
                 self.dialog.exec_()

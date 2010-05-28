@@ -66,7 +66,6 @@ def available_teams(request):
 @ajax_processor(None, isJavaScript)
 def get_discount(request):
     data = storage.Discount.objects.filter(is_active=True)
-    print 'ajax:get_discount', data
     return [item.about() for item in data]
 
 @login_required

@@ -89,7 +89,14 @@ class DlgClientInfo(QDialog):
 
         self.setRequired()
         self.setSignals()
-        self.initData( {} )
+
+        # discount combo
+        for i in self.discount: # see params
+            id = i['id']
+            title = u'%s - %s%%' % (i['title'], i['percent'])
+            self.comboDiscount.addItem(title, QVariant(id))
+
+        self.initData()
 
     def setRequired(self):
         self.editLastName.setProperty('required', QVariant(True))
@@ -110,16 +117,17 @@ class DlgClientInfo(QDialog):
         self.connect(self.buttonCancelDialog, SIGNAL('clicked()'),
                      self, SLOT('reject()'))
 
-    def initData(self, data):
+    def initData(self, data=dict()):
         self.client_id = data.get('id', '0')
         self.editFirstName.setText(data.get('first_name', ''))
         self.editLastName.setText(data.get('last_name', ''))
         self.editEmail.setText(data.get('email', ''))
         self.editPhone.setText(data.get('phone', ''))
-        for i in self.discount: # see params
-            id = i['id']
-            title = u'%s - %s%%' % (i['title'], i['percent'])
-            self.comboDiscount.addItem(title, QVariant(id))
+
+        discount = data.get('discount', None)
+        if discount:
+            index = self.comboDiscount.findData(QVariant( int(discount.get('id', 0)) ))
+            self.comboDiscount.setCurrentIndex( index )
 
         def str2date(value):
             import time
@@ -182,6 +190,7 @@ class DlgClientInfo(QDialog):
             QMessageBox.warning(self, _('Warning'),
                                 _('Please fill required fields.'))
     def checkFields(self):
+        discount, ok = self.comboDiscount.itemData(self.comboDiscount.currentIndex()).toInt()
         userinfo = {
             'last_name': self.editLastName.text().toUtf8(),
             'first_name': self.editFirstName.text().toUtf8(),
@@ -189,7 +198,7 @@ class DlgClientInfo(QDialog):
             'email': self.editEmail.text().toUtf8(),
             'birth_date': self.dateBirth.date().toPyDate(),
             'rfid_code': self.editRFID.text().toUtf8(),
-            'discount': self.comboDiscount.currentIndex()
+            'discount': discount
             }
         for k,v in userinfo.items():
             if k is 'birth_date':
