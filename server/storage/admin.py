@@ -8,16 +8,43 @@ from django import forms
 
 from storage import models
 
-class __PriceCategoryTeam(admin.ModelAdmin):
-    list_display = ('title', 'once_price', 'full_price', 'is_active', 'reg_datetime')
+class __CardType(admin.ModelAdmin):
+    def categories(self, cardtype):
+        cats = cardtype.category.all()
+        return u', '.join([unicode(cat) for cat in cats])
+
+    def discounts(self, cardtype):
+        discounts = cardtype.discount.all()
+        return u', '.join([unicode(dis) for dis in discounts])
+
+    def durations(self, cardtype):
+        data = cardtype.club_duration
+        res = data and data or u'--'
+        return '<center>%s</center>' % res
+    durations.allow_tags = True
+
+    list_display = ('title', 'categories', 'discounts', 'durations', 'is_priceless', 'is_active', 'reg_datetime')
     search_fields = ('title',)
-    fieldsets = ((None, {'fields': ('title', 'once_price', 'full_price', 'is_active')}),)
+    fieldsets = ((None, {'fields': ('title', 'category', 'discount', 'club_duration',
+                                    'is_priceless', 'available_formula', 'is_active')} ), )
+admin.site.register(models.CardType, __CardType)
+
+class __ClubDuration(admin.ModelAdmin):
+    list_display = ('title', 'duration', 'is_active', 'reg_datetime')
+    search_fields = ('title',)
+    fieldsets = ((None, {'fields': ('title', 'duration', 'is_active')} ), )
+admin.site.register(models.ClubDuration, __ClubDuration)
+
+class __PriceCategoryTeam(admin.ModelAdmin):
+    list_display = ('title', 'test_price', 'once_price', 'half_price', 'full_price', 'is_active', 'reg_datetime')
+    search_fields = ('title',)
+    fieldsets = ((None, {'fields': ('title', 'test_price', 'once_price', 'half_price', 'full_price', 'is_active')}),)
 admin.site.register(models.PriceCategoryTeam, __PriceCategoryTeam)
 
 class __PriceCategoryRent(admin.ModelAdmin):
-    list_display = ('title', 'once_price', 'full_price', 'is_active', 'reg_datetime')
+    list_display = ('title', 'test_price', 'once_price', 'half_price', 'full_price', 'is_active', 'reg_datetime')
     search_fields = ('title',)
-    fieldsets = ((None, {'fields': ('title', 'once_price', 'full_price', 'is_active')}),)
+    fieldsets = ((None, {'fields': ('title', 'test_price', 'once_price', 'half_price', 'full_price', 'is_active')}),)
 admin.site.register(models.PriceCategoryRent, __PriceCategoryRent)
 
 class __Discount(admin.ModelAdmin):
@@ -82,14 +109,15 @@ class __Renter(admin.ModelAdmin):
 admin.site.register(models.Renter, __Renter)
 
 class __Card(admin.ModelAdmin):
-    list_display = ('price_category', 'client', 'card_type', 'state',
-                    'begin_date', 'end_date', 'duration',
-                    'count_sold', 'count_used',
-                    'price','paid', 'paid_status',
+    list_display = ('price_category', 'client', 'card_type', 'state', 'discount',
+                    'price', 'paid',
+                    'count_available', 'count_sold', 'count_used',
+                    'begin_date', 'end_date',
                     'is_active', 'reg_datetime', 'cancel_datetime')
     fieldsets = (
-        (None, {'fields': ('price_category', 'client', 'card_type', 'duration',
-                           'count_sold', 'paid', 'paid_status', 'is_active', 'cancel_datetime')}),
+        (None, {'fields': ('price_category', 'client', 'card_type', 'state', 'discount', 'price', 'paid',
+                           'count_available', 'count_sold', 'count_used',
+                           'begin_date', 'end_date', 'is_active', 'cancel_datetime')}),
         )
 admin.site.register(models.Card, __Card)
 

@@ -13,7 +13,6 @@ PAID_STATUS = ( ('0', _(u'Reserved')),
                 ('1', _(u'Piad partially')),
                 ('2', _(u'Paid')) )
 
-# TODO
 class AbstractModel(models.Model):
 
     is_active = models.BooleanField(verbose_name=_(u'Is this record active?'), default=True)
@@ -21,7 +20,7 @@ class AbstractModel(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ['-reg_datetime']
+        ordering = ('-is_active', '-reg_datetime')
 
     def __unicode__(self):
         return self.title
@@ -46,27 +45,20 @@ class AbstractModel(models.Model):
 
         return field_vals
 
-class PriceCategoryTeam(AbstractModel):
+class PriceCategoryTeam(AbstractModel): # эконом, дисконт, эксклюзив, спецкурс...
 
     title = models.CharField(max_length=64)
     full_price = models.FloatField(verbose_name=_(u'Full price.'), default=0.00)
+    half_price = models.FloatField(verbose_name=_(u'Half price.'), default=0.00)
     once_price = models.FloatField(verbose_name=_(u'One visit price.'), default=0.00)
+    test_price = models.FloatField(verbose_name=_(u'Test price.'), default=0.00)
 
     class Meta:
-
         verbose_name = _(u'Price category of a team')
         verbose_name_plural = _(u'Price categories of a team')
+        ordering = ('-is_active', '-full_price')
 
-class PriceCategoryRent(AbstractModel):
-
-    title = models.CharField(max_length=64)
-    full_price = models.FloatField(verbose_name=_(u'Full price.'), default=0.00)
-    once_price = models.FloatField(verbose_name=_(u'One visit price.'), default=0.00)
-
-    class Meta:
-
-        verbose_name = _(u'Price category of a rent')
-        verbose_name_plural = _(u'Price categories of a rent')
+        #FIXME добавить привязку к набору скидок
 
 class Discount(AbstractModel):
 
@@ -77,6 +69,42 @@ class Discount(AbstractModel):
         verbose_name = _(u'Discount')
         verbose_name_plural = _(u'Discounts')
         ordering = ('percent', 'title')
+
+class ClubDuration(AbstractModel): # 1day, 1month, 3m, 6m, 12m
+    title = models.CharField(max_length=64)
+    duration = models.IntegerField(verbose_name=_(u'Duration in days.'))
+
+    class Meta:
+        verbose_name = _(u'Type of club card')
+        verbose_name_plural = _(u'Types of club card')
+        ordering = ('-is_active', 'duration')
+
+class CardType(AbstractModel): # флаер, пробное, разовое, абонемент, клубная карта
+
+    title = models.CharField(max_length=64)
+    category = models.ManyToManyField(PriceCategoryTeam, verbose_name=_(u'Price category'))
+    discount = models.ManyToManyField(Discount, verbose_name=_(u'Discount'))
+    club_duration = models.ForeignKey(ClubDuration, null=True, blank=True)
+    is_priceless = models.BooleanField(verbose_name=_(u'Is priceless?'))
+    available_formula = models.CharField(max_length=128, help_text=_(u'Enter the formula to calculate available visits.'))
+
+    class Meta:
+        verbose_name = _(u'Type of card')
+        verbose_name_plural = _(u'Types of card')
+        ordering = ('-is_active', '-title')
+
+class PriceCategoryRent(AbstractModel):
+
+    title = models.CharField(max_length=64)
+    full_price = models.FloatField(verbose_name=_(u'Full price.'), default=0.00)
+    half_price = models.FloatField(verbose_name=_(u'Half price.'), default=0.00)
+    once_price = models.FloatField(verbose_name=_(u'One visit price.'), default=0.00)
+    test_price = models.FloatField(verbose_name=_(u'Test price.'), default=0.00)
+
+    class Meta:
+
+        verbose_name = _(u'Price category of a rent')
+        verbose_name_plural = _(u'Price categories of a rent')
 
 class Room(AbstractModel):
 
@@ -172,32 +200,30 @@ class Renter(AbstractUser):
 
 class Card(AbstractModel):
 
-    CARD_TYPE = ( ('0', _(u'Normal card')),
-                  ('1', _(u'Club card')) )
     CARD_STATE = ( ('0', _(u'Wait')),
                    ('1', _(u'Active')),
                    ('2', _(u'Expired')),
                    ('3', _(u'Used')),
                    ('4', _(u'Cancel')) )
 
-    price_category = models.ForeignKey(PriceCategoryTeam)
     client = models.ForeignKey(Client, verbose_name=_(u'Client'))
-    card_type = models.CharField(verbose_name=_(u'Type'), help_text=_(u'Type of client\'s card'),
-                                 max_length=1, choices=CARD_TYPE, default=0)
-    state = models.CharField(verbose_name=_(u'State'), help_text=_(u'State of record'), max_length=1, choices=CARD_STATE, default=0)
-    begin_date = models.DateField(verbose_name=_(u'Begin'), null=True)
-    end_date = models.DateField(verbose_name=_(u'Expired'), null=True)
-    duration = models.IntegerField(default=0)
-    count_sold = models.IntegerField(verbose_name=_(u'Exercises sold'))
-    count_used = models.IntegerField(verbose_name=_(u'Exercises used'), default=0)
+    card_type = models.ForeignKey(CardType, verbose_name=_(u'Type'), help_text=_(u'Type of client\'s card'))
+    price_category = models.ForeignKey(PriceCategoryTeam, null=True, blank=True)
+    club_duration = models.ForeignKey(ClubDuration, null=True, blank=True)
+    discount = models.ForeignKey(Discount)
     price = models.FloatField(verbose_name=_(u'Price'), help_text=_(u'Price with all discounts.'), default=float(0.00))
     paid = models.FloatField(verbose_name=_(u'Paid'), help_text=_(u'Paid amount.'), default=float(0.00))
-    paid_status = models.CharField(verbose_name=_(u'Paid status'), max_length=1, choices=PAID_STATUS, default=0)
+    count_available = models.IntegerField(verbose_name=_(u'Exercises available'), default=0)
+    count_sold = models.IntegerField(verbose_name=_(u'Exercises sold'))
+    count_used = models.IntegerField(verbose_name=_(u'Exercises used'), default=0)
+    begin_date = models.DateField(verbose_name=_(u'Begin'), null=True)
+    end_date = models.DateField(verbose_name=_(u'Expired'), null=True)
     cancel_datetime = models.DateTimeField(verbose_name=_(u'Registered'), null=True)
+    state = models.CharField(verbose_name=_(u'State'), help_text=_(u'State of record'), max_length=1, choices=CARD_STATE, default=0)
 
     class Meta:
-        verbose_name = _(u'Card')
-        verbose_name_plural = _(u'Cards')
+        verbose_name = _(u'Client\'s card')
+        verbose_name_plural = _(u'Client\'s cards')
 
 class Team(AbstractModel):
 
@@ -218,7 +244,7 @@ class Team(AbstractModel):
         return result
 
     def dance_styles(self):
-        return ','.join([unicode(a) for a in self.dance_style.all()])
+        return u', '.join([unicode(a) for a in self.dance_style.all()])
 
 class Rent(AbstractModel):
 
@@ -337,7 +363,7 @@ class Visit(AbstractModel): # FIXME models
     schedule = models.ForeignKey(Schedule, verbose_name=_(u'Event'))
     card = models.ForeignKey(Card, verbose_name=_(u'Card'), null=True, blank=True)
 
-    class Meta:
+    class Meta
         verbose_name = _(u'Visit')
         verbose_name_plural = _(u'Visits')
         unique_together = ('client', 'schedule')
