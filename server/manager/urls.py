@@ -27,7 +27,7 @@ urlpatterns = patterns(
 urlpatterns += patterns(
     'manager.ajax',
     url(r'^login/$', 'login'),
-    url(r'^get_discount/$', 'get_discount'),
+    url(r'^static/$', 'static'),
     url(r'^get_client_info/$', 'get_client_info'),
     url(r'^get_renter_info/$', 'get_renter_info'),
     url(r'^get_users_info_by_name/$', 'get_users_info_by_name'),
@@ -35,7 +35,6 @@ urlpatterns += patterns(
     url(r'^set_client_card/$', 'set_client_card'),
     url(r'^set_renter_info/$', 'set_renter_info'),
     url(r'^set_renter_card/$', 'set_renter_card'),
-    url(r'^available_teams/$', 'available_teams'),
     url(r'^get_event_info/$', 'get_event_info'),
     url(r'^get_week/$', 'get_week'),
     url(r'^copy_week/$', 'copy_week'), # REMOVEIT

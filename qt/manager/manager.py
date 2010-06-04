@@ -4,7 +4,6 @@
 
 import sys, re, time
 from datetime import datetime, timedelta
-
 from os.path import dirname, join
 
 from settings import _, DEBUG
@@ -87,14 +86,11 @@ class MainWindow(QMainWindow):
         self.rooms = tuple( [ (a['title'], a['color'], a['id']) for a in response['rows'] ] )
         self.schedule.update_static( {'rooms': self.rooms} )
 
-        # available teams
-        self.http.request('/manager/available_teams/', {})
-        response = self.http.parse() # see format at team_tree.py
-        self.tree = TreeModel(response)
-
-        # discount
-        self.http.request('/manager/get_discount/', {})
-        self.discount = self.http.parse()
+        # static info
+        self.http.request('/manager/static/', {})
+        response = self.http.parse()
+        self.static = response
+        self.tree = TreeModel(self.static.get('styles', None))
 
     def update_interface(self):
         """ This method updates application's interface using static
@@ -323,7 +319,7 @@ class MainWindow(QMainWindow):
     def client_new(self):
         params = {
             'http': self.http,
-            'discount': self.discount,
+            'static': self.static,
             }
         self.dialog = DlgClientInfo(self, params)
 	self.dialog.setModal(True)
@@ -354,7 +350,7 @@ class MainWindow(QMainWindow):
                 user_info = response['info']
                 params = {
                     'http': self.http,
-                    'discount': self.discount,
+                    'static': self.static,
                     }
                 self.dialog = DlgClientInfo(self, params)
                 self.dialog.setModal(True)
@@ -386,7 +382,7 @@ class MainWindow(QMainWindow):
             else:
                 params = {
                     'http': self.http,
-                    'discount': self.discount,
+                    'static': self.static,
                     }
                 self.dialog = DlgClientInfo(self, params)
                 self.dialog.setModal(True)

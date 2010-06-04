@@ -16,13 +16,11 @@ from PyQt4.QtCore import *
 
 class DlgClientInfo(QDialog):
 
-    def __init__(self, parent=None, params=dict()):
+    def __init__(self, parent=None, static=dict()):
         QDialog.__init__(self, parent)
 
         self.parent = parent
-
-        for key, value in params.items():
-            setattr(self, key, value)
+        self.static = static
 
         self.client_id = u'0'
         self.setMinimumWidth(800)
@@ -60,12 +58,12 @@ class DlgClientInfo(QDialog):
         groupUser = QGroupBox(_('Base data'))
         groupUser.setLayout(layoutUser)
 
-        self.buttonAssignTeam = QPushButton(_('Assign team'))
+        self.add_card_button = QPushButton(_('Add card'))
         self.buttonApplyDialog = QPushButton(_('Apply'))
         self.buttonCancelDialog = QPushButton(_('Cancel'))
 
         buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(self.buttonAssignTeam)
+        buttonLayout.addWidget(self.add_card_button)
         buttonLayout.addStretch(1)
         buttonLayout.addWidget(self.buttonApplyDialog)
         buttonLayout.addWidget(self.buttonCancelDialog)
@@ -91,7 +89,7 @@ class DlgClientInfo(QDialog):
         self.setSignals()
 
         # discount combo
-        for i in self.discount: # see params
+        for i in self.static.get('discounts', list()): # see params
             id = i['id']
             title = u'%s - %s%%' % (i['title'], i['percent'])
             self.comboDiscount.addItem(title, QVariant(id))
@@ -110,8 +108,8 @@ class DlgClientInfo(QDialog):
     def setSignals(self):
         self.connect(self.buttonAssignRFID, SIGNAL('clicked()'),
                      self.assignRFID)
-        self.connect(self.buttonAssignTeam, SIGNAL('clicked()'),
-                     self.showAssignTeamDlg)
+        self.connect(self.add_card_button, SIGNAL('clicked()'),
+                     self.add_card_record) #showAssignTeamDlg)
         self.connect(self.buttonApplyDialog, SIGNAL('clicked()'),
                      self.applyDialog)
         self.connect(self.buttonCancelDialog, SIGNAL('clicked()'),
@@ -138,12 +136,10 @@ class DlgClientInfo(QDialog):
                                QDate.currentDate())
         self.editRFID.setText(data.get('rfid_code', ''))
 
-        self.prices = data.get('prices', [])
+        card_list = data.get('team_list', [])
+        self.cardinfo.model().initData(card_list, self.static)
 
-        teams = data.get('team_list', [])
-        self.cardinfo.model().initData(teams, self.prices)
-
-    def cancelTeam(self):
+    def cancelTeam(self): # FIXME: rename to cancelCard
         row = self.cardinfo.currentRow()
         if DEBUG:
             print 'cancel team'
@@ -163,6 +159,23 @@ class DlgClientInfo(QDialog):
         if QDialog.Accepted == dlgStatus:
             self.editRFID.setText(self.rfid_id)
 
+    def add_card_record(self):
+        data  = {
+            'card_type': 0,
+            'price_category': 0,
+            'count_sold': 0,
+            'price': 0.0,
+            'discount': 0,
+            'count_available': 0,
+            'count_used': 0,
+            'reg_datetime': _('Now'),
+            }
+        rows = []
+        rows.append(data)
+        model = self.cardinfo.model()
+        lastRow = model.rowCount(QModelIndex())
+        ok = model.insertRows(lastRow, rows, QModelIndex())
+
     def showAssignTeamDlg(self):
         dialog = DlgTeamAssign(self)
         dialog.setCallback(self.assignTeam) # see next method
@@ -178,7 +191,7 @@ class DlgClientInfo(QDialog):
         lastRow = model.rowCount(QModelIndex())
         if model.insertRows(lastRow, 1, QModelIndex()):
             index = model.index(0, 0)
-            model.setRow(index, data, Qt.EditRole)
+            model.set_row(index, data, Qt.EditRole)
 
     def applyDialog(self):
         """ Применить настройки. """
@@ -331,7 +344,7 @@ class DlgRenterInfo(QDialog):
         lastRow = self.rentInfoModel.rowCount(QModelIndex())
         if self.rentInfoModel.insertRows(lastRow, 1, QModelIndex()):
             index = self.rentInfoModel.index(0, 0)
-            self.rentInfoModel.setRow(index, params, Qt.EditRole)
+            self.rentInfoModel.set_row(index, params, Qt.EditRole)
 
     def applyDialog(self):
         userinfo, ok = self.checkFields()

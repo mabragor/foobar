@@ -58,9 +58,19 @@ def login(request, form):
 
 @login_required
 @ajax_processor(None, isJavaScript)
-def available_teams(request):
-    styles = storage.DanceStyle.objects.filter(is_active=True)
-    return [item.about() for item in styles]
+def static(request):
+    data = {}
+    params = (
+        ('card_types', storage.CardType),
+        ('price_cats_team', storage.PriceCategoryTeam),
+        ('price_cats_rent', storage.PriceCategoryRent),
+        ('discounts', storage.Discount),
+        ('styles', storage.DanceStyle),
+        )
+    for key, model in params:
+        qs = model.objects.filter(is_active=True)
+        data.update( {key: [item.about() for item in qs], } )
+    return data
 
 @login_required
 @ajax_processor(None, isJavaScript)

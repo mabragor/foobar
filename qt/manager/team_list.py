@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
-import time
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 
@@ -13,116 +12,45 @@ from PyQt4.QtCore import *
 PAID_STATUS = [_('Reserved'),
                _('Piad partially'),
                _('Paid')]
-CARD_TYPE = [_('Normal'), _('Club')]
-DURATION_TYPE = [30, 90, 180, 270, 360]
 
-def _dtapply(value):
-    if value is not None:
-        if type(value) in [date, datetime]:
-            return value
-        if type(value) is str:
-            if len(value) == 10:
-                result = datetime.strptime(value, '%Y-%m-%d')
-            else:
-                result = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
-            return result.date()
-        raise RuntimeWarning
-    else:
-        return None
-
-MODEL_MAP = ( # describes all fields in the model
-    # title
-    {'type': unicode,
-     'delegate': None},
-    # price
-    {'type': float,
-     'delegate': QComboBox},
-    # paid
-    {'type': float,
-     'delegate': QLineEdit},
-    # paid status
-    {'type': lambda x: PAID_STATUS[int(x)],
-     'delegate': QComboBox},
-    # card type
-    {'type': lambda x: CARD_TYPE[int(x)],
-     'delegate': QComboBox},
-    # count sold
-    {'type': int,
-     'delegate': None},
-    # count used
-    {'type': int,
-     'delegate': None},
-    # duration in days
-    {'type': lambda x: DURATION_TYPE[int(x)],
-     'delegate': QComboBox},
-    # reg_date
-    {'type': _dtapply,
-     'delegate': None},
-    # begin date
-    {'type': _dtapply,
-     'delegate': None},
-    # end date
-    {'type': _dtapply,
-     'delegate': None},
-    # cancel date
-    {'type': _dtapply,
-     'delegate': None},
-    # record id
-    {'type': int,
-     'delegate': None},
-    # team id
-    {'type': int,
-     'delegate': None},
-    # price category
-    {'type': int,
-     'delegate': None},
+MODEL_MAP_RAW = (
+    ('card_type', QComboBox, _(u'Type of card'), 'id2title'),
+    ('price_category', QComboBox, _('Price category'), 'id2title'),
+    ('count_sold', None, _(u'Sold'), 'int'),
+    ('price', QComboBox, _(u'Price'), 'float'),
+    ('discount', QComboBox, _(u'Discount'), 'id2title'),
+    ('count_available', None, _('Available'), 'int'),
+    ('count_used', None, _(u'Used'), 'int'),
+    ('begin date', None, _(u'Begin'), 'date2str'),
+    ('end date', None, _(u'End'), 'date2str'),
+    ('reg datetime', None, _('Register'), 'dt2str'),
+    ('cancel datetime', None, _(u'Cancel'), 'dt2str'),
+    ('id', None, 'id', 'int')
 )
+MODEL_MAP = list()
+for name, delegate, title, action in MODEL_MAP_RAW:
+   record = {'name': name, delegate: 'delegate',
+             'title': title, 'action': action}
+   MODEL_MAP.append(record)
+
+# FIXME: rename to CardListModel
 
 class TeamListModel(QAbstractTableModel):
 
     def __init__(self, parent=None):
         QAbstractTableModel.__init__(self, parent)
 
+        self.static = None
         self.storage = [] # here the data is stored
-        self.hidden_fields = 3 # from end of following lists
+        self.hidden_fields = 1 # from end of following lists
 
-        self.labels = [_('Title'), _('Price, rub'), _('Paid, rub'), _('Paid status'),
-                       _('Card'), _('Sold'), _('Used'), _('Duration'),
-                       _('Assigned'), _('Begin'), _('Expired'), _('Cancelled'),
-                       'id', 'team_id', 'price_category']
-        self.model_fields = ['title', 'price', 'paid', 'paid_status',
-                             'card_type', 'count_sold', 'count_used', 'duration',
-                             'reg_datetime', 'begin_date', 'end_date', 'cancel_datetime',
-                             'id', 'team_id', 'price_category']
-
-    def initData(self, data, prices):
+    def initData(self, card_list, static):
         """
         Формат полученных данных: см. методы about() у моделей.
         Вызывается из DlgClientInfo::initData()
         """
-        self.prices = prices # save prices info
-
-        for rec in data:
-            if type(rec) is not dict:
-                raise 'Check format'
-            team = rec['team']
-            self.storage.append( [
-                team['title'],
-                rec['price'],
-                rec['paid'],
-                rec['paid_status'],
-                rec['card_type'],
-                rec['count_sold'],
-                rec['count_used'],
-                rec['duration'],
-                rec['reg_datetime'],
-                rec['begin_date'],
-                rec['end_date'],
-                rec['cancel_datetime'],
-                rec['id'],
-                team['id'],
-                team['price_category'],
-                ] )
+        self.storage = card_list
+        self.static = static
         self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
                   QModelIndex(), 1, self.rowCount())
 
@@ -170,14 +98,11 @@ class TeamListModel(QAbstractTableModel):
         if parent and parent.isValid():
             return 0
         else:
-            return len(self.model_fields) - self.hidden_fields
-
-    def modelColumnCount(self):
-        return len(self.model_fields)
+            return len(MODEL_MAP) - self.hidden_fields
 
     def headerData(self, section, orientation, role): # base class method
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return QVariant(self.labels[section])
+            return QVariant(MODEL_MAP[section].get('title', '--'))
         if orientation == Qt.Vertical and role == Qt.DisplayRole:
             return QVariant(section+1) # порядковый номер
         return QVariant()
@@ -187,6 +112,25 @@ class TeamListModel(QAbstractTableModel):
             return Qt.ItemIsEnabled
         return Qt.ItemIsEnabled | Qt.ItemIsEditable
 
+    def converter(self, value, action):
+        print value, action
+
+        if value is None:
+            return QVariant()
+
+        if action == 'id2title':
+            pass
+        elif action == 'int':
+            return int(value)
+        elif action == 'float':
+            return float(value)
+        elif action == 'date2str':
+            return datetime.strptime(value, '%Y-%m-%d').date()
+        elif action == 'date2str':
+            return datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+        else:
+            raise RuntimeWarning
+
     def data(self, index, role): # base class method
         if not index.isValid():
             return QVariant()
@@ -194,70 +138,29 @@ class TeamListModel(QAbstractTableModel):
             return QVariant()
         idx_row = index.row()
         idx_col = index.column()
-        record = list(self.storage[idx_row])
 
-        object_type = MODEL_MAP[idx_col]['type']
+        print idx_row, idx_col
+        record = self.storage[idx_row]
+        print type(record), record
+
         try:
             value = record[idx_col]
+            print 'team_list::data', '%s:%s' % (idx_row, idx_col), value
         except IndexError:
-            return QVariant() # запись в модели ещё не заполнена
+            value = None
 
-        if value is None:
-            return QVariant() # пустое значение
-        else:
-            return QVariant(object_type(value))
-
-    def setRow(self, index, data, role):
-        if index.isValid() and role == Qt.EditRole:
-            reg_datetime = datetime.now()
-            team_id = data['team'][1]
-            title = data['team'][0]
-            price = 0.0
-            price_category = data['team'][2]
-            paid = 0
-            paid_status = 0
-            card_type = data['card_type']
-            count_sold = count_used = 0
-            duration = data['duration']
-            begin_date = exp_date = cancel_datetime = None
-
-            record = [title, price, paid, paid_status, card_type,
-                      count_sold, count_used, duration,
-                      reg_datetime, begin_date, exp_date, cancel_datetime,
-                      0, team_id, price_category]
-
-            idx_row = index.row()
-            idx_col = 0
-            for i in record:
-                self.setData(self.createIndex(idx_row, idx_col), i, role)
-                idx_col += 1
+        return QVariant(self.converter(value, action))
 
     def setData(self, index, value, role):
         if index.isValid() and role == Qt.EditRole:
             idx_row = index.row()
             idx_col = index.column()
-            #print '[%i, %i] %s' % (idx_row, idx_col, value)
+            field = MODEL_MAP[idx_col]['name']
 
-            record = list(self.storage[idx_row])
-            if len(record) == 0: # init record in this case
-                for i in xrange(self.modelColumnCount()):
-                    record.append(None)
-
-            # FIXME: I guess no convert is needed.
-            if type(value) is QVariant:
-                v = value.toString()
-            else:
-                v = value
-
-            #print type(value), value
-            record[idx_col] = v
-            self.storage[idx_row] = tuple(record)
-
-#             for item in self.storage:
-#                 print '\t',
-#                 for col in item:
-#                     print col,
-#                 print
+            record = self.storage[idx_row]
+            data = {field: value}
+            #record.update(data)
+            self.storage[idx_row] = record
 
             self.emit(SIGNAL('dataChanged(QModelIndex, QModelIndex)'),
                       index, index)
@@ -265,9 +168,16 @@ class TeamListModel(QAbstractTableModel):
         return False
 
     def insertRows(self, position, rows, parent):
-        self.beginInsertRows(QModelIndex(), position, position+rows-1)
-        for i in xrange(rows):
-            self.storage.insert(0, tuple())
+        self.beginInsertRows(QModelIndex(), position, len(rows)-1)
+        for row in rows:
+            column = 0
+            record = []
+
+            for name, delegate, title, action in MODEL_MAP_RAW:
+                value = row.get(name, None)
+                record.append(value)
+
+            self.storage.insert(0, record)
         self.endInsertRows()
         return True
 
@@ -282,12 +192,18 @@ class TeamListDelegate(QItemDelegate):
 
     """ The delegate allow to user to change the model values. """
 
-    COUNT_USED_INDEX = 6
-    PRICE_CAT_INDEX = 14
-
     def __init__(self, parent=None):
         QItemDelegate.__init__(self, parent)
-        print 'TeamListDelegate: constructor'
+
+        self.COUNT_USED_INDEX = self.search('count_used')
+        self.PRICE_CAT_INDEX = self.search('price_category')
+
+    def search(self, name):
+        result_list = filter(lambda x: x['name'] == name, MODEL_MAP)
+        if len(result_list) != 1:
+            raise Exception('Wrong search')
+        value = result_list[0]
+        return MODEL_MAP.index(value)
 
     def createEditor(self, parent, option, index):
         delegate_editor = MODEL_MAP[ index.column() ]['delegate']

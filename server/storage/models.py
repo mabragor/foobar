@@ -209,7 +209,6 @@ class Card(AbstractModel):
     client = models.ForeignKey(Client, verbose_name=_(u'Client'))
     card_type = models.ForeignKey(CardType, verbose_name=_(u'Type'), help_text=_(u'Type of client\'s card'))
     price_category = models.ForeignKey(PriceCategoryTeam, null=True, blank=True)
-    club_duration = models.ForeignKey(ClubDuration, null=True, blank=True)
     discount = models.ForeignKey(Discount)
     price = models.FloatField(verbose_name=_(u'Price'), help_text=_(u'Price with all discounts.'), default=float(0.00))
     paid = models.FloatField(verbose_name=_(u'Paid'), help_text=_(u'Paid amount.'), default=float(0.00))
@@ -363,7 +362,7 @@ class Visit(AbstractModel): # FIXME models
     schedule = models.ForeignKey(Schedule, verbose_name=_(u'Event'))
     card = models.ForeignKey(Card, verbose_name=_(u'Card'), null=True, blank=True)
 
-    class Meta
+    class Meta:
         verbose_name = _(u'Visit')
         verbose_name_plural = _(u'Visits')
         unique_together = ('client', 'schedule')
