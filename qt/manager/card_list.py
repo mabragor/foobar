@@ -14,8 +14,8 @@ PAID_STATUS = [_('Reserved'),
                _('Paid')]
 
 MODEL_MAP_RAW = (
-    ('card_type', QComboBox, _(u'Type of card'), 'id2title'),
-    ('price_category', QComboBox, _('Price category'), 'id2title'),
+    ('card_types', QComboBox, _(u'Type of card'), 'id2title'),
+    ('price_cats_team', QComboBox, _('Price category'), 'id2title'),
     ('count_sold', None, _(u'Sold'), 'int'),
     ('price', QComboBox, _(u'Price'), 'float'),
     ('discount', QComboBox, _(u'Discount'), 'id2title'),
@@ -29,28 +29,25 @@ MODEL_MAP_RAW = (
 )
 MODEL_MAP = list()
 for name, delegate, title, action in MODEL_MAP_RAW:
-   record = {'name': name, delegate: 'delegate',
+   record = {'name': name, 'delegate': delegate,
              'title': title, 'action': action}
    MODEL_MAP.append(record)
 
-# FIXME: rename to CardListModel
-
-class TeamListModel(QAbstractTableModel):
+class CardListModel(QAbstractTableModel):
 
     def __init__(self, parent=None):
         QAbstractTableModel.__init__(self, parent)
 
-        self.static = None
+        self.static = parent.static
         self.storage = [] # here the data is stored
         self.hidden_fields = 1 # from end of following lists
 
-    def initData(self, card_list, static):
+    def initData(self, card_list):
         """
         Формат полученных данных: см. методы about() у моделей.
         Вызывается из DlgClientInfo::initData()
         """
         self.storage = card_list
-        self.static = static
         self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
                   QModelIndex(), 1, self.rowCount())
 
@@ -113,8 +110,6 @@ class TeamListModel(QAbstractTableModel):
         return Qt.ItemIsEnabled | Qt.ItemIsEditable
 
     def converter(self, value, action):
-        print value, action
-
         if value is None:
             return QVariant()
 
@@ -139,15 +134,30 @@ class TeamListModel(QAbstractTableModel):
         idx_row = index.row()
         idx_col = index.column()
 
-        print idx_row, idx_col
-        record = self.storage[idx_row]
-        print type(record), record
+        field_obj = MODEL_MAP[idx_col]
+        field_name = field_obj['name']
+        delegate_editor = field_obj['delegate']
 
         try:
+            record = self.storage[idx_row]
             value = record[idx_col]
-            print 'team_list::data', '%s:%s' % (idx_row, idx_col), value
         except IndexError:
-            value = None
+            return QVariant()
+
+        if value is None:
+            return QVariant()
+
+        if delegate_editor is QComboBox:
+            items = self.static.get(field_name, list())
+            data = filter(lambda x: int(x['id']) == int(value), items)
+            print 'field_name', field_name
+            print 'items', items
+            print 'data', data
+            if len(data) != 1:
+               return QVariant(_('Choose'))
+            else:
+               value = data[0]['title']
+               return QVariant(value)
 
         return QVariant(self.converter(value, action))
 
@@ -175,9 +185,11 @@ class TeamListModel(QAbstractTableModel):
 
             for name, delegate, title, action in MODEL_MAP_RAW:
                 value = row.get(name, None)
+                print name,'=',value
                 record.append(value)
 
             self.storage.insert(0, record)
+            print self.storage
         self.endInsertRows()
         return True
 
@@ -188,18 +200,22 @@ class TeamListModel(QAbstractTableModel):
         self.endRemoveRows()
         return True
 
-class TeamListDelegate(QItemDelegate):
+class CardListDelegate(QItemDelegate):
 
     """ The delegate allow to user to change the model values. """
 
     def __init__(self, parent=None):
         QItemDelegate.__init__(self, parent)
 
+        self.static = parent.static
+
         self.COUNT_USED_INDEX = self.search('count_used')
-        self.PRICE_CAT_INDEX = self.search('price_category')
+        self.PRICE_CAT_INDEX = self.search('price_cats_team')
 
     def search(self, name):
-        result_list = filter(lambda x: x['name'] == name, MODEL_MAP)
+        result_list = filter(
+           lambda x: x['name'] == name, MODEL_MAP
+           )
         if len(result_list) != 1:
             raise Exception('Wrong search')
         value = result_list[0]
@@ -222,9 +238,13 @@ class TeamListDelegate(QItemDelegate):
 
     def setEditorData(self, editor, index):
         model = index.model()
+        column = index.column()
         raw_value = model.data(index, Qt.DisplayRole)
 
-        delegate_editor = MODEL_MAP[ index.column() ]['delegate']
+        field_obj = MODEL_MAP[ column ]
+        field_name = field_obj['name']
+        delegate_editor = field_obj['delegate']
+
         if not delegate_editor or delegate_editor is QLineEdit:
             value = raw_value.toString()
             editor.setText(value)
@@ -232,21 +252,25 @@ class TeamListDelegate(QItemDelegate):
             value = raw_value.toDate()
             editor.setDate(value)
         elif delegate_editor is QComboBox:
-            if 1 == index.column(): #price
-                # get the pice category of this team
+            items = self.static.get(field_name, list())
+            for i in items:
+                editor.addItem( i['title'], QVariant(i['id']) )
+
+            if 1 == column:
+                # get the pice category of this card
                 idx_price_cat = model.index(index.row(), self.PRICE_CAT_INDEX)
                 price_cat, ok = model.data(idx_price_cat, Qt.DisplayRole).toInt()
                 for i in model.prices:
                     if price_cat == int( i['price_category'] ):
                         cost = unicode( int( float( i['cost'] ) ) )
                         editor.addItem( cost, QVariant(i['id']) )
-            elif 3 == index.column(): # paid status
+            elif 3 == column: # paid status
                 for i in PAID_STATUS:
                     editor.addItem( i, QVariant(PAID_STATUS.index(i)) )
-            elif 4 == index.column(): # card type
+            elif 4 == column: # card type
                 for i in CARD_TYPE:
                     editor.addItem( i, QVariant(CARD_TYPE.index(i)) )
-            elif 7 == index.column(): # duration
+            elif 7 == column: # duration
                 for i in DURATION_TYPE:
                     editor.addItem( str(i), QVariant(DURATION_TYPE.index(i)) )
             value = raw_value.toString()
@@ -280,27 +304,30 @@ class TeamListDelegate(QItemDelegate):
     def updateEditorGeometry(self, editor, option, index):
         editor.setGeometry(option.rect)
 
-class TeamList(QTableView):
+class CardList(QTableView):
 
     """ Класс списка курсов. """
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, params=dict()):
         QTableView.__init__(self, parent)
+
+        self.static = params.get('static', None)
+        print 'CardList::init', 'static is', self.static.keys()
 
         self.verticalHeader().setResizeMode(QHeaderView.Fixed)
         self.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
         #self.horizontalHeader().setResizeMode(QHeaderView.Stretch)
         #self.resizeColumnsToContents()
 
-        self.actionTeamCancel = QAction(_('Cancel team'), self)
-        self.actionTeamCancel.setStatusTip(_('Cancel current team.'))
-        self.connect(self.actionTeamCancel, SIGNAL('triggered()'), self.teamCancel)
+        self.actionCardCancel = QAction(_('Cancel card'), self)
+        self.actionCardCancel.setStatusTip(_('Cancel current card.'))
+        self.connect(self.actionCardCancel, SIGNAL('triggered()'), self.cardCancel)
 
         # source model
-        self.model_obj = TeamListModel(self)
+        self.model_obj = CardListModel(self)
         self.setModel(self.model_obj)
 
-        self.delegate = TeamListDelegate()
+        self.delegate = CardListDelegate(self)
         self.setItemDelegate(self.delegate)
 
 #     def mousePressEvent(self, event):
@@ -312,9 +339,9 @@ class TeamList(QTableView):
         index = self.indexAt(event.pos())
         self.contextRow = index.row()
         menu = QMenu(self)
-        menu.addAction(self.actionTeamCancel)
+        menu.addAction(self.actionCardCancel)
         menu.exec_(event.globalPos())
 
-    def teamCancel(self):
+    def cardCancel(self):
         if DEBUG:
             print 'canceled [%i]' % self.contextRow

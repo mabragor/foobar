@@ -3,10 +3,10 @@
 
 from settings import _, DEBUG
 #from model_sorting import SortClientTeams
-from team_list import TeamList
+from card_list import CardList
 from rent_list import RentListModel, RentList
 from dlg_waiting_rfid import DlgWaitingRFID
-from dlg_team_assign import DlgTeamAssign
+#from dlg_team_assign import DlgTeamAssign
 from dlg_rent_assign import DlgRentAssign
 
 from datetime import datetime
@@ -16,11 +16,11 @@ from PyQt4.QtCore import *
 
 class DlgClientInfo(QDialog):
 
-    def __init__(self, parent=None, static=dict()):
+    def __init__(self, parent=None, params=dict()):
         QDialog.__init__(self, parent)
 
         self.parent = parent
-        self.static = static
+        self.params = params
 
         self.client_id = u'0'
         self.setMinimumWidth(800)
@@ -69,12 +69,12 @@ class DlgClientInfo(QDialog):
         buttonLayout.addWidget(self.buttonCancelDialog)
 
         # купленные курсы
-        self.cardinfo = TeamList(self)
+        self.cardinfo = CardList(self, self.params)
 
         cardLayout = QVBoxLayout()
         cardLayout.addWidget(self.cardinfo)
 
-        groupCard = QGroupBox(_('Teams\' history'))
+        groupCard = QGroupBox(_('Card history'))
         groupCard.setLayout(cardLayout)
 
         layout = QVBoxLayout()
@@ -89,7 +89,7 @@ class DlgClientInfo(QDialog):
         self.setSignals()
 
         # discount combo
-        for i in self.static.get('discounts', list()): # see params
+        for i in self.params.get('discounts', list()): # see params
             id = i['id']
             title = u'%s - %s%%' % (i['title'], i['percent'])
             self.comboDiscount.addItem(title, QVariant(id))
@@ -109,7 +109,7 @@ class DlgClientInfo(QDialog):
         self.connect(self.buttonAssignRFID, SIGNAL('clicked()'),
                      self.assignRFID)
         self.connect(self.add_card_button, SIGNAL('clicked()'),
-                     self.add_card_record) #showAssignTeamDlg)
+                     self.add_card_record)
         self.connect(self.buttonApplyDialog, SIGNAL('clicked()'),
                      self.applyDialog)
         self.connect(self.buttonCancelDialog, SIGNAL('clicked()'),
@@ -137,12 +137,12 @@ class DlgClientInfo(QDialog):
         self.editRFID.setText(data.get('rfid_code', ''))
 
         card_list = data.get('team_list', [])
-        self.cardinfo.model().initData(card_list, self.static)
+        self.cardinfo.model().initData(card_list)
 
-    def cancelTeam(self): # FIXME: rename to cancelCard
+    def cancelCard(self):
         row = self.cardinfo.currentRow()
         if DEBUG:
-            print 'cancel team'
+            print 'cancel card'
             print row
         self.cardinfo.removeRow(row)
 
@@ -161,8 +161,8 @@ class DlgClientInfo(QDialog):
 
     def add_card_record(self):
         data  = {
-            'card_type': 0,
-            'price_category': 0,
+            'card_types': 1,
+            'price_cats_team': 1,
             'count_sold': 0,
             'price': 0.0,
             'discount': 0,
@@ -176,14 +176,7 @@ class DlgClientInfo(QDialog):
         lastRow = model.rowCount(QModelIndex())
         ok = model.insertRows(lastRow, rows, QModelIndex())
 
-    def showAssignTeamDlg(self):
-        dialog = DlgTeamAssign(self)
-        dialog.setCallback(self.assignTeam) # see next method
-        dialog.setModel(self.parent.tree)
-        dialog.setModal(True)
-        dlgStatus = dialog.exec_()
-
-    def assignTeam(self, data): # data goes from DlgTeamAssign
+    def assignCard(self, data): # data goes from DlgTeamAssign
         # add user's discount
         data.update( {'discount': self.comboDiscount.currentIndex()} )
         # send data to user's model
