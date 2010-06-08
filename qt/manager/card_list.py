@@ -4,7 +4,8 @@
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 
-from settings import _, DEBUG
+from settings import _, DEBUG, userRoles
+GET_ID_ROLE = userRoles['getObjectID']
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -29,9 +30,9 @@ MODEL_MAP_RAW = (
 )
 MODEL_MAP = list()
 for name, delegate, title, action in MODEL_MAP_RAW:
-   record = {'name': name, 'delegate': delegate,
+    record = {'name': name, 'delegate': delegate,
              'title': title, 'action': action}
-   MODEL_MAP.append(record)
+    MODEL_MAP.append(record)
 
 class CardListModel(QAbstractTableModel):
 
@@ -51,11 +52,10 @@ class CardListModel(QAbstractTableModel):
         self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
                   QModelIndex(), 1, self.rowCount())
 
-#         self.emit(SIGNAL('columnsInserted(QModelIndex, int, int)'),
-#                   QModelIndex(), 1, cols)
-#         self.emit(SIGNAL('dataChanged(QModelIndex, QModelIndex)'),
-#                   self.createIndex(0, 0),
-#                   self.createIndex(self.rowCount(), self.columnCount()))
+    def dump(self):
+        import pprint
+        print 'CardListModel dump is'
+        pprint.pprint(self.storage)
 
     def get_model_as_formset(self, client_id):
         formset = {
@@ -129,7 +129,7 @@ class CardListModel(QAbstractTableModel):
     def data(self, index, role): # base class method
         if not index.isValid():
             return QVariant()
-        if role not in (Qt.DisplayRole, Qt.ToolTipRole) :
+        if role not in (Qt.DisplayRole, Qt.ToolTipRole, GET_ID_ROLE) :
             return QVariant()
         idx_row = index.row()
         idx_col = index.column()
@@ -148,6 +148,10 @@ class CardListModel(QAbstractTableModel):
             return QVariant()
 
         if delegate_editor is QComboBox:
+            if role == GET_ID_ROLE:
+               return QVariant(value)
+
+            # or return title
             items = self.static.get(field_name, list())
             data = filter(lambda x: int(x['id']) == int(value), items)
             if len(data) != 1:
@@ -215,14 +219,13 @@ class CardListDelegate(QItemDelegate):
         value = result_list[0]
         return MODEL_MAP.index(value)
 
-    def search_index(self, where, field_name, value):
+    def search_and_get(self, where, field_name, value):
         result_list = filter(
             lambda x: x[field_name] == value, where
             )
         if len(result_list) != 1:
             raise Exception('Wrong search')
-        value = result_list[0]
-        return where.index(value)
+        return result_list[0]
 
     def createEditor(self, parent, option, index):
         delegate_editor = MODEL_MAP[ index.column() ]['delegate']
@@ -242,6 +245,7 @@ class CardListDelegate(QItemDelegate):
 
     def setEditorData(self, editor, index):
         model = index.model()
+        row = index.row()
         column = index.column()
         raw_value = model.data(index, Qt.DisplayRole)
 
@@ -256,22 +260,23 @@ class CardListDelegate(QItemDelegate):
             value = raw_value.toDate()
             editor.setDate(value)
         elif delegate_editor is QComboBox:
+            match_list = None
             items = self.static.get(field_name, list())
 
             if 1 == column:
-               r = index.row()
-               c = index.column() - 1
-
-               card_type, ok = model.data(model.index(r, c), Qt.DisplayRole).toInt()
-               print 'card type index', card_type
-               # exclude unsupported price categories for current card type
+               # получаем идентификатор типа карты
+               raw = model.data(model.index(row, 0), GET_ID_ROLE)
+               ct_id, ok = raw.toInt()
+               # получаем список всех типов карт
                possible_card_types = self.static.get('card_types', [])
-               print 'len of posss cards', len(possible_card_types)
-               ct_idx = self.search_index(possible_card_types, 'id', card_type)
-               print 'index is', ct_idx
+               # находим информацию о нужной
+               card_type = self.search_and_get(possible_card_types, 'id', ct_id)
+               price_cats = card_type.get('price_categories', [])
+               match_list = [i['id'] for i in price_cats]
 
             for i in items:
-                editor.addItem( i['title'], QVariant(i['id']) )
+                if not match_list or i['id'] in match_list:
+                    editor.addItem( i['title'], QVariant(i['id']) )
 
 #             if 1 == column:
 #                 # get the price category of this card
@@ -305,20 +310,22 @@ class CardListDelegate(QItemDelegate):
         if not delegate_editor or delegate_editor is QLineEdit:
             value = editor.text()
         elif delegate_editor is QComboBox:
-            if 1 == index.column():
-                value = editor.currentText()
+            idx = editor.currentIndex()
+            value, ok = editor.itemData(idx).toInt()
+            #if 1 == index.column():
+            #    value = editor.currentText()
                 # fill count_sold
                 #g = generator_price('cost', value)
                 #price_info = filter(g, model.prices)[0]
                 #model.setData(model.index(index.row(), 5), price_info['count'], Qt.EditRole)
-            else:
-                value = editor.currentIndex()
+            #else:
         elif delegate_editor is QDateEdit:
             value = str(editor.date().toPyDate())
         else:
             value = 'Not implemented'
 
         model.setData(index, value, Qt.EditRole)
+        model.dump()
 
     def updateEditorGeometry(self, editor, option, index):
         editor.setGeometry(option.rect)
@@ -331,7 +338,6 @@ class CardList(QTableView):
         QTableView.__init__(self, parent)
 
         self.static = params.get('static', None)
-        print 'CardList::init', 'static is', self.static.keys()
 
         self.verticalHeader().setResizeMode(QHeaderView.Fixed)
         self.horizontalHeader().setResizeMode(QHeaderView.ResizeToContents)
