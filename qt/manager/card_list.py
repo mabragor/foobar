@@ -150,9 +150,6 @@ class CardListModel(QAbstractTableModel):
         if delegate_editor is QComboBox:
             items = self.static.get(field_name, list())
             data = filter(lambda x: int(x['id']) == int(value), items)
-            print 'field_name', field_name
-            print 'items', items
-            print 'data', data
             if len(data) != 1:
                return QVariant(_('Choose'))
             else:
@@ -168,8 +165,7 @@ class CardListModel(QAbstractTableModel):
             field = MODEL_MAP[idx_col]['name']
 
             record = self.storage[idx_row]
-            data = {field: value}
-            #record.update(data)
+            record[idx_col] = value
             self.storage[idx_row] = record
 
             self.emit(SIGNAL('dataChanged(QModelIndex, QModelIndex)'),
@@ -185,11 +181,9 @@ class CardListModel(QAbstractTableModel):
 
             for name, delegate, title, action in MODEL_MAP_RAW:
                 value = row.get(name, None)
-                print name,'=',value
                 record.append(value)
 
             self.storage.insert(0, record)
-            print self.storage
         self.endInsertRows()
         return True
 
@@ -214,12 +208,21 @@ class CardListDelegate(QItemDelegate):
 
     def search(self, name):
         result_list = filter(
-           lambda x: x['name'] == name, MODEL_MAP
-           )
+            lambda x: x['name'] == name, MODEL_MAP
+            )
         if len(result_list) != 1:
             raise Exception('Wrong search')
         value = result_list[0]
         return MODEL_MAP.index(value)
+
+    def search_index(self, where, field_name, value):
+        result_list = filter(
+            lambda x: x[field_name] == value, where
+            )
+        if len(result_list) != 1:
+            raise Exception('Wrong search')
+        value = result_list[0]
+        return where.index(value)
 
     def createEditor(self, parent, option, index):
         delegate_editor = MODEL_MAP[ index.column() ]['delegate']
@@ -228,6 +231,7 @@ class CardListDelegate(QItemDelegate):
         model = index.model()
         idx_count_used = model.index(index.row(), self.COUNT_USED_INDEX)
         count_used, ok = model.data(idx_count_used, Qt.DisplayRole).toInt()
+
         # if the card is already used, deny to edit its price
         if 1 == index.column() and 0 < count_used:
             delegate_editor = None
@@ -253,36 +257,50 @@ class CardListDelegate(QItemDelegate):
             editor.setDate(value)
         elif delegate_editor is QComboBox:
             items = self.static.get(field_name, list())
+
+            if 1 == column:
+               r = index.row()
+               c = index.column() - 1
+
+               card_type, ok = model.data(model.index(r, c), Qt.DisplayRole).toInt()
+               print 'card type index', card_type
+               # exclude unsupported price categories for current card type
+               possible_card_types = self.static.get('card_types', [])
+               print 'len of posss cards', len(possible_card_types)
+               ct_idx = self.search_index(possible_card_types, 'id', card_type)
+               print 'index is', ct_idx
+
             for i in items:
                 editor.addItem( i['title'], QVariant(i['id']) )
 
-            if 1 == column:
-                # get the pice category of this card
-                idx_price_cat = model.index(index.row(), self.PRICE_CAT_INDEX)
-                price_cat, ok = model.data(idx_price_cat, Qt.DisplayRole).toInt()
-                for i in model.prices:
-                    if price_cat == int( i['price_category'] ):
-                        cost = unicode( int( float( i['cost'] ) ) )
-                        editor.addItem( cost, QVariant(i['id']) )
-            elif 3 == column: # paid status
-                for i in PAID_STATUS:
-                    editor.addItem( i, QVariant(PAID_STATUS.index(i)) )
-            elif 4 == column: # card type
-                for i in CARD_TYPE:
-                    editor.addItem( i, QVariant(CARD_TYPE.index(i)) )
-            elif 7 == column: # duration
-                for i in DURATION_TYPE:
-                    editor.addItem( str(i), QVariant(DURATION_TYPE.index(i)) )
+#             if 1 == column:
+#                 # get the price category of this card
+#                 idx_price_cat = model.index(index.row(), self.PRICE_CAT_INDEX)
+#                 price_cat, ok = model.data(idx_price_cat, Qt.DisplayRole).toInt()
+#                 for i in model.prices:
+#                     if price_cat == int( i['price_category'] ):
+#                         cost = unicode( int( float( i['cost'] ) ) )
+#                         editor.addItem( cost, QVariant(i['id']) )
+#             elif 3 == column: # paid status
+#                 for i in PAID_STATUS:
+#                     editor.addItem( i, QVariant(PAID_STATUS.index(i)) )
+#             elif 4 == column: # card type
+#                 for i in CARD_TYPE:
+#                     editor.addItem( i, QVariant(CARD_TYPE.index(i)) )
+#             elif 7 == column: # duration
+#                 for i in DURATION_TYPE:
+#                     editor.addItem( str(i), QVariant(DURATION_TYPE.index(i)) )
             value = raw_value.toString()
             item_index = editor.findText(value)
             editor.setCurrentIndex( item_index )
         else:
             return None
 
-    def generator_price(self, field_name, value):
-        return lambda x: int( value ) == int( x[field_name] )
-
     def setModelData(self, editor, model, index):
+
+        def generator_price(field_name, value):
+            return lambda x: int( value ) == int( x[field_name] )
+
         delegate_editor = MODEL_MAP[ index.column() ]['delegate']
         if not delegate_editor or delegate_editor is QLineEdit:
             value = editor.text()
@@ -290,15 +308,16 @@ class CardListDelegate(QItemDelegate):
             if 1 == index.column():
                 value = editor.currentText()
                 # fill count_sold
-                g = self.generator_price('cost', value)
-                price_info = filter(g, model.prices)[0]
-                model.setData(model.index(index.row(), 5), price_info['count'], Qt.EditRole)
+                #g = generator_price('cost', value)
+                #price_info = filter(g, model.prices)[0]
+                #model.setData(model.index(index.row(), 5), price_info['count'], Qt.EditRole)
             else:
                 value = editor.currentIndex()
         elif delegate_editor is QDateEdit:
             value = str(editor.date().toPyDate())
         else:
             value = 'Not implemented'
+
         model.setData(index, value, Qt.EditRole)
 
     def updateEditorGeometry(self, editor, option, index):

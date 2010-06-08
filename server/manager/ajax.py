@@ -73,12 +73,6 @@ def static(request):
     return data
 
 @login_required
-@ajax_processor(None, isJavaScript)
-def get_discount(request):
-    data = storage.Discount.objects.filter(is_active=True)
-    return [item.about() for item in data]
-
-@login_required
 @ajax_processor(forms.UserSearch, isJavaScript)
 def get_users_info_by_name(request, form):
     response, users = abstract_request(request, form)
