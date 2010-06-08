@@ -93,6 +93,11 @@ class CardType(AbstractModel): # флаер, пробное, разовое, а�
         verbose_name_plural = _(u'Types of card')
         ordering = ('-is_active', '-title')
 
+    def about(self, short=False, exclude_fields=tuple()):
+        result = super(CardType, self).about(short, exclude_fields)
+        result.update( { 'price_categories': [i.about() for i in self.category.all() ],} )
+        return result
+
 class PriceCategoryRent(AbstractModel):
 
     title = models.CharField(max_length=64)
