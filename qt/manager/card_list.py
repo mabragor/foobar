@@ -17,8 +17,8 @@ PAID_STATUS = [_('Reserved'),
 MODEL_MAP_RAW = (
     ('card_types', QComboBox, _(u'Type of card'), 'id2title'),
     ('price_cats_team', QComboBox, _('Price category'), 'id2title'),
-    ('count_sold', None, _(u'Sold'), 'int'),
-    ('price', QComboBox, _(u'Price'), 'float'),
+    ('count_sold', QComboBox, _(u'Sold'), 'int'),
+    ('price', None, _(u'Price'), 'float'),
     ('discount', QComboBox, _(u'Discount'), 'id2title'),
     ('count_available', None, _('Available'), 'int'),
     ('count_used', None, _(u'Used'), 'int'),
@@ -137,6 +137,7 @@ class CardListModel(QAbstractTableModel):
         field_obj = MODEL_MAP[idx_col]
         field_name = field_obj['name']
         delegate_editor = field_obj['delegate']
+        action = field_obj['action']
 
         try:
             record = self.storage[idx_row]
@@ -148,7 +149,7 @@ class CardListModel(QAbstractTableModel):
             return QVariant()
 
         if delegate_editor is QComboBox:
-            if role == GET_ID_ROLE:
+            if role == GET_ID_ROLE or action == 'int':
                return QVariant(value)
 
             # or return title
@@ -197,6 +198,24 @@ class CardListModel(QAbstractTableModel):
             del(self.storage[position + i])
         self.endRemoveRows()
         return True
+
+    def price_matrix(self, card_type, price_cat, count_sold):
+       return 42
+
+    def calculate_price(self, index):
+        """ Метод для подсчёта цены по известным типу карты, ценовой
+        категории и количеству занятий."""
+        row = index.row()
+        record = self.storage[row]
+        card_type_id = record[0]
+        price_cat_id = record[1]
+        count_sold   = record[2]
+        record[3] = self.price_matrix(card_type_id, price_cat_id, count_sold)
+        self.storage[row] = record
+
+        changed = QModelIndex(row, 3)
+        self.emit(SIGNAL('dataChanged(QModelIndex, QModelIndex)'),
+                  changed, changed)
 
 class CardListDelegate(QItemDelegate):
 
@@ -264,15 +283,25 @@ class CardListDelegate(QItemDelegate):
             items = self.static.get(field_name, list())
 
             if 1 == column:
-               # получаем идентификатор типа карты
-               raw = model.data(model.index(row, 0), GET_ID_ROLE)
-               ct_id, ok = raw.toInt()
-               # получаем список всех типов карт
-               possible_card_types = self.static.get('card_types', [])
-               # находим информацию о нужной
-               card_type = self.search_and_get(possible_card_types, 'id', ct_id)
-               price_cats = card_type.get('price_categories', [])
-               match_list = [i['id'] for i in price_cats]
+                # получаем идентификатор типа карты
+                raw = model.data(model.index(row, 0), GET_ID_ROLE)
+                ct_id, ok = raw.toInt()
+                # получаем список всех типов карт
+                possible_card_types = self.static.get('card_types', [])
+                # находим информацию о нужной
+                card_type = self.search_and_get(possible_card_types, 'id', ct_id)
+                price_cats = card_type.get('price_categories', [])
+                match_list = [i['id'] for i in price_cats]
+            if 2 == column:
+                possible_values = [1,4]
+                v = 8; base = 8; mul = 1
+                while v < 366:
+                   possible_values.append(v)
+                   mul += 1
+                   v = base * mul
+                items = []
+                for i in possible_values:
+                   items.append( {'id': i, 'title': str(i)} )
 
             for i in items:
                 if not match_list or i['id'] in match_list:
@@ -302,6 +331,7 @@ class CardListDelegate(QItemDelegate):
             return None
 
     def setModelData(self, editor, model, index):
+        column = index.column()
 
         def generator_price(field_name, value):
             return lambda x: int( value ) == int( x[field_name] )
@@ -326,6 +356,8 @@ class CardListDelegate(QItemDelegate):
 
         model.setData(index, value, Qt.EditRole)
         model.dump()
+
+        model.calculate_price(index)
 
     def updateEditorGeometry(self, editor, option, index):
         editor.setGeometry(option.rect)
