@@ -60,44 +60,6 @@ class PriceCategoryTeam(AbstractModel): # эконом, дисконт, экск
 
         #FIXME добавить привязку к набору скидок
 
-class Discount(AbstractModel):
-
-    title = models.CharField(max_length=64)
-    percent = models.IntegerField(verbose_name=_(u'The percent of a discount.'), default=0)
-
-    class Meta:
-        verbose_name = _(u'Discount')
-        verbose_name_plural = _(u'Discounts')
-        ordering = ('percent', 'title')
-
-class ClubDuration(AbstractModel): # 1day, 1month, 3m, 6m, 12m
-    title = models.CharField(max_length=64)
-    duration = models.IntegerField(verbose_name=_(u'Duration in days.'))
-
-    class Meta:
-        verbose_name = _(u'Type of club card')
-        verbose_name_plural = _(u'Types of club card')
-        ordering = ('-is_active', 'duration')
-
-class CardType(AbstractModel): # флаер, пробное, разовое, абонемент, клубная карта
-
-    title = models.CharField(max_length=64)
-    category = models.ManyToManyField(PriceCategoryTeam, verbose_name=_(u'Price category'))
-    discount = models.ManyToManyField(Discount, verbose_name=_(u'Discount'))
-    club_duration = models.ForeignKey(ClubDuration, null=True, blank=True)
-    is_priceless = models.BooleanField(verbose_name=_(u'Is priceless?'))
-    available_formula = models.CharField(max_length=128, help_text=_(u'Enter the formula to calculate available visits.'))
-
-    class Meta:
-        verbose_name = _(u'Type of card')
-        verbose_name_plural = _(u'Types of card')
-        ordering = ('-is_active', '-title')
-
-    def about(self, short=False, exclude_fields=tuple()):
-        result = super(CardType, self).about(short, exclude_fields)
-        result.update( { 'price_categories': [i.about() for i in self.category.all() ],} )
-        return result
-
 class PriceCategoryRent(AbstractModel):
 
     title = models.CharField(max_length=64)
@@ -111,32 +73,58 @@ class PriceCategoryRent(AbstractModel):
         verbose_name = _(u'Price category of a rent')
         verbose_name_plural = _(u'Price categories of a rent')
 
-class Room(AbstractModel):
+class Discount(AbstractModel):
 
-    title = models.CharField(verbose_name=_(u'Title'), max_length=64,
-                             help_text=_(u'Visible title for a room'))
-    color = models.CharField(verbose_name=_(u'Color'), max_length=6,
-                             help_text=_(u'HEX color, as RRGGBB'))
+    title = models.CharField(max_length=64)
+    percent = models.IntegerField(verbose_name=_(u'The percent of a discount.'), default=0)
 
     class Meta:
-        verbose_name = _(u'Room')
-        verbose_name_plural = _(u'Rooms')
+        verbose_name = _(u'Discount')
+        verbose_name_plural = _(u'Discounts')
+        ordering = ('percent', 'title')
 
-class DanceStyle(AbstractModel):
+class AbstractCardType(AbstractModel): # флаер, пробное, разовое, абонемент, клубная карта, акция
 
-    title = models.CharField(verbose_name=_(u'Title'), max_length=64)
+    title = models.CharField(max_length=64)
+    category = models.ManyToManyField(PriceCategoryTeam, verbose_name=_(u'Price category'))
+    discount = models.ManyToManyField(Discount, verbose_name=_(u'Discount'))
 
     class Meta:
-        verbose_name = _(u'Style')
-        verbose_name_plural = _(u'Styles')
+        abstract = True
+        ordering = ('-is_active', '-title')
 
     def about(self, short=False, exclude_fields=tuple()):
-        result = super(DanceStyle, self).about(short, exclude_fields)
-        result.update( { 'children': self.children(), } )
+        result = super(CardType, self).about(short, exclude_fields)
+        result.update( { 'price_categories': [i.about() for i in self.category.all() ],} )
         return result
 
-    def children(self):
-        return [item.about() for item in self.team_set.all()]
+class CardOrdinary(AbstractCardType):
+
+    is_priceless = models.BooleanField(verbose_name=_(u'Is priceless?'))
+    available_formula = models.CharField(max_length=128, null=True, blank=True, help_text=_(u'Enter the formula to calculate available visits.'))
+
+    class Meta:
+        verbose_name = _(u'Ordinary card\'s type')
+        verbose_name_plural = _(u'Ordinary card\'s types')
+
+class CardClub(AbstractCardType): # 1day, 1month, 3m, 6m, 12m
+    price = models.FloatField(verbose_name=_(u'Price.'), default=0.00)
+    count_days = models.IntegerField(verbose_name=_(u'Duration in days.'))
+
+    class Meta:
+        verbose_name = _(u'Club card\'s type')
+        verbose_name_plural = _(u'Club card\'s types')
+
+class CardPromo(AbstractCardType):
+    price = models.FloatField(verbose_name=_(u'Price.'), default=0.00)
+    count_sold = models.IntegerField(verbose_name=_(u'Visits count.'))
+    count_days = models.IntegerField(verbose_name=_(u'Duration in days.'))
+    date_activation = models.DateField(verbose_name=_(u'Last date of an activation'), null=True, blank=True)
+    date_expiration = models.DateField(verbose_name=_(u'Date of an expiration'), null=True, blank=True)
+
+    class Meta:
+        verbose_name = _(u'Promo card\'s type')
+        verbose_name_plural = _(u'Promo card\'s types')
 
 class AbstractUser(AbstractModel):
 
@@ -212,9 +200,10 @@ class Card(AbstractModel):
                    ('4', _(u'Cancel')) )
 
     client = models.ForeignKey(Client, verbose_name=_(u'Client'))
-    card_type = models.ForeignKey(CardType, verbose_name=_(u'Type'), help_text=_(u'Type of client\'s card'))
-    price_category = models.ForeignKey(PriceCategoryTeam, null=True, blank=True)
     discount = models.ForeignKey(Discount)
+    card_ordinary = models.ForeignKey(CardOrdinary, null=True, blank=True)
+    card_club = models.ForeignKey(CardClub, null=True, blank=True)
+    card_promo = models.ForeignKey(CardPromo, null=True, blank=True)
     price = models.FloatField(verbose_name=_(u'Price'), help_text=_(u'Price with all discounts.'), default=float(0.00))
     paid = models.FloatField(verbose_name=_(u'Paid'), help_text=_(u'Paid amount.'), default=float(0.00))
     count_available = models.IntegerField(verbose_name=_(u'Exercises available'), default=0)
@@ -222,12 +211,49 @@ class Card(AbstractModel):
     count_used = models.IntegerField(verbose_name=_(u'Exercises used'), default=0)
     begin_date = models.DateField(verbose_name=_(u'Begin'), null=True)
     end_date = models.DateField(verbose_name=_(u'Expired'), null=True)
-    cancel_datetime = models.DateTimeField(verbose_name=_(u'Registered'), null=True)
+    cancel_datetime = models.DateTimeField(verbose_name=_(u'Cancelled'), null=True, blank=True)
     state = models.CharField(verbose_name=_(u'State'), help_text=_(u'State of record'), max_length=1, choices=CARD_STATE, default=0)
 
     class Meta:
         verbose_name = _(u'Client\'s card')
         verbose_name_plural = _(u'Client\'s cards')
+
+    def __unicode__(self):
+        if self.card_club is not None:
+            return _(u'Club')
+        elif self.card_promo is not None:
+            return _(u'Promo')
+        elif self.card_ordinary is not None:
+            return _(u'Normal')
+        else:
+            return _(u'Unknown')
+
+class Room(AbstractModel):
+
+    title = models.CharField(verbose_name=_(u'Title'), max_length=64,
+                             help_text=_(u'Visible title for a room'))
+    color = models.CharField(verbose_name=_(u'Color'), max_length=6,
+                             help_text=_(u'HEX color, as RRGGBB'))
+
+    class Meta:
+        verbose_name = _(u'Room')
+        verbose_name_plural = _(u'Rooms')
+
+class DanceStyle(AbstractModel):
+
+    title = models.CharField(verbose_name=_(u'Title'), max_length=64)
+
+    class Meta:
+        verbose_name = _(u'Style')
+        verbose_name_plural = _(u'Styles')
+
+    def about(self, short=False, exclude_fields=tuple()):
+        result = super(DanceStyle, self).about(short, exclude_fields)
+        result.update( { 'children': self.children(), } )
+        return result
+
+    def children(self):
+        return [item.about() for item in self.team_set.all()]
 
 class Team(AbstractModel):
 

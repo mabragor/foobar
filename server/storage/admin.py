@@ -8,32 +8,54 @@ from django import forms
 
 from storage import models
 
+class __Card(admin.ModelAdmin):
+    def card_type(self, card):
+        return card.__unicode__()
+
+    list_display = ('card_type', 'client',
+                    'state', 'discount', 'price', 'paid',
+                    'count_available', 'count_sold', 'count_used',
+                    'begin_date', 'end_date',
+                    'is_active', 'reg_datetime', 'cancel_datetime')
+    fieldsets = (
+        (None, {'fields': ('card_ordinary', 'card_club', 'card_promo',
+                           'client', 'state', 'discount', 'price', 'paid',
+                           'count_available', 'count_sold', 'count_used',
+                           'begin_date', 'end_date', 'is_active', 'cancel_datetime')}),
+        )
+admin.site.register(models.Card, __Card)
+
 class __CardType(admin.ModelAdmin):
+
     def categories(self, cardtype):
         cats = cardtype.category.all()
-        return u', '.join([unicode(cat) for cat in cats])
+        return u', '.join([unicode(i) for i in cats])
 
     def discounts(self, cardtype):
         discounts = cardtype.discount.all()
-        return u', '.join([unicode(dis) for dis in discounts])
+        return u', '.join([unicode(i) for i in discounts])
 
-    def durations(self, cardtype):
-        data = cardtype.club_duration
-        res = data and data or u'--'
-        return '<center>%s</center>' % res
-    durations.allow_tags = True
+    filter_horizontal = ('category', 'discount')
 
-    list_display = ('title', 'categories', 'discounts', 'durations', 'is_priceless', 'is_active', 'reg_datetime')
+class __CardOrdinary(__CardType):
+    list_display = ('title', 'categories', 'discounts',
+                    'is_priceless', 'is_active', 'reg_datetime')
     search_fields = ('title',)
-    fieldsets = ((None, {'fields': ('title', 'category', 'discount', 'club_duration',
-                                    'is_priceless', 'available_formula', 'is_active')} ), )
-admin.site.register(models.CardType, __CardType)
+admin.site.register(models.CardOrdinary, __CardOrdinary)
 
-class __ClubDuration(admin.ModelAdmin):
-    list_display = ('title', 'duration', 'is_active', 'reg_datetime')
+class __CardClub(__CardType):
+    list_display = ('title', 'categories', 'discounts', 'price',
+                    'count_days', 'is_active', 'reg_datetime')
     search_fields = ('title',)
-    fieldsets = ((None, {'fields': ('title', 'duration', 'is_active')} ), )
-admin.site.register(models.ClubDuration, __ClubDuration)
+admin.site.register(models.CardClub, __CardClub)
+
+class __CardPromo(__CardType):
+    list_display = ('title', 'categories', 'discounts', 'price',
+                    'count_sold', 'count_days',
+                    'date_activation', 'date_expiration',
+                    'is_active', 'reg_datetime')
+    search_fields = ('title',)
+admin.site.register(models.CardPromo, __CardPromo)
 
 class __PriceCategoryTeam(admin.ModelAdmin):
     list_display = ('title', 'test_price', 'once_price', 'half_price', 'full_price', 'is_active', 'reg_datetime')
@@ -107,19 +129,6 @@ class __Renter(admin.ModelAdmin):
         'fields': ('last_name', 'first_name', 'phone', 'email',
                    'birth_date', 'desc', 'is_active')}),)
 admin.site.register(models.Renter, __Renter)
-
-class __Card(admin.ModelAdmin):
-    list_display = ('price_category', 'client', 'card_type', 'state', 'discount',
-                    'price', 'paid',
-                    'count_available', 'count_sold', 'count_used',
-                    'begin_date', 'end_date',
-                    'is_active', 'reg_datetime', 'cancel_datetime')
-    fieldsets = (
-        (None, {'fields': ('price_category', 'client', 'card_type', 'state', 'discount', 'price', 'paid',
-                           'count_available', 'count_sold', 'count_used',
-                           'begin_date', 'end_date', 'is_active', 'cancel_datetime')}),
-        )
-admin.site.register(models.Card, __Card)
 
 
 ### Interface for Team Model : Begin
