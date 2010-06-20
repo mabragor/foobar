@@ -30,15 +30,18 @@ class AbstractModel(models.Model):
 
         for i in self._meta.fields:
             if i.name not in exclude_fields:
+                internal_type = i.get_internal_type()
                 value = getattr(self, i.name)
-                if 'ForeignKey' == i.get_internal_type() and hasattr(value, 'about'):
+                if value is None:
+                    field_vals.update( {i.name: None} )
+                elif 'ForeignKey' == internal_type and hasattr(value, 'about'):
                     short = True
                     field_vals.update( {i.name: value.about(short)} )
-                elif 'DateTimeField' == i.get_internal_type():
+                elif 'DateTimeField' == internal_type:
                     field_vals.update( {i.name: value.strftime('%Y-%m-%d %H:%M:%S')} )
-                elif 'DateField' == i.get_internal_type():
+                elif 'DateField' == internal_type:
                     field_vals.update( {i.name: value.strftime('%Y-%m-%d')} )
-                elif 'TimeField' == i.get_internal_type():
+                elif 'TimeField' == internal_type:
                     field_vals.update( {i.name: value.strftime('%H:%M:%S')} )
                 else:
                     field_vals.update( {i.name: value} )
@@ -94,7 +97,7 @@ class AbstractCardType(AbstractModel): # флаер, пробное, разов�
         ordering = ('-is_active', '-title')
 
     def about(self, short=False, exclude_fields=tuple()):
-        result = super(CardType, self).about(short, exclude_fields)
+        result = super(AbstractCardType, self).about(short, exclude_fields)
         result.update( { 'price_categories': [i.about() for i in self.category.all() ],} )
         return result
 

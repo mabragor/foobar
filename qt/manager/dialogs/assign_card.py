@@ -8,7 +8,7 @@ from team_tree import TeamTree
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
-class DlgTeamAssign(QDialog):
+class DlgAssignCard(QDialog):
 
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)

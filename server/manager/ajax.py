@@ -60,8 +60,11 @@ def login(request, form):
 @ajax_processor(None, isJavaScript)
 def static(request):
     data = {}
+
     params = (
-        ('card_types', storage.CardType),
+        ('card_ordinary', storage.CardOrdinary),
+        ('card_club', storage.CardClub),
+        ('card_promo', storage.CardPromo),
         ('price_cats_team', storage.PriceCategoryTeam),
         ('price_cats_rent', storage.PriceCategoryRent),
         ('discounts', storage.Discount),

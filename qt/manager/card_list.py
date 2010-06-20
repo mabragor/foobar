@@ -15,7 +15,7 @@ PAID_STATUS = [_('Reserved'),
                _('Paid')]
 
 MODEL_MAP_RAW = (
-    ('card_types', QComboBox, _(u'Type of card'), 'id2title'),
+    ('card_types', QComboBox, _(u'Type of card'), 'complex'),
     ('price_cats_team', QComboBox, _('Price category'), 'id2title'),
     ('count_sold', QComboBox, _(u'Sold'), 'int'),
     ('price', None, _(u'Price'), 'float'),
@@ -138,6 +138,8 @@ class CardListModel(QAbstractTableModel):
         field_name = field_obj['name']
         delegate_editor = field_obj['delegate']
         action = field_obj['action']
+
+        return QVariant() # REMOVE
 
         try:
             record = self.storage[idx_row]
@@ -342,6 +344,7 @@ class CardListDelegate(QItemDelegate):
         elif delegate_editor is QComboBox:
             idx = editor.currentIndex()
             value, ok = editor.itemData(idx).toInt()
+            print value, ok
             #if 1 == index.column():
             #    value = editor.currentText()
                 # fill count_sold

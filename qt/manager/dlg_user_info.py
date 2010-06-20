@@ -6,13 +6,59 @@ from settings import _, DEBUG
 from card_list import CardList
 from rent_list import RentListModel, RentList
 from dlg_waiting_rfid import DlgWaitingRFID
-#from dlg_team_assign import DlgTeamAssign
+from dialogs.assign_card import DlgAssignCard
 from dlg_rent_assign import DlgRentAssign
 
 from datetime import datetime
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
+from PyQt4 import uic
+
+class WizardDialog(QDialog):
+
+    def __init__(self, ui_file, parent=None, params=dict()):
+        QDialog.__init__(self, parent)
+
+        dlg = uic.loadUi(ui_file, self)
+        self.setupUi(dlg)
+
+    def prefill(self, title):
+        self.setWindowTitle(title)
+
+    def setupUi(self, dialog):
+        self.connect(dialog.goBack, SIGNAL('clicked()'), self.go_back)
+        self.connect(dialog.goNext, SIGNAL('clicked()'), self.go_next)
+
+    def go_back(self):
+        print 'Back button pressed'
+
+    def go_next(self):
+        print 'Next button pressed'
+
+class WizardListDlg(WizardDialog):
+
+    def __init__(self, parent=None, params=dict()):
+        WizardDialog.__init__(self, 'uis/dlg_list.ui', parent)
+
+    def prefill(self, title, data):
+        WizardDialog.prefill(self, title)
+
+        for id, text in data:
+            import pprint; pprint.pprint(data)
+            item = QListWidgetItem(text, self.listWidget)
+            item.setData(Qt.UserRole, QVariant(id))
+
+    def setupUi(self, dialog):
+        WizardDialog.setupUi(self, self)
+        self.connect(dialog.listWidget, SIGNAL('itemDoubleClicked(QListWidgetItem *)'), self.go_next)
+
+    def go_back(self):
+        print 'Back'
+
+    def go_next(self):
+        print 'Next'
+
 
 class DlgClientInfo(QDialog):
 
@@ -21,6 +67,8 @@ class DlgClientInfo(QDialog):
 
         self.parent = parent
         self.params = params
+        self.http = params['http']
+        self.static = params['static']
 
         self.client_id = u'0'
         self.setMinimumWidth(800)
@@ -58,12 +106,12 @@ class DlgClientInfo(QDialog):
         groupUser = QGroupBox(_('Base data'))
         groupUser.setLayout(layoutUser)
 
-        self.add_card_button = QPushButton(_('Add card'))
+        self.button_assign_card = QPushButton(_('Assign card'))
         self.buttonApplyDialog = QPushButton(_('Apply'))
         self.buttonCancelDialog = QPushButton(_('Cancel'))
 
         buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(self.add_card_button)
+        buttonLayout.addWidget(self.button_assign_card)
         buttonLayout.addStretch(1)
         buttonLayout.addWidget(self.buttonApplyDialog)
         buttonLayout.addWidget(self.buttonCancelDialog)
@@ -108,8 +156,8 @@ class DlgClientInfo(QDialog):
     def setSignals(self):
         self.connect(self.buttonAssignRFID, SIGNAL('clicked()'),
                      self.assignRFID)
-        self.connect(self.add_card_button, SIGNAL('clicked()'),
-                     self.add_card_record)
+        self.connect(self.button_assign_card, SIGNAL('clicked()'),
+                     self.assign_card)
         self.connect(self.buttonApplyDialog, SIGNAL('clicked()'),
                      self.applyDialog)
         self.connect(self.buttonCancelDialog, SIGNAL('clicked()'),
@@ -175,8 +223,28 @@ class DlgClientInfo(QDialog):
         model = self.cardinfo.model()
         lastRow = model.rowCount(QModelIndex())
         ok = model.insertRows(lastRow, rows, QModelIndex())
+        model.dump()
 
-    def assignCard(self, data): # data goes from DlgTeamAssign
+    def assign_card(self):
+
+        # получить списки карт
+        card_list = []
+        for i in self.static['card_ordinary']:
+            item = (i['id'], i['title'])
+            card_list.append(item)
+        if 0 < len(self.static['card_club']):
+            item = (-1, _('Club Card'))
+            card_list.append(item)
+        if 0 < len(self.static['card_promo']):
+            item = (-2, _('Promo Card'))
+            card_list.append(item)
+
+        self.dialog = WizardListDlg(self)
+        self.dialog.setModal(True)
+        self.dialog.prefill(_('Choose the card\'s type'), card_list)
+        self.dialog.exec_()
+        return
+
         # add user's discount
         data.update( {'discount': self.comboDiscount.currentIndex()} )
         # send data to user's model
@@ -395,3 +463,4 @@ class DlgRenterInfo(QDialog):
         params.update(formset)
         ajax = HttpAjax(self, '/manager/set_renter_card/', params, self.parent.session_id)
         response = ajax.parse_json()
+
