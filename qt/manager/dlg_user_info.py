@@ -187,6 +187,32 @@ class DlgClientInfo(QDialog):
         card_list = data.get('team_list', [])
         self.cardinfo.model().initData(card_list)
 
+
+        class Handler(QAbstractMessageHandler):
+            def handleMessage(self, msg_type, desc, identifier, loc):
+                print 'QUERY:', msg_type, desc, identifier, loc
+
+        handler = Handler()
+
+        file_name = '/home/rad/devel/foobar/qt/manager/uis/logic_clientcard.xml'
+
+        query  = QXmlQuery()
+        query.setMessageHandler(handler)
+        query.setQuery("doc('%s')/logic/rule[@name='test']" % file_name )
+
+        array = QByteArray()
+        buf = QBuffer(array)
+        buf.open(QIODevice.WriteOnly)
+
+        if query.isValid():
+            if query.evaluateTo(buf):
+                results = QString.fromUtf8(array)
+                print 'result of evaluation is',results
+            else:
+                print 'not evaluated'
+        else:
+            print 'not valid'
+
     def cancelCard(self):
         row = self.cardinfo.currentRow()
         if DEBUG:
