@@ -13,6 +13,8 @@ from datetime import datetime
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
+from PyQt4.QtXml import *
+from PyQt4.QtXmlPatterns import *
 from PyQt4 import uic
 
 class WizardDialog(QDialog):
@@ -163,6 +165,33 @@ class DlgClientInfo(QDialog):
         self.connect(self.buttonCancelDialog, SIGNAL('clicked()'),
                      self, SLOT('reject()'))
 
+    def xml_query(self, file_name, xquery):
+
+        from os.path import dirname, join
+
+        class Handler(QAbstractMessageHandler):
+            def handleMessage(self, msg_type, desc, identifier, loc):
+                print 'QUERY:', msg_type, desc, identifier, loc
+
+        handler = Handler()
+
+        query  = QXmlQuery()
+        query.setMessageHandler(handler)
+        query.setQuery(xquery % join(dirname(__file__), file_name))
+
+        array = QByteArray()
+        buf = QBuffer(array)
+        buf.open(QIODevice.WriteOnly)
+
+        if query.isValid():
+            if query.evaluateTo(buf):
+                results = QString.fromUtf8(array)
+                print 'result of evaluation is',results
+            else:
+                print 'not evaluated'
+        else:
+            print 'not valid'
+
     def initData(self, data=dict()):
         self.client_id = data.get('id', '0')
         self.editFirstName.setText(data.get('first_name', ''))
@@ -187,31 +216,9 @@ class DlgClientInfo(QDialog):
         card_list = data.get('team_list', [])
         self.cardinfo.model().initData(card_list)
 
-
-        class Handler(QAbstractMessageHandler):
-            def handleMessage(self, msg_type, desc, identifier, loc):
-                print 'QUERY:', msg_type, desc, identifier, loc
-
-        handler = Handler()
-
-        file_name = '/home/rad/devel/foobar/qt/manager/uis/logic_clientcard.xml'
-
-        query  = QXmlQuery()
-        query.setMessageHandler(handler)
-        query.setQuery("doc('%s')/logic/rule[@name='test']" % file_name )
-
-        array = QByteArray()
-        buf = QBuffer(array)
-        buf.open(QIODevice.WriteOnly)
-
-        if query.isValid():
-            if query.evaluateTo(buf):
-                results = QString.fromUtf8(array)
-                print 'result of evaluation is',results
-            else:
-                print 'not evaluated'
-        else:
-            print 'not valid'
+        file_name = 'uis/logic_clientcard.xml'
+        xquery = "doc('%s')/logic/rule[@name='test']"
+        self.xml_query(file_name, xquery)
 
     def cancelCard(self):
         row = self.cardinfo.currentRow()
