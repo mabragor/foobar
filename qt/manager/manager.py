@@ -29,11 +29,11 @@ from PyQt4.QtCore import *
 class MainWindow(QMainWindow):
 
     def __init__(self, parent=None):
-	QMainWindow.__init__(self, parent)
+        QMainWindow.__init__(self, parent)
 
-	self.mimes = {'team': 'application/x-team-item',
-		      'event':  'application/x-calendar-event',
-		      }
+        self.mimes = {'team': 'application/x-team-item',
+                      'event':  'application/x-calendar-event',
+                      }
         self.rooms = []
         self.tree = []
         self.rfid_id = None
@@ -44,8 +44,8 @@ class MainWindow(QMainWindow):
         self.schedule_quant = timedelta(minutes=30)
 
         self.menus = []
-	self.create_menus()
-	self.setup_views()
+        self.create_menus()
+        self.setup_views()
 
         settings = QSettings()
         settings.beginGroup('network')
@@ -56,15 +56,15 @@ class MainWindow(QMainWindow):
             self.setupApp()
 
         self.baseTitle = _('Manager\'s interface')
-	self.logoutTitle()
-	self.statusBar().showMessage(_('Ready'), 2000)
-	self.resize(640, 480)
+        self.logoutTitle()
+        self.statusBar().showMessage(_('Ready'), 2000)
+        self.resize(640, 480)
 
     def loggedTitle(self, name):
-	self.setWindowTitle('%s : %s' % (self.baseTitle, name))
+        self.setWindowTitle('%s : %s' % (self.baseTitle, name))
 
     def logoutTitle(self):
-	self.setWindowTitle('%s : %s' % (self.baseTitle, _('Login to start session')))
+        self.setWindowTitle('%s : %s' % (self.baseTitle, _('Login to start session')))
 
     def get_dynamic(self):
         self.schedule.model().update()
@@ -78,11 +78,11 @@ class MainWindow(QMainWindow):
         self.http.request('/manager/get_rooms/', {})
         default_response = {'rows': []}
         response = self.http.parse(default_response)
-	"""
-	{'rows': [{'color': 'FFAAAA', 'text': 'red', 'id': 1},
-		  {'color': 'AAFFAA', 'text': 'green', 'id': 2},
-		  ...]}
-	"""
+        """
+        {'rows': [{'color': 'FFAAAA', 'text': 'red', 'id': 1},
+                  {'color': 'AAFFAA', 'text': 'green', 'id': 2},
+            ...]}
+        """
         self.rooms = tuple( [ (a['title'], a['color'], a['id']) for a in response['rows'] ] )
         self.schedule.update_static( {'rooms': self.rooms} )
 
@@ -105,7 +105,6 @@ class MainWindow(QMainWindow):
                 self.connect(buttonFilter, SIGNAL('clicked()'),
                              self.prepare_filter(id, title))
 
-
     def prepare_filter(self, id, title):
         def handler():
             self.statusBar().showMessage(_('Filter: Room "%s" is changed its state') % title)
@@ -120,7 +119,7 @@ class MainWindow(QMainWindow):
             'quant': self.schedule_quant,
             'rooms': self.rooms,
             }
-	self.schedule = QtSchedule(self, schedule_params)
+        self.schedule = QtSchedule(self, schedule_params)
 
         self.bpMonday = QLabel('--/--/----')
         self.bpSunday = QLabel('--/--/----')
@@ -164,7 +163,7 @@ class MainWindow(QMainWindow):
         mainWidget = QWidget()
         mainWidget.setLayout(mainLayout)
 
-	self.setCentralWidget(mainWidget)
+        self.setCentralWidget(mainWidget)
 
     def showWeekRange(self, week_range):
         if self.schedule.model().getShowMode() == 'week':
@@ -173,80 +172,79 @@ class MainWindow(QMainWindow):
             self.bpSunday.setText(sunday.strftime('%d/%m/%Y'))
 
     def getMime(self, name):
-	return self.mimes.get(name, None)
+        return self.mimes.get(name, None)
 
     def create_menus(self):
-	""" Метод для генерации меню приложения. """
-	""" Использование: Описать меню со всеми действиями в блоке
-	data. Создать обработчики для каждого действия. """
-	data = [
-	    (_('File'), [
-		    (_('Log in'), 'Ctrl+I',
-		     'login', _('Start user session.')),
-		    (_('Log out'), '',
-		     'logout', _('End user session.')),
-                    (None, None, None, None),
-		    (_('Application settings'), 'Ctrl+G',
-		     'setupApp', _('Manage the application settings.')),
-                    (None, None, None, None),
-		    (_('Exit'), '',
-		     'close', _('Close the application.')),
-		    ]
-	     ),
-	    (_('Client'), [
-		    (_('New'), 'Ctrl+N',
-		     'client_new', _('Register new client.')),
-		    (_('Search by RFID'), 'Ctrl+D',
-		     'client_search_rfid', _('Search a client with its RFID card.')),
-		    (_('Search by name'), 'Ctrl+F',
-		     'client_search_name', _('Search a client with its name.')),
-		    ]
-	     ),
-	    (_('Renter'), [
-		    (_('New'), '',
-		     'renterNew', _('Register new renter.')),
-		    (_('Search by name'), '',
-		     'renterSearchName', _('Search a renter with its name.')),
-		    ]
-	     ),
-# 	    (_('Event'), [
-# 		    (_('Training'), 'Ctrl+T',
-# 		     'eventTraining', _('Assign a training event.')),
-# 		    (_('Rent'), 'Ctrl+R',
-# 		     'eventRent', _('Assign a rent event.')),
-#                     ]
-#              ),
-	    (_('Calendar'), [
-		    (_('Fill week'), 'Ctrl+L',
-		     'fillWeek', _('Fill current week.')),
-# 		    (_('Copy week'), 'Ctrl+W',
-# 		     'copyWeek', _('Copy current week into other.')),
-                    ]
+        """ Метод для генерации меню приложения. """
+        """ Использование: Описать меню со всеми действиями в блоке
+        data. Создать обработчики для каждого действия. """
+        data = [
+            (_('File'), [
+                (_('Log in'), 'Ctrl+I',
+                 'login', _('Start user session.')),
+                (_('Log out'), '',
+                 'logout', _('End user session.')),
+                (None, None, None, None),
+                (_('Application settings'), 'Ctrl+G',
+                 'setupApp', _('Manage the application settings.')),
+                (None, None, None, None),
+                (_('Exit'), '',
+                 'close', _('Close the application.')),
+                ]
              ),
-# 	    (_('Accounting'), [
-# 		    (_('Add resources'), '',
-# 		     'addResources', _('Add new set of resources into accounting.')),
-#                     ]
-#              ),
-	    ]
+            (_('Client'), [
+                (_('New'), 'Ctrl+N',
+                 'client_new', _('Register new client.')),
+                (_('Search by RFID'), 'Ctrl+D',
+		     'client_search_rfid', _('Search a client with its RFID card.')),
+                (_('Search by name'), 'Ctrl+F',
+                 'client_search_name', _('Search a client with its name.')),
+                ]
+             ),
+            (_('Renter'), [
+                (_('New'), '',
+                 'renterNew', _('Register new renter.')),
+                (_('Search by name'), '',
+                 'renterSearchName', _('Search a renter with its name.')),
+                ]
+             ),
+            # 	    (_('Event'), [
+            # 		    (_('Training'), 'Ctrl+T',
+            # 		     'eventTraining', _('Assign a training event.')),
+            # 		    (_('Rent'), 'Ctrl+R',
+            # 		     'eventRent', _('Assign a rent event.')),
+            #                     ]
+            #              ),
+            (_('Calendar'), [
+                (_('Fill week'), 'Ctrl+L',
+                 'fillWeek', _('Fill current week.')),
+                # 		    (_('Copy week'), 'Ctrl+W',
+                # 		     'copyWeek', _('Copy current week into other.')),
+                ]
+             ),
+            # 	    (_('Accounting'), [
+            # 		    (_('Add resources'), '',
+            # 		     'addResources', _('Add new set of resources into accounting.')),
+            #                     ]
+            #              ),
+            ]
 
-
-	for topic, info in data:
-	    menu = self.menuBar().addMenu(topic)
+        for topic, info in data:
+            menu = self.menuBar().addMenu(topic)
             # Отключаем элементы меню, надо войти в систему
             if topic != _('File'):
                 menu.setDisabled(True)
-	    for title, short, name, desc in info:
+            for title, short, name, desc in info:
                 if not title:
                     menu.addSeparator()
                     continue
-		setattr(self, 'act_%s' % name, QAction(title, self))
-		action = getattr(self, 'act_%s' % name)
-		action.setShortcut(short)
-		action.setStatusTip(desc)
-		self.connect(action, SIGNAL('triggered()'), getattr(self, name))
-		menu.addAction(action)
-            self.menus.append(menu)
+                setattr(self, 'act_%s' % name, QAction(title, self))
+                action = getattr(self, 'act_%s' % name)
+                action.setShortcut(short)
+                action.setStatusTip(desc)
+                self.connect(action, SIGNAL('triggered()'), getattr(self, name))
+                menu.addAction(action)
+                self.menus.append(menu)
 
     def activate_interface(self):
         # Активировать элементы меню
@@ -269,18 +267,18 @@ class MainWindow(QMainWindow):
     # Обработчики меню: начало
 
     def login(self):
-	def callback(credentials):
-	    self.credentials = credentials
+        def callback(credentials):
+            self.credentials = credentials
 
-	self.dialog = DlgLogin(self)
-	self.dialog.setCallback(callback)
-	self.dialog.setModal(True)
-	dlgStatus = self.dialog.exec_()
+        self.dialog = DlgLogin(self)
+        self.dialog.setCallback(callback)
+        self.dialog.setModal(True)
+        dlgStatus = self.dialog.exec_()
 
-	if QDialog.Accepted == dlgStatus:
+        if QDialog.Accepted == dlgStatus:
             self.http.request('/manager/login/', self.credentials)
             default_response = None
-	    response = self.http.parse(default_response)
+            response = self.http.parse(default_response)
             if response and 'user_info' in response:
                 self.loggedTitle(response['user_info'])
 
@@ -299,9 +297,9 @@ class MainWindow(QMainWindow):
                 self.refreshTimer.start()
 
                 self.activate_interface() # CHECK THIS
-        else:
-            QMessageBox.warning(self, _('Login failed'),
-                                _('It seems you\'ve entered wrong login/password.'))
+            else:
+                QMessageBox.warning(self, _('Login failed'),
+                                    _('It seems you\'ve entered wrong login/password.'))
 
     def logout(self):
         # Деактивировать элементы меню
@@ -311,9 +309,9 @@ class MainWindow(QMainWindow):
         self.schedule.model().storage.init()
 
     def setupApp(self):
-	self.dialog = DlgSettings(self)
-	self.dialog.setModal(True)
-	self.dialog.exec_()
+        self.dialog = DlgSettings(self)
+        self.dialog.setModal(True)
+        self.dialog.exec_()
         self.get_dynamic()
 
     def client_new(self):
@@ -322,8 +320,8 @@ class MainWindow(QMainWindow):
             'static': self.static,
             }
         self.dialog = DlgClientInfo(self, params)
-	self.dialog.setModal(True)
-	self.dialog.exec_()
+        self.dialog.setModal(True)
+        self.dialog.exec_()
 
     def client_search_rfid(self):
         if not self.http or not self.http.is_session_open():
@@ -332,16 +330,16 @@ class MainWindow(QMainWindow):
 	def callback(rfid):
 	    self.rfid_id = rfid
 
-	self.callback = callback
-	self.dialog = DlgWaitingRFID(self)
-	self.dialog.setModal(True)
-	dlgStatus = self.dialog.exec_()
+        self.callback = callback
+        self.dialog = DlgWaitingRFID(self)
+        self.dialog.setModal(True)
+        dlgStatus = self.dialog.exec_()
 
-	if QDialog.Accepted == dlgStatus and self.rfid_id is not None:
+        if QDialog.Accepted == dlgStatus and self.rfid_id is not None:
             params = {'rfid_code': self.rfid_id, 'mode': 'client'}
-	    self.http.request('/manager/get_client_info/', params)
+            self.http.request('/manager/get_client_info/', params)
             default_response = None
-	    response = self.http.parse(default_response)
+            response = self.http.parse(default_response)
 
             if not response or response['info'] is None:
                 QMessageBox.warning(self, _('Warning'),
@@ -365,17 +363,17 @@ class MainWindow(QMainWindow):
 	def callback(user_id):
 	    self.user_id = user_id
 
-	self.dialog = DlgSearchByName('client', self)
-	self.dialog.setModal(True)
-	self.dialog.setCallback(callback)
-	dlgStatus = self.dialog.exec_()
+        self.dialog = DlgSearchByName('client', self)
+        self.dialog.setModal(True)
+        self.dialog.setCallback(callback)
+        dlgStatus = self.dialog.exec_()
 
-	if QDialog.Accepted == dlgStatus:
-	    self.http.request('/manager/get_client_info/',
+        if QDialog.Accepted == dlgStatus:
+            self.http.request('/manager/get_client_info/',
                               {'user_id': self.user_id,
                                'mode': 'client'})
             default_response = None
-	    response = self.http.parse(default_response)
+            response = self.http.parse(default_response)
             if not response or response['info'] is None:
                 QMessageBox.warning(self, _('Warning'),
                                     _('This RFID belongs to nobody.'))
@@ -390,28 +388,28 @@ class MainWindow(QMainWindow):
                 self.dialog.exec_()
 
     def renterNew(self):
-	self.dialog = DlgRenterInfo(self)
-	self.dialog.setModal(True)
-	self.dialog.exec_()
+        self.dialog = DlgRenterInfo(self)
+        self.dialog.setModal(True)
+        self.dialog.exec_()
 
     def renterSearchName(self):
-	def callback(id):
-	    self.user_id = id
+        def callback(id):
+            self.user_id = id
 
-	self.dialog = DlgSearchByName('renter', self)
-	self.dialog.setModal(True)
-	self.dialog.setCallback(callback)
-	dlgStatus = self.dialog.exec_()
+        self.dialog = DlgSearchByName('renter', self)
+        self.dialog.setModal(True)
+        self.dialog.setCallback(callback)
+        dlgStatus = self.dialog.exec_()
 
-	if QDialog.Accepted == dlgStatus:
-	    ajax = HttpAjax(self, '/manager/get_renter_info/',
-			    {'user_id': self.user_id,
+        if QDialog.Accepted == dlgStatus:
+            ajax = HttpAjax(self, '/manager/get_renter_info/',
+                            {'user_id': self.user_id,
                              'mode': 'renter'}, self.session_id)
-	    response = ajax.parse_json()
-	    self.dialog = DlgRenterInfo(self)
-	    self.dialog.setModal(True)
-	    self.dialog.initData(response['info'])
-	    self.dialog.exec_()
+            response = ajax.parse_json()
+            self.dialog = DlgRenterInfo(self)
+            self.dialog.setModal(True)
+            self.dialog.initData(response['info'])
+            self.dialog.exec_()
 
     def eventTraining(self):
         def callback(e_date, e_time, room_tuple, team):
@@ -435,12 +433,12 @@ class MainWindow(QMainWindow):
             eventObj = Event({}) # FIXME
             self.schedule.insertEvent(room, eventObj)
 
-	self.dialog = DlgEventAssign('training', self)
-	self.dialog.setModal(True)
+        self.dialog = DlgEventAssign('training', self)
+        self.dialog.setModal(True)
         self.dialog.setCallback(callback)
         self.dialog.setModel(self.tree)
         self.dialog.setRooms(self.rooms)
-	self.dialog.exec_()
+        self.dialog.exec_()
 
     def eventRent(self):
         def callback(e_date, e_time, e_duration, room_tuple, rent):
@@ -461,11 +459,12 @@ class MainWindow(QMainWindow):
             id = int(response['saved_id'])
             eventObj = Event({}) # FIXME
             self.schedule.insertEvent(room, eventObj)
-	self.dialog = DlgEventAssign('rent', self)
-	self.dialog.setModal(True)
+
+        self.dialog = DlgEventAssign('rent', self)
+        self.dialog.setModal(True)
         self.dialog.setCallback(callback)
         self.dialog.setRooms(self.rooms)
-	self.dialog.exec_()
+        self.dialog.exec_()
 
     def fillWeek(self):
         def callback(selected_date):
@@ -485,10 +484,10 @@ class MainWindow(QMainWindow):
                 # update view
                 self.schedule.model().update()
 
-	self.dialog = DlgCopyWeek(self)
-	self.dialog.setModal(True)
+        self.dialog = DlgCopyWeek(self)
+        self.dialog.setModal(True)
         self.dialog.setCallback(callback)
-	self.dialog.exec_()
+        self.dialog.exec_()
 
     def copyWeek(self):
         def callback(selected_date):
@@ -501,10 +500,10 @@ class MainWindow(QMainWindow):
             response = ajax.parse_json()
             self.statusBar().showMessage(_('The week has been copied sucessfully.'))
 
-	self.dialog = DlgCopyWeek(self)
-	self.dialog.setModal(True)
+        self.dialog = DlgCopyWeek(self)
+        self.dialog.setModal(True)
         self.dialog.setCallback(callback)
-	self.dialog.exec_()
+        self.dialog.exec_()
 
     def addResources(self):
         def callback(count, price):
@@ -514,10 +513,10 @@ class MainWindow(QMainWindow):
             response = ajax.parse_json()
             self.statusBar().showMessage(_('The week has been copied sucessfully.'))
 
-	self.dialog = DlgAccounting(self)
-	self.dialog.setModal(True)
+        self.dialog = DlgAccounting(self)
+        self.dialog.setModal(True)
         self.dialog.setCallback(callback)
-	self.dialog.exec_()
+        self.dialog.exec_()
 
     # Обработчики меню: конец
 
@@ -532,9 +531,9 @@ class MainWindow(QMainWindow):
 
     def showEventProperties(self, calendar_event): #, room_id):
         self.dialog = DlgEventInfo(self, {'http': self.http})
-	self.dialog.setModal(True)
+        self.dialog.setModal(True)
         self.dialog.initData(calendar_event)
-	self.dialog.exec_()
+        self.dialog.exec_()
 
     # Drag'n'Drop section begins
     def mousePressEvent(self, event):
