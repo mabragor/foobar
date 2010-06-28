@@ -6,8 +6,11 @@ from datetime import timedelta, datetime
 
 from django.conf import settings
 from django.db import models
+from django.utils.html import escape
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
+
+from storage import translit
 
 PAID_STATUS = ( ('0', _(u'Reserved')),
                 ('1', _(u'Piad partially')),
@@ -89,7 +92,7 @@ class Discount(AbstractModel):
 class AbstractCardType(AbstractModel): # флаер, пробное, разовое, абонемент, клубная карта, акция
 
     title = models.CharField(max_length=64)
-    slug = models.SlugField(max_length=16)
+    slug = models.SlugField(max_length=128)
     category = models.ManyToManyField(PriceCategoryTeam, verbose_name=_(u'Price category'))
     discount = models.ManyToManyField(Discount, verbose_name=_(u'Discount'))
 
