@@ -59,9 +59,9 @@ class WizardListDlg(WizardDialog):
         self.callback = callback
 
         #import pprint; pprint.pprint(data)
-        for id, text in data:
+        for id, text, slug in data:
             item = QListWidgetItem(text, self.listWidget)
-            item.setData(Qt.UserRole, QVariant(id))
+            item.setData(Qt.UserRole, QVariant( (id, slug) ))
 
     def setupUi(self, dialog):
         self.dialog = dialog
@@ -181,33 +181,6 @@ class DlgClientInfo(QDialog):
         self.connect(self.buttonCancelDialog, SIGNAL('clicked()'),
                      self, SLOT('reject()'))
 
-    def xml_query(self, file_name, xquery):
-
-        from os.path import dirname, join
-
-        class Handler(QAbstractMessageHandler):
-            def handleMessage(self, msg_type, desc, identifier, loc):
-                print 'QUERY:', msg_type, desc, identifier, loc
-
-        handler = Handler()
-
-        query  = QXmlQuery()
-        query.setMessageHandler(handler)
-        query.setQuery(xquery % join(dirname(__file__), file_name))
-
-        array = QByteArray()
-        buf = QBuffer(array)
-        buf.open(QIODevice.WriteOnly)
-
-        if query.isValid():
-            if query.evaluateTo(buf):
-                results = QString.fromUtf8(array)
-                print 'result of evaluation is',results
-            else:
-                print 'not evaluated'
-        else:
-            print 'not valid'
-
     def initData(self, data=dict()):
         self.client_id = data.get('id', '0')
         self.editFirstName.setText(data.get('first_name', ''))
@@ -270,18 +243,45 @@ class DlgClientInfo(QDialog):
         ok = model.insertRows(lastRow, rows, QModelIndex())
         model.dump()
 
+    def xml_query(self, file_name, xquery):
+
+        from os.path import dirname, join
+
+        class Handler(QAbstractMessageHandler):
+            def handleMessage(self, msg_type, desc, identifier, loc):
+                print 'QUERY:', msg_type, desc, identifier, loc
+
+        handler = Handler()
+
+        query  = QXmlQuery()
+        query.setMessageHandler(handler)
+        query.setQuery(xquery % join(dirname(__file__), file_name))
+
+        array = QByteArray()
+        buf = QBuffer(array)
+        buf.open(QIODevice.WriteOnly)
+
+        if query.isValid():
+            if query.evaluateTo(buf):
+                results = QString.fromUtf8(array)
+                print 'result of evaluation is',results
+            else:
+                print 'not evaluated'
+        else:
+            print 'not valid'
+
     def assign_card(self):
 
         # получить списки карт
         card_list = []
         for i in self.static['card_ordinary']:
-            item = (i['id'], i['title'])
+            item = (i['id'], i['title'], i['slug'])
             card_list.append(item)
         if 0 < len(self.static['card_club']):
-            item = (-1, _('Club Card'))
+            item = (-1, _('Club Card'), 'club')
             card_list.append(item)
         if 0 < len(self.static['card_promo']):
-            item = (-2, _('Promo Card'))
+            item = (-2, _('Promo Card'), 'promo')
             card_list.append(item)
 
         def callback(data):
@@ -294,7 +294,7 @@ class DlgClientInfo(QDialog):
         self.dialog.exec_()
 
         file_name = 'uis/logic_clientcard.xml'
-        xquery = "doc('%s')/logic/rule[@name='test']"
+        xquery = "doc('%s')/logic/rule[@name='abonement']/sequence/dialog"
         self.xml_query(file_name, xquery)
 
 
