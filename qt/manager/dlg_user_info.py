@@ -18,11 +18,18 @@ from PyQt4.QtXmlPatterns import *
 from PyQt4 import uic
 
 class WizardDialog(QDialog):
+    """
+    Диалог получает описание последовательности действий и
+    обеспечивает запросы пользователю и обработку ответов в
+    соответствии с данным описанием.
+    """
 
-    def __init__(self, ui_file, parent=None, params=dict()):
+    ui_file = None # will define later
+
+    def __init__(self, parent=None, params=dict()):
         QDialog.__init__(self, parent)
 
-        dlg = uic.loadUi(ui_file, self)
+        dlg = uic.loadUi(self.ui_file, self)
         self.setupUi(dlg)
 
     def prefill(self, title):
@@ -40,27 +47,38 @@ class WizardDialog(QDialog):
 
 class WizardListDlg(WizardDialog):
 
+    dialog = None
+    ui_file = 'uis/dlg_list.ui'
+    callback = None
+
     def __init__(self, parent=None, params=dict()):
-        WizardDialog.__init__(self, 'uis/dlg_list.ui', parent)
+        WizardDialog.__init__(self, parent)
 
-    def prefill(self, title, data):
+    def prefill(self, title, data, callback):
         WizardDialog.prefill(self, title)
+        self.callback = callback
 
+        #import pprint; pprint.pprint(data)
         for id, text in data:
-            import pprint; pprint.pprint(data)
             item = QListWidgetItem(text, self.listWidget)
             item.setData(Qt.UserRole, QVariant(id))
 
     def setupUi(self, dialog):
+        self.dialog = dialog
         WizardDialog.setupUi(self, self)
-        self.connect(dialog.listWidget, SIGNAL('itemDoubleClicked(QListWidgetItem *)'), self.go_next)
+        self.connect(self.dialog.listWidget,
+                     SIGNAL('itemDoubleClicked(QListWidgetItem *)'),
+                     self.go_next)
 
     def go_back(self):
         print 'Back'
 
     def go_next(self):
-        print 'Next'
-
+        list_widget = self.dialog.listWidget
+        item = list_widget.currentItem()
+        result = (item.data(Qt.UserRole), item.text().toUtf8())
+        self.callback(result)
+        self.close()
 
 class DlgClientInfo(QDialog):
 
@@ -144,8 +162,6 @@ class DlgClientInfo(QDialog):
             title = u'%s - %s%%' % (i['title'], i['percent'])
             self.comboDiscount.addItem(title, QVariant(id))
 
-        self.initData()
-
     def setRequired(self):
         self.editLastName.setProperty('required', QVariant(True))
         self.editFirstName.setProperty('required', QVariant(True))
@@ -216,10 +232,6 @@ class DlgClientInfo(QDialog):
         card_list = data.get('team_list', [])
         self.cardinfo.model().initData(card_list)
 
-        file_name = 'uis/logic_clientcard.xml'
-        xquery = "doc('%s')/logic/rule[@name='test']"
-        self.xml_query(file_name, xquery)
-
     def cancelCard(self):
         row = self.cardinfo.currentRow()
         if DEBUG:
@@ -272,10 +284,22 @@ class DlgClientInfo(QDialog):
             item = (-2, _('Promo Card'))
             card_list.append(item)
 
+        def callback(data):
+            print 'callback trigger'
+            self.wizard = data # id, title
+
         self.dialog = WizardListDlg(self)
         self.dialog.setModal(True)
-        self.dialog.prefill(_('Choose the card\'s type'), card_list)
+        self.dialog.prefill(_('Choose the card\'s type'), card_list, callback)
         self.dialog.exec_()
+
+        file_name = 'uis/logic_clientcard.xml'
+        xquery = "doc('%s')/logic/rule[@name='test']"
+        self.xml_query(file_name, xquery)
+
+
+
+
         return
 
         # add user's discount

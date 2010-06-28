@@ -89,6 +89,7 @@ class Discount(AbstractModel):
 class AbstractCardType(AbstractModel): # флаер, пробное, разовое, абонемент, клубная карта, акция
 
     title = models.CharField(max_length=64)
+    slug = models.SlugField(max_length=16)
     category = models.ManyToManyField(PriceCategoryTeam, verbose_name=_(u'Price category'))
     discount = models.ManyToManyField(Discount, verbose_name=_(u'Discount'))
 
