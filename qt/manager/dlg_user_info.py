@@ -264,11 +264,12 @@ class DlgClientInfo(QDialog):
         if query.isValid():
             if query.evaluateTo(buf):
                 results = QString.fromUtf8(array)
-                print 'result of evaluation is',results
+                return results
             else:
                 print 'not evaluated'
         else:
             print 'not valid'
+        return None
 
     def assign_card(self):
 
@@ -294,12 +295,25 @@ class DlgClientInfo(QDialog):
         self.dialog.exec_()
 
         file_name = 'uis/logic_clientcard.xml'
-        xquery = "doc('%s')/logic/rule[@name='abonement']/sequence/dialog"
-        self.xml_query(file_name, xquery)
+        xquery = "doc('%s')/logic/rule[@name='abonement']/sequence"
+        results = self.xml_query(file_name, xquery)
+        if results:
+            sequence = QDomDocument()
+            if not sequence.setContent(results):
+                raise ValueError('could not parse XML:', results)
 
-
-
-
+            root = sequence.documentElement()
+            print root.tagName()
+            node = root.firstChild()
+            while not node.isNull():
+                element = node.toElement()
+                print element.tagName()
+                if node.hasAttributes():
+                    print '%s is %s' % (
+                        element.attribute('name'),
+                        element.attribute('type')
+                        )
+                node = node.nextSibling()
         return
 
         # add user's discount
