@@ -76,7 +76,65 @@ class WizardListDlg(WizardDialog):
     def go_next(self):
         list_widget = self.dialog.listWidget
         item = list_widget.currentItem()
-        result = (item.data(Qt.UserRole), item.text().toUtf8())
+        result = (item.data(Qt.UserRole).toPyObject(), item.text().toUtf8())
+        self.callback(result)
+        self.close()
+
+class WizardSpinDlg(WizardDialog):
+
+    dialog = None
+    ui_file = 'uis/dlg_spin.ui'
+    callback = None
+
+    def __init__(self, parent=None, params=dict()):
+        WizardDialog.__init__(self, parent)
+
+    def prefill(self, title, data, callback):
+        WizardDialog.prefill(self, title)
+        self.callback = callback
+
+        self.spinBox.setValue(data)
+
+    def setupUi(self, dialog):
+        self.dialog = dialog
+        WizardDialog.setupUi(self, self)
+        self.dialog.spinBox.setMaximum(1000000)
+
+    def go_back(self):
+        print 'Back'
+
+    def go_next(self):
+        spin_widget = self.dialog.spinBox
+        result = spin_widget.value()
+        self.callback(result)
+        self.close()
+
+class WizardPriceDlg(WizardDialog):
+
+    dialog = None
+    ui_file = 'uis/dlg_price.ui'
+    callback = None
+
+    def __init__(self, parent=None, params=dict()):
+        WizardDialog.__init__(self, parent)
+
+    def prefill(self, title, data, callback):
+        WizardDialog.prefill(self, title)
+        self.callback = callback
+
+        self.doubleSpinBox.setValue(data)
+
+    def setupUi(self, dialog):
+        self.dialog = dialog
+        WizardDialog.setupUi(self, self)
+        self.dialog.doubleSpinBox.setMaximum(1000000)
+
+    def go_back(self):
+        print 'Back'
+
+    def go_next(self):
+        spin_widget = self.dialog.doubleSpinBox
+        result = spin_widget.value()
         self.callback(result)
         self.close()
 
@@ -243,7 +301,7 @@ class DlgClientInfo(QDialog):
         ok = model.insertRows(lastRow, rows, QModelIndex())
         model.dump()
 
-    def xml_query(self, file_name, xquery):
+    def xml_query(self, file_name, xquery, slug):
 
         from os.path import dirname, join
 
@@ -255,7 +313,8 @@ class DlgClientInfo(QDialog):
 
         query  = QXmlQuery()
         query.setMessageHandler(handler)
-        query.setQuery(xquery % join(dirname(__file__), file_name))
+        prepared_query = xquery % (join(dirname(__file__), file_name), slug)
+        query.setQuery(prepared_query)
 
         array = QByteArray()
         buf = QBuffer(array)
@@ -271,6 +330,23 @@ class DlgClientInfo(QDialog):
             print 'not valid'
         return None
 
+    def wizard_dialog(self, dtype, title, data_to_fill):
+        def callback(data):
+            self.wizard_data = data # id, title, slug
+
+        dialogs = {
+            'list': WizardListDlg,
+            'spin': WizardSpinDlg,
+            'price': WizardPriceDlg,
+            }
+
+        self.dialog = dialogs[dtype](self)
+        self.dialog.setModal(True)
+        self.dialog.prefill(title, data_to_fill, callback)
+        self.dialog.exec_()
+
+        return self.wizard_data
+
     def assign_card(self):
 
         # получить списки карт
@@ -285,35 +361,42 @@ class DlgClientInfo(QDialog):
             item = (-2, _('Promo Card'), 'promo')
             card_list.append(item)
 
-        def callback(data):
-            print 'callback trigger'
-            self.wizard = data # id, title
-
-        self.dialog = WizardListDlg(self)
-        self.dialog.setModal(True)
-        self.dialog.prefill(_('Choose the card\'s type'), card_list, callback)
-        self.dialog.exec_()
+        result = self.wizard_dialog('list', _('Choose the card\'s type'), card_list)
+        id, slug = result[0]; title = result[1]
 
         file_name = 'uis/logic_clientcard.xml'
-        xquery = "doc('%s')/logic/rule[@name='abonement']/sequence"
-        results = self.xml_query(file_name, xquery)
+        xquery = "doc('%s')/logic/rule[@name='%s']/sequence"
+        results = self.xml_query(file_name, xquery, slug)
         if results:
             sequence = QDomDocument()
             if not sequence.setContent(results):
                 raise ValueError('could not parse XML:', results)
 
+            steps = {}
+
             root = sequence.documentElement()
-            print root.tagName()
             node = root.firstChild()
             while not node.isNull():
                 element = node.toElement()
-                print element.tagName()
-                if node.hasAttributes():
-                    print '%s is %s' % (
-                        element.attribute('name'),
-                        element.attribute('type')
-                        )
+                if 'dialog' == element.tagName():
+                    if node.hasAttributes():
+                        dlg_type = element.attribute('type')
+                        dlg_name = element.attribute('name')
+                        par_name = str(dlg_name)
+                        if 'list' == dlg_type:
+                            prefill = [(i, 'promo%i' % i, 'promo%i' % i) for i in xrange(3)]
+                            result = self.wizard_dialog('list', dlg_name, prefill)
+                            steps[par_name] = result[0][0]
+                        if 'spin' == dlg_type:
+                            result = self.wizard_dialog('spin', dlg_name, 8)
+                            steps[par_name] = result
+                        if 'price' == dlg_type:
+                            result = self.wizard_dialog('price', dlg_name, 3400.20)
+                            steps[par_name] = result
+
                 node = node.nextSibling()
+
+            print steps
         return
 
         # add user's discount
