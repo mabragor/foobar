@@ -59,9 +59,9 @@ class WizardListDlg(WizardDialog):
         self.callback = callback
 
         #import pprint; pprint.pprint(data)
-        for id, text, slug in data:
+        for id, text in data:
             item = QListWidgetItem(text, self.listWidget)
-            item.setData(Qt.UserRole, QVariant( (id, slug) ))
+            item.setData(Qt.UserRole, QVariant(id))
 
     def setupUi(self, dialog):
         self.dialog = dialog
@@ -76,7 +76,7 @@ class WizardListDlg(WizardDialog):
     def go_next(self):
         list_widget = self.dialog.listWidget
         item = list_widget.currentItem()
-        result = (item.data(Qt.UserRole).toPyObject(), item.text().toUtf8())
+        result = item.data(Qt.UserRole).toPyObject()
         self.callback(result)
         self.close()
 
@@ -347,22 +347,22 @@ class DlgClientInfo(QDialog):
 
         return self.wizard_data
 
-    def assign_card(self):
-
-        # получить списки карт
+    def generate_card_list(self):
         card_list = []
         for i in self.static['card_ordinary']:
-            item = (i['id'], i['title'], i['slug'])
+            item = (i['slug'], i['title'])
             card_list.append(item)
         if 0 < len(self.static['card_club']):
-            item = (-1, _('Club Card'), 'club')
+            item = ('club', _('Club Card'))
             card_list.append(item)
         if 0 < len(self.static['card_promo']):
-            item = (-2, _('Promo Card'), 'promo')
+            item = ('promo', _('Promo Card'))
             card_list.append(item)
+        return card_list
 
-        result = self.wizard_dialog('list', _('Choose the card\'s type'), card_list)
-        id, slug = result[0]; title = result[1]
+    def assign_card(self):
+        slug = self.wizard_dialog('list', _('Choose the card\'s type'),
+                                  self.generate_card_list())
 
         file_name = 'uis/logic_clientcard.xml'
         xquery = "doc('%s')/logic/rule[@name='%s']/sequence"
@@ -378,21 +378,35 @@ class DlgClientInfo(QDialog):
             node = root.firstChild()
             while not node.isNull():
                 element = node.toElement()
+                skip_next_dialog = False
                 if 'dialog' == element.tagName():
                     if node.hasAttributes():
                         dlg_type = element.attribute('type')
                         dlg_name = element.attribute('name')
-                        par_name = str(dlg_name)
-                        if 'list' == dlg_type:
-                            prefill = [(i, 'promo%i' % i, 'promo%i' % i) for i in xrange(3)]
-                            result = self.wizard_dialog('list', dlg_name, prefill)
-                            steps[par_name] = result[0][0]
-                        if 'spin' == dlg_type:
-                            result = self.wizard_dialog('spin', dlg_name, 8)
-                            steps[par_name] = result
-                        if 'price' == dlg_type:
-                            result = self.wizard_dialog('price', dlg_name, 3400.20)
-                            steps[par_name] = result
+                        static_key = element.hasAttribute('static') and str(element.attribute('static')) or None
+                        default = element.hasAttribute('default') and element.attribute('default') or 0
+
+                        result_as = str(element.attribute('result_as'))
+                        result_types = {'integer': int, 'float': float}
+                        conv = result_types[result_as]
+
+                        result = conv( self.show_ui_dialog(dlg_type, dlg_name, default, static_key) )
+
+                        steps[str(dlg_name)] = result
+
+                        if node.hasChildNodes():
+                            child = node.firstChild()
+                            print 'has child'
+                            element = child.toElement()
+                            if 'skip_next_if' == element.tagName():
+                                if element.hasAttribute('lower_than') and result < conv( element.attribute('lower_than') ):
+                                    skip_next_dialog = True
+                                if element.hasAttribute('greater_than') and result > conv( element.attribute('greater_than') ):
+                                    skip_next_dialog = True
+
+                if skip_next_dialog:
+                    print 'skip next dialog'
+                    node = node.nextSibling()
 
                 node = node.nextSibling()
 
@@ -407,6 +421,17 @@ class DlgClientInfo(QDialog):
         if model.insertRows(lastRow, 1, QModelIndex()):
             index = model.index(0, 0)
             model.set_row(index, data, Qt.EditRole)
+
+    def show_ui_dialog(self, dlg_type, dlg_name, default=0, static_key=None):
+        print dlg_name, default, type(default)
+        if 'list' == dlg_type and static_key is not None:
+            prefill = [(i['id'], i['title']) for i in self.static[static_key]]
+            result = self.wizard_dialog('list', dlg_name, prefill)
+        if 'spin' == dlg_type:
+            result = self.wizard_dialog('spin', dlg_name, int(default))
+        if 'price' == dlg_type:
+            result = self.wizard_dialog('price', dlg_name, float(default))
+        return result
 
     def applyDialog(self):
         """ Применить настройки. """
