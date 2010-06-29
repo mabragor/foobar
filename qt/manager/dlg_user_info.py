@@ -378,7 +378,6 @@ class DlgClientInfo(QDialog):
             node = root.firstChild()
             while not node.isNull():
                 element = node.toElement()
-                skip_next_dialog = False
                 if 'dialog' == element.tagName():
                     if node.hasAttributes():
                         dlg_type = element.attribute('type')
@@ -394,19 +393,8 @@ class DlgClientInfo(QDialog):
 
                         steps[str(dlg_name)] = result
 
-                        if node.hasChildNodes():
-                            child = node.firstChild()
-                            print 'has child'
-                            element = child.toElement()
-                            if 'skip_next_if' == element.tagName():
-                                if element.hasAttribute('lower_than') and result < conv( element.attribute('lower_than') ):
-                                    skip_next_dialog = True
-                                if element.hasAttribute('greater_than') and result > conv( element.attribute('greater_than') ):
-                                    skip_next_dialog = True
-
-                if skip_next_dialog:
-                    print 'skip next dialog'
-                    node = node.nextSibling()
+                        if self.need_skip_next_dlg(node, conv, result):
+                            node = node.nextSibling()
 
                 node = node.nextSibling()
 
@@ -421,6 +409,18 @@ class DlgClientInfo(QDialog):
         if model.insertRows(lastRow, 1, QModelIndex()):
             index = model.index(0, 0)
             model.set_row(index, data, Qt.EditRole)
+
+    def need_skip_next_dlg(self, node, conv, value):
+        skip = False
+        if node.hasChildNodes():
+            child = node.firstChild()
+            element = child.toElement()
+            if 'skip_next_if' == element.tagName():
+                if element.hasAttribute('lower_than') and value < conv( element.attribute('lower_than') ):
+                    skip = True
+                if element.hasAttribute('greater_than') and value > conv( element.attribute('greater_than') ):
+                    skip = True
+        return skip
 
     def show_ui_dialog(self, dlg_type, dlg_name, default=0, static_key=None):
         print dlg_name, default, type(default)
