@@ -15,17 +15,17 @@ PAID_STATUS = [_('Reserved'),
                _('Paid')]
 
 MODEL_MAP_RAW = (
-    ('card_types', QComboBox, _(u'Type of card'), 'complex'),
+    ('card_types', QComboBox, _('Type of card'), 'complex'),
     ('price_cats_team', QComboBox, _('Price category'), 'id2title'),
-    ('count_sold', QComboBox, _(u'Sold'), 'int'),
-    ('price', None, _(u'Price'), 'float'),
-    ('discount', QComboBox, _(u'Discount'), 'id2title'),
+    ('count_sold', QComboBox, _('Sold'), 'int'),
+    ('price', None, _('Price'), 'float'),
+    ('discount', QComboBox, _('Discount'), 'id2title'),
     ('count_available', None, _('Available'), 'int'),
-    ('count_used', None, _(u'Used'), 'int'),
-    ('begin date', None, _(u'Begin'), 'date2str'),
-    ('end date', None, _(u'End'), 'date2str'),
+    ('count_used', None, _('Used'), 'int'),
+    ('begin date', None, _('Begin'), 'date2str'),
+    ('end date', None, _('End'), 'date2str'),
     ('reg datetime', None, _('Register'), 'dt2str'),
-    ('cancel datetime', None, _(u'Cancel'), 'dt2str'),
+    ('cancel datetime', None, _('Cancel'), 'dt2str'),
     ('id', None, 'id', 'int')
 )
 MODEL_MAP = list()
