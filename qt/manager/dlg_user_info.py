@@ -381,6 +381,7 @@ class DlgClientInfo(QDialog):
                 if 'dialog' == element.tagName():
                     if node.hasAttributes():
                         dlg_type = element.attribute('type')
+                        dlg_title = element.attribute('title')
                         dlg_name = element.attribute('name')
                         static_key = element.hasAttribute('static') and str(element.attribute('static')) or None
                         default = element.hasAttribute('default') and element.attribute('default') or 0
@@ -389,7 +390,7 @@ class DlgClientInfo(QDialog):
                         result_types = {'integer': int, 'float': float}
                         conv = result_types[result_as]
 
-                        result = conv( self.show_ui_dialog(dlg_type, dlg_name, default, static_key) )
+                        result = conv( self.show_ui_dialog(dlg_type, dlg_title, default, static_key) )
 
                         steps[str(dlg_name)] = result
 
@@ -422,15 +423,14 @@ class DlgClientInfo(QDialog):
                     skip = True
         return skip
 
-    def show_ui_dialog(self, dlg_type, dlg_name, default=0, static_key=None):
-        print dlg_name, default, type(default)
+    def show_ui_dialog(self, dlg_type, dlg_title, default=0, static_key=None):
         if 'list' == dlg_type and static_key is not None:
             prefill = [(i['id'], i['title']) for i in self.static[static_key]]
-            result = self.wizard_dialog('list', dlg_name, prefill)
+            result = self.wizard_dialog('list', dlg_title, prefill)
         if 'spin' == dlg_type:
-            result = self.wizard_dialog('spin', dlg_name, int(default))
+            result = self.wizard_dialog('spin', dlg_title, int(default))
         if 'price' == dlg_type:
-            result = self.wizard_dialog('price', dlg_name, float(default))
+            result = self.wizard_dialog('price', dlg_title, float(default))
         return result
 
     def applyDialog(self):
