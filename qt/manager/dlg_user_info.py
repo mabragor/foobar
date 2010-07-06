@@ -17,6 +17,35 @@ from PyQt4.QtXml import *
 from PyQt4.QtXmlPatterns import *
 from PyQt4 import uic
 
+def dictlist2dict(dictlist, key_field):
+    """ Функция преобразовывает список словарей в словарь, где ключом
+    выступает указанное поле."""
+    def _convertor(listitem):
+        if type(listitem) is not dict:
+            raise ValueError(_('It expexts a dictionary but took %s') % type(key_field))
+        if key_field not in listitem:
+            raise KeyError(_('Key "%s" does not exists. Check dictionary.') % key_field)
+
+        result.update( {listitem[key_field]: listitem} )
+        return True
+
+    result = {}
+    map(_convertor, dictlist)
+    return result
+
+def dictlist_keyval(dictlist, key_field, value):
+    """ Функция производит поиск по списку словарей и возвращает
+    список тех элементов, у которых значение определённого ключа
+    соответствует указанному."""
+    def _search(listitem):
+        if type(listitem) is not dict:
+            raise ValueError(_('It expexts a dictionary but took %s') % type(key_field))
+        if key_field not in listitem:
+            raise KeyError(_('Key "%s" does not exists. Check dictionary.') % key_field)
+        return listitem[key_field] == value
+
+    return filter(_search, dictlist)
+
 class WizardDialog(QDialog):
     """
     Диалог получает описание последовательности действий и
@@ -372,7 +401,8 @@ class DlgClientInfo(QDialog):
             if not sequence.setContent(results):
                 raise ValueError('could not parse XML:', results)
 
-            steps = {}
+            card_type = dictlist_keyval(self.static['card_ordinary'], 'slug', slug)[0]
+            steps = {'card_slug': str(slug)}
 
             root = sequence.documentElement()
             node = root.firstChild()
@@ -380,38 +410,65 @@ class DlgClientInfo(QDialog):
                 element = node.toElement()
                 if 'dialog' == element.tagName():
                     if node.hasAttributes():
+                        # вычисляем атрибуты диалога
                         dlg_type = element.attribute('type')
                         dlg_title = element.attribute('title')
                         dlg_name = element.attribute('name')
                         static_key = element.hasAttribute('static') and str(element.attribute('static')) or None
                         default = element.hasAttribute('default') and element.attribute('default') or 0
 
+                        # получаем информацию о результирующем типе
                         result_as = str(element.attribute('result_as'))
                         result_types = {'integer': int, 'float': float}
                         conv = result_types[result_as]
 
-                        result = conv( self.show_ui_dialog(dlg_type, dlg_title, default, static_key) )
+                        # если надо, вычисляем начальное значение
+                        if node.hasChildNodes():
+                            child = node.firstChild()
+                            element = child.toElement()
+                            if 'calculate' == element.tagName():
+                                # Если надо произвести вычисление и
+                                # указанная функция реализована в
+                                # классе, вызываем её
+                                if element.hasAttribute('function'):
+                                    method_name = element.attribute('function')
+                                    if hasattr(self, str(method_name)):
+                                        function = eval('self.%s' % method_name)
+                                        if callable(function):
+                                            default = function(card_type, steps)
+                                        else:
+                                            print 'Это не метод.'
+                                    else:
+                                        print 'Метод не определён в классе.'
 
-                        steps[str(dlg_name)] = result
+                        # отображаем диалог и получаем данные от пользователя
+                        result = self.show_ui_dialog(dlg_type, dlg_title, default, static_key)
 
+                        # сохраняем данные с нужным типом
+                        steps[str(dlg_name)] = conv(result)
+
+                        # пропускаем один диалог, если надо
+                        # ToDo: пропускать диалоги, пока не появится нужный.
                         if self.need_skip_next_dlg(node, conv, result):
                             node = node.nextSibling()
 
                 node = node.nextSibling()
 
             print steps
-        return
 
-        # add user's discount
-        data.update( {'discount': self.comboDiscount.currentIndex()} )
-        # send data to user's model
-        model = self.cardinfo.model()
-        lastRow = model.rowCount(QModelIndex())
-        if model.insertRows(lastRow, 1, QModelIndex()):
-            index = model.index(0, 0)
-            model.set_row(index, data, Qt.EditRole)
+            # add user's discount
+            #data.update( {'client_discount': self.comboDiscount.currentIndex()} )
+
+            # send data to user's model
+            model = self.cardinfo.model()
+            lastRow = model.rowCount(QModelIndex())
+            if model.insertRows(lastRow, 1, QModelIndex()):
+                index = model.index(0, 0)
+                model.insertRows(index, steps, Qt.EditRole)
 
     def need_skip_next_dlg(self, node, conv, value):
+        """ Метод для реализации функционала пропуска следующего
+        диалога по условию."""
         skip = False
         if node.hasChildNodes():
             child = node.firstChild()
@@ -422,6 +479,25 @@ class DlgClientInfo(QDialog):
                 if element.hasAttribute('greater_than') and value > conv( element.attribute('greater_than') ):
                     skip = True
         return skip
+
+    def _price_abonement(self, card_type, steps):
+        """ Метод для вычисления цены абонемента. См. logic_clientcard.xml. """
+        prices = dictlist_keyval(card_type['price_categories'], 'id', steps['price_category'])[0]
+
+        count = int(steps['count'])
+        if count == 1:
+            price = float(prices['once_price'])
+        elif count == 4:
+            price = float(prices['half_price'])
+        elif count == 8:
+            price = float(prices['full_price'])
+        elif count > 8 and count % 8 == 0:
+            price = float(prices['full_price']) * (count / 8)
+        else:
+            print _('Invalid usage. Why do you use count=%i' % count)
+            price = float(0.0)
+
+        return price
 
     def show_ui_dialog(self, dlg_type, dlg_title, default=0, static_key=None):
         if 'list' == dlg_type and static_key is not None:

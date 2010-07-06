@@ -15,13 +15,10 @@ PAID_STATUS = [_('Reserved'),
                _('Paid')]
 
 MODEL_MAP_RAW = (
-    ('card_types', QComboBox, _('Type of card'), 'complex'),
-    ('price_cats_team', QComboBox, _('Price category'), 'id2title'),
-    ('count_sold', QComboBox, _('Sold'), 'int'),
+    ('card_info', None, _('Information'), 'complex'),
     ('price', None, _('Price'), 'float'),
-    ('discount', QComboBox, _('Discount'), 'id2title'),
-    ('count_available', None, _('Available'), 'int'),
     ('count_used', None, _('Used'), 'int'),
+    ('count_available', None, _('Available'), 'int'),
     ('begin date', None, _('Begin'), 'date2str'),
     ('end date', None, _('End'), 'date2str'),
     ('reg datetime', None, _('Register'), 'dt2str'),
