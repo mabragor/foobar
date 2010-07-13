@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
+# (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 import sys, re
 
@@ -15,27 +15,25 @@ class TreeModel(AbstractTreeModel):
         AbstractTreeModel.__init__(self, data, parent)
 
     def setData(self, data):
-        """
-        Формат полученных данных:
-        [ {id, title,
-           children: [
-           {'coach': {'birth_date': '2010-04-30',
-                      'desc': u'\u0431\u0443\u0445\u0430\u0435\u0442',
-                      'email': 'ivan@jet.ru',
-                      'first_name': u'\u0418\u0432\u0430\u043d',
-                      'id': 2,
-                      'last_name': u'\u041f\u0435\u0442\u0440\u043e\u043f\u043e\u043b\u044c\u0441\u043a\u0438\u0439',
-                      'name': u'\u041f\u0435\u0442\u0440\u043e\u043f\u043e\u043b\u044c\u0441\u043a\u0438\u0439 \u0418\u0432\u0430\u043d',
-                      'phone': '1234567890'},
-            'duration': 1.0,
-            'groups': u'\u0421\u043e\u0432\u0440\u0435\u043c\u0435\u043d\u043d\u044b\u0435 \u0442\u0430\u043d\u0446\u044b',
-            'id': 1,
-            'price_category': '0',
-            'title': u'\u0411\u0440\u0435\u0439\u043a-\u0434\u0430\u043d\u0441 \u0438 free style'},
-            ...],
-           ...},
-        ]
-        """
+        # Data format:
+        # [ {id, title,
+        #    children: [
+        #    {'coach': {'birth_date': '2010-04-30',
+        #               'desc': u'\u0431\u0443\u0445\u0430\u0435\u0442',
+        #               'email': 'ivan@jet.ru',
+        #               'first_name': u'\u0418\u0432\u0430\u043d',
+        #               'id': 2,
+        #               'last_name': u'\u041f\u0435\u0442\u0440\u043e\u043f\u043e\u043b\u044c\u0441\u043a\u0438\u0439',
+        #               'name': u'\u041f\u0435\u0442\u0440\u043e\u043f\u043e\u043b\u044c\u0441\u043a\u0438\u0439 \u0418\u0432\u0430\u043d',
+        #               'phone': '1234567890'},
+        #     'duration': 1.0,
+        #     'groups': u'\u0421\u043e\u0432\u0440\u0435\u043c\u0435\u043d\u043d\u044b\u0435 \u0442\u0430\u043d\u0446\u044b',
+        #     'id': 1,
+        #     'price_category': '0',
+        #     'title': u'\u0411\u0440\u0435\u0439\u043a-\u0434\u0430\u043d\u0441 \u0438 free style'},
+        #     ...],
+        #    ...},
+        # ]
         if not data:
             return
         for i in data:
@@ -52,8 +50,6 @@ class TreeModel(AbstractTreeModel):
                     folder.appendChild(child)
 
 class TeamTree(QTreeView):
-
-    """ Класс дерева направлений и групп. """
 
     def __init__(self, parent=None):
         QTreeView.__init__(self, parent)

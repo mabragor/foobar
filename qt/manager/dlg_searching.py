@@ -31,7 +31,6 @@ class DlgSearchByName(QDialog):
                      self.searchFor)
         self.connect(buttonCancel, SIGNAL('clicked()'),
                      self, SLOT('reject()'))
-
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch(1)
         buttonLayout.addWidget(self.buttonFind)

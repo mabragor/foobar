@@ -37,7 +37,7 @@ class DlgWaitingRFID(QDialog):
 
     def done(self, result_code):
         QDialog.done(self, result_code)
-        #Посылаем потоку RFID считывателя команду тихо завершиться.
+        # Send the kill event to RFID reader thread.
         self.reader.timeToDie()
 
     def closeEvent(self, event):
@@ -66,14 +66,14 @@ class WaitingRFID(QThread):
     def dispose(self):
         if not self.disposed:
             self.disposed = True
-            # закрываем порт
+            # close the port
             self.port.setDTR(False)
             self.port.setRTS(False)
             self.port.close()
 
     def run(self):
         if DEBUG:
-            # отладочный код, на случай отсутствия считывателя
+            # debug part, in case of absence of the RFID reader
             print 'debugging part of code, in case of RFID '\
                 'reader absence. See rfid.py\'s DEBUG variable.'
             demo_rfids = ['008365B0', ]#'0083AD33', '00836012']
@@ -85,7 +85,7 @@ class WaitingRFID(QThread):
             return
 
         rfid_code = ''
-        # инициализация считывателя
+        # init the reader
         try:
             self.port = serial.Serial(PORT['name'], PORT['rate'],
                                       bytesize = PORT['bits_in_byte'],
@@ -98,8 +98,8 @@ class WaitingRFID(QThread):
         self.port.setRTS(True)
 
         buffer = []
-        # бесконечный цикл, пока не получим идентификатор карты
-        # формат: =012345678<OD><OA>
+        # the infinite loop until get the card id
+        # format is =012345678<OD><OA>
         while True:
             symbol = self.port.read(1)
             if not self.hex(symbol) == '0D':
@@ -107,22 +107,21 @@ class WaitingRFID(QThread):
             else:
                 if '0A' == self.hex(self.port.read(1)):
                     if len(buffer) == 9:
-                        # первый символ нам не нужен
+                        # skip the first symbol
                         rfid_code = ''.join(buffer[1:])
                         break
-                    # в любом случае буфер надо чистить, так как в нём
-                    # либо уже ненужный идентификатор, либо тестовый
-                    # символ
+                    # in any cases buffer has to be clean, because of
+                    # it contains of old id or test symbol.
                     buffer = []
 
-                    # пользователь закрыл диалог, надо завершить поток
+                    # user closes the dialog, kill the reader's thread
                     if self.die:
                         break
 
         if not self.die:
-            # передаём код
+            # Send the card's id
             self.callback(rfid_code)
-            # закрываем окно диалога
+            # Close the dialog's window
             QCoreApplication.postEvent(self.dialog, QCloseEvent())
 
         self.dispose()

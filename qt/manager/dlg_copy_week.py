@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
+# (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 from settings import _
 
@@ -44,7 +44,7 @@ class DlgCopyWeek(QDialog):
         self.callback = callback
 
     def applyDialog(self):
-        """ Применить настройки. """
+        """ Apply settings. """
         selected = self.calendar.selectedDate()
         if QMessageBox.Ok == self.callback(selected.toPyDate()):
             return

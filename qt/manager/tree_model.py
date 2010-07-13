@@ -29,7 +29,8 @@ class TreeItem:
         return self.itemData[column]
 
     def parent(self):
-        return self.parentItem
+
+     return self.parentItem
 
     def row(self):
         if self.parentItem:
@@ -48,7 +49,7 @@ class AbstractTreeModel(QAbstractItemModel):
         self.setData(data)
 
     def setData(self, data):
-        """ Этот метод надо переопределить в производном классе. """
+        """ This method must be reimplemented in the derived class. """
 
     def columnCount(self, parent):
         if parent.isValid():

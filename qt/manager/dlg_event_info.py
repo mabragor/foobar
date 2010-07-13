@@ -167,17 +167,15 @@ class DlgEventInfo(QDialog):
         self.comboRoom.setCurrentIndex(self.current_room_index)
 
     def changeRoom(self, new_index):
-        """
-        Замена зала.
-        1. Выбранный зал пуст в течении всего периода.
-           Изменить зал для события.
-        2. Выбранный зал занят полностью, т.е. два занятия совпадают.
-           Обменять залы.
-        3. Выбранный зал занят частично.
-           Отменить замену, выдать сообщение.
-        """
+        # Room change:
+        # 1. The choosen room is empty inside whole time period.
+        #    Change a room for the event.
+        # 2. The choosen room is busy at all, i.e. two event are equal in time.
+        #    Change the rooms.
+        # 3. The choosen room is busy partially.
+        #    Cancel the change, raise message.
         if new_index != self.current_room_index:
-            # выполнить проверку занятости зала
+            # make room checking
             #
             pass
 

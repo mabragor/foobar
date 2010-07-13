@@ -39,23 +39,23 @@ class DlgSettings(QDialog):
 
         self.setWindowTitle(_('Settings'))
 
-        # загрузка настроек
+        # load settings
         self.settings = QSettings()
         self.loadSettings()
 
     def applyDialog(self):
-        """ Применить настройки. """
+        """ Apply settings. """
         self.saveSettings()
         self.accept()
 
     def loadSettings(self):
-        """ Загрузка настроек. """
+        """ Load settings. """
         for index in xrange(self.tabWidget.count()):
             tab = self.tabWidget.widget(index)
             tab.loadSettings(self.settings)
 
     def saveSettings(self):
-        """ Сохранение настроек. """
+        """ Save settings. """
         for index in xrange(self.tabWidget.count()):
             tab = self.tabWidget.widget(index)
             data = tab.saveSettings(self.settings)
@@ -111,7 +111,7 @@ class TabNetwork(TabAbstract):
                          'passwordProxyAuth': ''
                          }
 
-        # адрес и порт HTTP сервера
+        # the address and port of HTTP server
         labelHttpServer = QLabel(_('HTTP server (address/port)'))
         self.addressHttpServer = QLineEdit()
         self.portHttpServer = QLineEdit()
@@ -120,10 +120,10 @@ class TabNetwork(TabAbstract):
         boxHttpServer.addWidget(self.addressHttpServer)
         boxHttpServer.addWidget(self.portHttpServer)
 
-        # галка включения HTTP прокси
+        # checkbox to enabling http proxy usage
         self.useProxy = QCheckBox(_('Use HTTP proxy'))
 
-        # параметры HTTP прокси
+        # http proxy's parameters
         groupHttpProxy = QGroupBox(_('HTTP proxy settings'))
 
         labelHttpProxy = QLabel(_('Address and port'))
@@ -151,14 +151,13 @@ class TabNetwork(TabAbstract):
 
         groupHttpProxy.setLayout(groupLayout)
 
-        # сигнал-слот
         self.connect(self.useProxy, SIGNAL('toggled(bool)'), groupHttpProxy, SLOT('setDisabled(bool)'))
 
-        # будующий функционал надо отключать
+        # ToDo: implement this, is disabled now
         self.useProxy.setCheckState(Qt.Unchecked)
         groupHttpProxy.setDisabled(True)
 
-        # подключаем все элементы
+        # connect all items together
         mainLayout = QVBoxLayout()
         mainLayout.addStretch(1)
         mainLayout.addLayout(boxHttpServer)

@@ -14,7 +14,7 @@ from PyQt4.QtCore import *
 
 class Event(object):
 
-    """ Класс события. """
+    """ Event. """
 
     def __init__(self, monday, data_dict):
         self.monday = monday
@@ -164,16 +164,16 @@ class EventStorage(QAbstractTableModel):
 
         # NOT USED YET: self.getMime = parent.getMime
 
-        # Хранилище элементов
+        # Item storage
         self.storage = ModelStorage()
-        self.storage.init() # очистка
+        self.storage.init()
 
     def update(self):
         if 'week' == self.mode:
             self.load_data()
 
     def insert(self, room_id, event, emit_signal=False):
-        """ Метод регистрации нового события. """
+        """ This method registers new event. """
         self.emit(SIGNAL('layoutAboutToBeChanged()'))
 
         row, col = self.datetime2rowcol(event.begin_datetime)
@@ -190,7 +190,7 @@ class EventStorage(QAbstractTableModel):
             self.emit(SIGNAL('layoutChanged()'))
 
     def remove(self, event_id, room, emit_signal=False):
-        """ Метод удаления информации о событии. """
+        """ This method removes the event. """
         event = self.storage.searchByID(event_id)
         if event is None:
             return
@@ -204,7 +204,7 @@ class EventStorage(QAbstractTableModel):
                 self.emit(SIGNAL('layoutChanged()'))
 
     def move(self, row, col, room, event):
-        """ Метод перемещения события по координатной сетке. """
+        """ This method moves the event to new cell. """
         self.remove(event, room)
         self.insert(row, col, room, event)
 
@@ -222,20 +222,20 @@ class EventStorage(QAbstractTableModel):
             self.parent.parent.statusBar().showMessage(_('Parsing the response...'))
             response = http.parse(None)
 
-            # обработка результатов
+            # result processing
             if response and 'events' in response:
                 self.parent.parent.statusBar().showMessage(_('Filling the calendar...'))
                 self.storage.init()
-                # размещаем событие в модели
+                # place the event in the model
                 for event_info in response['events']:
                     qApp.processEvents() # keep GUI active
                     room_id = int( event_info['room']['id'] )
                     event_obj = Event(monday, event_info)
                     self.insert( room_id , event_obj )
-                # отображаем события
+                # draw events
                 self.emit(SIGNAL('layoutChanged()'))
                 self.parent.parent.statusBar().showMessage(_('Done'), 2000)
-                # отладочный вывод
+                # debugging
                 #self.storage.dump()
                 return True
             else:
@@ -276,22 +276,21 @@ class EventStorage(QAbstractTableModel):
             return self.dayColumn
 
     def exchangeRoom(self, data_a, data_b):
-        # paramsсодержит идентификаторы событий
         room_a = data_a[2]
         room_b = data_b[2]
-        # получить данные о событиях
+        # events data
         event_a = self.storage.byRCR(ModelStorage.GET, data_a)
         event_b = self.storage.byRCR(ModelStorage.GET, data_b)
-        # получить списки ячеек для каждого события
+        # get cells list for each event
         items_a = self.storage.getByER( (event_a, room_a) )
         items_b = self.storage.getByER( (event_b, room_b) )
-        # удалить все записи о каждом событии
+        # remove all records for each event
         self.remove(event_a, room_a)
         self.remove(event_b, room_b)
-        # проверить возможность обмена
+        # chech the exchange ability
         if self.may_insert(event_a, room_b) and \
                 self.may_insert(event_b, room_a):
-            # отправить инфо на сервер
+            # send the information to the server
             params = {'id_a': event_a.id,
                       'id_b': event_b.id}
             ajax = HttpAjax(self.parent, '/manager/exchange_room/',
@@ -299,12 +298,12 @@ class EventStorage(QAbstractTableModel):
             if ajax:
                 response = ajax.parse_json()
                 if response is not None:
-                    # добавить события, обменяв залы
+                    # add events, exchanging rooms
                     self.insert(room_a, event_b)
                     self.insert(room_b, event_a)
                     self.emit(SIGNAL('layoutChanged()'))
                     return True
-        # вертать взад
+        # get back
         self.insert(room_a, event_a)
         self.insert(room_b, event_b)
         self.emit(SIGNAL('layoutChanged()'))
@@ -342,8 +341,7 @@ class EventStorage(QAbstractTableModel):
             return None
 
     def headerData(self, section, orientation, role):
-        """ Метод для определения вертикальных и горизонтальных меток для
-        рядов и колонок таблицы. """
+        """ This method fills header cells. """
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             mon, sun = self.weekRange
             if 'week' == self.mode:
@@ -360,7 +358,7 @@ class EventStorage(QAbstractTableModel):
         return QVariant()
 
     def data(self, index, role, room_id=0):
-        """ Перегруженный метод базового класса. Под ролью понимаем зал. """
+        """ This method returns the data from model. Parameter 'role' here means room. """
         if not index.isValid():
             return QVariant()
         if role not in (Qt.DisplayRole, Qt.ToolTipRole):
@@ -391,15 +389,15 @@ class EventStorage(QAbstractTableModel):
         return self.weekRange[1]
 
     def get_event_by_cell(self, row, col, room_id):
-        """ Получение события по указанным координатам. """
+        """ This methods returns the event by given coordinates. """
         return self.storage.byRCR(ModelStorage.GET, (row, col, room_id))
 
     def get_cells_by_event(self, event, room_id):
-        """ Получение всех ячеек события. """
+        """ This method returns the cells list for given event. """
         return self.storage.getByER( (event, room_id) )
 
     def date2range(self, dt):
-        """ Возвращаем диапазон недели для переданной даты. """
+        """ This methods returns the day rango for a given week. """
         if type(dt) is datetime:
             dt = dt.date()
         monday = dt - timedelta(days=dt.weekday())
@@ -418,8 +416,7 @@ class EventStorage(QAbstractTableModel):
         return (row, col)
 
     def may_insert(self, event, room_id):
-        """ Метод для проверки позможности размещения события по указанным
-        координатам. Возвращает True/False. """
+        """ This method checks the ability of placing the event on schedule. """
         row, col = self.datetime2rowcol(event.begin)
         for i in xrange(event.duration.seconds / self.quant.seconds):
             if self.storage.byRCR(
@@ -454,18 +451,16 @@ class EventStorage(QAbstractTableModel):
 #                 result.append(room_id)
 #         return result
 
-    # Поддержка Drag'n'Drop - начало секции
+    # DnD support - the begin
 
     def supportedDropActions(self):
-        """ Метод для определения списка DnD действий, поддерживаемых
-        моделью. """
+        """ This method defines the actions supported by this model. """
         if DEBUG:
             print 'EventStorage::supportedDropActions'
         return (Qt.CopyAction | Qt.MoveAction)
 
     def flags(self, index):
-        """ Метод для определения списка элементов, которые могут участвовать
-        в DnD операциях. """
+        """ This method defines the list of items that may in DnD operations. """
         #if DEBUG:
         #    print 'EventStorage::flags', index.row(), index.column()
         if index.isValid():
@@ -476,13 +471,13 @@ class EventStorage(QAbstractTableModel):
         return res
 
     def mimeTypes(self):
-        """ Метод для декларации MIME типов, поддерживаемых моделью. """
+        """ This method declares supported MIME types. """
         types = QStringList()
         types << self.getMime('event') << self.getMime('team')
         return types
 
     def mimeData(self, indexes):
-        """ Метод для конвертации объектов в поддерживаемый MIME формат. """
+        """ This method converts objects into supported MIME format. """
         mimeData = QMimeData()
         encodedData = QByteArray()
 
@@ -523,7 +518,7 @@ class EventStorage(QAbstractTableModel):
         return True
 
     def setData(self, index, value, role):
-        """ Перегруженный метод базового класса. Под ролью понимаем зал. """
+        """ Parameter 'role' means room. """
         return True
 
     def setHeaderData(self, section, orientation, value, role):
@@ -542,5 +537,5 @@ class EventStorage(QAbstractTableModel):
 #     def insertRows(self, row, count, parent):
 #         print 'EventStorage::insertRows'
 
-    # Поддержка Drag'n'Drop - конец секции
+    # DnD support - the end
 

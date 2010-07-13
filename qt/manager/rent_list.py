@@ -125,7 +125,7 @@ class RentListModel(QAbstractTableModel):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return QVariant(self.labels[section])
         if orientation == Qt.Vertical and role == Qt.DisplayRole:
-            return QVariant(section+1) # порядковый номер
+            return QVariant(section+1) # order number
         return QVariant()
 
     def flags(self, index):
@@ -146,10 +146,10 @@ class RentListModel(QAbstractTableModel):
         try:
             value = record[idx_col]
         except IndexError:
-            return QVariant() # запись в модели ещё не заполнена
+            return QVariant() # model record isn't filled yet
 
         if value is None:
-            return QVariant() # пустое значение
+            return QVariant() # empty value
         else:
             return QVariant(object_type(value))
 

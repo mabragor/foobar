@@ -14,16 +14,29 @@ PAID_STATUS = [_('Reserved'),
                _('Piad partially'),
                _('Paid')]
 
+def date2str(value):
+    return datetime.strptime(value, '%Y-%m-%d').date()
+
+def dt2str(value):
+    if type(value) is datetime:
+        return value.strftime('%Y-%m-%d %H:%M:%S')
+    else:
+        raise RuntimeWarning('It must be datetime but %s' % type(value))
+
 MODEL_MAP_RAW = (
-    ('card_info', None, _('Information'), 'complex'),
-    ('price', None, _('Price'), 'float'),
-    ('count_used', None, _('Used'), 'int'),
-    ('count_available', None, _('Available'), 'int'),
-    ('begin date', None, _('Begin'), 'date2str'),
-    ('end date', None, _('End'), 'date2str'),
-    ('reg datetime', None, _('Register'), 'dt2str'),
-    ('cancel datetime', None, _('Cancel'), 'dt2str'),
-    ('id', None, 'id', 'int')
+    ('card_type', None, _('Type'), str),
+    ('card_meta', None, _('Meta'), unicode),
+    ('price_category', None, _('Category'), int),
+    ('price', None, _('Price'), float),
+    ('paid', None, _('Paid'), float),
+    ('count_sold', None, _('Sold'), int),
+    ('count_used', None, _('Used'), int),
+    ('count_available', None, _('Available'), int),
+    ('begin_date', None, _('Begin'), date2str),
+    ('end_date', None, _('End'), date2str),
+    ('reg_datetime', None, _('Register'), dt2str),
+    ('cancel_datetime', None, _('Cancel'), dt2str),
+    ('id', None, 'id', int)
 )
 MODEL_MAP = list()
 for name, delegate, title, action in MODEL_MAP_RAW:
@@ -42,8 +55,8 @@ class CardListModel(QAbstractTableModel):
 
     def initData(self, card_list):
         """
-        Формат полученных данных: см. методы about() у моделей.
-        Вызывается из DlgClientInfo::initData()
+        Data format is described in about() method of models.
+        Is called from DlgClientInfo::initData()
         """
         self.storage = card_list
         self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
@@ -98,34 +111,62 @@ class CardListModel(QAbstractTableModel):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return QVariant(MODEL_MAP[section].get('title', '--'))
         if orientation == Qt.Vertical and role == Qt.DisplayRole:
-            return QVariant(section+1) # порядковый номер
+            return QVariant(section+1) # order number
         return QVariant()
 
-    def flags(self, index):
+    def flags(self, index): # base class method
         if not index.isValid():
             return Qt.ItemIsEnabled
         return Qt.ItemIsEnabled | Qt.ItemIsEditable
 
-    def converter(self, value, action):
-        if value is None:
-            return QVariant()
+    def insert(self, card, position, role):
+        """ Insert a record into the model. """
+        #self.beginInsertRows(QModelIndex(), position, 1)
 
-        if action == 'id2title':
-            pass
-        elif action == 'int':
-            return int(value)
-        elif action == 'float':
-            return float(value)
-        elif action == 'date2str':
-            return datetime.strptime(value, '%Y-%m-%d').date()
-        elif action == 'date2str':
-            return datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
-        else:
-            raise RuntimeWarning
+        handlers = {
+            'abonement': self.prepare_abonement,
+            }
+        slug = card['slug']
+        handle = handlers[slug]
+        info = handle(card) # here is a dictionary
+
+        import pprint; pprint.pprint(info)
+
+        record = []
+
+        print info.keys()
+        for name, delegate, title, action in MODEL_MAP_RAW:
+            value = info.get(name, None)
+            print 'parsing: %s => %s' % (name, value)
+            record.append(value)
+        record.append(0) # this record is not registered in DB yet
+
+        import pprint; pprint.pprint(record)
+
+        self.storage.insert(0, record)
+        #self.endInsertRows()
+        self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
+                  QModelIndex(), 1, self.rowCount())
+
+    def prepare_abonement(self, card):
+        return {
+            'card_type': 'abonement',
+            'card_meta': None,
+            'price_category': card['price_category'],
+            'price': card['price'],
+            'paid': card['paid'],
+            'count_sold': card['count_sold'],
+            'count_used': 0,
+            'count_available': 0,
+            'begin_date': None,
+            'end_date': None,
+            'reg_datetime': datetime.now(),
+            'cancel_datetime': None
+            }
 
     def data(self, index, role): # base class method
         if not index.isValid():
-            return QVariant()
+            return QVariant('error')
         if role not in (Qt.DisplayRole, Qt.ToolTipRole, GET_ID_ROLE) :
             return QVariant()
         idx_row = index.row()
@@ -136,16 +177,16 @@ class CardListModel(QAbstractTableModel):
         delegate_editor = field_obj['delegate']
         action = field_obj['action']
 
-        return QVariant() # REMOVE
-
         try:
             record = self.storage[idx_row]
             value = record[idx_col]
+        except KeyError:
+            import pprint; pprint.pprint(self.storage)
         except IndexError:
             return QVariant()
 
         if value is None:
-            return QVariant()
+            return QVariant('--')
 
         if delegate_editor is QComboBox:
             if role == GET_ID_ROLE or action == 'int':
@@ -160,7 +201,7 @@ class CardListModel(QAbstractTableModel):
                value = data[0]['title']
                return QVariant(value)
 
-        return QVariant(self.converter(value, action))
+        return action(value)
 
     def setData(self, index, value, role):
         if index.isValid() and role == Qt.EditRole:
@@ -177,20 +218,6 @@ class CardListModel(QAbstractTableModel):
             return True
         return False
 
-    def insertRows(self, position, rows, parent):
-        self.beginInsertRows(QModelIndex(), position, len(rows)-1)
-        for row in rows:
-            column = 0
-            record = []
-
-            for name, delegate, title, action in MODEL_MAP_RAW:
-                value = row.get(name, None)
-                record.append(value)
-
-            self.storage.insert(0, record)
-        self.endInsertRows()
-        return True
-
     def removeRows(self, position, rows, parent):
         self.beginRemoveRows(QModelIndex(), position, position+rows-1)
         for i in xrange(rows):
@@ -202,8 +229,6 @@ class CardListModel(QAbstractTableModel):
        return 42
 
     def calculate_price(self, index):
-        """ Метод для подсчёта цены по известным типу карты, ценовой
-        категории и количеству занятий."""
         row = index.row()
         record = self.storage[row]
         card_type_id = record[0]
@@ -282,12 +307,12 @@ class CardListDelegate(QItemDelegate):
             items = self.static.get(field_name, list())
 
             if 1 == column:
-                # получаем идентификатор типа карты
+                # get the card type id
                 raw = model.data(model.index(row, 0), GET_ID_ROLE)
                 ct_id, ok = raw.toInt()
-                # получаем список всех типов карт
+                # the the list of all cards
                 possible_card_types = self.static.get('card_types', [])
-                # находим информацию о нужной
+                # search information for needed card
                 card_type = self.search_and_get(possible_card_types, 'id', ct_id)
                 price_cats = card_type.get('price_categories', [])
                 match_list = [i['id'] for i in price_cats]
@@ -364,7 +389,7 @@ class CardListDelegate(QItemDelegate):
 
 class CardList(QTableView):
 
-    """ Класс списка курсов. """
+    """ Courses list. """
 
     def __init__(self, parent=None, params=dict()):
         QTableView.__init__(self, parent)
@@ -384,8 +409,8 @@ class CardList(QTableView):
         self.model_obj = CardListModel(self)
         self.setModel(self.model_obj)
 
-        self.delegate = CardListDelegate(self)
-        self.setItemDelegate(self.delegate)
+        #self.delegate = CardListDelegate(self)
+        #self.setItemDelegate(self.delegate)
 
 #     def mousePressEvent(self, event):
 #         if event.button() == Qt.LeftButton:

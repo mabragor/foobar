@@ -90,6 +90,10 @@ class MainWindow(QMainWindow):
         self.http.request('/manager/static/', {})
         response = self.http.parse()
         self.static = response
+        #print 'Static is'
+        #
+        #import pprint; pprint.pprint(self.static)
+
         self.tree = TreeModel(self.static.get('styles', None))
 
     def update_interface(self):
@@ -175,9 +179,9 @@ class MainWindow(QMainWindow):
         return self.mimes.get(name, None)
 
     def create_menus(self):
-        """ Метод для генерации меню приложения. """
-        """ Использование: Описать меню со всеми действиями в блоке
-        data. Создать обработчики для каждого действия. """
+        """ This method generates the application menu. Usage:
+        Describe the menu with all its action in data block and
+        realize handlers for each action."""
         data = [
             (_('File'), [
                 (_('Log in'), 'Ctrl+I',
@@ -231,7 +235,7 @@ class MainWindow(QMainWindow):
 
         for topic, info in data:
             menu = self.menuBar().addMenu(topic)
-            # Отключаем элементы меню, надо войти в систему
+            # Disable the following menu actions, until user will be authorized.
             if topic != _('File'):
                 menu.setDisabled(True)
             for title, short, name, desc in info:
@@ -247,24 +251,24 @@ class MainWindow(QMainWindow):
                 self.menus.append(menu)
 
     def activate_interface(self):
-        # Активировать элементы меню
+        # Enable menu's action
         for menu in self.menus:
             menu.setDisabled(False)
-        # Активировать кнопки навигации
+        # Enable the navigation buttons
         self.buttonPrev.setDisabled(False)
         self.buttonNext.setDisabled(False)
         self.buttonToday.setDisabled(False)
 
     def refresh_data(self):
-        """ Метод для получения данных от сервера. Вызывается
-        периодически с помощью таймера."""
-        # если пользователь не аутентифицирован, ничего не делаем
+        """ This method get the data from a server. It call periodically using timer. """
+
+        # Do nothing until user authoruized
         if not self.http.is_session_open():
             return
-        # пока обновляем только модель календаря
+        # Just refresh the calendar's model
         self.schedule.model().update
 
-    # Обработчики меню: начало
+    # Menu handlers: The begin
 
     def login(self):
         def callback(credentials):
@@ -302,7 +306,7 @@ class MainWindow(QMainWindow):
                                     _('It seems you\'ve entered wrong login/password.'))
 
     def logout(self):
-        # Деактивировать элементы меню
+        # Disable menu's actions
         for menu in self.menus[1:]:
             menu.setDisabled(True)
         self.setWindowTitle('%s : %s' % (self.baseTitle, _('Login to start session')))
@@ -518,11 +522,10 @@ class MainWindow(QMainWindow):
         self.dialog.setCallback(callback)
         self.dialog.exec_()
 
-    # Обработчики меню: конец
+    # Menu handlers: The end
 
-#     def getUserInfo(self, rfid):
-# 	""" Метод для получения информации о пользователе по идентификатору
-# 	его карты. """
+#def getUserInfo(self, rfid):
+# 	""" This method get user's information by its card's identifier. """
 # 	ajax = HttpAjax(self, '/manager/get_client_info/',
 # 			{'rfid_code': rfid, mode='client'})
 # 	json_like = ajax.parse_json()
@@ -556,7 +559,7 @@ if __name__=="__main__":
                 file.close()
         return css
 
-    # глобальные параметры настроек приложения
+    # application global settings
     QCoreApplication.setOrganizationName('Home, Sweet Home')
     QCoreApplication.setOrganizationDomain('snegiri.dontexist.org')
     QCoreApplication.setApplicationName('foobar')

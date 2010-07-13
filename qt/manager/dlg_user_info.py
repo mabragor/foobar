@@ -18,8 +18,8 @@ from PyQt4.QtXmlPatterns import *
 from PyQt4 import uic
 
 def dictlist2dict(dictlist, key_field):
-    """ Функция преобразовывает список словарей в словарь, где ключом
-    выступает указанное поле."""
+    """ This function converts the list of dictionaries into one
+    dictionary using appropriate key field."""
     def _convertor(listitem):
         if type(listitem) is not dict:
             raise ValueError(_('It expexts a dictionary but took %s') % type(key_field))
@@ -34,9 +34,9 @@ def dictlist2dict(dictlist, key_field):
     return result
 
 def dictlist_keyval(dictlist, key_field, value):
-    """ Функция производит поиск по списку словарей и возвращает
-    список тех элементов, у которых значение определённого ключа
-    соответствует указанному."""
+    """ This function makes search on the list of dictionaries and
+    returns the list of items, which the value of appropriate key
+    equals the given value."""
     def _search(listitem):
         if type(listitem) is not dict:
             raise ValueError(_('It expexts a dictionary but took %s') % type(key_field))
@@ -47,11 +47,8 @@ def dictlist_keyval(dictlist, key_field, value):
     return filter(_search, dictlist)
 
 class WizardDialog(QDialog):
-    """
-    Диалог получает описание последовательности действий и
-    обеспечивает запросы пользователю и обработку ответов в
-    соответствии с данным описанием.
-    """
+    """ The dialog gives the description of a actions sequence and
+    asks user for datas and process his replies."""
 
     ui_file = None # will define later
 
@@ -223,7 +220,7 @@ class DlgClientInfo(QDialog):
         buttonLayout.addWidget(self.buttonApplyDialog)
         buttonLayout.addWidget(self.buttonCancelDialog)
 
-        # купленные курсы
+        # bought courses
         self.cardinfo = CardList(self, self.params)
 
         cardLayout = QVBoxLayout()
@@ -402,7 +399,7 @@ class DlgClientInfo(QDialog):
                 raise ValueError('could not parse XML:', results)
 
             card_type = dictlist_keyval(self.static['card_ordinary'], 'slug', slug)[0]
-            steps = {'card_slug': str(slug)}
+            steps = {'slug': str(slug)}
 
             root = sequence.documentElement()
             node = root.firstChild()
@@ -410,26 +407,24 @@ class DlgClientInfo(QDialog):
                 element = node.toElement()
                 if 'dialog' == element.tagName():
                     if node.hasAttributes():
-                        # вычисляем атрибуты диалога
+                        # get dialog's attributes
                         dlg_type = element.attribute('type')
                         dlg_title = element.attribute('title')
                         dlg_name = element.attribute('name')
                         static_key = element.hasAttribute('static') and str(element.attribute('static')) or None
                         default = element.hasAttribute('default') and element.attribute('default') or 0
 
-                        # получаем информацию о результирующем типе
+                        # get the result type info
                         result_as = str(element.attribute('result_as'))
                         result_types = {'integer': int, 'float': float}
                         conv = result_types[result_as]
 
-                        # если надо, вычисляем начальное значение
+                        # if there are child nodes, so
                         if node.hasChildNodes():
                             child = node.firstChild()
                             element = child.toElement()
                             if 'calculate' == element.tagName():
-                                # Если надо произвести вычисление и
-                                # указанная функция реализована в
-                                # классе, вызываем её
+                                # it needs to calculate the value using this class method
                                 if element.hasAttribute('function'):
                                     method_name = element.attribute('function')
                                     if hasattr(self, str(method_name)):
@@ -437,38 +432,34 @@ class DlgClientInfo(QDialog):
                                         if callable(function):
                                             default = function(card_type, steps)
                                         else:
-                                            print 'Это не метод.'
+                                            print 'This is not a callable.'
                                     else:
-                                        print 'Метод не определён в классе.'
+                                        print 'This method is not defined in the class.'
 
-                        # отображаем диалог и получаем данные от пользователя
+                        # show dialog and get a data from user
                         result = self.show_ui_dialog(dlg_type, dlg_title, default, static_key)
 
-                        # сохраняем данные с нужным типом
+                        # save user date with needed type
                         steps[str(dlg_name)] = conv(result)
 
-                        # пропускаем один диалог, если надо
-                        # ToDo: пропускать диалоги, пока не появится нужный.
+                        # skip the following dialog if it needs
+                        # ToDo: skip all dialogs until the one
                         if self.need_skip_next_dlg(node, conv, result):
                             node = node.nextSibling()
 
                 node = node.nextSibling()
 
-            print steps
+            #print steps
 
             # add user's discount
             #data.update( {'client_discount': self.comboDiscount.currentIndex()} )
 
             # send data to user's model
             model = self.cardinfo.model()
-            lastRow = model.rowCount(QModelIndex())
-            if model.insertRows(lastRow, 1, QModelIndex()):
-                index = model.index(0, 0)
-                model.insertRows(index, steps, Qt.EditRole)
+            model.insert(steps, 0, Qt.EditRole)
 
     def need_skip_next_dlg(self, node, conv, value):
-        """ Метод для реализации функционала пропуска следующего
-        диалога по условию."""
+        """ This method realises the skipping a next dialog by condition. """
         skip = False
         if node.hasChildNodes():
             child = node.firstChild()
@@ -481,10 +472,10 @@ class DlgClientInfo(QDialog):
         return skip
 
     def _price_abonement(self, card_type, steps):
-        """ Метод для вычисления цены абонемента. См. logic_clientcard.xml. """
+        """ This method calculate the abonement price. See logic_clientcard.xml. """
         prices = dictlist_keyval(card_type['price_categories'], 'id', steps['price_category'])[0]
 
-        count = int(steps['count'])
+        count = int(steps['count_sold'])
         if count == 1:
             price = float(prices['once_price'])
         elif count == 4:
@@ -497,6 +488,7 @@ class DlgClientInfo(QDialog):
             print _('Invalid usage. Why do you use count=%i' % count)
             price = float(0.0)
 
+        steps['price'] = price
         return price
 
     def show_ui_dialog(self, dlg_type, dlg_title, default=0, static_key=None):
@@ -510,7 +502,7 @@ class DlgClientInfo(QDialog):
         return result
 
     def applyDialog(self):
-        """ Применить настройки. """
+        """ Apply settings. """
         userinfo, ok = self.checkFields()
         if ok:
             self.saveSettings(userinfo)
