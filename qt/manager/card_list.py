@@ -15,7 +15,10 @@ PAID_STATUS = [_('Reserved'),
                _('Paid')]
 
 def date2str(value):
-    return datetime.strptime(value, '%Y-%m-%d').date()
+    if type(value) is date:
+        return value.strftime('%Y-%m-%d')
+    else:
+        raise RuntimeWarning('It must be date but %s' % type(value))
 
 def dt2str(value):
     if type(value) is datetime:
@@ -121,8 +124,6 @@ class CardListModel(QAbstractTableModel):
 
     def insert(self, card, position, role):
         """ Insert a record into the model. """
-        #self.beginInsertRows(QModelIndex(), position, 1)
-
         handlers = {
             'abonement': self.prepare_abonement,
             }
@@ -130,21 +131,14 @@ class CardListModel(QAbstractTableModel):
         handle = handlers[slug]
         info = handle(card) # here is a dictionary
 
-        import pprint; pprint.pprint(info)
-
         record = []
 
-        print info.keys()
         for name, delegate, title, action in MODEL_MAP_RAW:
             value = info.get(name, None)
-            print 'parsing: %s => %s' % (name, value)
             record.append(value)
         record.append(0) # this record is not registered in DB yet
 
-        import pprint; pprint.pprint(record)
-
         self.storage.insert(0, record)
-        #self.endInsertRows()
         self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
                   QModelIndex(), 1, self.rowCount())
 
