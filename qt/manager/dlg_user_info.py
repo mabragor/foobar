@@ -448,15 +448,21 @@ class DlgClientInfo(QDialog):
                             node = node.nextSibling()
 
                 node = node.nextSibling()
+            # end while
 
-            #print steps
-
-            # add user's discount
-            #data.update( {'client_discount': self.comboDiscount.currentIndex()} )
+            # fill count_available
+            if float(steps['price']) - float(steps['paid']) < 0.01: # client paid full price
+                steps['count_available'] = steps['count_sold']
+            else: # need to calculate
+                prices = dictlist_keyval(card_type['price_categories'], 'id', steps['price_category'])[0]
+                price = float(prices['once_price'])
+                from math import floor
+                steps['count_available'] = int(floor(steps['paid'] / price))
 
             # send data to user's model
             model = self.cardinfo.model()
             model.insert(steps, 0, Qt.EditRole)
+            model.dump()
 
     def need_skip_next_dlg(self, node, conv, value):
         """ This method realises the skipping a next dialog by condition. """

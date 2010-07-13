@@ -151,7 +151,7 @@ class CardListModel(QAbstractTableModel):
             'paid': card['paid'],
             'count_sold': card['count_sold'],
             'count_used': 0,
-            'count_available': 0,
+            'count_available': card['count_available'],
             'begin_date': None,
             'end_date': None,
             'reg_datetime': datetime.now(),
