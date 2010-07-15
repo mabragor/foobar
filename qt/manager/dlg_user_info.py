@@ -246,10 +246,9 @@ class DlgClientInfo(QDialog):
         self.setSignals()
 
         # discount combo
-        for i in self.params.get('discounts', list()): # see params
-            id = i['id']
-            title = u'%s - %s%%' % (i['title'], i['percent'])
-            self.comboDiscount.addItem(title, QVariant(id))
+        for i in self.static.get('discounts', list()): # see params
+            title = u'%(title)s - %(percent)s%%' % i
+            self.comboDiscount.addItem(title, QVariant(i['id']))
 
     def setRequired(self):
         self.editLastName.setProperty('required', QVariant(True))
