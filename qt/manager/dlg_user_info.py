@@ -17,6 +17,11 @@ from PyQt4.QtXml import *
 from PyQt4.QtXmlPatterns import *
 from PyQt4 import uic
 
+import pprint
+def dumpobj(title, value):
+    print title
+    pprint.pprint(value)
+
 def dictlist2dict(dictlist, key_field):
     """ This function converts the list of dictionaries into one
     dictionary using appropriate key field."""
