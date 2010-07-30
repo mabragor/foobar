@@ -264,50 +264,57 @@ class ClientInfo(UserInfo):
         return user.id
 
 class ClientCard(AjaxForm):
-
     client = forms.IntegerField()
-    card = forms.IntegerField()
-    team = forms.IntegerField()
-    price = forms.FloatField()
+    id = forms.IntegerField(required=False)
+    card_type = forms.CharField(max_length=64)
+    card_meta = forms.CharField(max_length=64, required=False)
+    discount = forms.IntegerField()
     price_category = forms.IntegerField()
+    price = forms.FloatField()
     paid = forms.FloatField()
-    paid_status = forms.IntegerField()
-    card_type = forms.IntegerField()
     count_sold = forms.IntegerField()
-    duration = forms.IntegerField()
+    count_used = forms.IntegerField()
+    count_available = forms.IntegerField()
+    begin_date = forms.DateField(required=False)
+    end_date = forms.DateField(required=False)
+    reg_datetime = forms.DateTimeField()
+    cancel_datetime = forms.DateTimeField(required=False)
 
     def clean_client(self):
         return self.check_obj_existence(storage.Client, 'client')
 
-    def clean_team(self):
-        return self.check_obj_existence(storage.Team, 'team')
+    def clean_discount(self):
+        return self.check_obj_existence(storage.Discount, 'discount')
+
+    def clean_price_category(self):
+        return self.check_obj_existence(storage.PriceCategoryTeam, 'price_category')
 
     def save(self):
         data = self.cleaned_data
-
-        client = self.get_object('client')
-        team = self.get_object('team')
-
-        card_id = data['card']
+        import pprint; pprint.pprint(data)
+        card_id = data['id']
         if card_id == 0:
-            card = storage.Card(client=client, team=team,
-                                paid=data['paid'],
-                                paid_status=data['paid_status'],
-                                card_type=data['card_type'],
-                                count_sold=data['count_sold'],
-                                duration=data['duration'],
-                                price=data['price'],
-                                price_category=data['price_category'],
-                                )
-        else:
+            del(data['id'])
+
+        if data['card_type'] == 'promo':
+            data['card_promo'] = storage.CardPromo.objects.get(
+                slug=data['card_meta'])
+        elif data['card_type'] == 'club':
+            data['card_club'] = storage.CardClub.objects.get(
+                slug=data['card_meta'])
+        else: # flyer, test, once, abonement
+            del(data['card_type'])
+            del(data['card_meta'])
+            data['discount'] = self.get_object('discount')
+            data['price_category'] = self.get_object('price_category')
+
+        if 0 == card_id: # create new card
+            data['client'] = self.get_object('client')
+            card = storage.Card(**data)
+        else: # edit the existed one
             card = storage.Card.objects.get(id=card_id)
-            card.paid = data['paid']
-            card.paid_status = data['paid_status']
-            card.card_type = data['card_type']
-            card.count_sold = data['count_sold']
-            card.duration = data['duration']
-            card.price = data['price']
-            card.price_category=data['price_category']
+            # ...
+        print 'type of card is', type(card)
         card.save()
 
 class RenterInfo(UserInfo):

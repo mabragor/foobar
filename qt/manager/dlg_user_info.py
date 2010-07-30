@@ -309,7 +309,6 @@ class DlgClientInfo(QDialog):
         self.dialog.setModal(True)
         dlgStatus = self.dialog.exec_()
 
-        """ Назначить карту пользователю. """
         if QDialog.Accepted == dlgStatus:
             self.editRFID.setText(self.rfid_id)
 
@@ -463,6 +462,10 @@ class DlgClientInfo(QDialog):
                 from math import floor
                 steps['count_available'] = int(floor(steps['paid'] / price))
 
+            import pprint
+            print 'STEPS:'
+            pprint.pprint(steps)
+
             # send data to user's model
             model = self.cardinfo.model()
             model.insert(steps, 0, Qt.EditRole)
@@ -552,6 +555,8 @@ class DlgClientInfo(QDialog):
         # save client's card
         model = self.cardinfo.model()
         params = model.get_model_as_formset(self.client_id)
+        print 'card_list formset is'
+        import pprint; pprint.pprint(params);
         self.http.request('/manager/set_client_card/', params)
         response = self.http.parse(default_response)
 

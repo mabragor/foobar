@@ -15,13 +15,15 @@ PAID_STATUS = [_('Reserved'),
                _('Paid')]
 
 def date2str(value):
-    if type(value) is date:
+    valtype = type(value)
+    if valtype is date:
         return value.strftime('%Y-%m-%d')
     else:
         raise RuntimeWarning('It must be date but %s' % type(value))
 
 def dt2str(value):
-    if type(value) is datetime:
+    valtype = type(value)
+    if valtype is datetime:
         return value.strftime('%Y-%m-%d %H:%M:%S')
     else:
         raise RuntimeWarning('It must be datetime but %s' % type(value))
@@ -29,6 +31,7 @@ def dt2str(value):
 MODEL_MAP_RAW = (
     ('card_type', None, _('Type'), str),
     ('card_meta', None, _('Meta'), unicode),
+    ('discount', None, _('Discount'), int),
     ('price_category', None, _('Category'), int),
     ('price', None, _('Price'), float),
     ('paid', None, _('Paid'), float),
@@ -39,7 +42,7 @@ MODEL_MAP_RAW = (
     ('end_date', None, _('End'), date2str),
     ('reg_datetime', None, _('Register'), dt2str),
     ('cancel_datetime', None, _('Cancel'), dt2str),
-    ('id', None, 'id', int)
+    ('id', None, 'id', int), # of card
 )
 MODEL_MAP = list()
 for name, delegate, title, action in MODEL_MAP_RAW:
@@ -71,30 +74,33 @@ class CardListModel(QAbstractTableModel):
         pprint.pprint(self.storage)
 
     def get_model_as_formset(self, client_id):
+        """ This method return Django-like formset dictionary using
+        the model's description."""
+        # Basement
         formset = {
             'form-TOTAL_FORMS': str(len(self.storage)),
             'form-INITIAL_FORMS': u'0',
             }
-        for record in self.storage:
-            index = self.storage.index(record)
+        # Fill the formset
+        for record_index, record in enumerate(self.storage):
+            prefix = 'form-%i' % record_index
+            row = {'%s-client' % prefix: client_id,}
+            for model_index, model_row in enumerate(MODEL_MAP_RAW):
+                name, delegate, title, action = model_row
+                key = '%s-%s' % (prefix, name)
+                value = record[model_index]
+                value_t = type(value)
 
-            title, price, paid, paid_status, card_type, \
-            count_sold, count_used, duration, \
-            reg_datetime, begin_date, exp_date, cancel_datetime, \
-            card_id, team_id, price_category = record
+                if value is None: # send None as empty string
+                    value = str()
+                elif value_t is datetime:
+                    value = dt2str(value)
+                elif value_t is date:
+                    value = date2str(value)
+                elif value_t in (int, float):
+                    value = str(value)
 
-            row = {
-                'form-%s-client' % index: client_id,
-                'form-%s-card' % index: card_id,
-                'form-%s-team' % index: team_id,
-                'form-%s-price' % index: price,
-                'form-%s-price_category' % index: int(price_category), #FIXME
-                'form-%s-paid' % index: paid,
-                'form-%s-paid_status' % index: paid_status,
-                'form-%s-card_type' % index: card_type,
-                'form-%s-count_sold' % index: count_sold,
-                'form-%s-duration' % index: duration,
-                }
+                row.update( {key: value} )
             formset.update( row )
         return formset
 
@@ -135,6 +141,7 @@ class CardListModel(QAbstractTableModel):
 
         for name, delegate, title, action in MODEL_MAP_RAW:
             value = info.get(name, None)
+            print '%s = %s' % (name, value)
             record.append(value)
         record.append(0) # this record is not registered in DB yet
 
@@ -144,8 +151,10 @@ class CardListModel(QAbstractTableModel):
 
     def prepare_abonement(self, card):
         return {
+            'id': 0,
             'card_type': 'abonement',
             'card_meta': None,
+            'discount': card['discount'],
             'price_category': card['price_category'],
             'price': card['price'],
             'paid': card['paid'],
@@ -303,6 +312,7 @@ class CardListDelegate(QItemDelegate):
             if 1 == column:
                 # get the card type id
                 raw = model.data(model.index(row, 0), GET_ID_ROLE)
+
                 ct_id, ok = raw.toInt()
                 # the the list of all cards
                 possible_card_types = self.static.get('card_types', [])

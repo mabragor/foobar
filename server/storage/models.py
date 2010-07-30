@@ -200,40 +200,47 @@ class Renter(AbstractUser):
 
 class Card(AbstractModel):
 
-    CARD_STATE = ( ('0', _(u'Wait')),
-                   ('1', _(u'Active')),
-                   ('2', _(u'Expired')),
-                   ('3', _(u'Used')),
-                   ('4', _(u'Cancel')) )
-
     client = models.ForeignKey(Client, verbose_name=_(u'Client'))
     discount = models.ForeignKey(Discount)
     card_ordinary = models.ForeignKey(CardOrdinary, null=True, blank=True)
     card_club = models.ForeignKey(CardClub, null=True, blank=True)
     card_promo = models.ForeignKey(CardPromo, null=True, blank=True)
+    price_category = models.ForeignKey(PriceCategoryTeam, verbose_name=_(u'Price category'))
     price = models.FloatField(verbose_name=_(u'Price'), help_text=_(u'Price with all discounts.'), default=float(0.00))
     paid = models.FloatField(verbose_name=_(u'Paid'), help_text=_(u'Paid amount.'), default=float(0.00))
-    count_available = models.IntegerField(verbose_name=_(u'Exercises available'), default=0)
     count_sold = models.IntegerField(verbose_name=_(u'Exercises sold'))
     count_used = models.IntegerField(verbose_name=_(u'Exercises used'), default=0)
+    count_available = models.IntegerField(verbose_name=_(u'Exercises available'), default=0)
     begin_date = models.DateField(verbose_name=_(u'Begin'), null=True)
     end_date = models.DateField(verbose_name=_(u'Expired'), null=True)
     cancel_datetime = models.DateTimeField(verbose_name=_(u'Cancelled'), null=True, blank=True)
-    state = models.CharField(verbose_name=_(u'State'), help_text=_(u'State of record'), max_length=1, choices=CARD_STATE, default=0)
 
     class Meta:
         verbose_name = _(u'Client\'s card')
         verbose_name_plural = _(u'Client\'s cards')
 
     def __unicode__(self):
+        res = None
         if self.card_club is not None:
-            return _(u'Club')
+            res = _(u'Club')
         elif self.card_promo is not None:
-            return _(u'Promo')
+            res = _(u'Promo')
         elif self.card_ordinary is not None:
-            return _(u'Normal')
+            res = _(u'Normal')
         else:
-            return _(u'Unknown')
+            res = _(u'Unknown')
+        return unicode(res)
+
+    @property
+    def state(self):
+        if self.begin_date is null:
+            return _(u'Wait')
+        if self.cancel_datetime is not null:
+            return _(u'Cancel')
+        if self.begin_date <= datetime.today() <= self.end_date:
+            return _(u'Active')
+        if self.end_date <= datetime.today():
+            return _(u'Expired')
 
 class Room(AbstractModel):
 

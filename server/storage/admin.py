@@ -19,7 +19,7 @@ class __Card(admin.ModelAdmin):
                     'is_active', 'reg_datetime', 'cancel_datetime')
     fieldsets = (
         (None, {'fields': ('card_ordinary', 'card_club', 'card_promo',
-                           'client', 'state', 'discount', 'price', 'paid',
+                           'client', 'discount', 'price', 'paid',
                            'count_available', 'count_sold', 'count_used',
                            'begin_date', 'end_date', 'is_active', 'cancel_datetime')}),
         )
