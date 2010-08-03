@@ -331,8 +331,8 @@ class MainWindow(QMainWindow):
         if not self.http or not self.http.is_session_open():
             return # login first
 
-	def callback(rfid):
-	    self.rfid_id = rfid
+        def callback(rfid):
+            self.rfid_id = rfid
 
         self.callback = callback
         self.dialog = DlgWaitingRFID(self)
@@ -356,6 +356,7 @@ class MainWindow(QMainWindow):
                     }
                 self.dialog = DlgClientInfo(self, params)
                 self.dialog.setModal(True)
+
                 self.dialog.initData(user_info)
                 self.dialog.exec_()
                 self.rfid_id = None
@@ -364,8 +365,8 @@ class MainWindow(QMainWindow):
         if not self.http or not self.http.is_session_open():
             return # login first
 
-	def callback(user_id):
-	    self.user_id = user_id
+        def callback(user_id):
+            self.user_id = user_id
 
         self.dialog = DlgSearchByName('client', self)
         self.dialog.setModal(True)

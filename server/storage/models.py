@@ -233,9 +233,9 @@ class Card(AbstractModel):
 
     @property
     def state(self):
-        if self.begin_date is null:
+        if self.begin_date is None:
             return _(u'Wait')
-        if self.cancel_datetime is not null:
+        if self.cancel_datetime is not None:
             return _(u'Cancel')
         if self.begin_date <= datetime.today() <= self.end_date:
             return _(u'Active')

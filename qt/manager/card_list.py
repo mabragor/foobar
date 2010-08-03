@@ -64,7 +64,8 @@ class CardListModel(QAbstractTableModel):
         Data format is described in about() method of models.
         Is called from DlgClientInfo::initData()
         """
-        self.storage = card_list
+        for item in card_list:
+            self.insert(item, 0)
         self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
                   QModelIndex(), 1, self.rowCount())
 
@@ -128,7 +129,7 @@ class CardListModel(QAbstractTableModel):
             return Qt.ItemIsEnabled
         return Qt.ItemIsEnabled | Qt.ItemIsEditable
 
-    def insert(self, card, position, role):
+    def insert(self, card, position, role=Qt.EditRole):
         """ Insert a record into the model. """
         handlers = {
             'abonement': self.prepare_abonement,
@@ -185,8 +186,9 @@ class CardListModel(QAbstractTableModel):
             value = record[idx_col]
         except KeyError:
             import pprint; pprint.pprint(self.storage)
+            return QVariant('-err-')
         except IndexError:
-            return QVariant()
+            return QVariant('-err-')
 
         if value is None:
             return QVariant('--')

@@ -297,12 +297,11 @@ class ClientCard(AjaxForm):
             del(data['id'])
 
         if data['card_type'] == 'promo':
-            data['card_promo'] = storage.CardPromo.objects.get(
-                slug=data['card_meta'])
+            data['card_promo'] = storage.CardPromo.objects.get(slug=data['card_meta'])
         elif data['card_type'] == 'club':
-            data['card_club'] = storage.CardClub.objects.get(
-                slug=data['card_meta'])
+            data['card_club'] = storage.CardClub.objects.get(slug=data['card_meta'])
         else: # flyer, test, once, abonement
+            data['card_ordinary'] = storage.CardOrdinary.objects.get(slug=data['card_type'])
             del(data['card_type'])
             del(data['card_meta'])
             data['discount'] = self.get_object('discount')
@@ -310,6 +309,7 @@ class ClientCard(AjaxForm):
 
         if 0 == card_id: # create new card
             data['client'] = self.get_object('client')
+            import pprint; pprint.pprint(data) # REMOVE IT
             card = storage.Card(**data)
         else: # edit the existed one
             card = storage.Card.objects.get(id=card_id)
