@@ -181,6 +181,7 @@ class DlgClientInfo(QDialog):
 
         self.client_id = u'0'
         self.setMinimumWidth(800)
+        self.setMinimumHeight(500)
 
         self.editLastName = QLineEdit()
         self.editFirstName = QLineEdit()

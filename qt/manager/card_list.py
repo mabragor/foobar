@@ -134,7 +134,19 @@ class CardListModel(QAbstractTableModel):
         handlers = {
             'abonement': self.prepare_abonement,
             }
-        slug = card['slug']
+
+        try:
+            slug = card['slug']
+        except KeyError:
+            if card['card_ordinary'] is not None:
+                slug = card['card_ordinary']['slug']
+            elif card['card_club'] is not None:
+                slug = card['card_club']['slug']
+            elif card['card_promo'] is not None:
+                slug = card['card_promo']['slug']
+            else:
+                raise
+
         handle = handlers[slug]
         info = handle(card) # here is a dictionary
 
@@ -205,6 +217,9 @@ class CardListModel(QAbstractTableModel):
             else:
                value = data[0]['title']
                return QVariant(value)
+
+        if type(value) is dict and 'id' in value:
+            value = value['id']
 
         return action(value)
 
