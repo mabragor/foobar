@@ -22,11 +22,17 @@ def date2str(value):
         raise RuntimeWarning('It must be date but %s' % type(value))
 
 def dt2str(value):
+    FORMAT = '%Y-%m-%d %H:%M:%S'
     valtype = type(value)
     if valtype is datetime:
-        return value.strftime('%Y-%m-%d %H:%M:%S')
-    else:
-        raise RuntimeWarning('It must be datetime but %s' % type(value))
+        return value.strftime(FORMAT)
+    elif valtype is unicode:
+        try:
+            datetime.strptime(value, FORMAT)
+            return value
+        except:
+            pass
+    raise RuntimeWarning('It must be datetime but %s' % type(value))
 
 MODEL_MAP_RAW = (
     ('card_type', None, _('Type'), str),
@@ -65,7 +71,7 @@ class CardListModel(QAbstractTableModel):
         Is called from DlgClientInfo::initData()
         """
         for item in card_list:
-            self.insert(item, 0)
+            self.insert_exist(item, 0)
         self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
                   QModelIndex(), 1, self.rowCount())
 
@@ -129,24 +135,12 @@ class CardListModel(QAbstractTableModel):
             return Qt.ItemIsEnabled
         return Qt.ItemIsEnabled | Qt.ItemIsEditable
 
-    def insert(self, card, position, role=Qt.EditRole):
+    def insert_new(self, card, position, role=Qt.EditRole):
         """ Insert a record into the model. """
         handlers = {
             'abonement': self.prepare_abonement,
             }
-
-        try:
-            slug = card['slug']
-        except KeyError:
-            if card['card_ordinary'] is not None:
-                slug = card['card_ordinary']['slug']
-            elif card['card_club'] is not None:
-                slug = card['card_club']['slug']
-            elif card['card_promo'] is not None:
-                slug = card['card_promo']['slug']
-            else:
-                raise
-
+        slug = card['slug']
         handle = handlers[slug]
         info = handle(card) # here is a dictionary
 
@@ -157,6 +151,32 @@ class CardListModel(QAbstractTableModel):
             print '%s = %s' % (name, value)
             record.append(value)
         record.append(0) # this record is not registered in DB yet
+
+        self.storage.insert(0, record)
+        self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
+                  QModelIndex(), 1, self.rowCount())
+
+    def insert_exist(self, card, position, role=Qt.EditRole):
+        import pprint; pprint.pprint(card)
+        """ Insert a record into the model. """
+        if card['card_ordinary'] is not None:
+            slug = card['card_ordinary']['slug']
+            card['card_type'] = 'abonement'
+        elif card['card_club'] is not None:
+            slug = card['card_club']['slug']
+            card['card_type'] = 'club'
+        elif card['card_promo'] is not None:
+            slug = card['card_promo']['slug']
+            card['card_type'] = 'promo'
+        else:
+            raise
+
+        record = []
+
+        for name, delegate, title, action in MODEL_MAP_RAW:
+            value = card.get(name, None)
+            print '%s = %s' % (name, value)
+            record.append(value)
 
         self.storage.insert(0, record)
         self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
@@ -207,19 +227,19 @@ class CardListModel(QAbstractTableModel):
 
         if delegate_editor is QComboBox:
             if role == GET_ID_ROLE or action == 'int':
-               return QVariant(value)
+                return QVariant(value)
 
             # or return title
             items = self.static.get(field_name, list())
             data = filter(lambda x: int(x['id']) == int(value), items)
             if len(data) != 1:
-               return QVariant(_('Choose'))
+                return QVariant(_('Choose'))
             else:
-               value = data[0]['title']
-               return QVariant(value)
+                value = data[0]['title']
+                return QVariant(value)
 
-        if type(value) is dict and 'id' in value:
-            value = value['id']
+        if type(value) is dict and 'title' in value:
+            return QVariant(value['title'])
 
         return action(value)
 

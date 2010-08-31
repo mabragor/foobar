@@ -291,6 +291,7 @@ class DlgClientInfo(QDialog):
                                QDate.currentDate())
         self.editRFID.setText(data.get('rfid_code', ''))
 
+        # fill the card list
         card_list = data.get('team_list', [])
         self.cardinfo.model().initData(card_list)
 
@@ -469,7 +470,7 @@ class DlgClientInfo(QDialog):
 
             # send data to user's model
             model = self.cardinfo.model()
-            model.insert(steps, 0)
+            model.insert_new(steps, 0)
             model.dump()
 
     def need_skip_next_dlg(self, node, conv, value):
