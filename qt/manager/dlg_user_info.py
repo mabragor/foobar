@@ -283,8 +283,9 @@ class DlgClientInfo(QDialog):
             self.comboDiscount.setCurrentIndex( index )
 
         def str2date(value):
-            import time
-            return datetime(*time.strptime(value, '%Y-%m-%d')[:3])
+            return datetime.strptime(value, '%Y-%m-%d').date()
+            #import time
+            #return datetime(*time.strptime(value, '%Y-%m-%d')[:3])
 
         birth_date = data.get('birth_date', None) # it could be none while testing
         self.dateBirth.setDate(birth_date and str2date(birth_date) or \
@@ -314,23 +315,23 @@ class DlgClientInfo(QDialog):
         if QDialog.Accepted == dlgStatus:
             self.editRFID.setText(self.rfid_id)
 
-    def add_card_record(self):
-        data  = {
-            'card_types': 1,
-            'price_cats_team': 1,
-            'count_sold': 0,
-            'price': 0.0,
-            'discount': 0,
-            'count_available': 0,
-            'count_used': 0,
-            'reg_datetime': _('Now'),
-            }
-        rows = []
-        rows.append(data)
-        model = self.cardinfo.model()
-        lastRow = model.rowCount(QModelIndex())
-        ok = model.insertRows(lastRow, rows, QModelIndex())
-        model.dump()
+    # def add_card_record(self):
+    #     data  = {
+    #         'card_types': 1,
+    #         'price_cats_team': 1,
+    #         'count_sold': 0,
+    #         'price': 0.0,
+    #         'discount': 0,
+    #         'count_available': 0,
+    #         'count_used': 0,
+    #         'reg_datetime': _('Now'),
+    #         }
+    #     rows = []
+    #     rows.append(data)
+    #     model = self.cardinfo.model()
+    #     lastRow = model.rowCount(QModelIndex())
+    #     ok = model.insertRows(lastRow, rows, QModelIndex())
+    #     model.dump()
 
     def xml_query(self, file_name, xquery, slug):
 
@@ -464,14 +465,14 @@ class DlgClientInfo(QDialog):
                 from math import floor
                 steps['count_available'] = int(floor(steps['paid'] / price))
 
-            import pprint
-            print 'STEPS:'
-            pprint.pprint(steps)
+            # import pprint
+            # print 'STEPS:'
+            # pprint.pprint(steps)
 
             # send data to user's model
             model = self.cardinfo.model()
             model.insert_new(steps, 0)
-            model.dump()
+            # model.dump()
 
     def need_skip_next_dlg(self, node, conv, value):
         """ This method realises the skipping a next dialog by condition. """

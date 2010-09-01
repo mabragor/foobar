@@ -154,7 +154,7 @@ class CardListModel(QAbstractTableModel):
 
         self.storage.insert(0, record)
         self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
-                  QModelIndex(), 1, self.rowCount())
+                  QModelIndex(), 1, 1)
 
     def insert_exist(self, card, position, role=Qt.EditRole):
         import pprint; pprint.pprint(card)
@@ -179,8 +179,6 @@ class CardListModel(QAbstractTableModel):
             record.append(value)
 
         self.storage.insert(0, record)
-        self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
-                  QModelIndex(), 1, self.rowCount())
 
     def prepare_abonement(self, card):
         return {
