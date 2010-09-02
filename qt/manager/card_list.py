@@ -62,7 +62,7 @@ class CardListModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self, parent)
 
         self.static = parent.static
-        self.storage = [] # here the data is stored
+        self.storage = [] # here the data is stored, as list of dictionaries
         self.hidden_fields = 1 # from end of following lists
 
     def initData(self, card_list):
@@ -70,7 +70,10 @@ class CardListModel(QAbstractTableModel):
         Data format is described in about() method of models.
         Is called from DlgClientInfo::initData()
         """
+        import pprint
         for item in card_list:
+            print '======\nITEM\n======'
+            pprint.pprint(item)
             self.insert_exist(item, 0)
         self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
                   QModelIndex(), 1, self.rowCount())
@@ -106,6 +109,11 @@ class CardListModel(QAbstractTableModel):
                     value = date2str(value)
                 elif value_t in (int, float):
                     value = str(value)
+                elif value_t is dict:
+                    if 'id' in value:
+                        value = value['id']
+                    else:
+                        value = 'no id found'
 
                 row.update( {key: value} )
             formset.update( row )
@@ -157,7 +165,7 @@ class CardListModel(QAbstractTableModel):
                   QModelIndex(), 1, 1)
 
     def insert_exist(self, card, position, role=Qt.EditRole):
-        import pprint; pprint.pprint(card)
+        #import pprint; pprint.pprint(card)
         """ Insert a record into the model. """
         if card['card_ordinary'] is not None:
             slug = card['card_ordinary']['slug']
@@ -215,7 +223,7 @@ class CardListModel(QAbstractTableModel):
             record = self.storage[idx_row]
             value = record[idx_col]
         except KeyError:
-            import pprint; pprint.pprint(self.storage)
+            #import pprint; pprint.pprint(self.storage)
             return QVariant('-err-')
         except IndexError:
             return QVariant('-err-')
