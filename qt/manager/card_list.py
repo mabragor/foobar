@@ -35,23 +35,23 @@ def dt2str(value):
     raise RuntimeWarning('It must be datetime but %s' % type(value))
 
 MODEL_MAP_RAW = (
-    ('card_type', None, _('Type'), str),
-    ('card_meta', None, _('Meta'), unicode),
-    ('discount', None, _('Discount'), int),
-    ('price_category', None, _('Category'), int),
-    ('price', None, _('Price'), float),
-    ('paid', None, _('Paid'), float),
-    ('count_sold', None, _('Sold'), int),
-    ('count_used', None, _('Used'), int),
-    ('count_available', None, _('Available'), int),
-    ('begin_date', None, _('Begin'), date2str),
-    ('end_date', None, _('End'), date2str),
-    ('reg_datetime', None, _('Register'), dt2str),
-    ('cancel_datetime', None, _('Cancel'), dt2str),
-    ('id', None, 'id', int), # of card
+    ('card_type', None, _('Type'), str, False),
+    ('card_meta', None, _('Meta'), unicode, False),
+    ('discount', None, _('Discount'), int, True),
+    ('price_category', None, _('Category'), int, True),
+    ('price', None, _('Price'), float, False),
+    ('paid', None, _('Paid'), float, False),
+    ('count_sold', None, _('Sold'), int, False),
+    ('count_used', None, _('Used'), int, False),
+    ('count_available', None, _('Available'), int, False),
+    ('begin_date', None, _('Begin'), date2str, False),
+    ('end_date', None, _('End'), date2str, False),
+    ('reg_datetime', None, _('Register'), dt2str, False),
+    ('cancel_datetime', None, _('Cancel'), dt2str, False),
+    ('id', None, 'id', int, False), # of card
 )
 MODEL_MAP = list()
-for name, delegate, title, action in MODEL_MAP_RAW:
+for name, delegate, title, action, static in MODEL_MAP_RAW:
     record = {'name': name, 'delegate': delegate,
              'title': title, 'action': action}
     MODEL_MAP.append(record)
@@ -96,7 +96,7 @@ class CardListModel(QAbstractTableModel):
             prefix = 'form-%i' % record_index
             row = {'%s-client' % prefix: client_id,}
             for model_index, model_row in enumerate(MODEL_MAP_RAW):
-                name, delegate, title, action = model_row
+                name, delegate, title, action, static = model_row
                 key = '%s-%s' % (prefix, name)
                 value = record[model_index]
                 value_t = type(value)
@@ -146,16 +146,37 @@ class CardListModel(QAbstractTableModel):
     def insert_new(self, card, position, role=Qt.EditRole):
         """ Insert a record into the model. """
         handlers = {
-            'abonement': self.prepare_abonement,
+            'abonement': (self.prepare_abonement, 'card_ordinary'),
             }
         slug = card['slug']
-        handle = handlers[slug]
+        handle, card_type = handlers[slug]
         info = handle(card) # here is a dictionary
+
+        card_desc_list = self.static[card_type]
+        search_result = filter(lambda a: a['slug'] == slug, card_desc_list)
+        if len(search_result) != 1:
+            raise Exception('Check card type list')
+        this_card = search_result[0]
+
+        # задача:
+        # подменять идентификатор ценовой категории и скидки
+        # на словарь с реальными данными
 
         record = []
 
-        for name, delegate, title, action in MODEL_MAP_RAW:
+        for name, delegate, title, action, use_static in MODEL_MAP_RAW:
             value = info.get(name, None)
+            if use_static:
+                if name == 'price_category':
+                    value = filter(
+                        lambda a: a['id'] == value,
+                        this_card['price_categories']
+                        )[0]
+                if name == 'discount':
+                    value = filter(
+                        lambda a: a['id'] == value,
+                        self.static['discounts']
+                        )[0]
             print '%s = %s' % (name, value)
             record.append(value)
         record.append(0) # this record is not registered in DB yet
@@ -181,7 +202,7 @@ class CardListModel(QAbstractTableModel):
 
         record = []
 
-        for name, delegate, title, action in MODEL_MAP_RAW:
+        for name, delegate, title, action, static in MODEL_MAP_RAW:
             value = card.get(name, None)
             print '%s = %s' % (name, value)
             record.append(value)
