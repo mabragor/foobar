@@ -269,7 +269,7 @@ class ClientCard(AjaxForm):
     card_type = forms.CharField(max_length=64)
     card_meta = forms.CharField(max_length=64, required=False)
     discount = forms.IntegerField()
-    price_category = forms.IntegerField()
+    price_category = forms.IntegerField(required=False)
     price = forms.FloatField()
     paid = forms.FloatField()
     count_sold = forms.IntegerField()
@@ -287,6 +287,8 @@ class ClientCard(AjaxForm):
         return self.check_obj_existence(storage.Discount, 'discount')
 
     def clean_price_category(self):
+        if not self.cleaned_data['price_category']:
+            return None
         return self.check_obj_existence(storage.PriceCategoryTeam, 'price_category')
 
     def save(self):
@@ -302,10 +304,14 @@ class ClientCard(AjaxForm):
             data['card_club'] = storage.CardClub.objects.get(slug=data['card_meta'])
         else: # flyer, test, once, abonement
             data['card_ordinary'] = storage.CardOrdinary.objects.get(slug=data['card_type'])
+            card_type = data['card_type']
+
             del(data['card_type'])
             del(data['card_meta'])
+
             data['discount'] = self.get_object('discount')
-            data['price_category'] = self.get_object('price_category')
+            if card_type in ('abonement',):
+                data['price_category'] = self.get_object('price_category')
 
         if 0 == card_id: # create new card
             data['client'] = self.get_object('client')

@@ -456,14 +456,16 @@ class DlgClientInfo(QDialog):
                 node = node.nextSibling()
             # end while
 
+            print card_type
             # fill count_available
-            if float(steps['price']) - float(steps['paid']) < 0.01: # client paid full price
-                steps['count_available'] = steps['count_sold']
-            else: # need to calculate
-                prices = dictlist_keyval(card_type['price_categories'], 'id', steps['price_category'])[0]
-                price = float(prices['once_price'])
-                from math import floor
-                steps['count_available'] = int(floor(steps['paid'] / price))
+            if not card_type['is_priceless']:
+                if float(steps['price']) - float(steps['paid']) < 0.01: # client paid full price
+                    steps['count_available'] = steps['count_sold']
+                else: # need to calculate
+                    prices = dictlist_keyval(card_type['price_categories'], 'id', steps['price_category'])[0]
+                    price = float(prices['once_price'])
+                    from math import floor
+                    steps['count_available'] = int(floor(steps['paid'] / price))
 
             # import pprint
             # print 'STEPS:'

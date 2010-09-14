@@ -2,7 +2,7 @@
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 # (c) 2009      Dmitry <alerion.um@gmail.com>
 
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 
 from django.conf import settings
 from django.db import models
@@ -205,7 +205,7 @@ class Card(AbstractModel):
     card_ordinary = models.ForeignKey(CardOrdinary, null=True, blank=True)
     card_club = models.ForeignKey(CardClub, null=True, blank=True)
     card_promo = models.ForeignKey(CardPromo, null=True, blank=True)
-    price_category = models.ForeignKey(PriceCategoryTeam, verbose_name=_(u'Price category'))
+    price_category = models.ForeignKey(PriceCategoryTeam, verbose_name=_(u'Price category'), null=True, blank=True)
     price = models.FloatField(verbose_name=_(u'Price'), help_text=_(u'Price with all discounts.'), default=float(0.00))
     paid = models.FloatField(verbose_name=_(u'Paid'), help_text=_(u'Paid amount.'), default=float(0.00))
     count_sold = models.IntegerField(verbose_name=_(u'Exercises sold'))
@@ -226,7 +226,7 @@ class Card(AbstractModel):
         elif self.card_promo is not None:
             res = _(u'Promo')
         elif self.card_ordinary is not None:
-            res = _(u'Normal')
+            res = self.card_ordinary.__unicode__()
         else:
             res = _(u'Unknown')
         return unicode(res)
@@ -237,9 +237,9 @@ class Card(AbstractModel):
             return _(u'Wait')
         if self.cancel_datetime is not None:
             return _(u'Cancel')
-        if self.begin_date <= datetime.today() <= self.end_date:
+        if self.begin_date <= date.today() <= self.end_date:
             return _(u'Active')
-        if self.end_date <= datetime.today():
+        if self.end_date <= datet.today():
             return _(u'Expired')
 
 class Room(AbstractModel):

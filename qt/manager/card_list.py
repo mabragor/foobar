@@ -18,6 +18,8 @@ def date2str(value):
     valtype = type(value)
     if valtype is date:
         return value.strftime('%Y-%m-%d')
+    elif valtype is unicode:
+        return value
     else:
         raise RuntimeWarning('It must be date but %s' % type(value))
 
@@ -144,8 +146,10 @@ class CardListModel(QAbstractTableModel):
         return Qt.ItemIsEnabled | Qt.ItemIsEditable
 
     def insert_new(self, card, position, role=Qt.EditRole):
-        """ Insert a record into the model. """
+        """ Insert a record into the model. Parameter 'card' has an
+        information obtained from UI dialogs."""
         handlers = {
+            'flyer': (self.prepare_flyer, 'card_ordinary'),
             'abonement': (self.prepare_abonement, 'card_ordinary'),
             }
         slug = card['slug']
@@ -158,21 +162,17 @@ class CardListModel(QAbstractTableModel):
             raise Exception('Check card type list')
         this_card = search_result[0]
 
-        # задача:
-        # подменять идентификатор ценовой категории и скидки
-        # на словарь с реальными данными
-
         record = []
 
         for name, delegate, title, action, use_static in MODEL_MAP_RAW:
             value = info.get(name, None)
             if use_static:
-                if name == 'price_category':
+                if value and name == 'price_category':
                     value = filter(
                         lambda a: a['id'] == value,
                         this_card['price_categories']
                         )[0]
-                if name == 'discount':
+                if value and name == 'discount':
                     value = filter(
                         lambda a: a['id'] == value,
                         self.static['discounts']
@@ -190,7 +190,7 @@ class CardListModel(QAbstractTableModel):
         """ Insert a record into the model. """
         if card['card_ordinary'] is not None:
             slug = card['card_ordinary']['slug']
-            card['card_type'] = 'abonement'
+            card['card_type'] = slug
         elif card['card_club'] is not None:
             slug = card['card_club']['slug']
             card['card_type'] = 'club'
@@ -208,6 +208,26 @@ class CardListModel(QAbstractTableModel):
             record.append(value)
 
         self.storage.insert(0, record)
+
+    def prepare_flyer(self, card):
+        print 'prepare_flyer'
+        print card
+        return {
+            'id': 0,
+            'card_type': 'flyer',
+            'card_meta': None,
+            'discount': 1,
+            'price_category': None,
+            'price': 0,
+            'paid': 0,
+            'count_sold': 1,
+            'count_used': 0,
+            'count_available': 1,
+            'begin_date': date.today(),
+            'end_date': date.today(),
+            'reg_datetime': datetime.now(),
+            'cancel_datetime': None
+            }
 
     def prepare_abonement(self, card):
         return {
