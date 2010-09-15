@@ -145,11 +145,17 @@ class CardListModel(QAbstractTableModel):
             return Qt.ItemIsEnabled
         return Qt.ItemIsEnabled | Qt.ItemIsEditable
 
+    def prepare_proxy(self, slug):
+        return lambda card: self.prepare_testonce(card, slug)
+
     def insert_new(self, card, position, role=Qt.EditRole):
         """ Insert a record into the model. Parameter 'card' has an
         information obtained from UI dialogs."""
+
         handlers = {
             'flyer': (self.prepare_flyer, 'card_ordinary'),
+            'test': (self.prepare_proxy('test'), 'card_ordinary'),
+            'once': (self.prepare_proxy('once'), 'card_ordinary'),
             'abonement': (self.prepare_abonement, 'card_ordinary'),
             }
         slug = card['slug']
@@ -210,8 +216,6 @@ class CardListModel(QAbstractTableModel):
         self.storage.insert(0, record)
 
     def prepare_flyer(self, card):
-        print 'prepare_flyer'
-        print card
         return {
             'id': 0,
             'card_type': 'flyer',
@@ -223,6 +227,24 @@ class CardListModel(QAbstractTableModel):
             'count_sold': 1,
             'count_used': 0,
             'count_available': 1,
+            'begin_date': date.today(),
+            'end_date': date.today(),
+            'reg_datetime': datetime.now(),
+            'cancel_datetime': None
+            }
+
+    def prepare_testonce(self, card, slug):
+        return {
+            'id': 0,
+            'card_type': slug,
+            'card_meta': None,
+            'discount': 1,
+            'price_category': card['price_category'],
+            'price': card['price'],
+            'paid': card['paid'],
+            'count_sold': card['count_sold'],
+            'count_used': 0,
+            'count_available': card['count_available'],
             'begin_date': date.today(),
             'end_date': date.today(),
             'reg_datetime': datetime.now(),

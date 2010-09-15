@@ -457,8 +457,17 @@ class DlgClientInfo(QDialog):
             # end while
 
             print card_type
+            print steps
             # fill count_available
             if not card_type['is_priceless']:
+                # here all prices defined hard, no delays for payment
+                if card_type['slug'] in ('test', 'once'):
+                    key = '%s_price' % card_type['slug']
+                    prices = dictlist_keyval(card_type['price_categories'], 'id', steps['price_category'])[0]
+                    price = float(prices[key])
+                    steps['price'] = steps['paid'] = price
+                    steps['count_sold'] = 1
+
                 if float(steps['price']) - float(steps['paid']) < 0.01: # client paid full price
                     steps['count_available'] = steps['count_sold']
                 else: # need to calculate

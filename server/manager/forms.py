@@ -287,6 +287,7 @@ class ClientCard(AjaxForm):
         return self.check_obj_existence(storage.Discount, 'discount')
 
     def clean_price_category(self):
+        print self.cleaned_data
         if not self.cleaned_data['price_category']:
             return None
         return self.check_obj_existence(storage.PriceCategoryTeam, 'price_category')
@@ -310,7 +311,7 @@ class ClientCard(AjaxForm):
             del(data['card_meta'])
 
             data['discount'] = self.get_object('discount')
-            if card_type in ('abonement',):
+            if card_type in ('test', 'once', 'abonement'):
                 data['price_category'] = self.get_object('price_category')
 
         if 0 == card_id: # create new card

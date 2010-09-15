@@ -239,7 +239,7 @@ class Card(AbstractModel):
             return _(u'Cancel')
         if self.begin_date <= date.today() <= self.end_date:
             return _(u'Active')
-        if self.end_date <= datet.today():
+        if self.end_date <= date.today():
             return _(u'Expired')
 
 class Room(AbstractModel):
