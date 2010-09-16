@@ -66,6 +66,7 @@ class TabAbstract(QWidget):
         self.parent = parent
 
     def saveSettings(self, settings):
+        is_changed = False
         settings.beginGroup(self.groupName)
         for name in self.defaults.keys():
             field = getattr(self, name)
@@ -73,17 +74,26 @@ class TabAbstract(QWidget):
                 value = field.text()
             elif type(field) is QCheckBox:
                 value = field.isChecked()
+            original_value = self.defaults[name]
+            if original_value != value:
+                is_changed = True
             settings.setValue(name, QVariant(value))
         settings.endGroup()
+        return is_changed
 
     def loadSettings(self, settings):
         settings.beginGroup(self.groupName)
         for name in self.defaults.keys():
             field = getattr(self, name)
+            raw_value = settings.value(name, QVariant(self.defaults[name]))
             if type(field) is QLineEdit:
-                field.setText(settings.value(name, QVariant(self.defaults[name])).toString())
+                value = raw_value.toString()
+                field.setText(value)
             elif type(field) is QCheckBox:
-                field.setChecked(settings.value(name, QVariant(self.defaults[name])).toBool())
+                value = raw_value.toBool()
+                field.setChecked(value)
+            # keep for compare when saving
+            self.defaults[name] = value
         settings.endGroup()
 
 class TabGeneral(TabAbstract):

@@ -90,9 +90,8 @@ class MainWindow(QMainWindow):
         self.http.request('/manager/static/', {})
         response = self.http.parse()
         self.static = response
-        #print 'Static is'
-        #
-        #import pprint; pprint.pprint(self.static)
+        print 'Static is'
+        import pprint; pprint.pprint(self.static)
 
         self.tree = TreeModel(self.static.get('styles', None))
 
@@ -317,6 +316,7 @@ class MainWindow(QMainWindow):
         self.dialog.setModal(True)
         self.dialog.exec_()
         self.get_dynamic()
+        self.http.reconnect()
 
     def client_new(self):
         params = {

@@ -14,21 +14,33 @@ class Http:
     def __init__(self, parent=None):
         self.session_id = None
         self.parent = parent
-        self.headers = {'Content-type': 'application/x-www-form-urlencoded',
-                   'Accept': 'text/plain'}
-        (self.host, self.port) = self.get_settings()
-        self.hostport = '%s:%s' % (self.host, self.port)
-        if DEBUG:
-            print 'Http:', self.hostport, '\n', self.headers
-
+        self.headers = {
+            'Content-type': 'application/x-www-form-urlencoded',
+            'Accept': 'text/plain'
+            }
         self.connect()
 
     def __del__(self):
         # close server's connection
-        self.conn.close()
+        self.disconnect()
+
+    def debug(self, message):
+        if DEBUG:
+            print '%s: %s' % (__name__, message)
 
     def connect(self):
+        (self.host, self.port) = self.get_settings()
+        self.hostport = '%s:%s' % (self.host, self.port)
+        self.debug('Connect to %s\n%s' % (self.hostport, self.headers))
         self.conn = httplib.HTTPConnection(self.hostport)
+
+    def disconnect(self):
+        self.debug('Disconnect')
+        self.conn.close()
+
+    def reconnect(self):
+        self.disconnect()
+        self.connect()
 
     def is_session_open(self):
         return self.session_id is not None
@@ -55,8 +67,7 @@ class Http:
                 self.conn.request('POST', url, params, self.headers)
                 break
             except httplib.CannotSendRequest:
-                print 'reconnect'
-                self.connect()
+                self.reconnect()
 
         self.response = self.conn.getresponse()
 
@@ -76,8 +87,7 @@ class Http:
                 pprint.pprint(cookie)
 
             self.session_id = cookie.get('sessionid', None)
-            if DEBUG:
-                print 'session id is', self.session_id
+            self.debug('session id is %s' % self.session_id)
 
     def parse(self, default={}): # public
         if self.response.status == 200: # http status
