@@ -212,3 +212,6 @@ class __Visit(admin.ModelAdmin):
     list_display = ('client', 'schedule', 'card')
 admin.site.register(models.Visit, __Visit)
 
+class __Log(admin.ModelAdmin):
+    pass
+admin.site.register(models.Log, __Log)
