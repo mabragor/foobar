@@ -1,0 +1,28 @@
+participant Client
+participant RFID
+participant Manager
+participant System
+
+Client -> Manager: I got a flyer.
+
+note right of Manager: Flyer had been allowed in limited list\nof price categories.
+
+alt: Client has RFID label.
+  Manager -> System: Switch to RFID mode.
+  System -> RFID: Wait for label.
+  Client -> RFID: Bring label on reader.
+  RFID -> System: Search client by ID.
+else: Absolutely new client.
+  Manager -> System: Register new client.\n(see appropriate diagram)
+end
+
+System -> Manager: Client's info dialog.
+Manager -> System: Register flyer training ticket.
+
+Manager -> Client: Which training do you want to visit?
+Client -> Manager: This one.
+Manager -> System: Confirm choice.
+System -> System: Close flyer training ticket.
+Manager -> Client: Please proceed to training.
+
+
