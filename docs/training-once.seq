@@ -1,0 +1,38 @@
+participant Client
+participant RFID
+participant Manager
+participant System
+
+Client -> Manager: I want to visit this training one time.\nHere is a payment.
+
+note right of Manager: One training had been allowed in limited list\nof price categories.
+
+alt: Client has RFID label.
+  Manager -> System: Switch to RFID mode.
+  System -> RFID: Wait for label.
+  Client -> RFID: Bring label on reader.
+  RFID -> System: Search client by ID.
+else: Absolutely new client.
+  Manager -> System: Register new client.\n(see appropriate diagram)
+end
+
+System -> Manager: Client's info dialog.
+Manager -> System: Register once training ticket.
+
+alt: Client has RFID label.
+  Manager -> System: Switch to RFID mode.
+  System -> RFID: Wait for label.
+  Client -> RFID: Bring label on reader.
+  RFID -> System: Search user by ID.
+else: Client forgets his/her label somewhere.
+  Manager -> System: Search by name.
+end
+
+System -> System: Search ready to run\ntrainings for client's capabilities.
+System -> Manager: List of trainings.
+Manager -> Client: Which training do you want to visit?
+Client -> Manager: This one.
+Manager -> System: Confirm choice.
+System -> System: Close once training ticket.
+Manager -> Client: Please proceed to training.
+
