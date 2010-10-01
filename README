@@ -6,3 +6,7 @@ Depends on:
 * python-django
 * python-dateutil
 * mysql5
+
+PiP:
+* South from http://south.aeracode.org/
+
