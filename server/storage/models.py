@@ -326,8 +326,14 @@ class Calendar(AbstractModel):
                            max_length=1, choices=DAYS_OF_WEEK,
                            default=0)
 
+    class Meta:
+        verbose_name = _(u'Calendar')
+        verbose_name_plural = _(u'Calendars')
+
     def __unicode__(self):
-        return _(u'%s at %s in %s') % (self.get_day_display(), self.time, self.room)
+        return _(u'%(day)s at %(time)s in %(room)s') % {'day': self.get_day_display(),
+                                                        'time': self.time,
+                                                        'room': self.room}
 
     def about(self, short=False, exclude_fields=tuple()):
         exclude_fields = ('team', 'rent')
