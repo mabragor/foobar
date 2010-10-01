@@ -1,38 +1,32 @@
-participant Client
+participant Клиент
 participant RFID
-participant Manager
-participant System
+participant Менеджер
+participant Система
 
-Client -> Manager: I want to test this training.\nHere is a payment.
+Клиент -> Менеджер: Я хочу купить пробное занятие.
 
-note right of Manager: Test training had been allowed in limited list\nof price categories.
+note right of Менеджер: Пробное посещение одного занятия доступно для определённых курсов \n в диапазоне разрешённых ценовых категорий.
 
-alt: Client has RFID label.
-  Manager -> System: Switch to RFID mode.
-  System -> RFID: Wait for label.
-  Client -> RFID: Bring label on reader.
-  RFID -> System: Search client by ID.
-else: Absolutely new client.
-  Manager -> System: Register new client.\n(see appropriate diagram)
+alt: У клиента есть карточка.
+  Менеджер -> Система: Прочесть карточку.
+  Система -> RFID: Ожидание карточки.
+  Клиент -> RFID: Поднести карточку к считывателю.
+  RFID -> Система: Поиск клиента по идентификатору карточки.
+else: Клиент забыл свою карточку.
+  Менеджер -> Система: Поиск по имени.
+else: Абсолютно новый клиент.
+  Менеджер -> Система: Регистрация нового клиента.
 end
 
-System -> Manager: Client's info dialog.
-Manager -> System: Register test training ticket.
+Система -> Менеджер: Диалог с информацией о клиенте.
+Клиент -> Менеджер: Оплата посещения.
+Менеджер -> Система: Регистрация посещения.
 
-alt: Client has RFID label.
-  Manager -> System: Switch to RFID mode.
-  System -> RFID: Wait for label.
-  Client -> RFID: Bring label on reader.
-  RFID -> System: Search user by ID.
-else: Client forgets his/her label somewhere.
-  Manager -> System: Search by name.
-end
-
-System -> System: Search ready to run\ntrainings for client's capabilities.
-System -> Manager: List of trainings.
-Manager -> Client: Which training do you want to visit?
-Client -> Manager: This one.
-Manager -> System: Confirm choice.
-System -> System: Close test training ticket.
-Manager -> Client: Please proceed to training.
-
+Менеджер -> Система: Получить список занятий.
+Система -> Система: Поиск ближайших занятий в соответствии с возможностями клиента.
+Система -> Менеджер: Список занятий.
+Менеджер -> Клиент: Какое занятие вы желаете посетить?
+Клиент -> Менеджер: Это.
+Менеджер -> Система: Подтверждение выбора занятия.
+Система -> Система: Аннулирование посещения на карточке клиента.
+Менеджер -> Клиент: Пройдите на занятие.
