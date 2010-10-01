@@ -5,7 +5,7 @@ include $(TOP_DIR)/config.mk
 include $(APP_DIR)/config.mk
 
 CURRENT_INSTALL_DIR=$(DESTDIR)/$(PROJECTNAME)/$(APPNAME)
-SUBDIRS=sql
+SUBDIRS=sql templatetags
 FILES=$(wildcard *.py)
 
 all: subdirs

@@ -1,16 +1,16 @@
-TOP_DIR=..
+TOP_DIR=../..
 
 include $(TOP_DIR)/config.mk
 
-CURRENT_INSTALL_DIR=$(DESTDIR)/$(PROJECTNAME)/templates
-SUBDIRS=admin manager
+CURRENT_INSTALL_DIR=$(DESTDIR)/$(PROJECTNAME)/templates/admin
 TEMPLATES=$(wildcard *.html)
+SUBDIRS=
 
-all: subdirs
+all:
 
 install: create_dir install_templates install_subdirs
 
-clean: clean_subdirs
-	rm -f *~
+clean:
+	rm -f *.mo *~
 
 include $(TOP_DIR)/targets.mk

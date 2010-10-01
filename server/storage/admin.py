@@ -21,6 +21,8 @@ class __User(UserAdmin):
 admin.site.unregister(UserModel)
 admin.site.register(UserModel, __User)
 
+UserModel.description = _(u'Users of this system.')
+
 ### Rest of the models
 
 from storage import models
