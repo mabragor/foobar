@@ -6,6 +6,23 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 
+### Change the Django's Users page
+
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User as UserModel
+
+class __User(UserAdmin):
+    list_display = ('username', 'group_list', 'last_name', 'first_name', 'email', 'is_staff', 'is_active')
+
+    def group_list(self, obj):
+        return ','.join(g.name for g in obj.groups.all())
+    group_list.short_description = _(u'Groups')
+
+admin.site.unregister(UserModel)
+admin.site.register(UserModel, __User)
+
+### Rest of the models
+
 from storage import models
 
 class __Card(admin.ModelAdmin):
