@@ -160,7 +160,7 @@ class __Renter(admin.ModelAdmin):
         'fields': ('last_name', 'first_name', 'phone', 'email',
                    'birth_date', 'desc', 'is_active')}),)
 admin.site.register(models.Renter, __Renter)
-models.Client.description = _(u'This model consists of all registered renters.')
+models.Renter.description = _(u'This model consists of all registered renters.')
 
 
 ### Interface for Team Model : Begin
