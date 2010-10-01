@@ -248,8 +248,3 @@ class __Visit(admin.ModelAdmin):
     list_display = ('client', 'schedule', 'card')
 admin.site.register(models.Visit, __Visit)
 models.Visit.description = _(u'This model consists of all registered visits of trainings.')
-
-class __Log(admin.ModelAdmin):
-    pass
-admin.site.register(models.Log, __Log)
-models.Log.description = _(u'This model consists of all meaningful events of system.')

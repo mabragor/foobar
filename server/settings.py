@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     #'django.contrib.sitemaps',
     #'django.contrib.webdesign',
+    #'south',
 )
 
 # robots begin
@@ -56,3 +57,7 @@ try:
     from settings_local import *
 except ImportError:
     pass
+
+# logger
+INSTALLED_APPS += ('logger',)
+MIDDLEWARE_CLASSES += ('logger.middleware.CurrentUserMiddleware',)
