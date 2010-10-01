@@ -1,0 +1,21 @@
+(c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
+(c) 2010 Maxim M. <shamanu4@gmail.com>
+
+Django action logger.
+
+INSTALLATION:
+  Put logger into your apps folder.
+  Put serializers.py and middleware.py into your source or lib root
+  Update your settings.py file:
+  Add 'logger' to INSTALLED_APPS
+  Add 'middleware. to MIDDLEWARE_CLASSES
+
+USAGE:
+  add 'from logger.models import logging_postsave, logging_postdelete' to your model.
+  Then connect signals to logging handlers
+  '''
+  models.signals.post_save.connect(logging_postsave, sender=YourModelName)
+  models.signals.post_delete.connect(logging_postdelete, sender=YourModelName)
+  '''
+
+Profit ;)
