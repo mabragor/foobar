@@ -9,3 +9,4 @@ class AppliedAdmin(admin.ModelAdmin):
     list_display = ('name', 'applied')
     fieldsets = ((None, {'fields': ()}),)
 admin.site.register(models.Applied, AppliedAdmin)
+models.Applied.description = _(u'This model consists of records of patches which had been applied on database. ')
