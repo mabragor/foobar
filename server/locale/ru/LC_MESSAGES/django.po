@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-10-01 18:30+0400\n"
+"POT-Creation-Date: 2010-10-02 23:44+0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,6 +52,42 @@ msgstr "Используйте метод POST"
 #: lib/decorators.py:49 lib/decorators.py:77
 msgid "Please, do not break our code :)"
 msgstr "Пожалуйста, не ломайте нас :)"
+
+#: logger/admin.py:13
+msgid "This model consists of all meaningful events of system."
+msgstr "Эта модель содержит все значимые события системы."
+
+#: logger/models.py:14
+msgid "user"
+msgstr "пользователь"
+
+#: logger/models.py:15
+msgid "action"
+msgstr "действие"
+
+#: logger/models.py:16
+msgid "content type"
+msgstr ""
+
+#: logger/models.py:17
+msgid "object id"
+msgstr ""
+
+#: logger/models.py:18
+msgid "data"
+msgstr "данные"
+
+#: logger/models.py:19
+msgid "timestamp"
+msgstr ""
+
+#: logger/models.py:22
+msgid "Log"
+msgstr "Журнал"
+
+#: logger/models.py:23
+msgid "Logs"
+msgstr "Журналы"
 
 #: manager/forms.py:27 manager/forms.py:29
 #, python-format
@@ -187,7 +223,6 @@ msgid "Patches"
 msgstr "Патчи"
 
 #: rfid/models.py:9 storage/models.py:22 storage/models.py:488
-#: storage/models.py:518
 msgid "Registered"
 msgstr "Зарегистрирован"
 
@@ -231,7 +266,8 @@ msgstr "Эта модель содержит информацию о всех в
 
 #: storage/admin.py:89
 msgid "This model consists of prices for every price category for teams."
-msgstr "Эта модель содержит цены для каждой ценовой категории танцевальных групп."
+msgstr ""
+"Эта модель содержит цены для каждой ценовой категории танцевальных групп."
 
 #: storage/admin.py:96
 msgid "This model consists of prices for every price category for rents."
@@ -298,10 +334,6 @@ msgstr "Эта модель содержит все запланированны
 #: storage/admin.py:250
 msgid "This model consists of all registered visits of trainings."
 msgstr "Эта модель содержит все зарегистрированные визиты на занятия."
-
-#: storage/admin.py:255
-msgid "This model consists of all meaningful events of system."
-msgstr "Эта модель содержит все значимые события системы."
 
 #: storage/models.py:15
 msgid "Reserved"
@@ -439,11 +471,11 @@ msgstr "Е-почта"
 msgid "Birth date"
 msgstr "Дата рождения"
 
-#: storage/models.py:160 storage/models.py:276
+#: storage/models.py:160
 msgid "Coach"
 msgstr "Преподаватель"
 
-#: storage/models.py:161
+#: storage/models.py:161 storage/models.py:276
 msgid "Coaches"
 msgstr "Преподаватели"
 
@@ -576,9 +608,9 @@ msgstr "Танцевальные стили"
 msgid "Duration"
 msgstr "Длительность"
 
-#: storage/models.py:278 storage/models.py:299
-msgid "The duration of an event."
-msgstr "Длительность события."
+#: storage/models.py:278
+msgid "The duration of an event, in hours."
+msgstr "Длительность события, в часах."
 
 #: storage/models.py:281 storage/models.py:317 storage/models.py:356
 msgid "Team"
@@ -588,14 +620,17 @@ msgstr "Группа"
 msgid "Teams"
 msgstr "Группы"
 
+#: storage/models.py:299
+msgid "The duration of an event."
+msgstr "Длительность события."
+
 #: storage/models.py:300
 msgid "Paid amount"
 msgstr "Оплачена сумма"
 
 #: storage/models.py:301
-#, fuzzy
 msgid "Paid status"
-msgstr "Оплачена сумма"
+msgstr "Статус оплаты"
 
 #: storage/models.py:304 storage/models.py:319 storage/models.py:357
 msgid "Rent"
@@ -795,11 +830,11 @@ msgstr "Приход"
 msgid "Outflow"
 msgstr "Расход"
 
-#: storage/models.py:482 storage/models.py:514
+#: storage/models.py:482
 msgid "User"
 msgstr "Пользователь"
 
-#: storage/models.py:483 storage/models.py:515
+#: storage/models.py:483
 msgid "Action"
 msgstr "Действие"
 
@@ -814,22 +849,6 @@ msgstr "Поток"
 #: storage/models.py:492
 msgid "Flows"
 msgstr "Потоки"
-
-#: storage/models.py:516
-msgid "Model"
-msgstr "Модель"
-
-#: storage/models.py:517
-msgid "Data"
-msgstr "Данные"
-
-#: storage/models.py:521
-msgid "Log"
-msgstr "Журнал"
-
-#: storage/models.py:522
-msgid "Logs"
-msgstr "Журналы"
 
 #: templates/login.html:8
 msgid "Authentication"
@@ -940,6 +959,9 @@ msgstr "Посетители по карте"
 #: templates/statistic/teams.html:65
 msgid "Income"
 msgstr "Входящие"
+
+#~ msgid "Model"
+#~ msgstr "Модель"
 
 #~ msgid "Phones"
 #~ msgstr "Телефоны"
