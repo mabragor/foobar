@@ -273,7 +273,7 @@ class Team(AbstractModel):
 
     price_category = models.ForeignKey(PriceCategoryTeam)
     dance_style = models.ManyToManyField(DanceStyle, verbose_name=_(u'Dance style'))
-    coach = models.ForeignKey(Coach, verbose_name=_(u'Coach'))
+    coaches = models.ManyToManyField(Coach, verbose_name=_(u'Coaches'))
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
     duration = models.FloatField(verbose_name=_(u'Duration'), help_text=_(u'The duration of an event.'))
 

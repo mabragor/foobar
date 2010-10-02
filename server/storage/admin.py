@@ -188,11 +188,11 @@ class __Team(admin.ModelAdmin):
 
     list_display = ('description', 'dance_styles',
                     'duration', 'is_active', 'reg_datetime')
-    ordering = ('price_category', 'title', 'coach')
+    ordering = ('price_category', 'title', 'coaches')
     search_fields = ('title',)
     fieldsets = (
         (None, {'fields': ('price_category', 'dance_style', 'title',
-                           'coach', 'duration', 'is_active')}),
+                           'coaches', 'duration', 'is_active')}),
         )
     inlines = [CalTeamItemInline]
 admin.site.register(models.Team, __Team)
