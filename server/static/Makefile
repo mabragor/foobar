@@ -2,7 +2,7 @@ TOP_DIR=..
 
 include $(TOP_DIR)/config.mk
 
-CURRENT_INSTALL_DIR=$(DESTDIR)/$(PROJECTNAME)/media
+CURRENT_INSTALL_DIR=$(DESTDIR)/$(PROJECTNAME)/static
 SUBDIRS=farbtastic
 TEMPLATES=$(wildcard *.html)
 
