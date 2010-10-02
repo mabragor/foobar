@@ -179,10 +179,10 @@ class __Team(admin.ModelAdmin):
     def description(self, team):
         calendar_items = models.Calendar.objects.filter(team=team)
         cal_desc = u'<br>'.join([c.__unicode__() for c in calendar_items])
-        return u'%s - %s - %s<hr/>%s' % (team.price_category,
-                                         team.title,
-                                         team.coach,
-                                         cal_desc)
+        return u'%s - %s<hr/>%s<hr/>%s' % (team.price_category,
+                                           team.title,
+                                           ','.join([c.__unicode__() for c in team.coaches.all()]),
+                                           cal_desc)
     description.short_description = _(u'Description')
     description.allow_tags = True
 
