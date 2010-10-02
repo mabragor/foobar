@@ -231,7 +231,7 @@ msgstr "Эта модель содержит информацию о всех в
 
 #: storage/admin.py:89
 msgid "This model consists of prices for every price category for teams."
-msgstr "Эта модель содержит цены для каждой ценовой категории команд."
+msgstr "Эта модель содержит цены для каждой ценовой категории танцевальных групп."
 
 #: storage/admin.py:96
 msgid "This model consists of prices for every price category for rents."
@@ -273,7 +273,7 @@ msgstr "Описание"
 
 #: storage/admin.py:199
 msgid "This model consists of all available teams."
-msgstr "Эта модель содержит все доступные команды."
+msgstr "Эта модель содержит все доступные танцевальные группы."
 
 #: storage/admin.py:222
 msgid "Info"
@@ -288,12 +288,12 @@ msgid ""
 "This model consists of records with events (team or rent) which assigned on "
 "a week."
 msgstr ""
-"Эта модель содержит записи о всех событиях (команда или аренда), которые "
+"Эта модель содержит записи о всех событиях (группа или аренда), которые "
 "назначены на неделю."
 
 #: storage/admin.py:245
 msgid "This model consists of records with scheduled events (team or rent)."
-msgstr "Эта модель содержит все запланированные события (команда или аренда)."
+msgstr "Эта модель содержит все запланированные события (группа или аренда)."
 
 #: storage/admin.py:250
 msgid "This model consists of all registered visits of trainings."
@@ -337,11 +337,11 @@ msgstr "Цена пробного занятия."
 
 #: storage/models.py:63
 msgid "Price category of a team"
-msgstr "Ценовая категория команды"
+msgstr "Ценовая категория группы"
 
 #: storage/models.py:64
 msgid "Price categories of a team"
-msgstr "Ценовые категории команды"
+msgstr "Ценовые категории группы"
 
 #: storage/models.py:79
 msgid "Price category of a rent"
@@ -582,11 +582,11 @@ msgstr "Длительность события."
 
 #: storage/models.py:281 storage/models.py:317 storage/models.py:356
 msgid "Team"
-msgstr "Команда"
+msgstr "Группа"
 
 #: storage/models.py:282
 msgid "Teams"
-msgstr "Команды"
+msgstr "Группы"
 
 #: storage/models.py:300
 msgid "Paid amount"
