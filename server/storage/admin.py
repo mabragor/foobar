@@ -106,12 +106,18 @@ models.Discount.description = _(u'This model consists of all possible discounts.
 ### Interface for Room Model : Begin
 
 class Room(admin.ModelAdmin):
-    list_display = ('title', 'color', 'is_active', 'reg_datetime')
+    list_display = ('title', 'colored_field', 'area', 'flooring', 'is_active', 'reg_datetime')
     ordering = ('title', )
     search_fields = ('title',)
-    fieldsets = ((None, {'fields': ('title', 'color', 'is_active')}),)
+    fieldsets = ((None, {'fields': ('title', 'color', 'area', 'flooring', 'is_active')}),)
+
+    def colored_field(self, floor):
+        return u'<div style="background-color: %s;">%s</div>' % (floor.color, floor.color)
+    colored_field.short_description = _(u'Color')
+    colored_field.allow_tags = True
 
     def formfield_for_dbfield(self, db_field, **kwargs):
+        """ Method to change the default widget for color field. """
         from widgets import ColorPickerWidget
         if db_field.name == 'color':
             kwargs['widget'] = ColorPickerWidget

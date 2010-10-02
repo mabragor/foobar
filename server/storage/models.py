@@ -248,6 +248,10 @@ class Room(AbstractModel):
                              help_text=_(u'Visible title for a room'))
     color = models.CharField(verbose_name=_(u'Color'), max_length=7,
                              help_text=_(u'HEX color, as #RRGGBB'))
+    area = models.FloatField(verbose_name=_(u'Area'),
+                             help_text=_(u'Room\'s area, in square meters'))
+    flooring = models.CharField(verbose_name=_(u'Flooring'), max_length=200,
+                                help_text=_(u'Flooring description, max 200 symbols'))
 
     class Meta:
         verbose_name = _(u'Room')

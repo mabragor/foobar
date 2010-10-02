@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-10-02 23:44+0400\n"
+"POT-Creation-Date: 2010-10-03 03:03+0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -222,7 +222,7 @@ msgstr "Патч"
 msgid "Patches"
 msgstr "Патчи"
 
-#: rfid/models.py:9 storage/models.py:22 storage/models.py:488
+#: rfid/models.py:9 storage/models.py:22 storage/models.py:492
 msgid "Registered"
 msgstr "Зарегистрирован"
 
@@ -277,49 +277,53 @@ msgstr "Эта модель содержит цены для каждой цен
 msgid "This model consists of all possible discounts."
 msgstr "Эта модель содержит все возможные скидки."
 
-#: storage/admin.py:112
+#: storage/admin.py:116 storage/models.py:249
+msgid "Color"
+msgstr "Цвет"
+
+#: storage/admin.py:127
 msgid "This model consists of all available rooms."
 msgstr "Эта модель содержит все доступные залы."
 
-#: storage/admin.py:120
+#: storage/admin.py:137
 msgid "This model consists of all available dance styles."
 msgstr "Эта модель содержит все доступные танцевальные стили."
 
-#: storage/admin.py:125 storage/admin.py:139 storage/admin.py:154
+#: storage/admin.py:142 storage/admin.py:156 storage/admin.py:171
 #: templates/statistic/teams.html:58
 msgid "Name"
 msgstr "Имя"
 
-#: storage/admin.py:134
+#: storage/admin.py:151
 msgid "This model consists of all available coaches."
 msgstr "Эта модель содержит информацию о всех преподавателях."
 
-#: storage/admin.py:149
+#: storage/admin.py:166
 msgid "This model consists of all registered clients."
 msgstr "Эта модель содержит информацию о всех зарегистрированных клиентах."
 
-#: storage/admin.py:163
+#: storage/admin.py:180
 msgid "This model consists of all registered renters."
 msgstr "Эта модель содержит информацию о всех зарегистрированных арендаторах."
 
-#: storage/admin.py:186 storage/admin.py:233 storage/models.py:157
-#: storage/models.py:185 storage/models.py:298
+#: storage/admin.py:203 storage/admin.py:250 storage/models.py:157
+#: storage/models.py:185 storage/models.py:302
 msgid "Description"
 msgstr "Описание"
 
-#: storage/admin.py:199
+#: storage/admin.py:216
 msgid "This model consists of all available teams."
 msgstr "Эта модель содержит все доступные танцевальные группы."
 
-#: storage/admin.py:222
+#: storage/admin.py:239
 msgid "Info"
 msgstr "Инфо"
 
-#: storage/admin.py:226
+#: storage/admin.py:243
 msgid "This model consists of all available rents."
 msgstr "Эта модель содержит все доступные аренды."
 
-#: storage/admin.py:239
+#: storage/admin.py:256
 msgid ""
 "This model consists of records with events (team or rent) which assigned on "
 "a week."
@@ -327,11 +331,11 @@ msgstr ""
 "Эта модель содержит записи о всех событиях (группа или аренда), которые "
 "назначены на неделю."
 
-#: storage/admin.py:245
+#: storage/admin.py:262
 msgid "This model consists of records with scheduled events (team or rent)."
 msgstr "Эта модель содержит все запланированные события (группа или аренда)."
 
-#: storage/admin.py:250
+#: storage/admin.py:267
 msgid "This model consists of all registered visits of trainings."
 msgstr "Эта модель содержит все зарегистрированные визиты на занятия."
 
@@ -475,7 +479,7 @@ msgstr "Дата рождения"
 msgid "Coach"
 msgstr "Преподаватель"
 
-#: storage/models.py:161 storage/models.py:276
+#: storage/models.py:161 storage/models.py:280
 msgid "Coaches"
 msgstr "Преподаватели"
 
@@ -483,7 +487,7 @@ msgstr "Преподаватели"
 msgid "RFID"
 msgstr "RFID"
 
-#: storage/models.py:169 storage/models.py:203 storage/models.py:412
+#: storage/models.py:169 storage/models.py:203 storage/models.py:416
 msgid "Client"
 msgstr "Клиент"
 
@@ -491,7 +495,7 @@ msgstr "Клиент"
 msgid "Clients"
 msgstr "Клиенты"
 
-#: storage/models.py:188 storage/models.py:296
+#: storage/models.py:188 storage/models.py:300
 msgid "Renter"
 msgstr "Арендатор"
 
@@ -499,7 +503,7 @@ msgstr "Арендатор"
 msgid "Renters"
 msgstr "Арендаторы"
 
-#: storage/models.py:209 storage/models.py:486
+#: storage/models.py:209 storage/models.py:490
 msgid "Price"
 msgstr "Цена"
 
@@ -531,7 +535,7 @@ msgstr "Начало"
 msgid "Expired"
 msgstr "Окончено"
 
-#: storage/models.py:216 storage/models.py:353
+#: storage/models.py:216 storage/models.py:357
 msgid "Cancelled"
 msgstr "Отменено"
 
@@ -551,7 +555,7 @@ msgstr "Клубная"
 msgid "Promo"
 msgstr "Рекламная"
 
-#: storage/models.py:231 storage/models.py:444
+#: storage/models.py:231 storage/models.py:448
 msgid "Unknown"
 msgstr "Неизвестно"
 
@@ -567,8 +571,8 @@ msgstr "Отменено"
 msgid "Active"
 msgstr "Активно"
 
-#: storage/models.py:247 storage/models.py:258 storage/models.py:277
-#: storage/models.py:297
+#: storage/models.py:247 storage/models.py:262 storage/models.py:281
+#: storage/models.py:301
 msgid "Title"
 msgstr "Заголовок"
 
@@ -576,279 +580,295 @@ msgstr "Заголовок"
 msgid "Visible title for a room"
 msgstr "Видимый текст для зала"
 
-#: storage/models.py:249
-msgid "Color"
-msgstr "Цвет"
-
 #: storage/models.py:250
-msgid "HEX color, as RRGGBB"
-msgstr "Цвет в формате HEX, пример: RRGGBB"
+msgid "HEX color, as #RRGGBB"
+msgstr "Цвет в формате HEX, пример: #RRGGBB"
 
-#: storage/models.py:253 storage/models.py:321 storage/models.py:358
+#: storage/models.py:251
+msgid "Area"
+msgstr "Площадь"
+
+#: storage/models.py:252
+msgid "Room's area, in square meters"
+msgstr "Площадь зала, в квадратных метрах"
+
+#: storage/models.py:253
+msgid "Flooring"
+msgstr "Покрытие"
+
+#: storage/models.py:254
+msgid "Flooring description, max 200 symbols"
+msgstr "Покрытие пола, максимум 200 символов"
+
+#: storage/models.py:257 storage/models.py:325 storage/models.py:362
 msgid "Room"
 msgstr "Зал"
 
-#: storage/models.py:254
+#: storage/models.py:258
 msgid "Rooms"
 msgstr "Залы"
 
-#: storage/models.py:261
+#: storage/models.py:265
 msgid "Style"
 msgstr "Стиль"
 
-#: storage/models.py:262
+#: storage/models.py:266
 msgid "Styles"
 msgstr "Стили"
 
-#: storage/models.py:275
+#: storage/models.py:279
 msgid "Dance style"
 msgstr "Танцевальные стили"
 
-#: storage/models.py:278 storage/models.py:299
+#: storage/models.py:282 storage/models.py:303
 msgid "Duration"
 msgstr "Длительность"
 
-#: storage/models.py:278
+#: storage/models.py:282
 msgid "The duration of an event, in hours."
 msgstr "Длительность события, в часах."
 
-#: storage/models.py:281 storage/models.py:317 storage/models.py:356
+#: storage/models.py:285 storage/models.py:321 storage/models.py:360
 msgid "Team"
 msgstr "Группа"
 
-#: storage/models.py:282
+#: storage/models.py:286
 msgid "Teams"
 msgstr "Группы"
 
-#: storage/models.py:299
+#: storage/models.py:303
 msgid "The duration of an event."
 msgstr "Длительность события."
 
-#: storage/models.py:300
+#: storage/models.py:304
 msgid "Paid amount"
 msgstr "Оплачена сумма"
 
-#: storage/models.py:301
+#: storage/models.py:305
 msgid "Paid status"
 msgstr "Статус оплаты"
 
-#: storage/models.py:304 storage/models.py:319 storage/models.py:357
+#: storage/models.py:308 storage/models.py:323 storage/models.py:361
 msgid "Rent"
 msgstr "Аренда"
 
-#: storage/models.py:305
+#: storage/models.py:309
 msgid "Rents"
 msgstr "Аренда"
 
-#: storage/models.py:309
+#: storage/models.py:313
 msgid "Monday"
 msgstr "Понедельник"
 
-#: storage/models.py:310
+#: storage/models.py:314
 msgid "Tuesday"
 msgstr "Вторник"
 
-#: storage/models.py:311
+#: storage/models.py:315
 msgid "Wednesday"
 msgstr "Среда"
 
-#: storage/models.py:312
+#: storage/models.py:316
 msgid "Thursday"
 msgstr "Четверг"
 
-#: storage/models.py:313
+#: storage/models.py:317
 msgid "Friday"
 msgstr "Пятница"
 
-#: storage/models.py:314
+#: storage/models.py:318
 msgid "Saturday"
 msgstr "Суббота"
 
-#: storage/models.py:315
+#: storage/models.py:319
 msgid "Sunday"
 msgstr "Воскресенье"
 
-#: storage/models.py:322
+#: storage/models.py:326
 msgid "Time"
 msgstr "Время"
 
-#: storage/models.py:323
+#: storage/models.py:327
 msgid "Time of the event"
 msgstr "Время события"
 
-#: storage/models.py:324
+#: storage/models.py:328
 msgid "Week day"
 msgstr "День недели"
 
-#: storage/models.py:325
+#: storage/models.py:329
 msgid "The day of a week."
 msgstr "День недели."
 
-#: storage/models.py:330
+#: storage/models.py:334
 msgid "Calendar"
 msgstr "Календарь"
 
-#: storage/models.py:331
+#: storage/models.py:335
 msgid "Calendars"
 msgstr "Календари"
 
-#: storage/models.py:334
+#: storage/models.py:338
 #, python-format
 msgid "%(day)s at %(time)s in %(room)s"
 msgstr "%(day)s в %(time)s в %(room)s"
 
-#: storage/models.py:351
+#: storage/models.py:355
 msgid "Waiting"
 msgstr "Ожидание"
 
-#: storage/models.py:352
+#: storage/models.py:356
 msgid "Done"
 msgstr "Выполнено"
 
-#: storage/models.py:355 templates/admin/index.html:45
+#: storage/models.py:359 templates/admin/index.html:45
 msgid "Change"
 msgstr "Замена"
 
-#: storage/models.py:359
+#: storage/models.py:363
 msgid "Begins"
 msgstr "Начинается"
 
-#: storage/models.py:360
+#: storage/models.py:364
 msgid "Ends"
 msgstr "Конец"
 
-#: storage/models.py:361
+#: storage/models.py:365
 msgid "Event status"
 msgstr "Статус события"
 
-#: storage/models.py:364
+#: storage/models.py:368
 msgid "Schedule"
 msgstr "Расписание"
 
-#: storage/models.py:365
+#: storage/models.py:369
 msgid "Schedules"
 msgstr "Расписания"
 
-#: storage/models.py:413
+#: storage/models.py:417
 msgid "Event"
 msgstr "Событие"
 
-#: storage/models.py:414
+#: storage/models.py:418
 msgid "Card"
 msgstr "Карта"
 
-#: storage/models.py:417
+#: storage/models.py:421
 msgid "Visit"
 msgstr "Посещение"
 
-#: storage/models.py:418
+#: storage/models.py:422
 msgid "Visits"
 msgstr "Посещения"
 
-#: storage/models.py:422
+#: storage/models.py:426
 msgid "Coach change"
 msgstr "Замена преподавателя"
 
-#: storage/models.py:423
+#: storage/models.py:427
 msgid "Economic expenses"
 msgstr "Хозяйственные нужды"
 
-#: storage/models.py:424 templates/statistic/teams.html:64
+#: storage/models.py:428 templates/statistic/teams.html:64
 msgid "Salary"
 msgstr "Зарплата"
 
-#: storage/models.py:425
+#: storage/models.py:429
 msgid "Subsist"
 msgstr "Аванс"
 
-#: storage/models.py:426
+#: storage/models.py:430
 msgid "Advertising"
 msgstr "Реклама"
 
-#: storage/models.py:427
+#: storage/models.py:431
 msgid "Capital investments"
 msgstr "Капитальное вложение"
 
-#: storage/models.py:431
+#: storage/models.py:435
 msgid "Basic services"
 msgstr "Основные услуги"
 
-#: storage/models.py:432
+#: storage/models.py:436
 msgid "Club cards"
 msgstr "Клубные карты"
 
-#: storage/models.py:433
+#: storage/models.py:437
 msgid "Gift certificates"
 msgstr "Подарочные сертификаты"
 
-#: storage/models.py:434
+#: storage/models.py:438
 msgid "Open abonement"
 msgstr "Абонемент с открытой датой"
 
-#: storage/models.py:435
+#: storage/models.py:439
 msgid "ISIC cards"
 msgstr "Карта ISIC"
 
-#: storage/models.py:436
+#: storage/models.py:440
 msgid "Cofe machine"
 msgstr "Кофе машина"
 
-#: storage/models.py:437
+#: storage/models.py:441
 msgid "Room rent"
 msgstr "Аренда зала"
 
-#: storage/models.py:438
+#: storage/models.py:442
 msgid "Dance show"
 msgstr "Выступления танцовщиков"
 
-#: storage/models.py:444
+#: storage/models.py:448
 msgid "RFID cards"
 msgstr "RFID карты"
 
-#: storage/models.py:448 storage/models.py:484
+#: storage/models.py:452 storage/models.py:488
 msgid "Type"
 msgstr "Тип"
 
-#: storage/models.py:449 storage/models.py:485
+#: storage/models.py:453 storage/models.py:489
 #: templates/statistic/teams.html:60
 msgid "Count"
 msgstr "Количество"
 
-#: storage/models.py:452
+#: storage/models.py:456
 msgid "Accounting"
 msgstr "Учёт"
 
-#: storage/models.py:453
+#: storage/models.py:457
 msgid "Accountings"
 msgstr "Учёт"
 
-#: storage/models.py:480
+#: storage/models.py:484
 msgid "Inflow"
 msgstr "Приход"
 
-#: storage/models.py:480
+#: storage/models.py:484
 msgid "Outflow"
 msgstr "Расход"
 
-#: storage/models.py:482
+#: storage/models.py:486
 msgid "User"
 msgstr "Пользователь"
 
-#: storage/models.py:483
+#: storage/models.py:487
 msgid "Action"
 msgstr "Действие"
 
-#: storage/models.py:487
+#: storage/models.py:491
 msgid "Total"
 msgstr "Всего"
 
-#: storage/models.py:491
+#: storage/models.py:495
 msgid "Flow"
 msgstr "Поток"
 
-#: storage/models.py:492
+#: storage/models.py:496
 msgid "Flows"
 msgstr "Потоки"
+
+#: storage/widgets.py:21
+msgid "Palette"
+msgstr ""
 
 #: templates/login.html:8
 msgid "Authentication"

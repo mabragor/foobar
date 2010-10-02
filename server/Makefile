@@ -2,7 +2,7 @@ include config.mk
 
 CURRENT_INSTALL_DIR=$(DESTDIR)/$(PROJECTNAME)
 FILES=$(wildcard *.py) $(wildcard *.wsgi)
-SUBDIRS=lib locale logger manager media patcher storage templates
+SUBDIRS=lib locale logger manager static patcher storage templates
 
 all: subdirs
 
