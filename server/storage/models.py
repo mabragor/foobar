@@ -246,8 +246,8 @@ class Room(AbstractModel):
 
     title = models.CharField(verbose_name=_(u'Title'), max_length=64,
                              help_text=_(u'Visible title for a room'))
-    color = models.CharField(verbose_name=_(u'Color'), max_length=6,
-                             help_text=_(u'HEX color, as RRGGBB'))
+    color = models.CharField(verbose_name=_(u'Color'), max_length=7,
+                             help_text=_(u'HEX color, as #RRGGBB'))
 
     class Meta:
         verbose_name = _(u'Room')

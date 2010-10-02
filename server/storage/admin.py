@@ -103,13 +103,24 @@ class __Discount(admin.ModelAdmin):
 admin.site.register(models.Discount, __Discount)
 models.Discount.description = _(u'This model consists of all possible discounts.')
 
-class __Room(admin.ModelAdmin):
+### Interface for Room Model : Begin
+
+class Room(admin.ModelAdmin):
     list_display = ('title', 'color', 'is_active', 'reg_datetime')
     ordering = ('title', )
     search_fields = ('title',)
     fieldsets = ((None, {'fields': ('title', 'color', 'is_active')}),)
-admin.site.register(models.Room, __Room)
+
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        from widgets import ColorPickerWidget
+        if db_field.name == 'color':
+            kwargs['widget'] = ColorPickerWidget
+        return super(Room, self).formfield_for_dbfield(db_field, **kwargs)
+
+admin.site.register(models.Room, Room)
 models.Room.description = _(u'This model consists of all available rooms.')
+
+### Interface for Room Model : End
 
 class __DanceStyle(admin.ModelAdmin):
     list_display = ('title', 'is_active', 'reg_datetime')

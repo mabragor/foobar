@@ -41,6 +41,13 @@ install_files:
 	  fi; \
 	done
 
+install_dirs:
+	for i in $(SUBDIRS) end-of-files-list; do \
+	  if [ $$i != end-of-files-list ]; then \
+	    cp -r $$i $(CURRENT_INSTALL_DIR)/; \
+	  fi; \
+	done
+
 install_templates:
 	for i in $(TEMPLATES) end-of-files-list; do \
 	  if [ $$i != end-of-files-list ]; then \
