@@ -197,6 +197,20 @@ class TeamInlineForm(forms.ModelForm):
         model = models.Calendar
         exclude = ('rent')
 
+    def clean(self):
+        d = self.cleaned_data
+
+        if d['DELETE']:
+            return super(TeamInlineForm, self).clean()
+        else:
+            del(d['DELETE'])
+
+        cal = models.Calendar(**d)
+        if not cal.may_save():
+            raise forms.ValidationError(_(u'Impossible to place this event!'))
+
+        return self.cleaned_data
+
 class CalTeamItemInline(admin.TabularInline):
     model = models.Calendar
     form = TeamInlineForm
@@ -261,41 +275,15 @@ class CalendarForm(forms.ModelForm):
     class Meta:
         model = models.Calendar
 
-    def event_obj(self, o_desc):
-        if type(o_desc) is dict:
-            team = o_desc['team']
-            rent = o_desc['rent']
-        else:
-            team = o_desc.team
-            rent = o_desc.rent
-        return team or rent
-
-    def calc_end(self, begin, duration):
-        return (datetime(1,1,1,begin.hour,begin.minute) \
-                + timedelta(minutes=int(60 * duration)) \
-                - timedelta(seconds=1)).time()
-
     def clean(self):
         d = self.cleaned_data
 
         if d['team'] is None and d['rent'] is None:
             raise forms.ValidationError(_(u'What event will happen?'))
 
-        result = models.Calendar.objects.filter(room=d['room'], day=d['day'])
-
-        # saving data
-        event = self.event_obj(d)
-        e_begin = d['time']
-        e_end = self.calc_end(e_begin, event.duration)
-
-        for item in result:
-            obj = self.event_obj(item)
-            i_begin = item.time
-            i_end = self.calc_end(i_begin, obj.duration)
-
-            if (e_begin < i_end <= e_end) or \
-                   (e_begin <= i_begin < e_end):
-                raise forms.ValidationError(_(u'Impossible to place this event!'))
+        cal = models.Calendar(**d)
+        if not cal.may_save():
+            raise forms.ValidationError(_(u'Impossible to place this event!'))
 
         return self.cleaned_data
 

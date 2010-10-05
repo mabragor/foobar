@@ -363,6 +363,31 @@ class Calendar(AbstractModel):
             result.update( {'whatis': 'rent'} )
         return result
 
+
+    def calc_end(self, begin, duration):
+        return (datetime(1,1,1,begin.hour,begin.minute) \
+                + timedelta(minutes=int(60 * duration)) \
+                - timedelta(seconds=1)).time()
+
+    def may_save(self):
+        result = Calendar.objects.filter(room=self.room, day=self.day)
+
+        # saving data
+        event = self.team or self.rent
+        e_begin = self.time
+        e_end = self.calc_end(e_begin, event.duration)
+
+        for item in result:
+            obj = item.team or item.rent
+            i_begin = item.time
+            i_end = self.calc_end(i_begin, obj.duration)
+
+            if (e_begin < i_end <= e_end) or \
+                   (e_begin <= i_begin < e_end):
+                return False
+
+        return True
+
 class Schedule(models.Model):
 
     EVENT_FIXED = ( ('0', _('Waiting')),

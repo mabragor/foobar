@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-10-05 22:12+0400\n"
+"POT-Creation-Date: 2010-10-06 00:09+0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -222,7 +222,7 @@ msgstr "Патч"
 msgid "Patches"
 msgstr "Патчи"
 
-#: rfid/models.py:9 storage/models.py:22 storage/models.py:505
+#: rfid/models.py:9 storage/models.py:22 storage/models.py:530
 msgid "Registered"
 msgstr "Зарегистрирован"
 
@@ -310,20 +310,24 @@ msgstr "Эта модель содержит информацию о всех з
 msgid "This model consists of all registered renters."
 msgstr "Эта модель содержит информацию о всех зарегистрированных арендаторах."
 
-#: storage/admin.py:213 storage/admin.py:309 storage/models.py:157
+#: storage/admin.py:210 storage/admin.py:286
+msgid "Impossible to place this event!"
+msgstr "Невозможно разместить это событие!"
+
+#: storage/admin.py:227 storage/admin.py:297 storage/models.py:157
 #: storage/models.py:185 storage/models.py:315
 msgid "Description"
 msgstr "Описание"
 
-#: storage/admin.py:226
+#: storage/admin.py:240
 msgid "This model consists of all available teams."
 msgstr "Эта модель содержит все доступные танцевальные группы."
 
-#: storage/admin.py:249
+#: storage/admin.py:263
 msgid "Info"
 msgstr "Инфо"
 
-#: storage/admin.py:253
+#: storage/admin.py:267
 msgid "This model consists of all available rents."
 msgstr "Эта модель содержит все доступные аренды."
 
@@ -331,11 +335,7 @@ msgstr "Эта модель содержит все доступные арен�
 msgid "What event will happen?"
 msgstr "Какое событие должно быть размещено?"
 
-#: storage/admin.py:298
-msgid "Impossible to place this event!"
-msgstr "Невозможно разместить это событие!"
-
-#: storage/admin.py:313
+#: storage/admin.py:301
 msgid ""
 "This model consists of records with events (team or rent) which assigned on "
 "a week."
@@ -343,11 +343,11 @@ msgstr ""
 "Эта модель содержит записи о всех событиях (группа или аренда), которые "
 "назначены на неделю."
 
-#: storage/admin.py:321
+#: storage/admin.py:309
 msgid "This model consists of records with scheduled events (team or rent)."
 msgstr "Эта модель содержит все запланированные события (группа или аренда)."
 
-#: storage/admin.py:326
+#: storage/admin.py:314
 msgid "This model consists of all registered visits of trainings."
 msgstr "Эта модель содержит все зарегистрированные визиты на занятия."
 
@@ -499,7 +499,7 @@ msgstr "Преподаватели"
 msgid "RFID"
 msgstr "RFID"
 
-#: storage/models.py:169 storage/models.py:203 storage/models.py:429
+#: storage/models.py:169 storage/models.py:203 storage/models.py:454
 msgid "Client"
 msgstr "Клиент"
 
@@ -515,7 +515,7 @@ msgstr "Арендатор"
 msgid "Renters"
 msgstr "Арендаторы"
 
-#: storage/models.py:209 storage/models.py:503
+#: storage/models.py:209 storage/models.py:528
 msgid "Price"
 msgstr "Цена"
 
@@ -547,7 +547,7 @@ msgstr "Начало"
 msgid "Expired"
 msgstr "Окончено"
 
-#: storage/models.py:216 storage/models.py:370
+#: storage/models.py:216 storage/models.py:395
 msgid "Cancelled"
 msgstr "Отменено"
 
@@ -567,7 +567,7 @@ msgstr "Клубная"
 msgid "Promo"
 msgstr "Рекламная"
 
-#: storage/models.py:231 storage/models.py:461
+#: storage/models.py:231 storage/models.py:486
 msgid "Unknown"
 msgstr "Неизвестно"
 
@@ -612,7 +612,7 @@ msgstr "Покрытие"
 msgid "Flooring description, max 200 symbols"
 msgstr "Покрытие пола, максимум 200 символов"
 
-#: storage/models.py:257 storage/models.py:338 storage/models.py:375
+#: storage/models.py:257 storage/models.py:338 storage/models.py:400
 msgid "Room"
 msgstr "Зал"
 
@@ -648,7 +648,7 @@ msgstr "Длительность"
 msgid "The duration of an event, in hours."
 msgstr "Длительность события, в часах."
 
-#: storage/models.py:298 storage/models.py:334 storage/models.py:373
+#: storage/models.py:298 storage/models.py:334 storage/models.py:398
 msgid "Team"
 msgstr "Группа"
 
@@ -668,7 +668,7 @@ msgstr "Оплачена сумма"
 msgid "Paid status"
 msgstr "Статус оплаты"
 
-#: storage/models.py:321 storage/models.py:336 storage/models.py:374
+#: storage/models.py:321 storage/models.py:336 storage/models.py:399
 msgid "Rent"
 msgstr "Аренда"
 
@@ -733,156 +733,156 @@ msgstr "Календари"
 msgid "%(day)s at %(time)s in %(room)s"
 msgstr "%(day)s в %(time)s в %(room)s"
 
-#: storage/models.py:368
+#: storage/models.py:393
 msgid "Waiting"
 msgstr "Ожидание"
 
-#: storage/models.py:369
+#: storage/models.py:394
 msgid "Done"
 msgstr "Выполнено"
 
-#: storage/models.py:372 templates/admin/index.html:45
+#: storage/models.py:397 templates/admin/index.html:45
 msgid "Change"
 msgstr "Замена"
 
-#: storage/models.py:376
+#: storage/models.py:401
 msgid "Begins"
 msgstr "Начинается"
 
-#: storage/models.py:377
+#: storage/models.py:402
 msgid "Ends"
 msgstr "Конец"
 
-#: storage/models.py:378
+#: storage/models.py:403
 msgid "Event status"
 msgstr "Статус события"
 
-#: storage/models.py:381
+#: storage/models.py:406
 msgid "Schedule"
 msgstr "Расписание"
 
-#: storage/models.py:382
+#: storage/models.py:407
 msgid "Schedules"
 msgstr "Расписания"
 
-#: storage/models.py:430
+#: storage/models.py:455
 msgid "Event"
 msgstr "Событие"
 
-#: storage/models.py:431
+#: storage/models.py:456
 msgid "Card"
 msgstr "Карта"
 
-#: storage/models.py:434
+#: storage/models.py:459
 msgid "Visit"
 msgstr "Посещение"
 
-#: storage/models.py:435
+#: storage/models.py:460
 msgid "Visits"
 msgstr "Посещения"
 
-#: storage/models.py:439
+#: storage/models.py:464
 msgid "Coach change"
 msgstr "Замена преподавателя"
 
-#: storage/models.py:440
+#: storage/models.py:465
 msgid "Economic expenses"
 msgstr "Хозяйственные нужды"
 
-#: storage/models.py:441 templates/statistic/teams.html:64
+#: storage/models.py:466 templates/statistic/teams.html:64
 msgid "Salary"
 msgstr "Зарплата"
 
-#: storage/models.py:442
+#: storage/models.py:467
 msgid "Subsist"
 msgstr "Аванс"
 
-#: storage/models.py:443
+#: storage/models.py:468
 msgid "Advertising"
 msgstr "Реклама"
 
-#: storage/models.py:444
+#: storage/models.py:469
 msgid "Capital investments"
 msgstr "Капитальное вложение"
 
-#: storage/models.py:448
+#: storage/models.py:473
 msgid "Basic services"
 msgstr "Основные услуги"
 
-#: storage/models.py:449
+#: storage/models.py:474
 msgid "Club cards"
 msgstr "Клубные карты"
 
-#: storage/models.py:450
+#: storage/models.py:475
 msgid "Gift certificates"
 msgstr "Подарочные сертификаты"
 
-#: storage/models.py:451
+#: storage/models.py:476
 msgid "Open abonement"
 msgstr "Абонемент с открытой датой"
 
-#: storage/models.py:452
+#: storage/models.py:477
 msgid "ISIC cards"
 msgstr "Карта ISIC"
 
-#: storage/models.py:453
+#: storage/models.py:478
 msgid "Cofe machine"
 msgstr "Кофе машина"
 
-#: storage/models.py:454
+#: storage/models.py:479
 msgid "Room rent"
 msgstr "Аренда зала"
 
-#: storage/models.py:455
+#: storage/models.py:480
 msgid "Dance show"
 msgstr "Выступления танцовщиков"
 
-#: storage/models.py:461
+#: storage/models.py:486
 msgid "RFID cards"
 msgstr "RFID карты"
 
-#: storage/models.py:465 storage/models.py:501
+#: storage/models.py:490 storage/models.py:526
 msgid "Type"
 msgstr "Тип"
 
-#: storage/models.py:466 storage/models.py:502
+#: storage/models.py:491 storage/models.py:527
 #: templates/statistic/teams.html:60
 msgid "Count"
 msgstr "Количество"
 
-#: storage/models.py:469
+#: storage/models.py:494
 msgid "Accounting"
 msgstr "Учёт"
 
-#: storage/models.py:470
+#: storage/models.py:495
 msgid "Accountings"
 msgstr "Учёт"
 
-#: storage/models.py:497
+#: storage/models.py:522
 msgid "Inflow"
 msgstr "Приход"
 
-#: storage/models.py:497
+#: storage/models.py:522
 msgid "Outflow"
 msgstr "Расход"
 
-#: storage/models.py:499
+#: storage/models.py:524
 msgid "User"
 msgstr "Пользователь"
 
-#: storage/models.py:500
+#: storage/models.py:525
 msgid "Action"
 msgstr "Действие"
 
-#: storage/models.py:504
+#: storage/models.py:529
 msgid "Total"
 msgstr "Всего"
 
-#: storage/models.py:508
+#: storage/models.py:533
 msgid "Flow"
 msgstr "Поток"
 
-#: storage/models.py:509
+#: storage/models.py:534
 msgid "Flows"
 msgstr "Потоки"
 
