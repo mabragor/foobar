@@ -257,9 +257,22 @@ class Room(AbstractModel):
         verbose_name = _(u'Room')
         verbose_name_plural = _(u'Rooms')
 
+class DanceDirection(AbstractModel):
+
+    title = models.CharField(verbose_name=_(u'Title'), max_length=64)
+
+    class Meta:
+        verbose_name = _(u'Direction')
+        verbose_name_plural = _(u'Directions')
+
+    def about(self, short=False, exclude_fields=tuple()):
+        result = super(DanceDirection, self).about(short, exclude_fields)
+        return result
+
 class DanceStyle(AbstractModel):
 
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
+    direction = models.ForeignKey(DanceDirection)
 
     class Meta:
         verbose_name = _(u'Style')

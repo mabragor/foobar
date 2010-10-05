@@ -130,11 +130,19 @@ models.Room.description = _(u'This model consists of all available rooms.')
 
 ### Interface for Room Model : End
 
-class __DanceStyle(admin.ModelAdmin):
+class __DanceDirection(admin.ModelAdmin):
     list_display = ('title', 'is_active', 'reg_datetime')
     ordering = ('title', )
     search_fields = ('title',)
     fieldsets = ((None, {'fields': ('title', 'is_active')}),)
+admin.site.register(models.DanceDirection, __DanceDirection)
+models.DanceDirection.description = _(u'This model consists of all available dance directions.')
+
+class __DanceStyle(admin.ModelAdmin):
+    list_display = ('title', 'direction', 'is_active', 'reg_datetime')
+    ordering = ('direction', 'title', )
+    search_fields = ('title',)
+    fieldsets = ((None, {'fields': ('direction', 'title', 'is_active')}),)
 admin.site.register(models.DanceStyle, __DanceStyle)
 models.DanceStyle.description = _(u'This model consists of all available dance styles.')
 
