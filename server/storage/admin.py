@@ -6,6 +6,8 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 
+from datetime import datetime, timedelta
+
 ### Change the Django's Users page
 
 from django.contrib.auth.admin import UserAdmin
@@ -244,16 +246,65 @@ models.Rent.description = _(u'This model consists of all available rents.')
 
 ### Interface for Rent Model : End
 
+### Interface for Calendar Model : Begin
+
+class CalendarForm(forms.ModelForm):
+
+    class Meta:
+        model = models.Calendar
+
+    def event_obj(self, o_desc):
+        if type(o_desc) is dict:
+            team = o_desc['team']
+            rent = o_desc['rent']
+        else:
+            team = o_desc.team
+            rent = o_desc.rent
+        return team or rent
+
+    def calc_end(self, begin, duration):
+        return (datetime(1,1,1,begin.hour,begin.minute) \
+                + timedelta(minutes=int(60 * duration)) \
+                - timedelta(seconds=1)).time()
+
+    def clean(self):
+        d = self.cleaned_data
+
+        if d['team'] is None and d['rent'] is None:
+            raise forms.ValidationError(_(u'What event will happen?'))
+
+        result = models.Calendar.objects.filter(room=d['room'], day=d['day'])
+
+        # saving data
+        event = self.event_obj(d)
+        e_begin = d['time']
+        e_end = self.calc_end(e_begin, event.duration)
+
+        for item in result:
+            obj = self.event_obj(item)
+            i_begin = item.time
+            i_end = self.calc_end(i_begin, obj.duration)
+
+            if (e_begin < i_end <= e_end) or \
+                   (e_begin <= i_begin < e_end):
+                raise forms.ValidationError(_(u'Impossible to place this event!'))
+
+        return self.cleaned_data
+
 class __Calendar(admin.ModelAdmin):
+    list_display = ('description', 'team', 'rent')
+    ordering = ('day', 'time', 'room')
+    form = CalendarForm
+
     def description(self, item):
         return item.__unicode__()
     description.short_description = _(u'Description')
     description.allow_tags = False
 
-    list_display = ('description', 'team', 'rent')
-    ordering = ('day', 'time', 'room')
 admin.site.register(models.Calendar, __Calendar)
 models.Calendar.description = _(u'This model consists of records with events (team or rent) which assigned on a week.')
+
+### Interface for Calendar Model : End
 
 class __Schedule(admin.ModelAdmin):
     list_display = ('room', 'begin_datetime', 'end_datetime',

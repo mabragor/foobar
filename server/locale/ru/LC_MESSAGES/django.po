@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-10-03 03:25+0400\n"
+"POT-Creation-Date: 2010-10-05 21:46+0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -234,96 +234,104 @@ msgstr "Идентификатор карты"
 msgid "Card codes"
 msgstr "Идентификаторы карт"
 
-#: storage/admin.py:19
+#: storage/admin.py:21
 msgid "Groups"
 msgstr "Группы"
 
-#: storage/admin.py:24
+#: storage/admin.py:26
 msgid "Users of this system."
 msgstr "Пользователи данной системы."
 
-#: storage/admin.py:25
+#: storage/admin.py:27
 msgid "User groups of this system."
 msgstr "Группы пользователей данной системы."
 
-#: storage/admin.py:47
+#: storage/admin.py:49
 msgid ""
 "This model consists of records of training courses which clients ever had "
 "bought."
 msgstr "Эта модель содержит записи о купленных клиентами курсов."
 
-#: storage/admin.py:66
+#: storage/admin.py:68
 msgid "This model consists of all possible types for ordinary cards."
 msgstr "Эта модель содержит информацию о всех возможных типах обычных карт."
 
-#: storage/admin.py:73
+#: storage/admin.py:75
 msgid "This model consists of all possible types for club cards."
 msgstr "Эта модель содержит информацию о всех возможных типах клубных карт."
 
-#: storage/admin.py:82
+#: storage/admin.py:84
 msgid "This model consists of all possible types for promo cards."
 msgstr "Эта модель содержит информацию о всех возможных типах рекламных карт."
 
-#: storage/admin.py:89
+#: storage/admin.py:91
 msgid "This model consists of prices for every price category for teams."
 msgstr ""
 "Эта модель содержит цены для каждой ценовой категории танцевальных групп."
 
-#: storage/admin.py:96
+#: storage/admin.py:98
 msgid "This model consists of prices for every price category for rents."
 msgstr "Эта модель содержит цены для каждой ценовой категории аренды."
 
-#: storage/admin.py:104
+#: storage/admin.py:106
 msgid "This model consists of all possible discounts."
 msgstr "Эта модель содержит все возможные скидки."
 
-#: storage/admin.py:116 storage/models.py:249
+#: storage/admin.py:118 storage/models.py:249
 msgid "Color"
 msgstr "Цвет"
 
-#: storage/admin.py:127
+#: storage/admin.py:129
 msgid "This model consists of all available rooms."
 msgstr "Эта модель содержит все доступные залы."
 
-#: storage/admin.py:137
+#: storage/admin.py:139
 msgid "This model consists of all available dance styles."
 msgstr "Эта модель содержит все доступные танцевальные стили."
 
-#: storage/admin.py:142 storage/admin.py:156 storage/admin.py:171
+#: storage/admin.py:144 storage/admin.py:158 storage/admin.py:173
 #: templates/statistic/teams.html:58
 msgid "Name"
 msgstr "Имя"
 
-#: storage/admin.py:151
+#: storage/admin.py:153
 msgid "This model consists of all available coaches."
 msgstr "Эта модель содержит информацию о всех преподавателях."
 
-#: storage/admin.py:166
+#: storage/admin.py:168
 msgid "This model consists of all registered clients."
 msgstr "Эта модель содержит информацию о всех зарегистрированных клиентах."
 
-#: storage/admin.py:180
+#: storage/admin.py:182
 msgid "This model consists of all registered renters."
 msgstr "Эта модель содержит информацию о всех зарегистрированных арендаторах."
 
-#: storage/admin.py:203 storage/admin.py:250 storage/models.py:157
+#: storage/admin.py:205 storage/admin.py:301 storage/models.py:157
 #: storage/models.py:185 storage/models.py:302
 msgid "Description"
 msgstr "Описание"
 
-#: storage/admin.py:216
+#: storage/admin.py:218
 msgid "This model consists of all available teams."
 msgstr "Эта модель содержит все доступные танцевальные группы."
 
-#: storage/admin.py:239
+#: storage/admin.py:241
 msgid "Info"
 msgstr "Инфо"
 
-#: storage/admin.py:243
+#: storage/admin.py:245
 msgid "This model consists of all available rents."
 msgstr "Эта модель содержит все доступные аренды."
 
-#: storage/admin.py:256
+#: storage/admin.py:274
+msgid "What event will happen?"
+msgstr "Какое событие должно быть размещено?"
+
+#: storage/admin.py:290
+msgid "Impossible to place this event!"
+msgstr "Невозможно разместить это событие!"
+
+#: storage/admin.py:305
 msgid ""
 "This model consists of records with events (team or rent) which assigned on "
 "a week."
@@ -331,11 +339,11 @@ msgstr ""
 "Эта модель содержит записи о всех событиях (группа или аренда), которые "
 "назначены на неделю."
 
-#: storage/admin.py:262
+#: storage/admin.py:313
 msgid "This model consists of records with scheduled events (team or rent)."
 msgstr "Эта модель содержит все запланированные события (группа или аренда)."
 
-#: storage/admin.py:267
+#: storage/admin.py:318
 msgid "This model consists of all registered visits of trainings."
 msgstr "Эта модель содержит все зарегистрированные визиты на занятия."
 
