@@ -25,7 +25,7 @@ clean: clean_subdirs
 translate:
 	mkdir -p ./locale
 	for i in ru; do \
-		django-admin makemessages --locale $$i; \
+		django-admin.py makemessages --locale $$i; \
 	done
 
 postscript:

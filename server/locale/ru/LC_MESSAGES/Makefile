@@ -16,6 +16,6 @@ locale: $(FILES)
 
 %.mo: %.po
 	cd $(TOP_DIR); \
-	django-admin compilemessages
+	django-admin.py compilemessages
 
 include $(TOP_DIR)/targets.mk
