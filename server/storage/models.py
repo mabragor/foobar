@@ -301,7 +301,10 @@ class Team(AbstractModel):
     def about(self, short=False, exclude_fields=tuple()):
         exclude_fields = ('group',)
         result = super(Team, self).about(short, exclude_fields)
-        result.update( { 'dance_styles': self.dance_styles(), } )
+        result.update( {
+            'dance_styles': self.dance_styles(),
+            'coaches': u', '.join([unicode(a) for a in self.coaches.all()]),
+            } )
         return result
 
     def dance_styles(self):

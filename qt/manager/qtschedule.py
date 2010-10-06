@@ -82,9 +82,9 @@ class QtSchedule(QTableView):
         self.model().rooms = self.rooms
 
     def string2color(self, color):
-        """ This method converts RRGGBB into QColor. """
+        """ This method converts #RRGGBB into QColor. """
 
-        regexp = re.compile(r'(?P<red_component>[0-9a-fA-F]{2})(?P<green_component>[0-9a-fA-F]{2})(?P<blue_component>[0-9a-fA-F]{2})')
+        regexp = re.compile(r'#(?P<red_component>[0-9a-fA-F]{2})(?P<green_component>[0-9a-fA-F]{2})(?P<blue_component>[0-9a-fA-F]{2})')
         groups = re.match(regexp, color)
         if groups:
             return QColor(int(groups.group('red_component'), 16),

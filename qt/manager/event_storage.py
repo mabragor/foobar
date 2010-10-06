@@ -20,7 +20,7 @@ class Event(object):
         self.monday = monday
         self.data = data_dict
 
-        #self.dump(self.data)
+        self.dump(self.data)
 
         __ = lambda x: \
              datetime(*time.strptime(x, '%Y-%m-%d %H:%M:%S')[:6])
@@ -30,26 +30,6 @@ class Event(object):
 
         minutes = int( self.data['event']['duration'] * 60 )
         self.duration = timedelta(minutes=minutes)
-
-        demo = {'id': 10,
-                'room': {'color': 'FFAAAA', 'id': 1, 'title': 'red'},
-                'begin_datetime': '2010-04-28 17:00:00',
-                'end_datetime': '2010-04-28 18:00:00',
-                'event': {'coach': {'birth_date': '2010-04-30',
-                                    'desc': u'\u0431\u0443\u0445\u0430\u0435\u0442',
-                                    'email': 'ivan@jet.ru',
-                                    'first_name': u'\u0418\u0432\u0430\u043d',
-                                    'id': 2,
-                                    'last_name': u'\u041f\u0435\u0442\u0440\u043e\u043f\u043e\u043b\u044c\u0441\u043a\u0438\u0439',
-                                    'name': u'\u041f\u0435\u0442\u0440\u043e\u043f\u043e\u043b\u044c\u0441\u043a\u0438\u0439 \u0418\u0432\u0430\u043d',
-                                    'phone': '1234567890'},
-                          'duration': 1.0,
-                          'groups': u'\u0421\u043e\u0432\u0440\u0435\u043c\u0435\u043d\u043d\u044b\u0435 \u0442\u0430\u043d\u0446\u044b',
-                          'id': 1,
-                          'price_category': '0',
-                          'title': u'\u0411\u0440\u0435\u0439\u043a-\u0434\u0430\u043d\u0441 \u0438 free style'},
-                'event_fixed': '0',
-                'type': 'training'}
 
     def dump(self, value):
         import pprint
@@ -74,7 +54,7 @@ class Event(object):
 
     @property
     def coach(self):
-        return self.data['event']['coach']['name']
+        return self.data['event']['coaches']
 
     @property
     def fixed(self): #FIXME

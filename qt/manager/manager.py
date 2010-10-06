@@ -90,10 +90,10 @@ class MainWindow(QMainWindow):
         self.http.request('/manager/static/', {})
         response = self.http.parse()
         self.static = response
-        print 'Static is'
-        import pprint; pprint.pprint(self.static)
+        #print 'Static is'
+        #import pprint; pprint.pprint(self.static)
 
-        self.tree = TreeModel(self.static.get('styles', None))
+        #self.tree = TreeModel(self.static.get('styles', None))
 
     def update_interface(self):
         """ This method updates application's interface using static
@@ -484,7 +484,7 @@ class MainWindow(QMainWindow):
                 # inform user
                 info = response['saved_id']
                 msg = _('The week has been filled sucessfully. Copied: %(copied)i. Passed: %(passed)i.')
-                self.statusBar().showMessage(msg % info)
+                self.statusBar().showMessage(msg % info, 3000)
                 # FIXME: pause here, but not just sleep, use timer
                 # update view
                 self.schedule.model().update()
