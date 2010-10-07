@@ -695,7 +695,7 @@ schedule. """
 
             ne.duration = object.duration
             ne.begin_datetime = datetime.combine(week_start, e.time) + timedelta(days=int(e.day))
-            ne.end_datetime = ne.begin_datetime + timedelta(minutes=(60 * object.duration))
+            ne.end_datetime = ne.begin_datetime + timedelta(minutes=(60 * object.duration)) - timedelta(seconds=1)
 
             # check for existent event
             if 0 == storage.Schedule.objects.filter(room=e.room,

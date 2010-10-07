@@ -102,8 +102,7 @@ class EventInfo(UiDlgTemplate):
         begin = __(self.schedule['begin_datetime'])
         end = __(self.schedule['end_datetime'])
         self.editBegin.setDateTime(QDateTime(begin))
-        duration = (end - begin).seconds / 60
-        self.editDuration.setText(str(duration))
+        self.editEnd.setDateTime(QDateTime(end))
         #self.initRooms(int(room['id']))
 
         try:

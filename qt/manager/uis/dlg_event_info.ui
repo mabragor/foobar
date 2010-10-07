@@ -32,7 +32,7 @@
        <enum>QLayout::SetMaximumSize</enum>
       </property>
       <item row="0" column="0">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="labelTitle">
         <property name="text">
          <string>Title</string>
         </property>
@@ -42,7 +42,7 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="labelCoaches">
         <property name="text">
          <string>Coaches</string>
         </property>
@@ -52,7 +52,7 @@
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="labelBegin">
         <property name="text">
          <string>Begin</string>
         </property>
@@ -62,9 +62,9 @@
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QLabel" name="label_4">
+       <widget class="QLabel" name="labelEnd">
         <property name="text">
-         <string>Duration</string>
+         <string>End</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -72,7 +72,7 @@
        </widget>
       </item>
       <item row="4" column="0">
-       <widget class="QLabel" name="label_5">
+       <widget class="QLabel" name="labelRoom">
         <property name="text">
          <string>Room</string>
         </property>
@@ -82,7 +82,7 @@
        </widget>
       </item>
       <item row="5" column="0">
-       <widget class="QLabel" name="label_6">
+       <widget class="QLabel" name="labelFix">
         <property name="text">
          <string>Fix as</string>
         </property>
@@ -100,13 +100,6 @@
       </item>
       <item row="1" column="1">
        <widget class="QLineEdit" name="editCoaches">
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLineEdit" name="editDuration">
         <property name="readOnly">
          <bool>true</bool>
         </property>
@@ -164,6 +157,9 @@
          <bool>true</bool>
         </property>
        </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QDateTimeEdit" name="editEnd"/>
       </item>
      </layout>
     </item>
