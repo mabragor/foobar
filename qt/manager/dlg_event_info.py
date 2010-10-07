@@ -18,6 +18,7 @@ from PyQt4 import uic
 class UiDlgTemplate(QDialog):
     """ This is a common template for all UI dialogs. """
 
+    parent = None
     ui_file = None
     dialog = None
     http = None
@@ -25,8 +26,8 @@ class UiDlgTemplate(QDialog):
     def __init__(self, parent=None, params=dict()):
         QDialog.__init__(self, parent)
 
+        self.parent = parent
         self.http = params.get('http', None)
-
         self.dialog = uic.loadUi(self.ui_file, self)
         self.setupUi()
 
@@ -103,7 +104,14 @@ class EventInfo(UiDlgTemplate):
         end = __(self.schedule['end_datetime'])
         self.editBegin.setDateTime(QDateTime(begin))
         self.editEnd.setDateTime(QDateTime(end))
-        #self.initRooms(int(room['id']))
+
+        current_id = int(room['id'])
+        self.current_room_index = current_id - 1
+        for title, color, room_id in self.parent.rooms:
+            self.comboRoom.addItem(title, QVariant(room_id))
+            if id == current_id + 100:
+                current = self.comboRoom.count() - 1
+        self.comboRoom.setCurrentIndex(self.current_room_index)
 
         try:
             index = int(self.schedule.get('fixed', 0))
@@ -113,14 +121,6 @@ class EventInfo(UiDlgTemplate):
         self.buttonFix.setDisabled(True)
 
         self.buttonRemove.setDisabled( begin < datetime.now() )
-
-    def initRooms(self, current_id):
-        self.current_room_index = current_id - 1
-        for title, color, id in self.parent.rooms:
-            self.comboRoom.addItem(title, QVariant(id))
-            if id == current_id + 100:
-                current = self.comboRoom.count() - 1
-        self.comboRoom.setCurrentIndex(self.current_room_index)
 
     def changeRoom(self, new_index):
         # Room change:
