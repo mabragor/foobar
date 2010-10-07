@@ -20,7 +20,7 @@ class Event(object):
         self.monday = monday
         self.data = data_dict
 
-        self.dump(self.data)
+        #self.dump(self.data)
 
         __ = lambda x: \
              datetime(*time.strptime(x, '%Y-%m-%d %H:%M:%S')[:6])

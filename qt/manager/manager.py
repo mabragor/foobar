@@ -19,7 +19,7 @@ from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_searching import DlgSearchByName
 from dlg_user_info import DlgClientInfo, DlgRenterInfo
 from dlg_event_assign import DlgEventAssign
-from dlg_event_info import DlgEventInfo
+from dlg_event_info import EventInfo
 from dlg_copy_week import DlgCopyWeek
 from dlg_accounting import DlgAccounting
 
@@ -534,7 +534,7 @@ class MainWindow(QMainWindow):
 # 	return json_like
 
     def showEventProperties(self, calendar_event): #, room_id):
-        self.dialog = DlgEventInfo(self, {'http': self.http})
+        self.dialog = EventInfo(self, {'http': self.http})
         self.dialog.setModal(True)
         self.dialog.initData(calendar_event)
         self.dialog.exec_()
