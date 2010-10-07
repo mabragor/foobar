@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<logic name="card_types" version="1.0">
+
+  <!-- При регистрации флаера никакой дополнительной информации не
+       требуется. Автоматически заполняются поля count_sold=1,
+       price=0, discount=None, end_date=дата_регистрации -->
+  <rule name="flyer">
+    <sequence/>
+  </rule>
+
+  <!-- При регистрации пробного занятия требуется указать ценовую
+       категорию. Автоматически заполняются поля count_sold=1, price,
+       discount=None, end_date=дата_регистрации -->
+  <rule name="test">
+    <sequence>
+      <dialog type="list" name="price_category" title="Ценовая категория" static="price_cats_team" result_as="integer"/>
+    </sequence>
+  </rule>
+
+  <!-- При регистрации разового занятия требуется указать ценовую
+       категорию. Автоматически заполняются поля count_sold=1, price,
+       discount=None, end_date=дата_регистрации -->
+  <rule name="once">
+    <sequence>
+      <dialog type="list" name="price_category" title="Ценовая категория" static="price_cats_team" result_as="integer"/>
+    </sequence>
+  </rule>
+
+  <!-- При регистрации абонемента требуется указать ценовую категорию,
+       скидку, количество занятий, оплаченную сумму. -->
+  <rule name="abonement">
+
+    <!-- абонемент активируется с момента первого занятия -->
+
+    <sequence>
+      <dialog type="list" name="price_category" title="Ценовая категория" static="price_cats_team" result_as="integer"/>
+      <dialog type="spin" name="count_sold" title="Количество занятий" default="8" result_as="integer">
+        <skip_next_if lower_than="8"/>
+      </dialog>
+      <dialog type="list" name="discount" title="Скидка" static="discounts" result_as="integer"/>
+      <dialog type="price" name="paid" title="Оплачено" result_as="float">
+        <calculate function="_price_abonement"/>
+      </dialog>
+    </sequence>
+  </rule>
+
+  <!-- При регистрации клубной карты требуется указать ценовую
+       категорию, длительность действия карты, оплаченную сумму -->
+  <rule name="club">
+    <sequence>
+      <dialog type="list" name="price_category"/>
+      <dialog type="list" name="duration"/>
+      <dialog type="price" name="paid"/>
+    </sequence>
+  </rule>
+
+  <!-- При регистрации на акцию требуется выборать акцию, остальные
+       поля заполняются автоматически. -->
+  <rule name="promo">
+    <sequence>
+      <dialog type="list" name="promo"/>
+    </sequence>
+  </rule>
+
+</logic>
