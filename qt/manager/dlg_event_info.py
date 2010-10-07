@@ -29,9 +29,14 @@ class EventInfo(UiDlgTemplate):
 
         self.connect(self.dialog.buttonClose,
                      SIGNAL('clicked()'), self.close)
+        # show registered visitors dialog
         self.connect(self.buttonVisitors,
                      SIGNAL('clicked()'),
                      self.showVisitors)
+        # register visitor using his rfid label
+        self.connect(self.buttonVisit,
+                     SIGNAL('clicked()'),
+                     self.visitEvent)
         self.connect(self.dialog.comboFix,
                      SIGNAL('currentIndexChanged(int)'),
                      self.enableComboFix)
@@ -43,8 +48,6 @@ class EventInfo(UiDlgTemplate):
     def setSignals(self):
         self.connect(self.comboRoom, SIGNAL('currentIndexChanged(int)'),
                      self.changeRoom)
-        self.connect(self.buttonVisit, SIGNAL('clicked()'),
-                     self.visitEvent)
         self.connect(self.buttonRemove, SIGNAL('clicked()'),
                      self.eventRemove)
         self.connect(self.buttonChange, SIGNAL('clicked()'),
@@ -110,19 +113,6 @@ class EventInfo(UiDlgTemplate):
         dialog.initData(self.schedule['id'])
         dialog.exec_()
 
-    def changeRoom(self, new_index):
-        # Room change:
-        # 1. The choosen room is empty inside whole time period.
-        #    Change a room for the event.
-        # 2. The choosen room is busy at all, i.e. two event are equal in time.
-        #    Change the rooms.
-        # 3. The choosen room is busy partially.
-        #    Cancel the change, raise message.
-        if new_index != self.current_room_index:
-            # make room checking
-            #
-            pass
-
     def visitEvent(self):
         def callback(rfid):
             self.rfid_id = rfid
@@ -135,14 +125,27 @@ class EventInfo(UiDlgTemplate):
         if QDialog.Accepted == dlgStatus:
             params = {'rfid_code': self.rfid_id,
                       'event_id': self.schedule['id']}
-            ajax = HttpAjax(self, '/manager/register_visit/',
-                        params, self.parent.session_id)
-            response = ajax.parse_json()
+            self.http.request('/manager/register_visit/', params)
+            default_response = None
+            response = self.http.parse(None)
             if response:
                 message = _('The client is registered on this event.')
             else:
                 message = _('Unable to register the visit!')
             QMessageBox.information(self, _('Client registration'), message)
+
+    def changeRoom(self, new_index):
+        # Room change:
+        # 1. The choosen room is empty inside whole time period.
+        #    Change a room for the event.
+        # 2. The choosen room is busy at all, i.e. two event are equal in time.
+        #    Change the rooms.
+        # 3. The choosen room is busy partially.
+        #    Cancel the change, raise message.
+        if new_index != self.current_room_index:
+            # make room checking
+            #
+            pass
 
     def eventRemove(self):
         reply = QMessageBox.question(

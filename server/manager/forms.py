@@ -159,6 +159,8 @@ class RegisterVisit(AjaxForm):
         visit.save()
         # increment visits on client's card
         card.count_used += 1
+
+        # start card
         card.begin_date = date.today()
         duration = DURATION_TYPE[card.duration]
         card.end_date = date.today() + timedelta(days=duration)

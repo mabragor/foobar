@@ -40,7 +40,7 @@ class ShowVisitors(UiDlgTemplate):
             self.dialog.tableVisitors.setItem(lastRow, 0, QTableWidgetItem(last_name))
             self.dialog.tableVisitors.setItem(lastRow, 1, QTableWidgetItem(first_name))
             self.dialog.tableVisitors.setItem(lastRow, 2, QTableWidgetItem(rfid_code))
-            self.dialog.tableVisitors.setItem(lastRow, 3, QTableWidgetItem(QDateTime.currentDateTime()))
+            self.dialog.tableVisitors.setItem(lastRow, 3, QTableWidgetItem(QDateTime.currentDateTime().toString()))
 
     def registerManually(self):
         rfid_id, ok = QInputDialog.getText(self, _('Register manually'),
