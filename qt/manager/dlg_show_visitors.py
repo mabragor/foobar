@@ -2,53 +2,31 @@
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 from settings import _
+from ui_dialog import UiDlgTemplate
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
-class DlgShowVisitors(QDialog):
+class ShowVisitors(UiDlgTemplate):
+
+    ui_file = 'uis/dlg_event_visitors.ui'
+    dialog = None
+    title = _('Registered visitors')
+    event_id = None
 
     def __init__(self, parent=None, params=dict()):
-        QDialog.__init__(self, parent)
+        UiDlgTemplate.__init__(self, parent, params)
 
-        self.parent = parent
-        self.http = params.get('http', None)
+    def setupUi(self):
+        UiDlgTemplate.setupUi(self)
 
-        self.setMinimumWidth(600)
-        self.event_id = None
-
-        labels = QStringList([_('Last name'),
-                              _('First name'),
-                              _('RFID')])
-
-        self.visitors = QTableWidget(0, 3)
-        self.visitors.setHorizontalHeaderLabels(labels)
-        self.visitors.setSelectionMode(QAbstractItemView.NoSelection)
-
-        visitLayout = QVBoxLayout()
-        visitLayout.addWidget(self.visitors)
-        group = QGroupBox(_('Visitors'))
-        group.setLayout(visitLayout)
-
-        buttonManual = QPushButton( _('Register manually') )
-        buttonClose = QPushButton( _('Close') )
-
-        self.connect(buttonManual, SIGNAL('clicked()'),
+        self.connect(self.dialog.buttonManual,
+                     SIGNAL('clicked()'),
                      self.registerManually)
-        self.connect(buttonClose, SIGNAL('clicked()'),
+        self.connect(self.dialog.buttonClose,
+                     SIGNAL('clicked()'),
                      self, SLOT('reject()'))
 
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(buttonManual)
-        buttonLayout.addStretch(1)
-        buttonLayout.addWidget(buttonClose)
-
-        mainLayout = QVBoxLayout()
-        mainLayout.addWidget(group)
-        mainLayout.addLayout(buttonLayout)
-
-        self.setLayout(mainLayout)
-        self.setWindowTitle( _('Registered visitors') )
 
     def initData(self, event_id):
         self.event_id = event_id
@@ -57,11 +35,12 @@ class DlgShowVisitors(QDialog):
         response = self.http.parse(default_response)
         visitor_list = response['visitor_list']
         for last_name, first_name, rfid_code in visitor_list:
-            lastRow = self.visitors.rowCount()
-            self.visitors.insertRow(lastRow)
-            self.visitors.setItem(lastRow, 0, QTableWidgetItem(last_name))
-            self.visitors.setItem(lastRow, 1, QTableWidgetItem(first_name))
-            self.visitors.setItem(lastRow, 2, QTableWidgetItem(rfid_code))
+            lastRow = self.dialog.tableVisitors.rowCount()
+            self.dialog.tableVisitors.insertRow(lastRow)
+            self.dialog.tableVisitors.setItem(lastRow, 0, QTableWidgetItem(last_name))
+            self.dialog.tableVisitors.setItem(lastRow, 1, QTableWidgetItem(first_name))
+            self.dialog.tableVisitors.setItem(lastRow, 2, QTableWidgetItem(rfid_code))
+            self.dialog.tableVisitors.setItem(lastRow, 3, QTableWidgetItem(QDateTime.currentDateTime()))
 
     def registerManually(self):
         rfid_id, ok = QInputDialog.getText(self, _('Register manually'),

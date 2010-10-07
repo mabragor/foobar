@@ -7,45 +7,26 @@ from datetime import datetime
 from settings import _, DEBUG
 from event_storage import Event
 from dlg_waiting_rfid import DlgWaitingRFID
-from dlg_show_visitors import DlgShowVisitors
+from dlg_show_visitors import ShowVisitors
+from ui_dialog import UiDlgTemplate
 
 __ = lambda x: datetime(*time.strptime(str(x), '%Y-%m-%d %H:%M:%S')[:6])
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-from PyQt4 import uic
-
-class UiDlgTemplate(QDialog):
-    """ This is a common template for all UI dialogs. """
-
-    parent = None
-    ui_file = None
-    dialog = None
-    http = None
-
-    def __init__(self, parent=None, params=dict()):
-        QDialog.__init__(self, parent)
-
-        self.parent = parent
-        self.http = params.get('http', None)
-        self.dialog = uic.loadUi(self.ui_file, self)
-        self.setupUi()
-
-    def setupUi(self, title=None):
-        if title:
-            self.setWindowTitle(title)
-        # init controls here
 
 class EventInfo(UiDlgTemplate):
 
     ui_file = 'uis/dlg_event_info.ui'
     dialog = None
+    title = _('Event\'s information')
 
     def __init__(self, parent=None, params=dict()):
         UiDlgTemplate.__init__(self, parent, params)
 
-    def setupUi(self, title=None):
-        UiDlgTemplate.setupUi(self, title)
+    def setupUi(self):
+        UiDlgTemplate.setupUi(self)
+
         self.connect(self.dialog.buttonClose,
                      SIGNAL('clicked()'), self.close)
         self.connect(self.buttonVisitors,
@@ -124,7 +105,7 @@ class EventInfo(UiDlgTemplate):
         self.buttonRemove.setDisabled( begin < datetime.now() )
 
     def showVisitors(self):
-        dialog = DlgShowVisitors(self, {'http': self.http})
+        dialog = ShowVisitors(self, {'http': self.http})
         dialog.setModal(True)
         dialog.initData(self.schedule['id'])
         dialog.exec_()
