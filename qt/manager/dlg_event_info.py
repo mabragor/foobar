@@ -48,6 +48,9 @@ class EventInfo(UiDlgTemplate):
         UiDlgTemplate.setupUi(self, title)
         self.connect(self.dialog.buttonClose,
                      SIGNAL('clicked()'), self.close)
+        self.connect(self.buttonVisitors,
+                     SIGNAL('clicked()'),
+                     self.showVisitors)
         self.connect(self.dialog.comboFix,
                      SIGNAL('currentIndexChanged(int)'),
                      self.enableComboFix)
@@ -59,8 +62,6 @@ class EventInfo(UiDlgTemplate):
     def setSignals(self):
         self.connect(self.comboRoom, SIGNAL('currentIndexChanged(int)'),
                      self.changeRoom)
-        self.connect(self.buttonVisitors, SIGNAL('clicked()'),
-                     self.showVisitors)
         self.connect(self.buttonVisit, SIGNAL('clicked()'),
                      self.visitEvent)
         self.connect(self.buttonRemove, SIGNAL('clicked()'),
@@ -122,6 +123,12 @@ class EventInfo(UiDlgTemplate):
 
         self.buttonRemove.setDisabled( begin < datetime.now() )
 
+    def showVisitors(self):
+        dialog = DlgShowVisitors(self, {'http': self.http})
+        dialog.setModal(True)
+        dialog.initData(self.schedule['id'])
+        dialog.exec_()
+
     def changeRoom(self, new_index):
         # Room change:
         # 1. The choosen room is empty inside whole time period.
@@ -177,12 +184,6 @@ class EventInfo(UiDlgTemplate):
             else:
                 QMessageBox.information(self, _('Event removing'),
                                         _('Unable to remove this event!'))
-
-    def showVisitors(self):
-        dialog = DlgShowVisitors(self)
-        dialog.setModal(True)
-        dialog.initData(self.schedule['id'])
-        dialog.exec_()
 
     def enableComboChange(self, index):
         self.buttonChange.setDisabled(False)

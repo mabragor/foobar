@@ -2,17 +2,18 @@
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 from settings import _
-from http import Http
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
 class DlgShowVisitors(QDialog):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, params=dict()):
         QDialog.__init__(self, parent)
 
         self.parent = parent
+        self.http = params.get('http', None)
+
         self.setMinimumWidth(600)
         self.event_id = None
 
@@ -51,9 +52,9 @@ class DlgShowVisitors(QDialog):
 
     def initData(self, event_id):
         self.event_id = event_id
-        ajax = HttpAjax(self, '/manager/get_visitors/',
-                        {'event_id': event_id}, self.parent.parent.session_id)
-        response = ajax.parse_json()
+        self.http.request('/manager/get_visitors/', {'event_id': event_id})
+        default_response = None
+        response = self.http.parse(default_response)
         visitor_list = response['visitor_list']
         for last_name, first_name, rfid_code in visitor_list:
             lastRow = self.visitors.rowCount()
@@ -69,9 +70,9 @@ class DlgShowVisitors(QDialog):
             if not rfid_id.isEmpty():
                 params = {'rfid_code': rfid_id,
                           'event_id': self.event_id}
-                ajax = HttpAjax(self, '/manager/register_visit/',
-                                params, self.parent.parent.session_id)
-                response = ajax.parse_json()
+                self.http.request('/manager/register_visit/', params)
+                default_response = None
+                response = self.http.parse(default_response)
                 if response:
                     self.initData(self.event_id)
             else:
