@@ -34,13 +34,13 @@ class ShowVisitors(UiDlgTemplate):
         default_response = None
         response = self.http.parse(default_response)
         visitor_list = response['visitor_list']
-        for last_name, first_name, rfid_code in visitor_list:
+        for last_name, first_name, rfid_code, reg_datetime in visitor_list:
             lastRow = self.dialog.tableVisitors.rowCount()
             self.dialog.tableVisitors.insertRow(lastRow)
             self.dialog.tableVisitors.setItem(lastRow, 0, QTableWidgetItem(last_name))
             self.dialog.tableVisitors.setItem(lastRow, 1, QTableWidgetItem(first_name))
             self.dialog.tableVisitors.setItem(lastRow, 2, QTableWidgetItem(rfid_code))
-            self.dialog.tableVisitors.setItem(lastRow, 3, QTableWidgetItem(QDateTime.currentDateTime().toString()))
+            self.dialog.tableVisitors.setItem(lastRow, 3, QTableWidgetItem(reg_datetime))
 
     def registerManually(self):
         rfid_id, ok = QInputDialog.getText(self, _('Register manually'),

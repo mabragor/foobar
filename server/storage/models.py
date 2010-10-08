@@ -450,7 +450,8 @@ class Schedule(models.Model):
     def get_visitors(self):
         return [(v.client.last_name,
                  v.client.first_name,
-                 v.client.rfid_code) for v in self.visit_set.all()]
+                 v.client.rfid_code,
+                 v.reg_datetime) for v in self.visit_set.all()]
 
 class Visit(AbstractModel): # FIXME models
 
@@ -462,6 +463,10 @@ class Visit(AbstractModel): # FIXME models
         verbose_name = _(u'Visit')
         verbose_name_plural = _(u'Visits')
         unique_together = ('client', 'schedule')
+
+    @property
+    def title(self):
+        return u'%s' % self.client
 
 TYPICAL_CHARGES = (
     ('0', _('Coach change')),
