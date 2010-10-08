@@ -242,6 +242,18 @@ class Card(AbstractModel):
         if self.end_date <= date.today():
             return _(u'Expired')
 
+    def register_visit(self):
+        # increment visits on client's card
+        self.count_used += 1
+
+        today = date.today()
+        if self.card_club is not None:
+            duration = timetelta(days=self.card_club.count_days)
+            self.begin_date = today
+            self.end_date = today + duration
+
+        self.save()
+
 class Room(AbstractModel):
 
     title = models.CharField(verbose_name=_(u'Title'), max_length=64,
@@ -467,6 +479,14 @@ class Visit(AbstractModel): # FIXME models
     @property
     def title(self):
         return u'%s' % self.client
+
+    def save(self):
+        super(Visit, self).save()
+        self.card.register_visit()
+
+    # end of Visit model
+
+
 
 TYPICAL_CHARGES = (
     ('0', _('Coach change')),

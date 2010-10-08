@@ -157,14 +157,6 @@ class RegisterVisit(AjaxForm):
         visit = storage.Visit(client=client, schedule=event)
         visit.card = card
         visit.save()
-        # increment visits on client's card
-        card.count_used += 1
-
-        # start card
-        card.begin_date = date.today()
-        duration = DURATION_TYPE[card.duration]
-        card.end_date = date.today() + timedelta(days=duration)
-        card.save()
         return visit.id
 
 class GetScheduleInfo(AjaxForm):
