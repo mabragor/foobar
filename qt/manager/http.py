@@ -97,28 +97,28 @@ class Http:
             else:
                 response = json.loads(data) # 2.6
             if 'code' in response and response['code'] != 200:
-                msg = '[%(code)s] %(desc)s' % response
-                if self.parent:
-                    QMessageBox.warning(self.parent, _('Warning'), msg)
-                else:
-                    print msg
+                self.error_msg = '[%(code)s] %(desc)s' % response
+                # if self.parent:
+                #     QMessageBox.warning(self.parent, _('Warning'), self.error_msg)
+                # else:
+                #     print self.error_msg
                 return default
             return response
         elif self.response.status == 302: # authentication
-            msg = _('Authenticate yourself.')
-            if self.parent:
-                QMessageBox.warning(self.parent, _('Warning'), msg)
-            else:
-                print msg
+            self.error_msg = _('Authenticate yourself.')
+            # if self.parent:
+            #     QMessageBox.warning(self.parent, _('Warning'), self.error_msg)
+            # else:
+            #     print self.error_msg
             return default
         elif self.response.status == 500: # error
             open('./dump.html', 'w').write(self.response.read())
         else:
-            msg = '[%s] %s' % (self.response.status, self.response.reason)
-            if self.parent:
-                QMessageBox.critical(self.parent, _('HTTP Error'), msg)
-            else:
-                print msg
+            self.error_msg = '[%s] %s' % (self.response.status, self.response.reason)
+            # if self.parent:
+            #     QMessageBox.critical(self.parent, _('HTTP Error'), self.error_msg)
+            # else:
+            #     print self.error_msg
             return default
 
 # Test part of module

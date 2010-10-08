@@ -131,7 +131,8 @@ class EventInfo(UiDlgTemplate):
             if response:
                 message = _('The client is registered on this event.')
             else:
-                message = _('Unable to register the visit!')
+                error_msg = self.http.error_msg
+                message = _('Unable to register the visit!\nReason:\n%s') % error_msg
             QMessageBox.information(self, _('Client registration'), message)
 
     def changeRoom(self, new_index):
