@@ -12,8 +12,6 @@ from datetime import timedelta, datetime, date
 
 class AjaxForm(forms.Form):
 
-    # TODO: check symbols of RFID code
-
     def dump(self, value):
         import pprint
         pprint.pprint(value)
@@ -63,6 +61,18 @@ class AjaxForm(forms.Form):
         else:
             raise forms.ValidationError(_(u'Unsupported type.'))
         return value
+
+    def rfid_validation(self, value):
+        hex_values = [str(i) for i in xrange(10)] + [a for a in 'ABCDEF']
+        for i in value:
+            if i.upper() not in hex_values:
+                raise forms.ValidationError(_(u'RFID has to consist of HEX symbols.'))
+
+    def rfid_client(self, value):
+        try:
+            return storage.Client.objects.get(rfid_code=value)
+        except storage.Client.DoesNotExist:
+            raise forms.ValidationError(_(u'No client for a given RFID.'))
 
     def get_errors(self):
         from django.utils.encoding import force_unicode
@@ -114,48 +124,36 @@ class RegisterVisit(AjaxForm):
         return self.check_obj_existence(storage.Schedule, 'event_id')
 
     def clean_rfid_code(self):
-        hex_values = [str(i) for i in xrange(10)] + [a for a in 'ABCDEF']
-        for i in self.cleaned_data['rfid_code']:
-            if i.upper() not in hex_values:
-                raise forms.ValidationError(_(u'RFID has to consist of HEX symbols.'))
-        return self.cleaned_data['rfid_code']
+        value = self.cleaned_data['rfid_code']
+        self.rfid_validation(value)
+        return value
 
     def clean(self):
-        rfid_id = self.data['rfid_code']
-        try:
-            client = storage.Client.objects.get(rfid_code=rfid_id)
-        except storage.Client.DoesNotExist:
-            raise forms.ValidationError(_(u'No client for a given RFID.'))
+        self.client = self.rfid_client(self.cleaned_data['rfid_code'])
+        self.event = self.get_object('event_id')
 
-        event = self.get_object('event_id')
-
-        if event.begin_datetime <= datetime.now():
+        if self.event.begin_datetime <= datetime.now():
             raise forms.ValidationError(_(u'Avoid the appointment in the past.'))
-        if storage.Visit.objects.filter(client=client, schedule=event).count() > 0:
+        if storage.Visit.objects.filter(client=self.client, schedule=self.event).count() > 0:
             raise forms.ValidationError(_(u'The client is already registered on this event.'))
 
-        # search for card
-        cards = client.card_set.filter(price_category__lte=event.team.price_category)
-        if len(cards) == 0:
-            raise forms.ValidationError(_(u'The client has no card of needed category.'))
-        else:
-            # save the first card as check_obj_existence does
-            card = cards[0]
-            setattr(self, 'object_card_id', card)
-            if card.count_used >= card.count_sold:
-                raise forms.ValidationError(_(u'The client is exceeded the limit.'))
-
-        return self.cleaned_data
-
     def save(self):
-        DURATION_TYPE = [30, 90, 180, 270, 360]
+        # client and event attributes are defined in parent class
+        available_cards = storage.Card.objects.filter(client=self.client,
+                                                      price_category=self.event.team.price_category,
+                                                      cancel_datetime=None,
+                                                      end_date__lt=date.today())
+        if len(available_cards) == 0:
+            raise forms.ValidationError(_(u'The client has no card of needed category.'))
+        # sort by priority
+        sorting = []
+        for card in available_cards:
+            obj = card.card_ordinary or card.card_club or card.card_promo
+            sorting.append( (card.pk, obj.priority, card) )
+        sorted(sorting, key=lambda x: x[1])
 
-        client = storage.Client.objects.get(rfid_code=self.cleaned_data['rfid_code'])
-        event = self.get_object('event_id')
-        card = self.get_object('card_id')
-
-        visit = storage.Visit(client=client, schedule=event)
-        visit.card = card
+        visit = storage.Visit(client=self.client, schedule=self.event)
+        visit.card = available_cards.get(pk=sorting[0][0]) # get by pk
         visit.save()
         return visit.id
 
@@ -168,9 +166,6 @@ class GetScheduleInfo(AjaxForm):
     def query(self, request=None):
         event = self.get_object('id')
         return event.about()
-
-class UserRFID(forms.Form):
-    rfid_code = forms.CharField(max_length=8)
 
 class UserSearch(AjaxForm):
     """ Form searches users using their names and returns users list. """

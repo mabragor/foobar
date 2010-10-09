@@ -67,6 +67,7 @@ class __CardOrdinary(__CardType):
     list_display = ('title', 'categories', 'discounts', 'priority',
                     'is_priceless', 'is_active', 'reg_datetime')
     search_fields = ('title',)
+    ordering = ('priority', )
 admin.site.register(models.CardOrdinary, __CardOrdinary)
 models.CardOrdinary.description = _(u'This model consists of all possible types for ordinary cards.')
 
@@ -74,6 +75,7 @@ class __CardClub(__CardType):
     list_display = ('title', 'categories', 'discounts', 'priority', 'price',
                     'count_days', 'is_active', 'reg_datetime')
     search_fields = ('title',)
+    ordering = ('priority', )
 admin.site.register(models.CardClub, __CardClub)
 models.CardClub.description = _(u'This model consists of all possible types for club cards.')
 
@@ -83,6 +85,7 @@ class __CardPromo(__CardType):
                     'date_activation', 'date_expiration',
                     'is_active', 'reg_datetime')
     search_fields = ('title',)
+    ordering = ('priority', )
 admin.site.register(models.CardPromo, __CardPromo)
 models.CardPromo.description = _(u'This model consists of all possible types for promo cards.')
 

@@ -3,8 +3,6 @@
 
 import time
 from datetime import datetime, date, timedelta
-from dateutil.relativedelta import relativedelta
-
 from settings import _, DEBUG
 
 from PyQt4.QtGui import *

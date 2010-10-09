@@ -6,8 +6,6 @@ from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from lib.decorators import ajax_processor, render_to
 from django.shortcuts import get_object_or_404
-#from lib import DatetimeJSONEncoder
-#from forms import ScheduleForm, UserRFID, StatusForm, CopyForm, UserCardForm
 
 #@render_to('manager/index.html')
 @render_to('manager.html')

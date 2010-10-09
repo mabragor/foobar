@@ -2,7 +2,6 @@
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 from datetime import datetime, date, timedelta
-from dateutil.relativedelta import relativedelta
 
 from settings import _, DEBUG, userRoles
 GET_ID_ROLE = userRoles['getObjectID']
