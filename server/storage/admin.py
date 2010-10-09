@@ -33,6 +33,7 @@ from storage import models
 class __Card(admin.ModelAdmin):
     def card_type(self, card):
         return card.__unicode__()
+    card_type.short_description = _(u'Card type')
 
     list_display = ('card_type', 'client',
                     'state', 'discount', 'price', 'paid',
@@ -53,29 +54,31 @@ class __CardType(admin.ModelAdmin):
     def categories(self, cardtype):
         cats = cardtype.category.all()
         return u', '.join([unicode(i) for i in cats])
+    categories.short_description = _(u'Categories')
 
     def discounts(self, cardtype):
         discounts = cardtype.discount.all()
         return u', '.join([unicode(i) for i in discounts])
+    discounts.short_description = _(u'Discounts')
 
     filter_horizontal = ('category', 'discount')
 
 class __CardOrdinary(__CardType):
-    list_display = ('title', 'categories', 'discounts',
+    list_display = ('title', 'categories', 'discounts', 'priority',
                     'is_priceless', 'is_active', 'reg_datetime')
     search_fields = ('title',)
 admin.site.register(models.CardOrdinary, __CardOrdinary)
 models.CardOrdinary.description = _(u'This model consists of all possible types for ordinary cards.')
 
 class __CardClub(__CardType):
-    list_display = ('title', 'categories', 'discounts', 'price',
+    list_display = ('title', 'categories', 'discounts', 'priority', 'price',
                     'count_days', 'is_active', 'reg_datetime')
     search_fields = ('title',)
 admin.site.register(models.CardClub, __CardClub)
 models.CardClub.description = _(u'This model consists of all possible types for club cards.')
 
 class __CardPromo(__CardType):
-    list_display = ('title', 'categories', 'discounts', 'price',
+    list_display = ('title', 'categories', 'discounts', 'priority', 'price',
                     'count_sold', 'count_days',
                     'date_activation', 'date_expiration',
                     'is_active', 'reg_datetime')

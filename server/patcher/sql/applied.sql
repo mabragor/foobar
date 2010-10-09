@@ -19,5 +19,6 @@ insert into patcher_applied (name, applied) values
 ('1003301015', NOW()),
 ('1004031245', NOW()),
 ('1004210801', NOW()),
-('1004210834', NOW())
+('1004210834', NOW()),
+('1002250003', NOW())
 ;

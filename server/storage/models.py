@@ -53,7 +53,7 @@ class AbstractModel(models.Model):
 
 class PriceCategoryTeam(AbstractModel): # эконом, дисконт, эксклюзив, спецкурс...
 
-    title = models.CharField(max_length=64)
+    title = models.CharField(verbose_name=_('Title'), max_length=64)
     full_price = models.FloatField(verbose_name=_(u'Full price.'), default=0.00)
     half_price = models.FloatField(verbose_name=_(u'Half price.'), default=0.00)
     once_price = models.FloatField(verbose_name=_(u'One visit price.'), default=0.00)
@@ -68,7 +68,7 @@ class PriceCategoryTeam(AbstractModel): # эконом, дисконт, экск
 
 class PriceCategoryRent(AbstractModel):
 
-    title = models.CharField(max_length=64)
+    title = models.CharField(verbose_name=_('Title'), max_length=64)
     full_price = models.FloatField(verbose_name=_(u'Full price.'), default=0.00)
     half_price = models.FloatField(verbose_name=_(u'Half price.'), default=0.00)
     once_price = models.FloatField(verbose_name=_(u'One visit price.'), default=0.00)
@@ -81,7 +81,7 @@ class PriceCategoryRent(AbstractModel):
 
 class Discount(AbstractModel):
 
-    title = models.CharField(max_length=64)
+    title = models.CharField(verbose_name=_('Title'), max_length=64)
     percent = models.IntegerField(verbose_name=_(u'The percent of a discount.'), default=0)
 
     class Meta:
@@ -91,10 +91,12 @@ class Discount(AbstractModel):
 
 class AbstractCardType(AbstractModel): # флаер, пробное, разовое, абонемент, клубная карта, акция
 
-    title = models.CharField(max_length=64)
-    slug = models.SlugField(max_length=128)
+    title = models.CharField(verbose_name=_('Title'), max_length=64,
+                             help_text=_(u'The name of this item. It will show on the list of items.'))
+    slug = models.SlugField(verbose_name=_('Slug'), max_length=128, help_text=_(u'ASCII name for this item.'))
     category = models.ManyToManyField(PriceCategoryTeam, verbose_name=_(u'Price category'))
     discount = models.ManyToManyField(Discount, verbose_name=_(u'Discount'))
+    priority = models.IntegerField(verbose_name=_('Priority'), help_text=_(u'Priority for the algorithm to automatically select while the registration of a visit.'))
 
     class Meta:
         abstract = True
@@ -108,7 +110,8 @@ class AbstractCardType(AbstractModel): # флаер, пробное, разов�
 class CardOrdinary(AbstractCardType):
 
     is_priceless = models.BooleanField(verbose_name=_(u'Is priceless?'))
-    available_formula = models.CharField(max_length=128, null=True, blank=True, help_text=_(u'Enter the formula to calculate available visits.'))
+    available_formula = models.CharField(verbose_name=_(u'Formula'), max_length=128, null=True, blank=True,
+                                         help_text=_(u'Enter the formula to calculate available visits.'))
 
     class Meta:
         verbose_name = _(u'Ordinary card\'s type')
@@ -467,9 +470,9 @@ class Schedule(models.Model):
 
 class Visit(AbstractModel): # FIXME models
 
-    client = models.ForeignKey(Client, verbose_name=_(u'Client'))
+    client = models.ForeignKey(Client)
     schedule = models.ForeignKey(Schedule, verbose_name=_(u'Event'))
-    card = models.ForeignKey(Card, verbose_name=_(u'Card'), null=True, blank=True)
+    card = models.ForeignKey(Card, null=True, blank=True)
 
     class Meta:
         verbose_name = _(u'Visit')
