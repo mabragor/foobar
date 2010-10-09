@@ -1,0 +1,85 @@
+digraph G {
+compound = True;
+graph [rankdir="TB", compound=true, ratio=compress,
+       remincross=true, center=true];
+node [shape=record, fontname="Verdana", fontsize=8];
+edge [arrowsize=1, color=blue, fontname="Verdana", fontsize=8];
+
+{
+    node [shape=plaintext];
+    django -> custom -> abstract -> get -> post -> delete[color=gray];
+}
+
+node [shape=box];
+{ rank=same; django;
+  Field[color=green];
+  Form[color=green];
+}
+{ rank=same; custom;
+  AjaxForm[color=orange];
+  ListField[color=blue];
+}
+{ rank=same; abstract;
+  EventRFID[color=orange];
+  UserInfo[color=orange];
+}
+{ rank=same; get;
+  Login;
+  GetCardSchedule;
+  GetScheduleInfo;
+  UserSearch;
+  UserIdRfid;
+  DateRange;
+  GetVisitors;
+
+}
+{ rank=same; post;
+  RegisterVisit;
+  ClientInfo;
+  RenterInfo;
+  ClientCard;
+  RenterCard;
+  RegisterChange;
+  RegisterFix;
+  CalendarEventAdd;
+  ExchangeRoom;
+  CopyWeek;
+  FillWeek;
+  AddResource;
+  SubResource;
+}
+
+{ rank=same; delete;
+  CalendarEventDel;
+}
+
+ListField -> Field;
+AjaxForm -> Form;
+Login -> AjaxForm;
+
+
+EventRFID -> AjaxForm;
+GetCardSchedule -> EventRFID;
+RegisterVisit -> EventRFID;
+GetScheduleInfo -> AjaxForm;
+UserSearch -> AjaxForm;
+UserIdRfid -> AjaxForm;
+UserInfo -> AjaxForm;
+ClientInfo -> UserInfo;
+RenterInfo -> UserInfo;
+ClientCard -> AjaxForm;
+RenterCard -> AjaxForm;
+RegisterChange -> AjaxForm;
+RegisterFix -> AjaxForm;
+DateRange -> AjaxForm;
+DateRange -> ListField[color=gray, style=dashed]
+CalendarEventAdd -> AjaxForm;
+CalendarEventDel -> AjaxForm;
+ExchangeRoom -> AjaxForm;
+CopyWeek -> AjaxForm;
+FillWeek -> AjaxForm;
+GetVisitors -> AjaxForm
+AddResource -> AjaxForm
+SubResource -> AjaxForm
+
+};

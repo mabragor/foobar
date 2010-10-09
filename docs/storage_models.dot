@@ -1,0 +1,62 @@
+digraph G {
+compound = True;
+graph [rankdir="TB", compound=true, ratio=compress,
+       remincross=true, center=true];
+node [shape=record, fontname="Verdana", fontsize=8];
+edge [arrowsize=1, color=blue, fontname="Verdana", fontsize=8];
+
+{
+    node [shape=plaintext];
+    django -> abstract1 -> abstract2 -> model[color=gray];
+}
+
+node [shape=box];
+{ rank=same; django;
+  Model[color=green];
+}
+{ rank=same; abstract1;
+  AbstractModel[color=orange];
+}
+{ rank=same; abstract2;
+  AbstractCardType[color=orange];
+  AbstractUser[color=orange];
+}
+{ rank=same; model;
+  PriceCategoryTeam; PriceCategoryRent;
+  Discount;
+  CardOrdinary; CardClub; CardPromo;
+  Coach; Client; Renter;
+  Card;
+  Room;
+  DanceDirection; DanceStyle;
+  Team; Rent;
+  Visit;
+  Schedule; Accounting; Flow;
+}
+
+AbstractModel -> Model;
+Schedule -> Model;
+Accounting -> Model;
+Flow -> Model;
+
+PriceCategoryTeam -> AbstractModel;
+PriceCategoryRent -> AbstractModel;
+Discount -> AbstractModel;
+Card -> AbstractModel;
+Room -> AbstractModel;
+DanceDirection -> AbstractModel;
+DanceStyle -> AbstractModel;
+Team -> AbstractModel;
+Rent -> AbstractModel;
+Visit -> AbstractModel;
+
+AbstractCardType -> AbstractModel;
+CardOrdinary -> AbstractCardType;
+CardClub -> AbstractCardType;
+CardPromo -> AbstractCardType;
+
+AbstractUser -> AbstractModel;
+Coach -> AbstractUser;
+Client -> AbstractUser;
+Renter -> AbstractUser;
+};
