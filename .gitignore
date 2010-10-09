@@ -8,6 +8,8 @@
 # ignore diagrams and generated files
 /diagram
 /docs/*.png
+/docs/*dot.svg
+/docs/*fdp.svg
 /server/settings_local.py
 /server/config.mk
 /server/django.wsgi
