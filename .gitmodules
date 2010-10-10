@@ -1,0 +1,3 @@
+[submodule "server/schema2dot"]
+	path = server/schema2dot
+	url = git@github.com:RaD/django-schema2dot.git
