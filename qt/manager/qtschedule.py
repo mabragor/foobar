@@ -347,14 +347,13 @@ class QtSchedule(QTableView):
             cx, cy = self.get_scrolled_coords(self.columnViewportPosition(col),
                                               self.rowViewportPosition(row))
             event_index = (x - cx) / (w / len(self.rooms))
-            try:
-                room_name, room_color, room_id = self.rooms[event_index]
-                model = self.model()
-                title = model.data(model.index(row, col), Qt.ToolTipRole, room_id).toString()
-                if len(title) > 0:
-                    QToolTip.showText(help.globalPos(), QString(title))
-            except:
-                pass
+            room_name, room_color, room_id = self.rooms[event_index]
+            model = self.model()
+            tooltip = model.data(model.index(row, col), Qt.ToolTipRole, room_id).toString()
+            if len(tooltip) > 0:
+                QToolTip.showText(help.globalPos(), QString(tooltip))
+            else:
+                print 'check tooltip on schedule'
         return QTableView.viewportEvent(self, event)
 
 #from settings import XPM_EVENT_CLOSED

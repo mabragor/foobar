@@ -57,6 +57,13 @@ class Event(object):
         return self.data['event']['coaches']
 
     @property
+    def tooltip(self):
+        event = self.data['event']
+        return '%s\n%s\n%s' % (event['title'],
+                               event['coaches'],
+                               event['price_category']['title'])
+
+    @property
     def fixed(self): #FIXME
         return int( self.data['status'] )
 
@@ -348,8 +355,7 @@ class EventStorage(QAbstractTableModel):
         event = self.get_event_by_cell(row, col, room_id)
         if event:
             if role == Qt.ToolTipRole:
-                tooltip = '%s\n%s' % (event.title, event.coach)
-                return QVariant(tooltip)
+                return QVariant( event.tooltip )
             if role == Qt.DisplayRole:
                 cells = self.get_cells_by_event(event, room_id)
                 if cells:
