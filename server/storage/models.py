@@ -245,7 +245,13 @@ class Card(AbstractModel):
         if self.end_date <= date.today():
             return _(u'Expired')
 
+    def may_register(self):
+        """ This method checks the possibility to register a visit on
+        the card."""
+        return self.count_used < self.count_available
+
     def register_visit(self):
+        """ This method registers a visit on the card."""
         # increment visits on client's card
         self.count_used += 1
 

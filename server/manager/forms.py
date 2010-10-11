@@ -141,21 +141,27 @@ class RegisterVisit(AjaxForm):
         available_cards = storage.Card.objects.filter(client=self.client,
                                                       price_category=self.event.team.price_category,
                                                       cancel_datetime=None,
-                                                      end_date__lt=date.today())
-        if len(available_cards) == 0:
-            raise forms.ValidationError(_(u'The client has no card of needed category.'))
-        self.cards = available_cards
+                                                      end_date__lte=date.today())
+        if len(available_cards) > 0:
+            # sort by priority
+            sorting = []
+            for card in available_cards:
+                obj = card.card_ordinary or card.card_club or card.card_promo
+                sorting.append( (card.pk, obj.priority, card) )
+            sorted(sorting, key=lambda x: x[1])
+
+            # find the appropriate card
+            for i in sorting:
+                card = available_cards.get(pk=i[0]) # get by pk
+                if card.may_register():
+                    self.chosen_card = card
+                    return
+        raise forms.ValidationError(_(u'The client has no card of needed category.'))
 
     def save(self):
-        # sort by priority
-        sorting = []
-        for card in self.cards:
-            obj = card.card_ordinary or card.card_club or card.card_promo
-            sorting.append( (card.pk, obj.priority, card) )
-        sorted(sorting, key=lambda x: x[1])
 
         visit = storage.Visit(client=self.client, schedule=self.event)
-        visit.card = self.cards.get(pk=sorting[0][0]) # get by pk
+        visit.card = self.chosen_card # see clean() method
         visit.save()
         return visit.id
 
