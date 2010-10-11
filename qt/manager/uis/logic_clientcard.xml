@@ -5,7 +5,9 @@
        требуется. Автоматически заполняются поля count_sold=1,
        price=0, discount=None, end_date=дата_регистрации -->
   <rule name="flyer">
-    <sequence/>
+    <sequence>
+      <dialog type="list" name="price_category" title="Ценовая категория" static="price_cats_team" result_as="integer"/>
+    </sequence>
   </rule>
 
   <!-- При регистрации пробного занятия требуется указать ценовую

@@ -220,7 +220,7 @@ class CardListModel(QAbstractTableModel):
             'card_type': 'flyer',
             'card_meta': None,
             'discount': 1,
-            'price_category': None,
+            'price_category': card['price_category'],
             'price': 0,
             'paid': 0,
             'count_sold': 1,

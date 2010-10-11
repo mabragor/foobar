@@ -156,6 +156,7 @@ class RegisterVisit(AjaxForm):
                 if card.may_register():
                     self.chosen_card = card
                     return
+
         raise forms.ValidationError(_(u'The client has no card of needed category.'))
 
     def save(self):
@@ -308,8 +309,7 @@ class ClientCard(AjaxForm):
             del(data['card_meta'])
 
             data['discount'] = self.get_object('discount')
-            if card_type in ('test', 'once', 'abonement'):
-                data['price_category'] = self.get_object('price_category')
+            data['price_category'] = self.get_object('price_category')
 
         if 0 == card_id: # create new card
             data['client'] = self.get_object('client')
