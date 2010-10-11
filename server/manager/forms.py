@@ -530,7 +530,7 @@ class CalendarEventDel(AjaxForm):
     def clean(self):
         id = self.cleaned_data['id']
         event = storage.Schedule.objects.get(id=id)
-        if event.begin < datetime.now():
+        if event.begin_datetime < datetime.now():
             raise forms.ValidationError(_(u'Unable to delete this event.'))
         return self.cleaned_data
 

@@ -27,39 +27,14 @@ class EventInfo(UiDlgTemplate):
     def setupUi(self):
         UiDlgTemplate.setupUi(self)
 
-        self.connect(self.dialog.buttonClose,
-                     SIGNAL('clicked()'), self.close)
-        # show registered visitors dialog
-        self.connect(self.buttonVisitors,
-                     SIGNAL('clicked()'),
-                     self.showVisitors)
-        # register visitor using his rfid label
-        self.connect(self.buttonVisit,
-                     SIGNAL('clicked()'),
-                     self.visitEvent)
-        self.connect(self.dialog.comboFix,
-                     SIGNAL('currentIndexChanged(int)'),
-                     self.enableComboFix)
+        self.connect(self.dialog.buttonClose, SIGNAL('clicked()'), self.close)
+        self.connect(self.buttonVisitors,     SIGNAL('clicked()'), self.showVisitors)
+        self.connect(self.buttonVisit,        SIGNAL('clicked()'), self.visitEvent)
+        self.connect(self.buttonRemove,       SIGNAL('clicked()'), self.eventRemove)
+        self.connect(self.dialog.comboFix,    SIGNAL('currentIndexChanged(int)'), self.enableComboFix)
 
     def enableComboFix(self, index):
         self.dialog.buttonFix.setDisabled(False)
-
-
-    def setSignals(self):
-        self.connect(self.comboRoom, SIGNAL('currentIndexChanged(int)'),
-                     self.changeRoom)
-        self.connect(self.buttonRemove, SIGNAL('clicked()'),
-                     self.eventRemove)
-        self.connect(self.buttonChange, SIGNAL('clicked()'),
-                     self.changeCoach)
-        self.connect(self.buttonFix, SIGNAL('clicked()'),
-                     self.fixEvent)
-        self.connect(self.buttonClose, SIGNAL('clicked()'),
-                     self, SLOT('reject()'))
-        self.connect(self.comboChange, SIGNAL('currentIndexChanged(int)'),
-                     self.enableComboChange)
-        self.connect(self.comboFix, SIGNAL('currentIndexChanged(int)'),
-                     self.enableComboFix)
 
     def initData(self, schedule):
         """ Use this method to initialize the dialog. """
@@ -127,7 +102,7 @@ class EventInfo(UiDlgTemplate):
                       'event_id': self.schedule['id']}
             self.http.request('/manager/register_visit/', params)
             default_response = None
-            response = self.http.parse(None)
+            response = self.http.parse(default_response)
             if response:
                 message = _('The client is registered on this event.')
             else:
@@ -155,13 +130,13 @@ class EventInfo(UiDlgTemplate):
             QMessageBox.Yes, QMessageBox.No)
         if reply == QMessageBox.Yes:
             params = {'id': self.schedule['id']}
-            ajax = HttpAjax(self, '/manager/cal_event_del/',
-                            params, self.parent.session_id)
-            response = ajax.parse_json()
+            self.http.request('/manager/cal_event_del/', params)
+            default_response = None
+            response = self.http.parse(default_response)
             if response:
                 index = self.comboRoom.currentIndex()
                 room_id, ok = self.comboRoom.itemData(index).toInt()
-                model = self.parent.scheduleModel
+                model = self.parent.schedule.model()
                 model.remove(self.schedule['id'], room_id, True)
                 QMessageBox.information(self, _('Event removing'),
                                         _('Complete.'))
