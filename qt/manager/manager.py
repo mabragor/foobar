@@ -67,8 +67,6 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('%s : %s' % (self.baseTitle, _('Login to start session')))
 
     def get_dynamic(self):
-        self.schedule.model().update()
-
         self.bpMonday.setText(self.schedule.model().getMonday().strftime('%d/%m/%Y'))
         self.bpSunday.setText(self.schedule.model().getSunday().strftime('%d/%m/%Y'))
 
