@@ -285,14 +285,12 @@ class ClientCard(AjaxForm):
         return self.check_obj_existence(storage.Discount, 'discount')
 
     def clean_price_category(self):
-        print self.cleaned_data
         if not self.cleaned_data['price_category']:
             return None
         return self.check_obj_existence(storage.PriceCategoryTeam, 'price_category')
 
     def save(self):
         data = self.cleaned_data
-        import pprint; pprint.pprint(data)
         card_id = data['id']
         if card_id == 0:
             del(data['id'])
@@ -313,12 +311,10 @@ class ClientCard(AjaxForm):
 
         if 0 == card_id: # create new card
             data['client'] = self.get_object('client')
-            import pprint; pprint.pprint(data) # REMOVE IT
             card = storage.Card(**data)
         else: # edit the existed one
             card = storage.Card.objects.get(id=card_id)
             # ...
-        print 'type of card is', type(card)
         card.save()
 
 class RenterInfo(UserInfo):
@@ -407,18 +403,24 @@ class RegisterChange(AjaxForm):
     """ Form registers the coach's change for the event. """
 
     event_id = forms.IntegerField()
-    coach_id = forms.IntegerField()
+    coach_id_list = forms.CharField(max_length=256)
 
     def clean_event_id(self):
         return self.check_obj_existence(storage.Schedule, 'event_id')
 
-    def clean_coach_id(self):
-        return self.check_obj_existence(storage.Coach, 'coach_id')
+    def clean_coach_id_list(self):
+        coaches_id = self.cleaned_data['coach_id_list'].split(',')
+        coaches_list = []
+        for coach_id in coaches_id:
+            coaches_list.append(storage.Coach.objects.get(id=int(coach_id)))
+        return coaches_list
 
     def save(self):
         event = self.get_object('event_id')
-        coach = self.get_object('coach_id')
-        event.change = coach
+        coaches_list = self.cleaned_data['coach_id_list']
+        event.coaches.clear()
+        for i in coaches_list:
+            event.coaches.add(i)
         event.save()
         return event.id
 
@@ -699,6 +701,10 @@ schedule. """
                                                     begin_datetime=ne.begin_datetime,
                                                     end_datetime=ne.end_datetime).count():
                 ne.save()
+                # copy coaches info
+                if e.team is not None:
+                    for coach in e.team.coaches.all():
+                        ne.coaches.add(coach)
                 count_copied += 1
             else:
                 count_passed += 1

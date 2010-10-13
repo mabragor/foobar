@@ -62,6 +62,7 @@ def static(request):
     data = {}
 
     params = (
+        ('coaches', 'model', storage.Coach),
         ('card_ordinary', 'model', storage.CardOrdinary),
         ('card_club', 'model', storage.CardClub),
         ('card_promo', 'model', storage.CardPromo),

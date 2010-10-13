@@ -310,7 +310,12 @@ models.Calendar.description = _(u'This model consists of records with events (te
 
 class __Schedule(admin.ModelAdmin):
     list_display = ('room', 'begin_datetime', 'end_datetime',
-                    'status', 'team', 'rent', 'change')
+                    'status', 'team', 'rent', 'coaches_list')
+
+    def coaches_list(self, item):
+        return ', '.join([i.__unicode__() for i in item.coaches.all()])
+    coaches_list.short_description = _(u'List of coaches')
+
 admin.site.register(models.Schedule, __Schedule)
 models.Schedule.description = _(u'This model consists of records with scheduled events (team or rent).')
 

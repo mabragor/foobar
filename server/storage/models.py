@@ -418,7 +418,7 @@ class Schedule(models.Model):
                     ('1', _('Done')),
                     ('2', _('Cancelled')) )
 
-    change = models.ForeignKey(Coach, verbose_name=_(u'Change'), null=True, blank=True)
+    coaches = models.ManyToManyField(Coach, verbose_name=_(u'Coaches'))
     team = models.ForeignKey(Team, verbose_name=_(u'Team'), null=True, blank=True)
     rent = models.ForeignKey(Rent, verbose_name=_(u'Rent'), null=True, blank=True)
     room = models.ForeignKey(Room, verbose_name=_(u'Room'))
@@ -450,9 +450,8 @@ class Schedule(models.Model):
         }
         if self.team:
             obj.update( {'type': 'training',
-                         'event': self.team.about()} )
-            if self.change is not None:
-                obj.update( {'change': self.change.pk} )
+                         'event': self.team.about(),
+                         'coaches': [i.about() for i in self.coaches.all()]} )
         if self.rent:
             obj.update( {'type': 'rent', 'event': self.rent.about()} )
         return obj

@@ -8,6 +8,7 @@ from settings import _, DEBUG
 from event_storage import Event
 from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_show_visitors import ShowVisitors
+from dialogs.show_coaches import ShowCoaches
 from ui_dialog import UiDlgTemplate
 
 __ = lambda x: datetime(*time.strptime(str(x), '%Y-%m-%d %H:%M:%S')[:6])
@@ -32,6 +33,8 @@ class EventInfo(UiDlgTemplate):
         self.connect(self.buttonVisit,        SIGNAL('clicked()'), self.visitEvent)
         self.connect(self.buttonRemove,       SIGNAL('clicked()'), self.removeEvent)
         self.connect(self.buttonFix,          SIGNAL('clicked()'), self.fixEvent)
+
+        self.connect(self.buttonChange,       SIGNAL('clicked()'), self.changeCoaches)
         self.connect(self.dialog.comboFix,    SIGNAL('currentIndexChanged(int)'),
                      lambda: self.buttonFix.setDisabled(False))
 
@@ -50,14 +53,18 @@ class EventInfo(UiDlgTemplate):
         response = self.http.parse(default_response)
 
         self.schedule = response['info']
-
         event = self.schedule['event']
         status = self.schedule.get('status', 0) # 0 means wainting
         room = self.schedule['room']
         self.editTitle.setText(event['title'])
 
-        if self.schedule_object.isTeam(): # CHECKME
-            self.editCoaches.setText(event['coaches'])
+        if self.schedule_object.isTeam(): # get coaches list from schedule, not from team, because of exchange
+            coaches_list = self.schedule.get('coaches', None)
+            if coaches_list:
+                title = ', '.join([i['name'] for i in coaches_list])
+            else:
+                title = _('Unknown')
+            self.editCoaches.setText(title)
 
         begin = __(self.schedule['begin_datetime'])
         end = __(self.schedule['end_datetime'])
@@ -145,22 +152,6 @@ class EventInfo(UiDlgTemplate):
                 QMessageBox.information(self, _('Event removing'),
                                         _('Unable to remove this event!'))
 
-    def changeCoach(self):
-        index = self.comboChange.currentIndex()
-        coach_id, ok = self.comboChange.itemData(index).toInt()
-
-        params = {'event_id': self.schedule['id'],
-                  'coach_id': coach_id}
-        # FIXME
-        ajax = HttpAjax(self, '/manager/register_change/',
-                        params, self.parent.session_id)
-        response = ajax.parse_json()
-        if response:
-            message = _('The coach of this event has been changed.')
-        else:
-            message = _('Unable to change a coach.')
-        QMessageBox.information(self, _('Coach change registration'), message)
-
     def fixEvent(self):
         index = self.comboFix.currentIndex()
         fix_id, ok = self.comboFix.itemData(index).toInt()
@@ -181,3 +172,10 @@ class EventInfo(UiDlgTemplate):
             message = _('Unable to fix this event.')
         QMessageBox.information(self, _('Event fix registration'), message)
 
+    def changeCoaches(self):
+        dialog = ShowCoaches(self, {'http': self.http})
+        dialog.setModal(True)
+        dialog.initData(self.schedule)
+        dialog.exec_()
+
+        self.initData(self.schedule_object, self.schedule_index)

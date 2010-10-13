@@ -44,11 +44,11 @@ urlpatterns += patterns(
     url(r'^exchange_room/$', 'exchange_room'),
     url(r'^register_visit/$', 'register_visit'),
     url(r'^register_rent/$', 'register_rent'),
-    url(r'^register_change/$', 'register_change'),
+    url(r'^register_change/$', 'register_change'), # change coaches for the event
     url(r'^register_fix/$', 'register_fix'),
     url(r'^get_visitors/$', 'get_visitors'),
     url(r'^get_rents/$', 'get_rents'),
-    url(r'^get_coaches/$', 'get_coaches'),
+#    url(r'^get_coaches/$', 'get_coaches'),
     url(r'^get_accounting/$', 'get_accounting'),
     url(r'^add_resource/$', 'add_resource'),
     url(r'^sub_resource/$', 'sub_resource'),
