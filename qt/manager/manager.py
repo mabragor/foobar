@@ -88,7 +88,7 @@ class MainWindow(QMainWindow):
         self.http.request('/manager/static/', {})
         response = self.http.parse()
         self.static = response
-        #print 'Static is'
+        print 'Static is', self.static.keys()
         #import pprint; pprint.pprint(self.static)
 
         #self.tree = TreeModel(self.static.get('styles', None))
@@ -531,10 +531,10 @@ class MainWindow(QMainWindow):
 # 	print 'USER INFO:', json_like
 # 	return json_like
 
-    def showEventProperties(self, calendar_event): #, room_id):
+    def showEventProperties(self, calendar_event, index): #, room_id):
         self.dialog = EventInfo(self, {'http': self.http})
         self.dialog.setModal(True)
-        self.dialog.initData(calendar_event)
+        self.dialog.initData(calendar_event, index)
         self.dialog.exec_()
 
     # Drag'n'Drop section begins

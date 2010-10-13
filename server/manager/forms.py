@@ -434,7 +434,7 @@ class RegisterFix(AjaxForm):
     def save(self):
         event = self.get_object('event_id')
         fix = self.param('fix_id')
-        event.fixed = fix
+        event.status = fix
         event.save()
         return event.id
 

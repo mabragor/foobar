@@ -283,7 +283,7 @@ class QtSchedule(QTableView):
         if not variant.isValid():
             return
         evt = variant.toPyObject()
-        self.parent.showEventProperties(evt) #, room_id)
+        self.parent.showEventProperties(evt, index) #, room_id)
         event.accept()
 
     def mouseMoveEvent(self, event):
@@ -352,8 +352,6 @@ class QtSchedule(QTableView):
             tooltip = model.data(model.index(row, col), Qt.ToolTipRole, room_id).toString()
             if len(tooltip) > 0:
                 QToolTip.showText(help.globalPos(), QString(tooltip))
-            else:
-                print 'check tooltip on schedule'
         return QTableView.viewportEvent(self, event)
 
 #from settings import XPM_EVENT_CLOSED

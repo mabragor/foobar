@@ -30,34 +30,33 @@ class EventInfo(UiDlgTemplate):
         self.connect(self.dialog.buttonClose, SIGNAL('clicked()'), self.close)
         self.connect(self.buttonVisitors,     SIGNAL('clicked()'), self.showVisitors)
         self.connect(self.buttonVisit,        SIGNAL('clicked()'), self.visitEvent)
-        self.connect(self.buttonRemove,       SIGNAL('clicked()'), self.eventRemove)
-        self.connect(self.dialog.comboFix,    SIGNAL('currentIndexChanged(int)'), self.enableComboFix)
+        self.connect(self.buttonRemove,       SIGNAL('clicked()'), self.removeEvent)
+        self.connect(self.buttonFix,          SIGNAL('clicked()'), self.fixEvent)
+        self.connect(self.dialog.comboFix,    SIGNAL('currentIndexChanged(int)'),
+                     lambda: self.buttonFix.setDisabled(False))
 
     def enableComboFix(self, index):
         self.dialog.buttonFix.setDisabled(False)
 
-    def initData(self, schedule):
+    def initData(self, obj, index):
         """ Use this method to initialize the dialog. """
-        # get the coaches list first
-        # self.http.request('/manager/get_coaches/', {})
-        # default_response = {'coaches_list': dict()}
-        # response = self.http.parse(default_response)
-        # for i in response['coaches_list']:
-        #     item = '%s %s' % (i['last_name'], i['first_name'])
-        #     self.comboChange.addItem(item, QVariant(int(i['id'])))
+
+        self.schedule_object = obj
+        self.schedule_index = index
 
         # get the event's information
-        self.http.request('/manager/get_event_info/', {'id': schedule.id})
+        self.http.request('/manager/get_event_info/', {'id': self.schedule_object.id})
         default_response = None
         response = self.http.parse(default_response)
 
         self.schedule = response['info']
 
         event = self.schedule['event']
+        status = self.schedule.get('status', 0) # 0 means wainting
         room = self.schedule['room']
         self.editTitle.setText(event['title'])
 
-        if schedule.isTeam():
+        if self.schedule_object.isTeam(): # CHECKME
             self.editCoaches.setText(event['coaches'])
 
         begin = __(self.schedule['begin_datetime'])
@@ -72,15 +71,16 @@ class EventInfo(UiDlgTemplate):
             if id == current_id + 100:
                 current = self.comboRoom.count() - 1
         self.comboRoom.setCurrentIndex(self.current_room_index)
-
-        try:
-            index = int(self.schedule.get('fixed', 0))
-        except ValueError:
-            index = 0
-        self.comboFix.setCurrentIndex(index)
-        self.buttonFix.setDisabled(True)
-
         self.buttonRemove.setDisabled( begin < datetime.now() )
+
+        self._init_fix(status)
+
+    def _init_fix(self, current):
+        """ Helper method to init eventFix combo."""
+        for id, title in self.parent.static['event_fix_choice']:
+            self.comboFix.addItem(title, QVariant(id))
+        self.comboFix.setCurrentIndex(int(current))
+        self.buttonFix.setDisabled(True)
 
     def showVisitors(self):
         dialog = ShowVisitors(self, {'http': self.http})
@@ -123,7 +123,7 @@ class EventInfo(UiDlgTemplate):
             #
             pass
 
-    def eventRemove(self):
+    def removeEvent(self):
         reply = QMessageBox.question(
             self, _('Event remove'),
             _('Are you sure to remove this event from the calendar?'),
@@ -145,18 +145,13 @@ class EventInfo(UiDlgTemplate):
                 QMessageBox.information(self, _('Event removing'),
                                         _('Unable to remove this event!'))
 
-    def enableComboChange(self, index):
-        self.buttonChange.setDisabled(False)
-
-    def enableComboFix(self, index):
-        self.buttonFix.setDisabled(False)
-
     def changeCoach(self):
         index = self.comboChange.currentIndex()
         coach_id, ok = self.comboChange.itemData(index).toInt()
 
         params = {'event_id': self.schedule['id'],
                   'coach_id': coach_id}
+        # FIXME
         ajax = HttpAjax(self, '/manager/register_change/',
                         params, self.parent.session_id)
         response = ajax.parse_json()
@@ -172,11 +167,17 @@ class EventInfo(UiDlgTemplate):
 
         params = {'event_id': self.schedule['id'],
                   'fix_id': fix_id}
-        ajax = HttpAjax(self, '/manager/register_fix/',
-                        params, self.parent.session_id)
-        response = ajax.parse_json()
+        self.http.request('/manager/register_fix/', params)
+        default_response = None
+        response = self.http.parse(default_response)
         if response:
             message = _('The event has been fixed.')
+
+            self.schedule_object.set_fixed(fix_id)
+            model = self.parent.schedule.model()
+            model.change(self.schedule_object, self.schedule_index)
+            self.buttonFix.setDisabled(True)
         else:
             message = _('Unable to fix this event.')
         QMessageBox.information(self, _('Event fix registration'), message)
+

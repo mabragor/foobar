@@ -62,17 +62,23 @@ def static(request):
     data = {}
 
     params = (
-        ('card_ordinary', storage.CardOrdinary),
-        ('card_club', storage.CardClub),
-        ('card_promo', storage.CardPromo),
-        ('price_cats_team', storage.PriceCategoryTeam),
-        ('price_cats_rent', storage.PriceCategoryRent),
-        ('discounts', storage.Discount),
-        ('styles', storage.DanceStyle),
+        ('card_ordinary', 'model', storage.CardOrdinary),
+        ('card_club', 'model', storage.CardClub),
+        ('card_promo', 'model', storage.CardPromo),
+        ('price_cats_team', 'model', storage.PriceCategoryTeam),
+        ('price_cats_rent', 'model', storage.PriceCategoryRent),
+        ('discounts', 'model', storage.Discount),
+        ('styles', 'model', storage.DanceStyle),
+        ('event_fix_choice', 'tuple', storage.Schedule.EVENT_FIXED),
         )
-    for key, model in params:
-        qs = model.objects.filter(is_active=True)
-        data.update( {key: [item.about() for item in qs], } )
+    for key, _type, model in params:
+        if _type == 'model':
+            qs = model.objects.filter(is_active=True)
+            data.update( {key: [item.about() for item in qs], } )
+        elif _type == 'tuple':
+            data.update( {key: model} )
+        else:
+            raise RuntimeWarning('STATIC')
     return data
 
 @login_required

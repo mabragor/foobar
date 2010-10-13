@@ -67,6 +67,9 @@ class Event(object):
     def fixed(self): #FIXME
         return int( self.data['status'] )
 
+    def set_fixed(self, value):
+        self.data['status'] = str(value)
+
 class ModelStorage:
 
     SET = 1; GET = 2; DEL = 3
@@ -189,6 +192,10 @@ class EventStorage(QAbstractTableModel):
             self.storage.delByER( (event, room) )
             if emit_signal:
                 self.emit(SIGNAL('layoutChanged()'))
+
+    def change(self, event, index):
+        """ Change event's info."""
+        self.emit(SIGNAL('dataChanged(QModelIndex, QModelIndex)'), index, index)
 
     def move(self, row, col, room, event):
         """ This method moves the event to new cell. """
