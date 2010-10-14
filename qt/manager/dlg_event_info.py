@@ -78,7 +78,11 @@ class EventInfo(UiDlgTemplate):
             if id == current_id + 100:
                 current = self.comboRoom.count() - 1
         self.comboRoom.setCurrentIndex(self.current_room_index)
-        self.buttonRemove.setDisabled( begin < datetime.now() )
+
+        # disable controls for events in the past
+        is_past = begin < datetime.now()
+        self.buttonRemove.setDisabled(is_past)
+        self.buttonVisit.setDisabled(is_past)
 
         self._init_fix(status)
 
