@@ -148,7 +148,7 @@ class EventInfo(UiDlgTemplate):
                 index = self.comboRoom.currentIndex()
                 room_id, ok = self.comboRoom.itemData(index).toInt()
                 model = self.parent.schedule.model()
-                model.remove(self.schedule['id'], room_id, True)
+                model.remove(self.schedule_object, self.schedule_index, True)
                 QMessageBox.information(self, _('Event removing'),
                                         _('Complete.'))
                 self.accept()

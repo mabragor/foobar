@@ -179,19 +179,17 @@ class EventStorage(QAbstractTableModel):
         if emit_signal:
             self.emit(SIGNAL('layoutChanged()'))
 
-    def remove(self, event_id, room, emit_signal=False):
+    def remove(self, event, index, emit_signal=False):
         """ This method removes the event. """
-        event = self.storage.searchByID(event_id)
-        if event is None:
-            return
+        room = event.data['room']['id']
         cell_list = self.get_cells_by_event(event, room)
         if cell_list:
             for row, col in cell_list:
                 self.storage.byRCR(ModelStorage.DEL,
                                    (row, col, room))
             self.storage.delByER( (event, room) )
-            if emit_signal:
-                self.emit(SIGNAL('layoutChanged()'))
+            if emit_signal and index:
+                self.emit(SIGNAL('dataChanged(QModelIndex, QModelIndex)'), index, index)
 
     def change(self, event, index):
         """ Change event's info."""
