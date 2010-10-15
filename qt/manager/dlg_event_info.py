@@ -83,6 +83,7 @@ class EventInfo(UiDlgTemplate):
         is_past = begin < datetime.now()
         self.buttonRemove.setDisabled(is_past)
         self.buttonVisit.setDisabled(is_past)
+        self.buttonChange.setDisabled(is_past)
 
         self._init_fix(status)
 
