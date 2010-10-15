@@ -9,11 +9,12 @@ from PyQt4.QtCore import *
 
 class DlgSearchByName(QDialog):
 
-    def __init__(self, mode='client', parent=None):
+    def __init__(self, parent, params, mode='client'):
         QDialog.__init__(self, parent)
 
         self.setMinimumWidth(500)
         self.parent = parent
+        self.http = params.get('http', None)
         self.mode = mode
 
         labelField = QLabel(_('Search'))
@@ -81,9 +82,10 @@ class DlgSearchByName(QDialog):
     def searchFor(self):
         name = self.editField.text().toUtf8()
         params = {'name': name, 'mode': self.mode}
-        ajax = HttpAjax(self, '/manager/get_users_info_by_name/', params, self.parent.session_id)
-        response = ajax.parse_json()
-        if response:
+        self.http.request('/manager/get_users_info_by_name/', params)
+        default_response = None
+        response = self.http.parse(default_response)
+        if response and 'users' in response:
             user_list = response['users']
             self.showList(user_list)
 

@@ -366,7 +366,11 @@ class MainWindow(QMainWindow):
         def callback(user_id):
             self.user_id = user_id
 
-        self.dialog = DlgSearchByName('client', self)
+        params = {
+            'http': self.http,
+            'static': self.static,
+            }
+        self.dialog = DlgSearchByName(self, params, 'client')
         self.dialog.setModal(True)
         self.dialog.setCallback(callback)
         dlgStatus = self.dialog.exec_()
