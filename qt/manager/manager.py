@@ -13,6 +13,7 @@ from qtschedule import QtSchedule
 
 from team_tree import TreeModel
 
+from dialogs.searching import Searching
 from dlg_settings import DlgSettings
 from dlg_login import DlgLogin
 from dlg_waiting_rfid import DlgWaitingRFID
@@ -369,8 +370,9 @@ class MainWindow(QMainWindow):
         params = {
             'http': self.http,
             'static': self.static,
+            'mode': 'client',
             }
-        self.dialog = DlgSearchByName(self, params, 'client')
+        self.dialog = Searching(self, params)
         self.dialog.setModal(True)
         self.dialog.setCallback(callback)
         dlgStatus = self.dialog.exec_()
