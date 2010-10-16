@@ -14,11 +14,11 @@ from qtschedule import QtSchedule
 from team_tree import TreeModel
 
 from dialogs.searching import Searching
+from dialogs.user_info import ClientInfo, DlgRenterInfo
 from dlg_settings import DlgSettings
 from dlg_login import DlgLogin
 from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_searching import DlgSearchByName
-from dlg_user_info import DlgClientInfo, DlgRenterInfo
 from dlg_event_assign import DlgEventAssign
 from dlg_event_info import EventInfo
 from dlg_copy_week import DlgCopyWeek
@@ -322,7 +322,7 @@ class MainWindow(QMainWindow):
             'http': self.http,
             'static': self.static,
             }
-        self.dialog = DlgClientInfo(self, params)
+        self.dialog = ClientInfo(self, params)
         self.dialog.setModal(True)
         self.dialog.exec_()
 
@@ -353,7 +353,7 @@ class MainWindow(QMainWindow):
                     'http': self.http,
                     'static': self.static,
                     }
-                self.dialog = DlgClientInfo(self, params)
+                self.dialog = ClientInfo(self, params)
                 self.dialog.setModal(True)
 
                 self.dialog.initData(user_info)
@@ -391,7 +391,7 @@ class MainWindow(QMainWindow):
                     'http': self.http,
                     'static': self.static,
                     }
-                self.dialog = DlgClientInfo(self, params)
+                self.dialog = ClientInfo(self, params)
                 self.dialog.setModal(True)
                 self.dialog.initData(response['info'])
                 self.dialog.exec_()

@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
-from settings import _, DEBUG
+from settings import _, DEBUG, userRoles
 #from model_sorting import SortClientTeams
-from card_list import CardList
+from card_list import CardListModel
 from rent_list import RentListModel, RentList
 from dlg_waiting_rfid import DlgWaitingRFID
 from dialogs.assign_card import DlgAssignCard
 from dlg_rent_assign import DlgRentAssign
+from settings import _, userRoles
+from ui_dialog import UiDlgTemplate
 
 from datetime import datetime
 
@@ -169,111 +171,39 @@ class WizardPriceDlg(WizardDialog):
         self.callback(result)
         self.close()
 
-class DlgClientInfo(QDialog):
+class ClientInfo(UiDlgTemplate):
+
+    ui_file = 'uis/dlg_user_info.ui'
+    title = _('Client\'s information')
+    card_model = None
+    static = None
+    client_id = u'0'
 
     def __init__(self, parent=None, params=dict()):
-        QDialog.__init__(self, parent)
-
-        self.parent = parent
-        self.params = params
-        self.http = params['http']
         self.static = params['static']
+        UiDlgTemplate.__init__(self, parent, params)
 
-        self.client_id = u'0'
-        self.setMinimumWidth(800)
-        self.setMinimumHeight(500)
+    def setupUi(self):
+        UiDlgTemplate.setupUi(self)
 
-        self.editLastName = QLineEdit()
-        self.editFirstName = QLineEdit()
-        self.editEmail = QLineEdit()
-        self.editPhone = QLineEdit()
-        self.comboDiscount = QComboBox()
-        self.dateBirth = QDateEdit()
-        self.editRFID = QLineEdit(); self.editRFID.setReadOnly(True)
+        self.tableHistory.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        self.buttonAssignRFID = QPushButton(_('Assign RFID'))
+        self.card_model = CardListModel(self)
+        self.tableHistory.setModel(self.card_model)
 
-        layoutUser = QGridLayout()
-        layoutUser.setColumnStretch(1, 1)
-        layoutUser.setColumnMinimumWidth(1, 250)
-
-        layoutUser.addWidget(QLabel(_('Last name')), 0, 0)
-        layoutUser.addWidget(self.editLastName, 0, 1)
-        layoutUser.addWidget(QLabel(_('First name')), 1, 0)
-        layoutUser.addWidget(self.editFirstName, 1, 1)
-        layoutUser.addWidget(QLabel(_('E-mail')), 2, 0)
-        layoutUser.addWidget(self.editEmail, 2, 1)
-        layoutUser.addWidget(QLabel(_('Phone')), 3, 0)
-        layoutUser.addWidget(self.editPhone, 3, 1)
-        layoutUser.addWidget(QLabel(_('Discount')), 4, 0)
-        layoutUser.addWidget(self.comboDiscount, 4, 1)
-        layoutUser.addWidget(QLabel(_('Date of birth')), 5, 0)
-        layoutUser.addWidget(self.dateBirth, 5, 1)
-        layoutUser.addWidget( QLabel(_('RFID')), 6, 0)
-        layoutUser.addWidget(self.editRFID, 6, 1)
-        layoutUser.addWidget(self.buttonAssignRFID, 6, 2)
-
-        groupUser = QGroupBox(_('Base data'))
-        groupUser.setLayout(layoutUser)
-
-        self.button_assign_card = QPushButton(_('Assign card'))
-        self.buttonApplyDialog = QPushButton(_('Apply'))
-        self.buttonCancelDialog = QPushButton(_('Cancel'))
-
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(self.button_assign_card)
-        buttonLayout.addStretch(1)
-        buttonLayout.addWidget(self.buttonApplyDialog)
-        buttonLayout.addWidget(self.buttonCancelDialog)
-
-        # bought courses
-        self.cardinfo = CardList(self, self.params)
-
-        cardLayout = QVBoxLayout()
-        cardLayout.addWidget(self.cardinfo)
-
-        groupCard = QGroupBox(_('Card history'))
-        groupCard.setLayout(cardLayout)
-
-        layout = QVBoxLayout()
-        layout.addWidget(groupUser)
-        layout.addLayout(buttonLayout)
-        layout.addWidget(groupCard)
-
-        self.setLayout(layout)
-        self.setWindowTitle(_('Client\'s information'))
-
-        self.setRequired()
-        self.setSignals()
-
-        # discount combo
         for i in self.static.get('discounts', list()): # see params
             title = u'%(title)s - %(percent)s%%' % i
             self.comboDiscount.addItem(title, QVariant(i['id']))
 
-    def setRequired(self):
-        self.editLastName.setProperty('required', QVariant(True))
-        self.editFirstName.setProperty('required', QVariant(True))
-        self.editEmail.setProperty('required', QVariant(True))
-        self.editPhone.setProperty('required', QVariant(True))
-        self.comboDiscount.setProperty('required', QVariant(True))
-        self.dateBirth.setProperty('required', QVariant(True))
-        self.editRFID.setProperty('required', QVariant(True))
-
-    def setSignals(self):
-        self.connect(self.buttonAssignRFID, SIGNAL('clicked()'),
-                     self.assignRFID)
-        self.connect(self.button_assign_card, SIGNAL('clicked()'),
-                     self.assign_card)
-        self.connect(self.buttonApplyDialog, SIGNAL('clicked()'),
-                     self.applyDialog)
-        self.connect(self.buttonCancelDialog, SIGNAL('clicked()'),
-                     self, SLOT('reject()'))
+        self.connect(self.buttonAssign, SIGNAL('clicked()'), self.assign_card)
+        self.connect(self.buttonRFID,   SIGNAL('clicked()'), self.assignRFID)
+        self.connect(self.buttonApply, SIGNAL('clicked()'), self.applyDialog)
+        self.connect(self.buttonClose,  SIGNAL('clicked()'), self, SLOT('reject()'))
 
     def initData(self, data=dict()):
         self.client_id = data.get('id', '0')
-        self.editFirstName.setText(data.get('first_name', ''))
         self.editLastName.setText(data.get('last_name', ''))
+        self.editFirstName.setText(data.get('first_name', ''))
         self.editEmail.setText(data.get('email', ''))
         self.editPhone.setText(data.get('phone', ''))
 
@@ -284,24 +214,19 @@ class DlgClientInfo(QDialog):
 
         def str2date(value):
             return datetime.strptime(value, '%Y-%m-%d').date()
-            #import time
-            #return datetime(*time.strptime(value, '%Y-%m-%d')[:3])
 
         birth_date = data.get('birth_date', None) # it could be none while testing
         self.dateBirth.setDate(birth_date and str2date(birth_date) or \
                                QDate.currentDate())
-        self.editRFID.setText(data.get('rfid_code', ''))
+        rfid = data.get('rfid_code', None)
+        if rfid:
+            self.buttonRFID.setText(rfid)
+            self.buttonRFID.setToolTip(_('RFID code of this client.'))
+            self.buttonRFID.setDisabled(True)
 
         # fill the card list
         card_list = data.get('team_list', [])
-        self.cardinfo.model().initData(card_list)
-
-    def cancelCard(self):
-        row = self.cardinfo.currentRow()
-        if DEBUG:
-            print 'cancel card'
-            print row
-        self.cardinfo.removeRow(row)
+        self.tableHistory.model().initData(card_list)
 
     def assignRFID(self):
         def callback(rfid):
@@ -313,25 +238,14 @@ class DlgClientInfo(QDialog):
         dlgStatus = self.dialog.exec_()
 
         if QDialog.Accepted == dlgStatus:
-            self.editRFID.setText(self.rfid_id)
+            self.buttonRFID.setText(self.rfid_id)
 
-    # def add_card_record(self):
-    #     data  = {
-    #         'card_types': 1,
-    #         'price_cats_team': 1,
-    #         'count_sold': 0,
-    #         'price': 0.0,
-    #         'discount': 0,
-    #         'count_available': 0,
-    #         'count_used': 0,
-    #         'reg_datetime': _('Now'),
-    #         }
-    #     rows = []
-    #     rows.append(data)
-    #     model = self.cardinfo.model()
-    #     lastRow = model.rowCount(QModelIndex())
-    #     ok = model.insertRows(lastRow, rows, QModelIndex())
-    #     model.dump()
+    def cancelCard(self):
+        row = self.cardinfo.currentRow()
+        if DEBUG:
+            print 'cancel card'
+            print row
+        self.cardinfo.removeRow(row)
 
     def xml_query(self, file_name, xquery, slug):
 
@@ -396,7 +310,7 @@ class DlgClientInfo(QDialog):
         slug = self.wizard_dialog('list', _('Choose the card\'s type'),
                                   self.generate_card_list())
 
-        file_name = 'uis/logic_clientcard.xml'
+        file_name = '../uis/logic_clientcard.xml'
         xquery = "doc('%s')/logic/rule[@name='%s']/sequence"
         results = self.xml_query(file_name, xquery, slug)
         if results:
@@ -456,8 +370,8 @@ class DlgClientInfo(QDialog):
                 node = node.nextSibling()
             # end while
 
-            print card_type
-            print steps
+            #print card_type
+            #print steps
             # fill count_available
             if not card_type['is_priceless']:
                 # here all prices defined hard, no delays for payment
@@ -481,7 +395,7 @@ class DlgClientInfo(QDialog):
             # pprint.pprint(steps)
 
             # send data to user's model
-            model = self.cardinfo.model()
+            model = self.tableHistory.model()
             model.insert_new(steps, 0)
             # model.dump()
 
@@ -545,7 +459,7 @@ class DlgClientInfo(QDialog):
             'phone': self.editPhone.text().toUtf8(),
             'email': self.editEmail.text().toUtf8(),
             'birth_date': self.dateBirth.date().toPyDate(),
-            'rfid_code': self.editRFID.text().toUtf8(),
+            'rfid_code': self.buttonRFID.text().toUtf8(),
             'discount': discount
             }
         for k,v in userinfo.items():
@@ -567,10 +481,8 @@ class DlgClientInfo(QDialog):
         self.client_id = int( response['saved_id'] )
 
         # save client's card
-        model = self.cardinfo.model()
+        model = self.tableHistory.model()
         params = model.get_model_as_formset(self.client_id)
-        print 'card_list formset is'
-        import pprint; pprint.pprint(params);
         self.http.request('/manager/set_client_card/', params)
         response = self.http.parse(default_response)
 

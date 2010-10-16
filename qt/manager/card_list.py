@@ -71,10 +71,7 @@ class CardListModel(QAbstractTableModel):
         Data format is described in about() method of models.
         Is called from DlgClientInfo::initData()
         """
-        import pprint
         for item in card_list:
-            print '======\nITEM\n======'
-            pprint.pprint(item)
             self.insert_exist(item, 0)
         self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
                   QModelIndex(), 1, self.rowCount())
@@ -182,7 +179,6 @@ class CardListModel(QAbstractTableModel):
                         lambda a: a['id'] == value,
                         self.static['discounts']
                         )[0]
-            print '%s = %s' % (name, value)
             record.append(value)
         record.append(0) # this record is not registered in DB yet
 
@@ -191,7 +187,6 @@ class CardListModel(QAbstractTableModel):
                   QModelIndex(), 1, 1)
 
     def insert_exist(self, card, position, role=Qt.EditRole):
-        #import pprint; pprint.pprint(card)
         """ Insert a record into the model. """
         if card['card_ordinary'] is not None:
             slug = card['card_ordinary']['slug']
@@ -285,7 +280,6 @@ class CardListModel(QAbstractTableModel):
             record = self.storage[idx_row]
             value = record[idx_col]
         except KeyError:
-            #import pprint; pprint.pprint(self.storage)
             return QVariant('-err-')
         except IndexError:
             return QVariant('-err-')
@@ -475,7 +469,6 @@ class CardListDelegate(QItemDelegate):
         elif delegate_editor is QComboBox:
             idx = editor.currentIndex()
             value, ok = editor.itemData(idx).toInt()
-            print value, ok
             #if 1 == index.column():
             #    value = editor.currentText()
                 # fill count_sold
@@ -489,7 +482,7 @@ class CardListDelegate(QItemDelegate):
             value = 'Not implemented'
 
         model.setData(index, value, Qt.EditRole)
-        model.dump()
+        #model.dump()
 
         model.calculate_price(index)
 
