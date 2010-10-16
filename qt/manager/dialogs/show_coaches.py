@@ -12,7 +12,6 @@ GET_ID_ROLE = userRoles['getObjectID']
 class ShowCoaches(UiDlgTemplate):
 
     ui_file = 'uis/dlg_event_coaches.ui'
-    dialog = None
     title = _('Registered visitors')
     event_id = None
 
@@ -24,20 +23,20 @@ class ShowCoaches(UiDlgTemplate):
 
         self.tableCoaches.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        self.connect(self.dialog.buttonApply, SIGNAL('clicked()'), self.apply)
-        self.connect(self.dialog.buttonClose,  SIGNAL('clicked()'), self, SLOT('reject()'))
+        self.connect(self.buttonApply, SIGNAL('clicked()'), self.apply)
+        self.connect(self.buttonClose,  SIGNAL('clicked()'), self, SLOT('reject()'))
 
     def initData(self, schedule):
         self.event_id = schedule.get('id', None)
         for coach in self.parent.parent.static['coaches']:
-            lastRow = self.dialog.tableCoaches.rowCount()
-            self.dialog.tableCoaches.insertRow(lastRow)
+            lastRow = self.tableCoaches.rowCount()
+            self.tableCoaches.insertRow(lastRow)
             name = QTableWidgetItem(coach['last_name']) # data may assign on cells only, use first one
             name.setData(GET_ID_ROLE, int(coach['id']))
-            self.dialog.tableCoaches.setItem(lastRow, 0, name)
-            self.dialog.tableCoaches.setItem(lastRow, 1, QTableWidgetItem(coach['first_name']))
-            self.dialog.tableCoaches.setItem(lastRow, 2, QTableWidgetItem('--'))
-            self.dialog.tableCoaches.setItem(lastRow, 3, QTableWidgetItem(coach['reg_datetime']))
+            self.tableCoaches.setItem(lastRow, 0, name)
+            self.tableCoaches.setItem(lastRow, 1, QTableWidgetItem(coach['first_name']))
+            self.tableCoaches.setItem(lastRow, 2, QTableWidgetItem('--'))
+            self.tableCoaches.setItem(lastRow, 3, QTableWidgetItem(coach['reg_datetime']))
 
     def apply(self):
         coach_id_list = []
@@ -58,6 +57,9 @@ class ShowCoaches(UiDlgTemplate):
                 response = self.http.parse(default_response)
                 if response:
                     message = _('Coaches have exchanged.')
+                    QMessageBox.warning(self, _('Coaches exchange'), message)
+                    self.accept()
+                    return
                 else:
                     message = _('Unable to exchange.')
             else:

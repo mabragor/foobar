@@ -13,7 +13,6 @@ GET_ID_ROLE = userRoles['getObjectID']
 class Searching(UiDlgTemplate):
 
     ui_file = 'uis/dlg_searching.ui'
-    dialog = None
     title = None
     mode = None
 
@@ -30,9 +29,9 @@ class Searching(UiDlgTemplate):
 
         self.tableUsers.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        self.connect(self.dialog.buttonSearch, SIGNAL('clicked()'), self.searchFor)
-        self.connect(self.dialog.buttonShow, SIGNAL('clicked()'), self.applyDialog)
-        self.connect(self.dialog.buttonClose,  SIGNAL('clicked()'), self, SLOT('reject()'))
+        self.connect(self.buttonSearch, SIGNAL('clicked()'), self.searchFor)
+        self.connect(self.buttonShow, SIGNAL('clicked()'), self.applyDialog)
+        self.connect(self.buttonClose,  SIGNAL('clicked()'), self, SLOT('reject()'))
 
     def setCallback(self, callback):
         self.callback = callback
@@ -57,18 +56,18 @@ class Searching(UiDlgTemplate):
             self.tableUsers.insertRow(lastRow)
             name = QTableWidgetItem(user['last_name']) # data may assign on cells only, use first one
             name.setData(GET_ID_ROLE, int(user['id']))
-            self.dialog.tableUsers.setItem(lastRow, 0, name)
+            self.tableUsers.setItem(lastRow, 0, name)
             self.tableUsers.setItem(lastRow, 0, QTableWidgetItem(user['last_name']))
             self.tableUsers.setItem(lastRow, 1, QTableWidgetItem(user['first_name']))
             self.tableUsers.setItem(lastRow, 2, QTableWidgetItem(user['email']))
 
         if len(user_list) > 0:
             self.tableUsers.selectRow(0)
-            self.buttonFind.setDisabled(False)
+            self.buttonSearch.setDisabled(False)
             self.buttonShow.setFocus(Qt.OtherFocusReason)
         else:
             self.buttonShow.setDisabled(True)
-            self.buttonFind.setFocus(Qt.OtherFocusReason)
+            self.buttonSearch.setFocus(Qt.OtherFocusReason)
 
     def applyDialog(self):
         index = self.tableUsers.currentIndex()

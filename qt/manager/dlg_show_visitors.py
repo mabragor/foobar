@@ -10,7 +10,6 @@ from PyQt4.QtCore import *
 class ShowVisitors(UiDlgTemplate):
 
     ui_file = 'uis/dlg_event_visitors.ui'
-    dialog = None
     title = _('Registered visitors')
     event_id = None
 
@@ -20,12 +19,8 @@ class ShowVisitors(UiDlgTemplate):
     def setupUi(self):
         UiDlgTemplate.setupUi(self)
 
-        self.connect(self.dialog.buttonManual,
-                     SIGNAL('clicked()'),
-                     self.registerManually)
-        self.connect(self.dialog.buttonClose,
-                     SIGNAL('clicked()'),
-                     self, SLOT('reject()'))
+        self.connect(self.buttonManual, SIGNAL('clicked()'), self.registerManually)
+        self.connect(self.buttonClose, SIGNAL('clicked()'), self, SLOT('reject()'))
 
 
     def initData(self, event_id):
@@ -35,12 +30,12 @@ class ShowVisitors(UiDlgTemplate):
         response = self.http.parse(default_response)
         visitor_list = response['visitor_list']
         for last_name, first_name, rfid_code, reg_datetime in visitor_list:
-            lastRow = self.dialog.tableVisitors.rowCount()
-            self.dialog.tableVisitors.insertRow(lastRow)
-            self.dialog.tableVisitors.setItem(lastRow, 0, QTableWidgetItem(last_name))
-            self.dialog.tableVisitors.setItem(lastRow, 1, QTableWidgetItem(first_name))
-            self.dialog.tableVisitors.setItem(lastRow, 2, QTableWidgetItem(rfid_code))
-            self.dialog.tableVisitors.setItem(lastRow, 3, QTableWidgetItem(reg_datetime))
+            lastRow = self.tableVisitors.rowCount()
+            self.tableVisitors.insertRow(lastRow)
+            self.tableVisitors.setItem(lastRow, 0, QTableWidgetItem(last_name))
+            self.tableVisitors.setItem(lastRow, 1, QTableWidgetItem(first_name))
+            self.tableVisitors.setItem(lastRow, 2, QTableWidgetItem(rfid_code))
+            self.tableVisitors.setItem(lastRow, 3, QTableWidgetItem(reg_datetime))
 
     def registerManually(self):
         rfid_id, ok = QInputDialog.getText(self, _('Register manually'),

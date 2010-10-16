@@ -19,7 +19,6 @@ from PyQt4.QtCore import *
 class EventInfo(UiDlgTemplate):
 
     ui_file = 'uis/dlg_event_info.ui'
-    dialog = None
     title = _('Event\'s information')
 
     def __init__(self, parent=None, params=dict()):
@@ -28,18 +27,17 @@ class EventInfo(UiDlgTemplate):
     def setupUi(self):
         UiDlgTemplate.setupUi(self)
 
-        self.connect(self.dialog.buttonClose, SIGNAL('clicked()'), self.close)
-        self.connect(self.buttonVisitors,     SIGNAL('clicked()'), self.showVisitors)
-        self.connect(self.buttonVisit,        SIGNAL('clicked()'), self.visitEvent)
-        self.connect(self.buttonRemove,       SIGNAL('clicked()'), self.removeEvent)
-        self.connect(self.buttonFix,          SIGNAL('clicked()'), self.fixEvent)
-
-        self.connect(self.buttonChange,       SIGNAL('clicked()'), self.changeCoaches)
-        self.connect(self.dialog.comboFix,    SIGNAL('currentIndexChanged(int)'),
+        self.connect(self.buttonClose,     SIGNAL('clicked()'), self.close)
+        self.connect(self.buttonVisitors,  SIGNAL('clicked()'), self.showVisitors)
+        self.connect(self.buttonVisit,     SIGNAL('clicked()'), self.visitEvent)
+        self.connect(self.buttonRemove,    SIGNAL('clicked()'), self.removeEvent)
+        self.connect(self.buttonFix,       SIGNAL('clicked()'), self.fixEvent)
+        self.connect(self.buttonChange,    SIGNAL('clicked()'), self.changeCoaches)
+        self.connect(self.comboFix, SIGNAL('currentIndexChanged(int)'),
                      lambda: self.buttonFix.setDisabled(False))
 
     def enableComboFix(self, index):
-        self.dialog.buttonFix.setDisabled(False)
+        self.buttonFix.setDisabled(False)
 
     def initData(self, obj, index):
         """ Use this method to initialize the dialog. """

@@ -12,7 +12,6 @@ class UiDlgTemplate(QDialog):
 
     parent = None
     ui_file = None
-    dialog = None
     title = None
     http = None
 
@@ -21,7 +20,7 @@ class UiDlgTemplate(QDialog):
 
         self.parent = parent
         self.http = params.get('http', None)
-        self.dialog = uic.loadUi(self.ui_file, self)
+        uic.loadUi(self.ui_file, self)
         self.setupUi()
 
     def setupUi(self):
