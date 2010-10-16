@@ -91,7 +91,6 @@ class WizardListDlg(WizardDialog):
         WizardDialog.prefill(self, title)
         self.callback = callback
 
-        #import pprint; pprint.pprint(data)
         for id, text in data:
             item = QListWidgetItem(text, self.listWidget)
             item.setData(Qt.UserRole, QVariant(id))
@@ -197,15 +196,21 @@ class ClientInfo(UiDlgTemplate):
 
         self.connect(self.buttonAssign, SIGNAL('clicked()'), self.assign_card)
         self.connect(self.buttonRFID,   SIGNAL('clicked()'), self.assignRFID)
-        self.connect(self.buttonApply, SIGNAL('clicked()'), self.applyDialog)
+        self.connect(self.buttonApply,  SIGNAL('clicked()'), self.applyDialog)
         self.connect(self.buttonClose,  SIGNAL('clicked()'), self, SLOT('reject()'))
 
     def initData(self, data=dict()):
         self.client_id = data.get('id', '0')
-        self.editLastName.setText(data.get('last_name', ''))
-        self.editFirstName.setText(data.get('first_name', ''))
-        self.editEmail.setText(data.get('email', ''))
-        self.editPhone.setText(data.get('phone', ''))
+
+        meta = [('last_name', self.editLastName),
+                ('first_name', self.editFirstName),
+                ('email', self.editEmail),
+                ('phone', self.editPhone),
+                ]
+        for key, obj in meta:
+            text = data.get(key, '')
+            obj.setText(text)
+            obj.setToolTip(text)
 
         discount = data.get('discount', None)
         if discount:
@@ -239,6 +244,7 @@ class ClientInfo(UiDlgTemplate):
 
         if QDialog.Accepted == dlgStatus:
             self.buttonRFID.setText(self.rfid_id)
+            self.buttonRFID.setDisabled(True)
 
     def cancelCard(self):
         row = self.cardinfo.currentRow()
@@ -446,11 +452,11 @@ class ClientInfo(UiDlgTemplate):
         """ Apply settings. """
         userinfo, ok = self.checkFields()
         if ok:
-            self.saveSettings(userinfo)
-            self.accept()
+            if self.saveSettings(userinfo):
+                self.accept()
         else:
             QMessageBox.warning(self, _('Warning'),
-                                _('Please fill required fields.'))
+                                _('Please fill all fields.'))
     def checkFields(self):
         discount, ok = self.comboDiscount.itemData(self.comboDiscount.currentIndex()).toInt()
         userinfo = {
@@ -462,6 +468,8 @@ class ClientInfo(UiDlgTemplate):
             'rfid_code': self.buttonRFID.text().toUtf8(),
             'discount': discount
             }
+        if len(userinfo['rfid_code']) != 8:
+            return (userinfo, False)
         for k,v in userinfo.items():
             if k is 'birth_date':
                 continue
@@ -472,19 +480,31 @@ class ClientInfo(UiDlgTemplate):
         return (userinfo, True)
 
     def saveSettings(self, userinfo):
+        default_response = None
+
         # save client's information
         params = { 'user_id': self.client_id, }
         params.update(userinfo)
         self.http.request('/manager/set_client_info/', params)
-        default_response = None
         response = self.http.parse(default_response)
-        self.client_id = int( response['saved_id'] )
+        if not response:
+            error_msg = self.http.error_msg
+            message = _('Unable to save client\'s info!\nReason:\n%s') % error_msg
+            QMessageBox.warning(self, _('Saving'), message)
+            return False
 
         # save client's card
         model = self.tableHistory.model()
-        params = model.get_model_as_formset(self.client_id)
+        params = model.get_model_as_formset(response['saved_id'])
         self.http.request('/manager/set_client_card/', params)
         response = self.http.parse(default_response)
+        if not response:
+            error_msg = self.http.error_msg
+            message = _('Unable to save client\'s card!\nReason:\n%s') % error_msg
+            QMessageBox.warning(self, _('Saving'), message)
+            return False
+
+        return True
 
 class DlgRenterInfo(QDialog):
 

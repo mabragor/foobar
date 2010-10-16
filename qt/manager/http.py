@@ -112,6 +112,7 @@ class Http:
             #     print self.error_msg
             return default
         elif self.response.status == 500: # error
+            self.error_msg = _('Error 500. Check dump!')
             open('./dump.html', 'w').write(self.response.read())
         else:
             self.error_msg = '[%s] %s' % (self.response.status, self.response.reason)

@@ -18,7 +18,6 @@ from dialogs.user_info import ClientInfo, DlgRenterInfo
 from dlg_settings import DlgSettings
 from dlg_login import DlgLogin
 from dlg_waiting_rfid import DlgWaitingRFID
-from dlg_searching import DlgSearchByName
 from dlg_event_assign import DlgEventAssign
 from dlg_event_info import EventInfo
 from dlg_copy_week import DlgCopyWeek
@@ -405,7 +404,12 @@ class MainWindow(QMainWindow):
         def callback(id):
             self.user_id = id
 
-        self.dialog = DlgSearchByName('renter', self)
+        params = {
+            'http': self.http,
+            'static': self.static,
+            'mode': 'client',
+            }
+        self.dialog = Searching(self, params)
         self.dialog.setModal(True)
         self.dialog.setCallback(callback)
         dlgStatus = self.dialog.exec_()

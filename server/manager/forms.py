@@ -234,6 +234,22 @@ class ClientInfo(UserInfo):
     birth_date = forms.DateField()
     rfid_code = forms.CharField(max_length=8)
 
+    def clean_phone(self):
+        value = self.param('phone')
+        if len(value) == 0:
+            raise ValidationError(_(u'Field "Phone" is empty.'))
+        return value
+
+    def clean_rfid_code(self):
+        value = self.param('rfid_code')
+        if len(value) == 0:
+            raise ValidationError(_(u'Assign RFID label.'))
+        # if this code is used while we treying to register new user
+        if self.param('user_id') == '0' and \
+               storage.Client.objects.filter(rfid_code=value).count() > 0:
+            raise forms.ValidationError(_(u'This RFID label is used already.'))
+        return value
+
     def save(self):
         data = self.cleaned_data
 
@@ -285,7 +301,7 @@ class ClientCard(AjaxForm):
         return self.check_obj_existence(storage.Discount, 'discount')
 
     def clean_price_category(self):
-        if not self.cleaned_data['price_category']:
+        if not self.param('price_category'):
             return None
         return self.check_obj_existence(storage.PriceCategoryTeam, 'price_category')
 
