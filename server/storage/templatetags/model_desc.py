@@ -3,6 +3,7 @@
 
 from django import template
 from django.db.models import get_model
+from django.utils.translation import ugettext as _
 
 register = template.Library()
 
@@ -13,4 +14,9 @@ def model_desc(url, app_name=None):
         model_name = values[1]
     else: # application mode
         model_name = values[0]
-    return getattr(get_model(app_name, model_name), 'description', '')
+    model = get_model(app_name, model_name)
+    desc = getattr(model, 'description', '')
+    is_slave = getattr(model, 'is_slave', False)
+    if is_slave:
+        return u'%s<br/><span style="color: gray;">%s</span>' % (_(u'Slave model!'), desc)
+    return desc

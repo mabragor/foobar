@@ -305,6 +305,7 @@ class __Calendar(admin.ModelAdmin):
 
 admin.site.register(models.Calendar, __Calendar)
 models.Calendar.description = _(u'This model consists of records with events (team or rent) which assigned on a week.')
+models.Calendar.is_slave = True
 
 ### Interface for Calendar Model : End
 
