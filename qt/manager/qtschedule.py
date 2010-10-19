@@ -45,7 +45,7 @@ class QtSchedule(QTableView):
         self.selected_data = None
 
         # Deny to select mutiple cells
-        self.setSelectionMode(QAbstractItemView.ExtendedSelection) #SingleSelection)
+        self.setSelectionMode(QAbstractItemView.NoSelection) #SingleSelection)
 
         # Allow DnD
 #         self.setAcceptDrops(True)
@@ -66,6 +66,8 @@ class QtSchedule(QTableView):
         self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
 
         self.setGridStyle(Qt.DotLine)
+        self.setShowGrid(True)
+
         self.resizeColumnsToContents()
         self.verticalHeader().setStretchLastSection(True)
 
@@ -386,7 +388,7 @@ class QtScheduleDelegate(QItemDelegate):
             brush = QBrush(brush_color)
             painter.setBrush(brush)
 
-    def paint(self, painter, option, index):
+    def paint(self, painter, cell, index):
         """ This method draws the cell. """
         painter.save()
 
@@ -394,28 +396,35 @@ class QtScheduleDelegate(QItemDelegate):
         rooms = model.rooms
         count = len(rooms)
 
-        dx = self.parent.scrolledCellX
+        dx = 0 #self.parent.scrolledCellX
         dy = self.parent.scrolledCellY
 
         row = index.row()
         col = index.column()
+
+        pen_width = 1
 
         for room_name, room_color, room_id in rooms:
             event = model.data(index, Qt.DisplayRole, room_id).toPyObject()
 
             if isinstance(event, Event):
                 # fill the event's body
-                w = option.rect.width() / count
-                h = option.rect.height()
-                x = dx + col * (option.rect.width() + 1) + \
+                h = cell.rect.height()
+                if self.parent.showGrid():
+                    w = (cell.rect.width() - pen_width)/ count
+                else:
+                    w = cell.rect.width() / count
+
+                x = dx + col * (cell.rect.width() + 1) + \
                     w * map(lambda x: x[2] == room_id, rooms).index(True)
-                y = dy + row * (option.rect.height() + 1)
+                y = dy + row * (cell.rect.height() + 1)
+
                 painter.fillRect(x, y, w, h, self.parent.string2color(room_color));
 
 
                 # event's type: training, rent
                 if event.isRent() and event.show_type == 'tail':
-                    self.prepare( painter, (Qt.black, 1), Qt.blue )
+                    self.prepare( painter, (Qt.black, pen_width), Qt.blue )
                     lower = w if w < h else h
                     SIDE = int(lower / 4)
                     rw = rh = SIDE if lower > SIDE else lower-2
@@ -459,7 +468,7 @@ class QtScheduleDelegate(QItemDelegate):
                 if self.parent.selected_event == event:
                     self.prepare( painter, (Qt.blue, 3) )
                 else:
-                    self.prepare( painter, (Qt.black, 1) )
+                    self.prepare( painter, (Qt.black, pen_width) )
 
                 # draws items using type of the cell
                 painter.drawLine(x, y+h, x, y)
@@ -468,7 +477,7 @@ class QtScheduleDelegate(QItemDelegate):
                     painter.drawLine(x, y, x+w, y)
 
                     # draw event's title
-                    self.prepare( painter, (Qt.black, 1) )
+                    self.prepare( painter, (Qt.black, pen_width) )
                     painter.drawText(x+1, y+1, w-2, h-2,
                                      Qt.AlignLeft | Qt.AlignTop,
                                      event.title)
@@ -477,7 +486,7 @@ class QtScheduleDelegate(QItemDelegate):
                     painter.drawLine(x, y+h, x+w, y+h)
 
                     # draw event's coach
-                    self.prepare( painter, (Qt.black, 1) )
+                    self.prepare( painter, (Qt.black, pen_width) )
                     painter.drawText(x+1, y+1, w-2, h-2,
                                      Qt.AlignLeft | Qt.AlignTop,
                                      event.coach)
@@ -485,7 +494,7 @@ class QtScheduleDelegate(QItemDelegate):
                     pass
 
         painter.restore()
-        #QItemDelegate.paint(self, painter, option, index)
+        #QItemDelegate.paint(self, painter, cell, index)
 
     def direction(self, width, height):
         return self.HORIZONTAL if width < height else self.VERTICAL
