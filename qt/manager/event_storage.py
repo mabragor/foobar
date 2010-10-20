@@ -53,8 +53,12 @@ class Event(object):
         return self.data['event']['title']
 
     @property
-    def coach(self):
+    def coaches(self):
         return self.data['event']['coaches']
+
+    def set_coaches(self, coaches_list):
+        self.data['coaches'] = coaches_list
+        self.data['event']['coaches'] = ','.join([c['name'] for c in coaches_list])
 
     @property
     def tooltip(self):

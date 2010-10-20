@@ -489,7 +489,7 @@ class QtScheduleDelegate(QItemDelegate):
                     self.prepare( painter, (Qt.black, pen_width) )
                     painter.drawText(x+1, y+1, w-2, h-2,
                                      Qt.AlignLeft | Qt.AlignTop,
-                                     event.coach)
+                                     event.coaches)
                 else:
                     pass
 

@@ -13,6 +13,7 @@ class ShowCoaches(UiDlgTemplate):
 
     ui_file = 'uis/dlg_event_coaches.ui'
     title = _('Registered visitors')
+    callback = None
     event_id = None
 
     def __init__(self, parent=None, params=dict()):
@@ -25,6 +26,9 @@ class ShowCoaches(UiDlgTemplate):
 
         self.connect(self.buttonApply, SIGNAL('clicked()'), self.apply)
         self.connect(self.buttonClose,  SIGNAL('clicked()'), self, SLOT('reject()'))
+
+    def setCallback(self, callback):
+        self.callback = callback
 
     def initData(self, schedule):
         self.event_id = schedule.get('id', None)
@@ -59,6 +63,7 @@ class ShowCoaches(UiDlgTemplate):
                     message = _('Coaches have exchanged.')
                     QMessageBox.warning(self, _('Coaches exchange'), message)
                     self.accept()
+                    self.callback(coach_id_list)
                     return
                 else:
                     message = _('Unable to exchange.')

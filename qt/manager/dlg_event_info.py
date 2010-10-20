@@ -176,9 +176,22 @@ class EventInfo(UiDlgTemplate):
         QMessageBox.information(self, _('Event fix registration'), message)
 
     def changeCoaches(self):
+
+        def coaches_callback(coach_id_list):
+            from library import dictlist_keyval
+            # get the coach descriptions' list using its id list
+            coaches_dictlist = dictlist_keyval(self.parent.static['coaches'], 'id', coach_id_list)
+            self.schedule_object.set_coaches(coaches_dictlist)
+
         dialog = ShowCoaches(self, {'http': self.http})
+        dialog.setCallback(coaches_callback)
         dialog.setModal(True)
         dialog.initData(self.schedule)
         dialog.exec_()
 
+        # update the dialog's info
         self.initData(self.schedule_object, self.schedule_index)
+
+        # update schedule model to immediate refresh this event
+        model = self.parent.schedule.model()
+        model.change(self.schedule_object, self.schedule_index)
