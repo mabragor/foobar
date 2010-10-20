@@ -60,8 +60,6 @@ class ShowCoaches(UiDlgTemplate):
                 default_response = None
                 response = self.http.parse(default_response)
                 if response:
-                    message = _('Coaches have exchanged.')
-                    QMessageBox.warning(self, _('Coaches exchange'), message)
                     self.accept()
                     self.callback(coach_id_list)
                     return

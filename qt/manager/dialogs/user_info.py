@@ -10,6 +10,7 @@ from dialogs.assign_card import DlgAssignCard
 from dlg_rent_assign import DlgRentAssign
 from settings import _, userRoles
 from ui_dialog import UiDlgTemplate
+from library import dictlist2dict, dictlist_keyval
 
 from datetime import datetime
 
@@ -18,40 +19,6 @@ from PyQt4.QtCore import *
 from PyQt4.QtXml import *
 from PyQt4.QtXmlPatterns import *
 from PyQt4 import uic
-
-import pprint
-def dumpobj(title, value):
-    print title
-    pprint.pprint(value)
-
-def dictlist2dict(dictlist, key_field):
-    """ This function converts the list of dictionaries into one
-    dictionary using appropriate key field."""
-    def _convertor(listitem):
-        if type(listitem) is not dict:
-            raise ValueError(_('It expexts a dictionary but took %s') % type(key_field))
-        if key_field not in listitem:
-            raise KeyError(_('Key "%s" does not exists. Check dictionary.') % key_field)
-
-        result.update( {listitem[key_field]: listitem} )
-        return True
-
-    result = {}
-    map(_convertor, dictlist)
-    return result
-
-def dictlist_keyval(dictlist, key_field, value):
-    """ This function makes search on the list of dictionaries and
-    returns the list of items, which the value of appropriate key
-    equals the given value."""
-    def _search(listitem):
-        if type(listitem) is not dict:
-            raise ValueError(_('It expexts a dictionary but took %s') % type(key_field))
-        if key_field not in listitem:
-            raise KeyError(_('Key "%s" does not exists. Check dictionary.') % key_field)
-        return listitem[key_field] == value
-
-    return filter(_search, dictlist)
 
 class WizardDialog(QDialog):
     """ The dialog gives the description of a actions sequence and

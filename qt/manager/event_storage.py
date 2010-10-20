@@ -54,17 +54,19 @@ class Event(object):
 
     @property
     def coaches(self):
-        return self.data['event']['coaches']
+        # warning: self.data['event']['coaches'] contains of initial coaches list
+        coach_names = ','.join([c['name'] for c in self.data['coaches']])
+        return coach_names
 
     def set_coaches(self, coaches_list):
         self.data['coaches'] = coaches_list
-        self.data['event']['coaches'] = ','.join([c['name'] for c in coaches_list])
 
     @property
     def tooltip(self):
+        coach_names = ','.join([c['name'] for c in self.data['coaches']])
         event = self.data['event']
         return '%s\n%s\n%s' % (event['title'],
-                               event['coaches'],
+                               coach_names,
                                event['price_category']['title'])
 
     @property
