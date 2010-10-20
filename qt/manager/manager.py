@@ -185,10 +185,10 @@ class MainWindow(QMainWindow):
                  'login', _('Start user session.')),
                 (_('Log out'), '',
                  'logout', _('End user session.')),
-                (None, None, None, None),
+                None,
                 (_('Application settings'), 'Ctrl+G',
                  'setupApp', _('Manage the application settings.')),
-                (None, None, None, None),
+                None,
                 (_('Exit'), '',
                  'close', _('Close the application.')),
                 ]
@@ -235,10 +235,11 @@ class MainWindow(QMainWindow):
             # Disable the following menu actions, until user will be authorized.
             if topic != _('File'):
                 menu.setDisabled(True)
-            for title, short, name, desc in info:
-                if not title:
+            for item in info:
+                if item is None:
                     menu.addSeparator()
                     continue
+                title, short, name, desc = item
                 setattr(self, 'act_%s' % name, QAction(title, self))
                 action = getattr(self, 'act_%s' % name)
                 action.setShortcut(short)
@@ -247,14 +248,15 @@ class MainWindow(QMainWindow):
                 menu.addAction(action)
                 self.menus.append(menu)
 
-    def activate_interface(self):
+    def interface_disable(self, state): # True = disabled, False = enabled
         # Enable menu's action
         for menu in self.menus:
-            menu.setDisabled(False)
+            if menu.title() != _('File'):
+                menu.setDisabled(state)
         # Enable the navigation buttons
-        self.buttonPrev.setDisabled(False)
-        self.buttonNext.setDisabled(False)
-        self.buttonToday.setDisabled(False)
+        self.buttonPrev.setDisabled(state)
+        self.buttonNext.setDisabled(state)
+        self.buttonToday.setDisabled(state)
 
     def refresh_data(self):
         """ This method get the data from a server. It call periodically using timer. """
@@ -297,17 +299,15 @@ class MainWindow(QMainWindow):
                 self.connect(self.refreshTimer, SIGNAL('timeout()'), self.refresh_data)
                 self.refreshTimer.start()
 
-                self.activate_interface() # CHECK THIS
+                self.interface_disable(False)
             else:
                 QMessageBox.warning(self, _('Login failed'),
                                     _('It seems you\'ve entered wrong login/password.'))
 
     def logout(self):
-        # Disable menu's actions
-        for menu in self.menus[1:]:
-            menu.setDisabled(True)
+        self.interface_disable(True)
         self.setWindowTitle('%s : %s' % (self.baseTitle, _('Login to start session')))
-        self.schedule.model().storage.init()
+        self.schedule.model().storage_init()
 
     def setupApp(self):
         self.dialog = DlgSettings(self)

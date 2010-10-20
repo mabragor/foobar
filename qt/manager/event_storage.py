@@ -156,7 +156,12 @@ class EventStorage(QAbstractTableModel):
 
         # Item storage
         self.storage = ModelStorage()
+        self.storage_init()
+
+    def storage_init(self):
+        self.emit(SIGNAL('layoutAboutToBeChanged()'))
         self.storage.init()
+        self.emit(SIGNAL('layoutChanged()'))
 
     def update(self):
         if 'week' == self.mode:
@@ -217,7 +222,7 @@ class EventStorage(QAbstractTableModel):
             # result processing
             if response and 'events' in response:
                 self.parent.parent.statusBar().showMessage(_('Filling the calendar...'))
-                self.storage.init()
+                self.storage_init()
                 # place the event in the model
                 for event_info in response['events']:
                     qApp.processEvents() # keep GUI active
