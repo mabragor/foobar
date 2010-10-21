@@ -265,7 +265,7 @@ class EventStorage(QAbstractTableModel):
 
     def changeShowMode(self, column):
         if 'week' == self.mode:
-            selfmode = 'day'
+            self.mode = 'day'
             self.storage.setFilter(column)
         else:
             self.mode = 'week'
