@@ -246,11 +246,12 @@ class CardListModel(QAbstractTableModel):
             }
 
     def prepare_abonement(self, card):
+        NODISCOUNT_ID = 1
         return {
             'id': 0,
             'card_type': 'abonement',
             'card_meta': None,
-            'discount': card['discount'],
+            'discount': card.get('discount', NODISCOUNT_ID),
             'price_category': card['price_category'],
             'price': card['price'],
             'paid': card['paid'],
