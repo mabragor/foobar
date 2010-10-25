@@ -265,13 +265,18 @@ class Card(AbstractModel):
             print 'Cancel this card'
             self.cancel_datetime = datetime.now()
 
-        # activate club card
-        if self.card_club is not None:
+        # activate card (except promo)
+        if self.card_ordinary or self.card_club:
             today = date.today()
-            duration = timetelta(days=self.card_club.count_days)
+            if self.card_ordinary:
+                card_title = _(u'Activate ordinary card')
+                duration = timedelta(days=30)
+            else:
+                card_title = _(u'Activate club card')
+                duration = timetelta(days=self.card_club.count_days)
             self.begin_date = today
             self.end_date = today + duration
-            print _(u'Activate club card [%s .. %s]') % (self.begin_date, self.end_date)
+            print u'%s [%s .. %s]' % (card_title, self.begin_date, self.end_date)
 
         self.save()
 
