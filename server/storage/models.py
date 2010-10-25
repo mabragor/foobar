@@ -252,14 +252,26 @@ class Card(AbstractModel):
 
     def register_visit(self):
         """ This method registers a visit on the card."""
-        # increment visits on client's card
-        self.count_used += 1
+        print 'Register visit'
 
-        today = date.today()
+        # increment visits on client's card
+        if self.count_available > self.count_used:
+            self.count_used += 1
+        else:
+            raise RuntimeWarning(_(u'Check sources: %i and %i') % (self.count_available, self.count_used))
+
+        # close card
+        if self.count_available == self.count_used:
+            print 'Cancel this card'
+            self.cancel_datetime = datetime.now()
+
+        # activate club card
         if self.card_club is not None:
+            today = date.today()
             duration = timetelta(days=self.card_club.count_days)
             self.begin_date = today
             self.end_date = today + duration
+            print _(u'Activate club card [%s .. %s]') % (self.begin_date, self.end_date)
 
         self.save()
 
@@ -489,6 +501,7 @@ class Visit(AbstractModel): # FIXME models
         return u'%s' % self.client
 
     def save(self):
+        print 'Save visit'
         super(Visit, self).save()
         self.card.register_visit()
 

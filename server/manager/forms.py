@@ -4,7 +4,7 @@
 
 from django.conf import settings
 from django import forms
-from django.db.models import Q
+from django.db.models import Q, F
 from django.utils.translation import ugettext as _
 
 from storage import models as storage
@@ -138,24 +138,30 @@ class RegisterVisit(AjaxForm):
             raise forms.ValidationError(_(u'The client is already registered on this event.'))
 
         # client and event attributes are defined in parent class
-        available_cards = storage.Card.objects.filter(client=self.client,
-                                                      price_category=self.event.team.price_category,
-                                                      cancel_datetime=None,
-                                                      end_date__lte=date.today())
+        available_cards = storage.Card.objects.filter(
+            client=self.client,
+            cancel_datetime=None,
+            count_used__lt=F('count_available'),
+            price_category=self.event.team.price_category
+            #end_date__lte=date.today() // new card has null here
+            )
         if len(available_cards) > 0:
+            print 'Available card list:', available_cards
             # sort by priority
+            FIELD_PK = 0
+            FIELD_PRIORITY = 1
             sorting = []
             for card in available_cards:
                 obj = card.card_ordinary or card.card_club or card.card_promo
                 sorting.append( (card.pk, obj.priority, card) )
-            sorted(sorting, key=lambda x: x[1])
+            sorted(sorting, key=lambda x: x[FIELD_PRIORITY])
 
             # find the appropriate card
             for i in sorting:
-                card = available_cards.get(pk=i[0]) # get by pk
+                card = available_cards.get(pk=i[FIELD_PK]) # get by pk
                 if card.may_register():
                     self.chosen_card = card
-                    return
+                    return self.cleaned_data
 
         raise forms.ValidationError(_(u'The client has no card of needed category.'))
 
