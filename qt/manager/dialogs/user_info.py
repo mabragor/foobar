@@ -217,8 +217,17 @@ class ClientInfo(UiDlgTemplate):
         dlgStatus = dialog.exec_()
 
         if QDialog.Accepted == dlgStatus:
-            self.buttonRFID.setText(self.rfid_id)
-            self.buttonRFID.setDisabled(True)
+            # check the rfid code
+            params = {'rfid_code': self.rfid_id, 'mode': 'client'}
+            self.http.request('/manager/get_client_info/', params)
+            default_response = None
+            response = self.http.parse(default_response)
+            if response and 'info' in response and response['info'] is not None:
+                QMessageBox.warning(self, _('Warning'),
+                                    _('This RFID is used already!'))
+            else:
+                self.buttonRFID.setText(self.rfid_id)
+                self.buttonRFID.setDisabled(True)
 
     def cancelCard(self):
         row = self.cardinfo.currentRow()
