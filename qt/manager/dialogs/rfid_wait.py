@@ -29,9 +29,14 @@ class WaitingRFID(UiDlgTemplate):
         self.reader.start()
 
     def done(self, result_code):
-        QDialog.done(self, result_code)
+        """
+        This method is called automatically, when user cancels the dialog.
+        """
+
         # Send the kill event to RFID reader thread.
         self.reader.timeToDie()
+
+        QDialog.done(self, result_code)
 
     def closeEvent(self, event):
         self.accept()
@@ -52,6 +57,8 @@ class ThreadRFID(QThread):
 
     def timeToDie(self):
         self.die = True
+        self.dispose()
+        self.exit(0)
 
     def hex(self, symbol):
         return '%02X' % ord(symbol)
@@ -63,6 +70,7 @@ class ThreadRFID(QThread):
             self.port.setDTR(False)
             self.port.setRTS(False)
             self.port.close()
+            del(self.port)
 
     def run(self):
         if DEBUG:
