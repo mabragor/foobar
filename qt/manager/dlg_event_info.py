@@ -9,6 +9,7 @@ from event_storage import Event
 from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_show_visitors import ShowVisitors
 from dialogs.show_coaches import ShowCoaches
+from dialogs.searching import Searching
 from ui_dialog import UiDlgTemplate
 
 __ = lambda x: datetime(*time.strptime(str(x), '%Y-%m-%d %H:%M:%S')[:6])
@@ -27,12 +28,13 @@ class EventInfo(UiDlgTemplate):
     def setupUi(self):
         UiDlgTemplate.setupUi(self)
 
-        self.connect(self.buttonClose,     SIGNAL('clicked()'), self.close)
-        self.connect(self.buttonVisitors,  SIGNAL('clicked()'), self.showVisitors)
-        self.connect(self.buttonVisit,     SIGNAL('clicked()'), self.visitEvent)
-        self.connect(self.buttonRemove,    SIGNAL('clicked()'), self.removeEvent)
-        self.connect(self.buttonFix,       SIGNAL('clicked()'), self.fixEvent)
-        self.connect(self.buttonChange,    SIGNAL('clicked()'), self.changeCoaches)
+        self.connect(self.buttonClose,       SIGNAL('clicked()'), self.close)
+        self.connect(self.buttonVisitors,    SIGNAL('clicked()'), self.showVisitors)
+        self.connect(self.buttonVisitRFID,   SIGNAL('clicked()'), self.visitEventRFID)
+        self.connect(self.buttonVisitManual, SIGNAL('clicked()'), self.visitEventManual)
+        self.connect(self.buttonRemove,      SIGNAL('clicked()'), self.removeEvent)
+        self.connect(self.buttonFix,         SIGNAL('clicked()'), self.fixEvent)
+        self.connect(self.buttonChange,      SIGNAL('clicked()'), self.changeCoaches)
         self.connect(self.comboFix, SIGNAL('currentIndexChanged(int)'),
                      lambda: self.buttonFix.setDisabled(False))
 
@@ -80,7 +82,8 @@ class EventInfo(UiDlgTemplate):
         # disable controls for events in the past
         is_past = begin < datetime.now()
         self.buttonRemove.setDisabled(is_past)
-        self.buttonVisit.setDisabled(is_past)
+        self.buttonVisitRFID.setDisabled(is_past)
+        self.buttonVisitManual.setDisabled(is_past)
         self.buttonChange.setDisabled(is_past)
 
         self._init_fix(status)
@@ -98,7 +101,11 @@ class EventInfo(UiDlgTemplate):
         dialog.initData(self.schedule['id'])
         dialog.exec_()
 
-    def visitEvent(self):
+    def visitEventRFID(self):
+        """
+        Register the visit by client's RFID label.
+        """
+
         def callback(rfid):
             self.rfid_id = rfid
 
@@ -110,6 +117,38 @@ class EventInfo(UiDlgTemplate):
         if QDialog.Accepted == dlgStatus:
             params = {'rfid_code': self.rfid_id,
                       'event_id': self.schedule['id']}
+            self.http.request('/manager/register_visit/', params)
+            default_response = None
+            response = self.http.parse(default_response)
+            if response:
+                message = _('The client is registered on this event.')
+            else:
+                error_msg = self.http.error_msg
+                message = _('Unable to register the visit!\nReason:\n%s') % error_msg
+            QMessageBox.information(self, _('Client registration'), message)
+
+    def visitEventManual(self):
+        """
+        Register the visit manually through searching a client.
+        """
+
+        def callback(user_id):
+            self.user_id = user_id
+
+        params = {
+            'http': self.http,
+            'static': self.parent.static,
+            'mode': 'client',
+            'apply_title': _('Register'),
+            }
+        self.dialog = Searching(self, params)
+        self.dialog.setModal(True)
+        self.dialog.setCallback(callback)
+        dlgStatus = self.dialog.exec_()
+
+        if QDialog.Accepted == dlgStatus:
+            params = {'event_id': self.schedule['id'],
+                      'client_id': self.user_id}
             self.http.request('/manager/register_visit/', params)
             default_response = None
             response = self.http.parse(default_response)

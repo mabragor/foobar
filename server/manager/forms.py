@@ -118,18 +118,16 @@ class Login(AjaxForm):
 
 class RegisterVisit(AjaxForm):
     event_id = forms.IntegerField()
-    rfid_code = forms.CharField(max_length=8)
+    client_id = forms.IntegerField()
 
     def clean_event_id(self):
         return self.check_obj_existence(storage.Schedule, 'event_id')
 
-    def clean_rfid_code(self):
-        value = self.cleaned_data['rfid_code']
-        self.rfid_validation(value)
-        return value
+    def clean_client_id(self):
+        return self.check_obj_existence(storage.Client, 'client_id')
 
     def clean(self):
-        self.client = self.rfid_client(self.cleaned_data['rfid_code'])
+        self.client = self.get_object('client_id')
         self.event = self.get_object('event_id')
 
         if self.event.begin_datetime <= datetime.now():

@@ -370,6 +370,7 @@ class MainWindow(QMainWindow):
             'http': self.http,
             'static': self.static,
             'mode': 'client',
+            'apply_title': _('Show'),
             }
         self.dialog = Searching(self, params)
         self.dialog.setModal(True)

@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>295</height>
+    <height>301</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,10 +22,10 @@
      <x>9</x>
      <y>9</y>
      <width>581</width>
-     <height>281</height>
+     <height>282</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="9,0">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="6,1,1">
     <item>
      <layout class="QGridLayout" name="gridLayout">
       <property name="sizeConstraint">
@@ -149,32 +149,50 @@
      </layout>
     </item>
     <item>
-     <layout class="QGridLayout" name="buttonLayout" rowstretch="0">
-      <property name="sizeConstraint">
-       <enum>QLayout::SetMinimumSize</enum>
-      </property>
-      <item row="0" column="0">
+     <layout class="QHBoxLayout" name="visitLayout">
+      <item>
+       <widget class="QLabel" name="labelVisit">
+        <property name="text">
+         <string>Register visit</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="buttonVisitRFID">
+        <property name="text">
+         <string>By RFID</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="buttonVisitManual">
+        <property name="text">
+         <string>Manually</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="buttonLayout">
+      <item>
        <widget class="QPushButton" name="buttonVisitors">
         <property name="text">
          <string>Visitors</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="buttonVisit">
-        <property name="text">
-         <string>Visit</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
+      <item>
        <widget class="QPushButton" name="buttonRemove">
         <property name="text">
          <string>Remove</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -187,7 +205,7 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="4">
+      <item>
        <widget class="QPushButton" name="buttonClose">
         <property name="text">
          <string>Close</string>

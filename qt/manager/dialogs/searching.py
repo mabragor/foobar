@@ -18,6 +18,7 @@ class Searching(UiDlgTemplate):
 
     def __init__(self, parent, params=dict()):
         self.mode = params.get('mode', 'client')
+        self.apply_title = params.get('apply_title', _('Show'))
         if self.mode == 'client':
             self.title = _('Search client')
         else:
@@ -29,8 +30,11 @@ class Searching(UiDlgTemplate):
 
         self.tableUsers.setSelectionBehavior(QAbstractItemView.SelectRows)
 
+        self.buttonApply.setText(self.apply_title)
+        self.buttonApply.setDisabled(True)
+
         self.connect(self.buttonSearch, SIGNAL('clicked()'), self.searchFor)
-        self.connect(self.buttonShow, SIGNAL('clicked()'), self.applyDialog)
+        self.connect(self.buttonApply, SIGNAL('clicked()'), self.applyDialog)
         self.connect(self.buttonClose,  SIGNAL('clicked()'), self, SLOT('reject()'))
 
     def setCallback(self, callback):
@@ -45,6 +49,7 @@ class Searching(UiDlgTemplate):
         if response and 'users' in response:
             user_list = response['users']
             self.showList(user_list)
+            self.buttonApply.setDisabled(False)
 
     def showList(self, user_list):
         self.user_list = user_list
@@ -64,9 +69,9 @@ class Searching(UiDlgTemplate):
         if len(user_list) > 0:
             self.tableUsers.selectRow(0)
             self.buttonSearch.setDisabled(False)
-            self.buttonShow.setFocus(Qt.OtherFocusReason)
+            self.buttonApply.setFocus(Qt.OtherFocusReason)
         else:
-            self.buttonShow.setDisabled(True)
+            self.buttonApply.setDisabled(True)
             self.buttonSearch.setFocus(Qt.OtherFocusReason)
 
     def applyDialog(self):

@@ -95,7 +95,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="buttonShow">
+       <widget class="QPushButton" name="buttonApply">
         <property name="text">
          <string>Show</string>
         </property>
@@ -112,8 +112,6 @@
     </item>
    </layout>
   </widget>
-  <zorder>verticalLayoutWidget</zorder>
-  <zorder></zorder>
  </widget>
  <resources/>
  <connections/>
