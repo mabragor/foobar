@@ -18,7 +18,6 @@ class WaitingRFID(UiDlgTemplate):
     def __init__(self, parent, params=dict()):
         UiDlgTemplate.__init__(self, parent, params)
         self.callback = params.get('callback', None)
-        print 'callback:', self.callback
 
     def setupUi(self):
         UiDlgTemplate.setupUi(self)
@@ -114,8 +113,6 @@ class ThreadRFID(QThread):
 
         if not self.die:
             # Send the card's id
-            print rfid_code
-            print self.dialog.callback
             self.dialog.callback(rfid_code)
             # Close the dialog's window
             QCoreApplication.postEvent(self.dialog, QCloseEvent())

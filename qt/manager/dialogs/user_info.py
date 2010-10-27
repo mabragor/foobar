@@ -2,11 +2,13 @@
 # (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 from settings import _, DEBUG, userRoles
+
+from dialogs.rfid_wait import WaitingRFID
+from dialogs.assign_card import DlgAssignCard
+
 #from model_sorting import SortClientTeams
 from card_list import CardListModel
 from rent_list import RentListModel, RentList
-from dlg_waiting_rfid import DlgWaitingRFID
-from dialogs.assign_card import DlgAssignCard
 from dlg_rent_assign import DlgRentAssign
 from settings import _, userRoles
 from ui_dialog import UiDlgTemplate
@@ -204,10 +206,15 @@ class ClientInfo(UiDlgTemplate):
         def callback(rfid):
             self.rfid_id = rfid
 
-        self.callback = callback
-        self.dialog = DlgWaitingRFID(self)
-        self.dialog.setModal(True)
-        dlgStatus = self.dialog.exec_()
+        params = {
+            'http': self.http,
+            'static': self.static,
+            'mode': 'client',
+            'callback': callback,
+            }
+        dialog = WaitingRFID(self, params)
+        dialog.setModal(True)
+        dlgStatus = dialog.exec_()
 
         if QDialog.Accepted == dlgStatus:
             self.buttonRFID.setText(self.rfid_id)

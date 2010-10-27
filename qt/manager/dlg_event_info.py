@@ -6,11 +6,11 @@ from datetime import datetime
 
 from settings import _, DEBUG
 from event_storage import Event
-from dlg_waiting_rfid import DlgWaitingRFID
-from dlg_show_visitors import ShowVisitors
+from ui_dialog import UiDlgTemplate
+from dialogs.rfid_wait import WaitingRFID
 from dialogs.show_coaches import ShowCoaches
 from dialogs.searching import Searching
-from ui_dialog import UiDlgTemplate
+from dlg_show_visitors import ShowVisitors
 
 __ = lambda x: datetime(*time.strptime(str(x), '%Y-%m-%d %H:%M:%S')[:6])
 
@@ -109,14 +109,32 @@ class EventInfo(UiDlgTemplate):
         def callback(rfid):
             self.rfid_id = rfid
 
-        self.callback = callback
-        self.dialog = DlgWaitingRFID(self)
-        self.dialog.setModal(True)
-        dlgStatus = self.dialog.exec_()
+        params = {
+            'http': self.http,
+            'callback': callback,
+            }
+        dialog = WaitingRFID(self, params)
+        dialog.setModal(True)
+        dlgStatus = dialog.exec_()
 
         if QDialog.Accepted == dlgStatus:
-            params = {'rfid_code': self.rfid_id,
-                      'event_id': self.schedule['id']}
+            user_id = None
+
+            # get user_id by rfid_code
+            params = {'rfid_code': self.rfid_id, 'mode': 'client'}
+            self.http.request('/manager/get_client_info/', params)
+            default_response = None
+            response = self.http.parse(default_response)
+            if response and 'info' in response:
+                user_id = response['info'].get('id', None)
+            else:
+                QMessageBox.critical(self, _('Client registration'),
+                                     _('Could not find user by RFID!'))
+                return
+
+            # register user on the event
+            params = {'event_id': self.schedule['id'],
+                      'client_id': user_id}
             self.http.request('/manager/register_visit/', params)
             default_response = None
             response = self.http.parse(default_response)
