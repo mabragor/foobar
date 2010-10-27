@@ -13,11 +13,11 @@ from qtschedule import QtSchedule
 
 from team_tree import TreeModel
 
+from dialogs.rfid_wait import WaitingRFID
 from dialogs.searching import Searching
 from dialogs.user_info import ClientInfo, DlgRenterInfo
 from dlg_settings import DlgSettings
 from dlg_login import DlgLogin
-from dlg_waiting_rfid import DlgWaitingRFID
 from dlg_event_assign import DlgEventAssign
 from dlg_event_info import EventInfo
 from dlg_copy_week import DlgCopyWeek
@@ -332,10 +332,15 @@ class MainWindow(QMainWindow):
         def callback(rfid):
             self.rfid_id = rfid
 
-        self.callback = callback
-        self.dialog = DlgWaitingRFID(self)
-        self.dialog.setModal(True)
-        dlgStatus = self.dialog.exec_()
+        params = {
+            'http': self.http,
+            'static': self.static,
+            'mode': 'client',
+            'callback': callback,
+            }
+        dialog = WaitingRFID(self, params)
+        dialog.setModal(True)
+        dlgStatus = dialog.exec_()
 
         if QDialog.Accepted == dlgStatus and self.rfid_id is not None:
             params = {'rfid_code': self.rfid_id, 'mode': 'client'}

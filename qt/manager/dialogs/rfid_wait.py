@@ -1,38 +1,32 @@
 # -*- coding: utf-8 -*-
-# (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
+# (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 import serial, random, time
 
-from os.path import dirname, join
-
 from settings import _, DEBUG, PORT
+from ui_dialog import UiDlgTemplate
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
-class DlgWaitingRFID(QDialog):
+class WaitingRFID(UiDlgTemplate):
 
-    def __init__(self, parent=None):
-        QDialog.__init__(self, parent)
+    ui_file = 'uis/dlg_rfid_wait.ui'
+    title = _('RFID Reader')
+    callback = None
 
-        self.parent = parent
-        self.parent.dialog = self
-        self.reader = WaitingRFID(self.parent)
+    def __init__(self, parent, params=dict()):
+        UiDlgTemplate.__init__(self, parent, params)
+        self.callback = params.get('callback', None)
+        print 'callback:', self.callback
 
-        self.layout = QVBoxLayout()
+    def setupUi(self):
+        UiDlgTemplate.setupUi(self)
 
-        self.label = QLabel(_('Put the RFID label on to the RFID reader, please.'))
-        self.layout.addWidget(self.label)
+        self.labelText.setText(_('Put the RFID on the reader'))
+        self.connect(self.buttonCancel, SIGNAL('clicked()'), self, SLOT('reject()'))
 
-        self.cancel = QPushButton(_('Cancel'), self)
-        self.layout.addWidget(self.cancel)
-
-        self.setLayout(self.layout)
-        self.setWindowTitle(_('RFID reader'))
-
-        self.connect(self.cancel, SIGNAL('clicked()'),
-                     self.reject)
-
+        self.reader = ThreadRFID(self)
         self.reader.start()
 
     def done(self, result_code):
@@ -44,10 +38,10 @@ class DlgWaitingRFID(QDialog):
         self.accept()
         event.accept()
 
-class WaitingRFID(QThread):
+class ThreadRFID(QThread):
+
     def __init__(self, parent):
-        self.dialog = parent.dialog
-        self.callback = parent.callback
+        self.dialog = parent
 
         self.disposed = False
         self.die = False
@@ -80,7 +74,7 @@ class WaitingRFID(QThread):
             index = random.randint(0, len(demo_rfids) - 1)
             rfid_code = demo_rfids[index]
             time.sleep(1)
-            self.callback(rfid_code)
+            self.dialog.callback(rfid_code)
             QCoreApplication.postEvent(self.dialog, QCloseEvent())
             return
 
@@ -120,7 +114,9 @@ class WaitingRFID(QThread):
 
         if not self.die:
             # Send the card's id
-            self.callback(rfid_code)
+            print rfid_code
+            print self.dialog.callback
+            self.dialog.callback(rfid_code)
             # Close the dialog's window
             QCoreApplication.postEvent(self.dialog, QCloseEvent())
 
