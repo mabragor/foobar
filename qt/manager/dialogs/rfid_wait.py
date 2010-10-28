@@ -44,6 +44,8 @@ class WaitingRFID(UiDlgTemplate):
 
 class ThreadRFID(QThread):
 
+    port = None
+
     def __init__(self, parent):
         self.dialog = parent
 
@@ -67,10 +69,11 @@ class ThreadRFID(QThread):
         if not self.disposed:
             self.disposed = True
             # close the port
-            self.port.setDTR(False)
-            self.port.setRTS(False)
-            self.port.close()
-            del(self.port)
+            if self.port:
+                self.port.setDTR(False)
+                self.port.setRTS(False)
+                self.port.close()
+                self.port = None
 
     def run(self):
         if DEBUG:
