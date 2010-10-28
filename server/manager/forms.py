@@ -142,7 +142,7 @@ class RegisterVisit(AjaxForm):
             client=self.client,
             cancel_datetime=None,
             count_used__lt=F('count_available'),
-            price_category=self.event.team.price_category
+            price_category__full_price__gte=self.event.team.price_category.full_price
             #end_date__lte=date.today() // new card has null here
             )
         if len(available_cards) > 0:
