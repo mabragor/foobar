@@ -165,7 +165,7 @@ class Coach(AbstractUser):
 
 class Client(AbstractUser):
 
-    rfid_code = models.CharField(verbose_name=_(u'RFID'), max_length=8)
+    rfid_code = models.CharField(verbose_name=_(u'RFID'), max_length=8, null=True, blank=True)
     discount = models.ForeignKey(Discount)
 
     class Meta:

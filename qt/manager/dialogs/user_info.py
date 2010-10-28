@@ -451,8 +451,11 @@ class ClientInfo(UiDlgTemplate):
             'rfid_code': self.buttonRFID.text().toUtf8(),
             'discount': discount
             }
+
+        # this may be uninitialized, so remove it from dictionary
         if len(userinfo['rfid_code']) != 8:
-            return (userinfo, False)
+            del(userinfo['rfid_code'])
+
         for k,v in userinfo.items():
             if k is 'birth_date':
                 continue

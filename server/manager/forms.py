@@ -21,10 +21,12 @@ class AjaxForm(forms.Form):
         try:
             return self.cleaned_data[name]
         except KeyError:
+            message = _(u'There is no such key: %s.') % unicode(name)
             if settings.DEBUG:
-                raise forms.ValidationError(_(u'There is no such key: %s.') % unicode(name))
+                raise forms.ValidationError(message)
             else:
-                print _(u'There is no such key: %s.') % unicode(name)
+                print message
+
     def check_obj_existence(self, model, field_name):
         """ This method check object existence and saving the object into the
         class. """
@@ -236,20 +238,18 @@ class ClientInfo(UserInfo):
     phone = forms.CharField(max_length=16)
     discount = forms.IntegerField()
     birth_date = forms.DateField()
-    rfid_code = forms.CharField(max_length=8)
+    rfid_code = forms.CharField(max_length=8, required=False)
 
     def clean_phone(self):
         value = self.param('phone')
         if len(value) == 0:
-            raise ValidationError(_(u'Field "Phone" is empty.'))
+            raise forms.ValidationError(_(u'Field "Phone" is empty.'))
         return value
 
     def clean_rfid_code(self):
-        value = self.param('rfid_code')
-        if len(value) == 0:
-            raise ValidationError(_(u'Assign RFID label.'))
-        # if this code is used while we treying to register new user
-        if self.param('user_id') == '0' and \
+        value = self.cleaned_data.get('rfid_code', None)
+        # if this code is used while we trying to register new user
+        if value and self.param('user_id') == '0' and \
                storage.Client.objects.filter(rfid_code=value).count() > 0:
             raise forms.ValidationError(_(u'This RFID label is used already.'))
         return value
