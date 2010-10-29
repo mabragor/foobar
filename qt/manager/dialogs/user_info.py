@@ -86,6 +86,7 @@ class WizardSpinDlg(WizardDialog):
     dialog = None
     ui_file = 'uis/dlg_spin.ui'
     callback = None
+    SPIN_STEP = 4
 
     def __init__(self, parent=None, params=dict()):
         WizardDialog.__init__(self, parent)
@@ -99,7 +100,10 @@ class WizardSpinDlg(WizardDialog):
     def setupUi(self, dialog):
         self.dialog = dialog
         WizardDialog.setupUi(self, self)
-        self.dialog.spinBox.setMaximum(1000000)
+
+        self.dialog.spinBox.setRange(0, 1000000)
+        self.dialog.spinBox.setSingleStep(self.SPIN_STEP)
+        self.connect(self.dialog.spinBox, SIGNAL('editingFinished()'), self.editing_finished)
 
     def go_back(self):
         print 'Back'
@@ -109,6 +113,20 @@ class WizardSpinDlg(WizardDialog):
         result = spin_widget.value()
         self.callback(result)
         self.close()
+
+    def editing_finished(self):
+        """
+        The editingFinished() signal handler.
+        The value has to be dividable by SPIN_STEP
+        """
+        value = self.dialog.spinBox.value()
+        if value < self.SPIN_STEP:
+            self.dialog.spinBox.setValue(self.SPIN_STEP)
+            return
+
+        reminder = value % self.SPIN_STEP
+        if reminder != 0:
+            self.dialog.spinBox.setValue(value - reminder)
 
 class WizardPriceDlg(WizardDialog):
 
