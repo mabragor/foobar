@@ -204,7 +204,6 @@ class CardListModel(QAbstractTableModel):
 
         for name, delegate, title, action, static in MODEL_MAP_RAW:
             value = card.get(name, None)
-            print '%s = %s' % (name, value)
             record.append(value)
 
         self.storage.insert(0, record)
@@ -264,6 +263,11 @@ class CardListModel(QAbstractTableModel):
             'cancel_datetime': None
             }
 
+    def get_record_id(self, row):
+        COLUMN_ID_INDEX = 13
+        record = self.storage[row]
+        return record[COLUMN_ID_INDEX]
+
     def data(self, index, role): # base class method
         if not index.isValid():
             return QVariant('error')
@@ -287,19 +291,6 @@ class CardListModel(QAbstractTableModel):
 
         if value is None:
             return QVariant('--')
-
-        if delegate_editor is QComboBox:
-            if role == GET_ID_ROLE or action == 'int':
-                return QVariant(value)
-
-            # or return title
-            items = self.static.get(field_name, list())
-            data = filter(lambda x: int(x['id']) == int(value), items)
-            if len(data) != 1:
-                return QVariant(_('Choose'))
-            else:
-                value = data[0]['title']
-                return QVariant(value)
 
         if type(value) is dict and 'title' in value:
             return QVariant(value['title'])
@@ -492,7 +483,7 @@ class CardListDelegate(QItemDelegate):
 
 class CardList(QTableView):
 
-    """ Courses list. """
+    """ Courses list. NOT USED YET """
 
     def __init__(self, parent=None, params=dict()):
         QTableView.__init__(self, parent)

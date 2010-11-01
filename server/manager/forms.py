@@ -32,9 +32,10 @@ class AjaxForm(forms.Form):
         class. """
         value = self.cleaned_data[field_name]
         try:
-            setattr(self, 'object_%s' % field_name, model.objects.get(id=value))
+            item = model.objects.get(id=value)
         except model.DoesNotExist:
             raise forms.ValidationError(_(u'Wrong ID of %s.') % unicode(model))
+        setattr(self, 'object_%s' % field_name, item)
         return value
 
     def get_object(self, field_name):
@@ -171,6 +172,31 @@ class RegisterVisit(AjaxForm):
         visit.card = self.chosen_card # see clean() method
         visit.save()
         return visit.id
+
+class PaymentAdd (AjaxForm):
+    """ Form registers client credit payments. """
+    card_id = forms.IntegerField()
+    amount = forms.FloatField()
+
+    def clean_card_id(self):
+        """ Validation of card_id field. """
+        return self.check_obj_existence(storage.Card, 'card_id')
+
+    def clean_amount(self):
+        """ Validation of amount field. """
+        amount = float(self.param('amount'))
+        card = self.get_object('card_id')
+        if card.paid + amount > card.price:
+            needed_payment = card.price - card.paid
+            raise forms.ValidationError(_(u'Too much money. Payment is %f.') % needed_payment)
+        return amount
+
+    def save(self):
+        """ Saving information. """
+        card = self.get_object('card_id')
+        card.paid += self.param('amount')
+        card.save()
+        return card.id
 
 class GetScheduleInfo(AjaxForm):
     id = forms.IntegerField()

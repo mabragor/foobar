@@ -29,6 +29,7 @@ urlpatterns += patterns(
     url(r'^login/$', 'login'),
     url(r'^static/$', 'static'),
     url(r'^get_client_info/$', 'get_client_info'),
+    url(r'^payment_add/$', 'payment_add'),
     url(r'^get_renter_info/$', 'get_renter_info'),
     url(r'^get_users_info_by_name/$', 'get_users_info_by_name'),
     url(r'^set_client_info/$', 'set_client_info'),

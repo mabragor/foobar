@@ -27,9 +27,12 @@ class WizardDialog(QDialog):
     asks user for datas and process his replies."""
 
     ui_file = None # will define later
+    params = None
 
     def __init__(self, parent=None, params=dict()):
         QDialog.__init__(self, parent)
+
+        self.params = params
 
         dlg = uic.loadUi(self.ui_file, self)
         self.setupUi(dlg)
@@ -38,6 +41,13 @@ class WizardDialog(QDialog):
         self.setWindowTitle(title)
 
     def setupUi(self, dialog):
+        back_title = self.params.get('button_back', None)
+        next_title = self.params.get('button_next', None)
+        if back_title:
+            dialog.goBack.setText(back_title)
+        if next_title:
+            dialog.goNext.setText(next_title)
+
         self.connect(dialog.goBack, SIGNAL('clicked()'), self.go_back)
         self.connect(dialog.goNext, SIGNAL('clicked()'), self.go_next)
 
@@ -54,7 +64,7 @@ class WizardListDlg(WizardDialog):
     callback = None
 
     def __init__(self, parent=None, params=dict()):
-        WizardDialog.__init__(self, parent)
+        WizardDialog.__init__(self, parent, params)
 
     def prefill(self, title, data, callback):
         WizardDialog.prefill(self, title)
@@ -89,7 +99,7 @@ class WizardSpinDlg(WizardDialog):
     SPIN_STEP = 4
 
     def __init__(self, parent=None, params=dict()):
-        WizardDialog.__init__(self, parent)
+        WizardDialog.__init__(self, parent, params)
 
     def prefill(self, title, data, callback):
         WizardDialog.prefill(self, title)
@@ -135,7 +145,7 @@ class WizardPriceDlg(WizardDialog):
     callback = None
 
     def __init__(self, parent=None, params=dict()):
-        WizardDialog.__init__(self, parent)
+        WizardDialog.__init__(self, parent, params)
 
     def prefill(self, title, data, callback):
         WizardDialog.prefill(self, title)
@@ -157,6 +167,34 @@ class WizardPriceDlg(WizardDialog):
         self.callback(result)
         self.close()
 
+class PaymentDlg(WizardDialog):
+
+    dialog = None
+    ui_file = 'uis/dlg_price.ui'
+    callback = None
+
+    def __init__(self, parent=None, params=dict()):
+        WizardDialog.__init__(self, parent, params)
+
+    def setupUi(self, dialog):
+        self.dialog = dialog
+        WizardDialog.setupUi(self, self)
+
+        self.callback = self.params.get('callback', None)
+        initial_value = self.params.get('initial_value', 0)
+        dialog_title = self.params.get('title', _('Unknown'))
+        self.doubleSpinBox.setRange(0, initial_value)
+        self.doubleSpinBox.setValue(initial_value)
+        WizardDialog.prefill(self, dialog_title)
+
+    def go_back(self):
+        self.reject()
+
+    def go_next(self):
+        value = self.doubleSpinBox.value()
+        self.callback(value)
+        self.accept()
+
 class ClientInfo(UiDlgTemplate):
 
     ui_file = 'uis/dlg_user_info.ui'
@@ -164,6 +202,10 @@ class ClientInfo(UiDlgTemplate):
     card_model = None
     static = None
     client_id = u'0'
+
+    COLUMN_PRICE_INDEX = 4
+    COLUMN_PAID_INDEX = 5
+    COLUMN_CANCEL_INDEX = 12
 
     def __init__(self, parent=None, params=dict()):
         self.static = params['static']
@@ -176,6 +218,8 @@ class ClientInfo(UiDlgTemplate):
 
         self.card_model = CardListModel(self)
         self.tableHistory.setModel(self.card_model)
+        self.tableHistory.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.tableHistory.customContextMenuRequested.connect(self.context_menu)
 
         for i in self.static.get('discounts', list()): # see params
             title = u'%(title)s - %(percent)s%%' % i
@@ -185,6 +229,38 @@ class ClientInfo(UiDlgTemplate):
         self.connect(self.buttonRFID,   SIGNAL('clicked()'), self.assignRFID)
         self.connect(self.buttonApply,  SIGNAL('clicked()'), self.applyDialog)
         self.connect(self.buttonClose,  SIGNAL('clicked()'), self, SLOT('reject()'))
+
+    def context_menu(self, position):
+        """ Create context menu."""
+
+        menu = QMenu()
+
+        index = self.tableHistory.indexAt(position)
+        model = index.model()
+
+        # payment
+        action_payment_add = menu.addAction(_('Payment'))
+        need_to_add = self.payment_diff(index)
+        if need_to_add < 0.01:
+            action_payment_add.setDisabled(True)
+        # cancel
+        action_cancel = menu.addAction(_('Cancel'))
+        idx_cancel = model.index(index.row(), self.COLUMN_CANCEL_INDEX)
+        card_cancel = model.data(idx_cancel, Qt.DisplayRole)
+        if type(card_cancel) is unicode:
+            action_cancel.setDisabled(True)
+
+        # show context menu
+        action = menu.exec_(self.tableHistory.mapToGlobal(position))
+
+        # choose action
+        if action == action_payment_add:
+            self.payment_add(index, need_to_add)
+        elif action == action_cancel:
+            QMessageBox.warning(self, _('Warning'),
+                                _('Not yet implemented!'))
+        else:
+            print 'unknown'
 
     def initData(self, data=dict()):
         self.client_id = data.get('id', '0')
@@ -219,6 +295,54 @@ class ClientInfo(UiDlgTemplate):
         # fill the card list
         card_list = data.get('team_list', [])
         self.tableHistory.model().initData(card_list)
+
+    def payment_diff(self, index):
+        """ Calculate payment amount. """
+
+        model = index.model()
+        idx_price = model.index(index.row(), self.COLUMN_PRICE_INDEX)
+        card_price = model.data(idx_price, Qt.DisplayRole)
+        idx_paid = model.index(index.row(), self.COLUMN_PAID_INDEX)
+        card_paid = model.data(idx_paid, Qt.DisplayRole)
+        initial_value = card_price - card_paid
+
+        return initial_value
+
+    def payment_add(self, index, initial_value=0.00):
+        """ Show price dialog and register payment. """
+
+        def callback(value):
+            print 'callback value is', value
+            self.payment = value
+
+        model = index.model()
+        card_id = model.get_record_id(index.row())
+
+        idx_price = model.index(index.row(), self.COLUMN_PRICE_INDEX)
+        idx_paid = model.index(index.row(), self.COLUMN_PAID_INDEX)
+        card_paid = model.data(idx_paid, Qt.DisplayRole)
+
+        params = {
+            'title': _('Payment'),
+            'button_back': _('Cancel'),
+            'button_next': _('Apply'),
+            'callback': callback,
+            'initial_value': initial_value,
+            }
+
+        dialog = PaymentDlg(self, params)
+        dialog.setModal(True)
+
+        if QDialog.Accepted == dialog.exec_():
+            params = {'card_id': card_id, 'amount': self.payment}
+            self.http.request('/manager/payment_add/', params)
+            default_response = None
+            response = self.http.parse(default_response)
+
+            if response and response.get('saved_id', 0) == card_id:
+                value = card_paid + self.payment
+                model.setData(idx_paid, value, Qt.EditRole)
+
 
     def assignRFID(self):
         def callback(rfid):

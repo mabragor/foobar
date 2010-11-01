@@ -110,6 +110,12 @@ def get_client_info(request, form):
     return response
 
 @login_required
+@ajax_processor(forms.PaymentAdd, isJavaScript)
+def payment_add(request, form):
+    signal_log_action.send(sender=request.user, action='payment_add')
+    return abstract_response(request, form)
+
+@login_required
 @ajax_processor(forms.RenterInfo, isJavaScript)
 def set_renter_info(request, form):
     signal_log_action.send(sender=request.user, action='set_renter_info')
