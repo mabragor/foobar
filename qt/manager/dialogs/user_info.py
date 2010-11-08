@@ -408,6 +408,8 @@ class ClientInfo(UiDlgTemplate):
         return None
 
     def wizard_dialog(self, dtype, title, data_to_fill):
+        self.wizard_data = None
+
         def callback(data):
             self.wizard_data = data # id, title, slug
 
@@ -440,6 +442,8 @@ class ClientInfo(UiDlgTemplate):
     def assign_card(self):
         slug = self.wizard_dialog('list', _('Choose the card\'s type'),
                                   self.generate_card_list())
+        if not slug: # user has pressed 'Escape' or closes the dialog
+            return
 
         file_name = '../uis/logic_clientcard.xml'
         xquery = "doc('%s')/logic/rule[@name='%s']/sequence"
@@ -488,7 +492,10 @@ class ClientInfo(UiDlgTemplate):
                                         print 'This method is not defined in the class.'
 
                         # show dialog and get a data from user
+                        result = None
                         result = self.show_ui_dialog(dlg_type, dlg_title, default, static_key)
+                        if not result: # user has pressed 'Escape' or closes the dialog
+                            return
 
                         # save user date with needed type
                         steps[str(dlg_name)] = conv(result)
