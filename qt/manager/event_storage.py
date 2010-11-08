@@ -221,7 +221,7 @@ class EventStorage(QAbstractTableModel):
         http = self.params.get('http', None)
         if http and http.is_session_open():
             params = { 'monday': monday, 'filter': [] }
-            http.request('/manager/get_week/', params)
+            http.request('/manager/get_week/', params) # FIXME: wrong place for HTTP Request!
             self.parent.parent.statusBar().showMessage(_('Parsing the response...'))
             response = http.parse(None)
 

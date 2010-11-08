@@ -43,7 +43,9 @@ class Searching(UiDlgTemplate):
     def searchFor(self):
         name = self.editSearch.text().toUtf8()
         params = {'name': name, 'mode': self.mode}
-        self.http.request('/manager/get_users_info_by_name/', params)
+        if not self.http.request('/manager/get_users_info_by_name/', params):
+            QMessageBox.critical(self, _('Searching'), _('Unable to search: %s') % self.http.error_msg)
+            return
         default_response = None
         response = self.http.parse(default_response)
         if response and 'users' in response:

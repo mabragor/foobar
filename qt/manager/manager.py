@@ -73,7 +73,9 @@ class MainWindow(QMainWindow):
     def get_static(self):
         """ This methods get static information from server. """
         # get rooms
-        self.http.request('/manager/get_rooms/', {})
+        if not self.http.request('/manager/get_rooms/', {}):
+            QMessageBox.critical(self, _('Room info'), _('Unable to fetch: %s') % self.http.error_msg)
+            return
         default_response = {'rows': []}
         response = self.http.parse(default_response)
         """
@@ -85,7 +87,9 @@ class MainWindow(QMainWindow):
         self.schedule.update_static( {'rooms': self.rooms} )
 
         # static info
-        self.http.request('/manager/static/', {})
+        if not self.http.request('/manager/static/', {}):
+            QMessageBox.critical(self, _('Static info'), _('Unable to fetch: %s') % self.http.error_msg)
+            return
         response = self.http.parse()
         self.static = response
         print 'Static is', self.static.keys()
@@ -279,7 +283,10 @@ class MainWindow(QMainWindow):
         dlgStatus = self.dialog.exec_()
 
         if QDialog.Accepted == dlgStatus:
-            self.http.request('/manager/login/', self.credentials)
+            if not self.http.request('/manager/login/', self.credentials):
+                QMessageBox.critical(self, _('Login'), _('Unable to login: %s') % self.http.error_msg)
+                return
+
             default_response = None
             response = self.http.parse(default_response)
             if response and 'user_info' in response:
@@ -344,7 +351,9 @@ class MainWindow(QMainWindow):
 
         if QDialog.Accepted == dlgStatus and self.rfid_id is not None:
             params = {'rfid_code': self.rfid_id, 'mode': 'client'}
-            self.http.request('/manager/get_client_info/', params)
+            if not self.http.request('/manager/get_client_info/', params):
+                QMessageBox.critical(self, _('Client info'), _('Unable to fetch: %s') % self.http.error_msg)
+                return
             default_response = None
             response = self.http.parse(default_response)
 
@@ -383,9 +392,11 @@ class MainWindow(QMainWindow):
         dlgStatus = self.dialog.exec_()
 
         if QDialog.Accepted == dlgStatus:
-            self.http.request('/manager/get_client_info/',
-                              {'user_id': self.user_id,
-                               'mode': 'client'})
+            if not self.http.request('/manager/get_client_info/',
+                                     {'user_id': self.user_id,
+                                      'mode': 'client'}):
+                QMessageBox.critical(self, _('Client info'), _('Unable to fetch: %s') % self.http.error_msg)
+                return
             default_response = None
             response = self.http.parse(default_response)
             if not response or response['info'] is None:
@@ -491,7 +502,9 @@ class MainWindow(QMainWindow):
             from_range = model.weekRange
             to_range = model.date2range(selected_date)
 
-            self.http.request('/manager/fill_week/', {'to_date': to_range[0]})
+            if not self.http.request('/manager/fill_week/', {'to_date': to_range[0]}):
+                QMessageBox.critical(self, _('Fill week'), _('Unable to fill: %s') % self.http.error_msg)
+                return
             default_response = None
             response = self.http.parse(default_response)
             if response and 'saved_id' in response:

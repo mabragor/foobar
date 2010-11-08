@@ -335,7 +335,9 @@ class ClientInfo(UiDlgTemplate):
 
         if QDialog.Accepted == dialog.exec_():
             params = {'card_id': card_id, 'amount': self.payment}
-            self.http.request('/manager/payment_add/', params)
+            if not self.http.request('/manager/payment_add/', params):
+                QMessageBox.critical(self, _('Register payment'), _('Unable to register: %s') % self.http.error_msg)
+                return
             default_response = None
             response = self.http.parse(default_response)
 
@@ -361,7 +363,9 @@ class ClientInfo(UiDlgTemplate):
         if QDialog.Accepted == dlgStatus:
             # check the rfid code
             params = {'rfid_code': self.rfid_id, 'mode': 'client'}
-            self.http.request('/manager/get_client_info/', params)
+            if not self.http.request('/manager/get_client_info/', params):
+                QMessageBox.critical(self, _('Client info'), _('Unable to fetch: %s') % self.http.error_msg)
+                return
             default_response = None
             response = self.http.parse(default_response)
             if response and 'info' in response and response['info'] is not None:
@@ -620,7 +624,9 @@ class ClientInfo(UiDlgTemplate):
         # save client's information
         params = { 'user_id': self.client_id, }
         params.update(userinfo)
-        self.http.request('/manager/set_client_info/', params)
+        if not self.http.request('/manager/set_client_info/', params):
+            QMessageBox.critical(self, _('Save info'), _('Unable to save: %s') % self.http.error_msg)
+            return
         response = self.http.parse(default_response)
         if not response:
             error_msg = self.http.error_msg
@@ -631,7 +637,9 @@ class ClientInfo(UiDlgTemplate):
         # save client's card
         model = self.tableHistory.model()
         params = model.get_model_as_formset(response['saved_id'])
-        self.http.request('/manager/set_client_card/', params)
+        if not self.http.request('/manager/set_client_card/', params):
+            QMessageBox.critical(self, _('Save cards'), _('Unable to save: %s') % self.http.error_msg)
+            return
         response = self.http.parse(default_response)
         if not response:
             error_msg = self.http.error_msg

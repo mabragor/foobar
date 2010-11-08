@@ -24,7 +24,9 @@ class ShowVisitors(UiDlgTemplate):
 
     def initData(self, event_id):
         self.event_id = event_id
-        self.http.request('/manager/get_visitors/', {'event_id': event_id})
+        if not self.http.request('/manager/get_visitors/', {'event_id': event_id}):
+            QMessageBox.critical(self, _('Visitors'), _('Unable to fetch: %s') % self.http.error_msg)
+            return
         default_response = None
         response = self.http.parse(default_response)
         visitor_list = response['visitor_list']

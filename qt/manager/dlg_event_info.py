@@ -48,7 +48,9 @@ class EventInfo(UiDlgTemplate):
         self.schedule_index = index
 
         # get the event's information
-        self.http.request('/manager/get_event_info/', {'id': self.schedule_object.id})
+        if not self.http.request('/manager/get_event_info/', {'id': self.schedule_object.id}):
+            QMessageBox.critical(self, _('Event info'), _('Unable to fetch: %s') % self.http.error_msg)
+            return
         default_response = None
         response = self.http.parse(default_response)
 
@@ -122,7 +124,9 @@ class EventInfo(UiDlgTemplate):
 
             # get user_id by rfid_code
             params = {'rfid_code': self.rfid_id, 'mode': 'client'}
-            self.http.request('/manager/get_client_info/', params)
+            if not self.http.request('/manager/get_client_info/', params):
+                QMessageBox.critical(self, _('Client info'), _('Unable to fetch: %s') % self.http.error_msg)
+                return
             default_response = None
             response = self.http.parse(default_response)
             if response and 'info' in response:
@@ -135,7 +139,9 @@ class EventInfo(UiDlgTemplate):
             # register user on the event
             params = {'event_id': self.schedule['id'],
                       'client_id': user_id}
-            self.http.request('/manager/register_visit/', params)
+            if not self.http.request('/manager/register_visit/', params):
+                QMessageBox.critical(self, _('Register visit'), _('Unable to register: %s') % self.http.error_msg)
+                return
             default_response = None
             response = self.http.parse(default_response)
             if response:
@@ -167,7 +173,9 @@ class EventInfo(UiDlgTemplate):
         if QDialog.Accepted == dlgStatus:
             params = {'event_id': self.schedule['id'],
                       'client_id': self.user_id}
-            self.http.request('/manager/register_visit/', params)
+            if not self.http.request('/manager/register_visit/', params):
+                QMessageBox.critical(self, _('Register visit'), _('Unable to register: %s') % self.http.error_msg)
+                return
             default_response = None
             response = self.http.parse(default_response)
             if response:
@@ -197,7 +205,9 @@ class EventInfo(UiDlgTemplate):
             QMessageBox.Yes, QMessageBox.No)
         if reply == QMessageBox.Yes:
             params = {'id': self.schedule['id']}
-            self.http.request('/manager/cal_event_del/', params)
+            if not self.http.request('/manager/cal_event_del/', params):
+                QMessageBox.critical(self, _('Event deletion'), _('Unable to delete: %s') % self.http.error_msg)
+                return
             default_response = None
             response = self.http.parse(default_response)
             if response:
@@ -218,7 +228,9 @@ class EventInfo(UiDlgTemplate):
 
         params = {'event_id': self.schedule['id'],
                   'fix_id': fix_id}
-        self.http.request('/manager/register_fix/', params)
+        if not self.http.request('/manager/register_fix/', params):
+            QMessageBox.critical(self, _('Register fix'), _('Unable to fix: %s') % self.http.error_msg)
+            return
         default_response = None
         response = self.http.parse(default_response)
         if response:

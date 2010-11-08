@@ -68,6 +68,10 @@ class Http:
                 break
             except httplib.CannotSendRequest:
                 self.reconnect()
+            except Exception, e:
+                self.error_msg = '[%s] %s' % (e.errno, e.strerror.decode('utf-8'))
+                self.response = None
+                return False
 
         self.response = self.conn.getresponse()
 
@@ -88,8 +92,11 @@ class Http:
 
             self.session_id = cookie.get('sessionid', None)
             self.debug('session id is %s' % self.session_id)
+        return True
 
     def parse(self, default={}): # public
+        if not self.response: # request failed
+            return None
         if self.response.status == 200: # http status
             data = self.response.read()
             if hasattr(json, 'read'):
@@ -98,28 +105,16 @@ class Http:
                 response = json.loads(data) # 2.6
             if 'code' in response and response['code'] != 200:
                 self.error_msg = '[%(code)s] %(desc)s' % response
-                # if self.parent:
-                #     QMessageBox.warning(self.parent, _('Warning'), self.error_msg)
-                # else:
-                #     print self.error_msg
                 return default
             return response
         elif self.response.status == 302: # authentication
             self.error_msg = _('Authenticate yourself.')
-            # if self.parent:
-            #     QMessageBox.warning(self.parent, _('Warning'), self.error_msg)
-            # else:
-            #     print self.error_msg
             return default
         elif self.response.status == 500: # error
             self.error_msg = _('Error 500. Check dump!')
             open('./dump.html', 'w').write(self.response.read())
         else:
             self.error_msg = '[%s] %s' % (self.response.status, self.response.reason)
-            # if self.parent:
-            #     QMessageBox.critical(self.parent, _('HTTP Error'), self.error_msg)
-            # else:
-            #     print self.error_msg
             return default
 
 # Test part of module
@@ -135,24 +130,33 @@ class TestWindow(QMainWindow):
         http = Http()
 
         # make anonimous request
-        http.request('/manager/get_rooms/', {})
-        result = http.parse()
-        if 'rows' in result:
-            print 'anonymous request: test passed'
+        is_success = http.request('/manager/get_rooms/', {})
+        if is_success:
+            result = http.parse()
+            if 'rows' in result:
+                print 'anonymous request: test passed'
+        else:
+            print http.error_msg
 
         # authenticate test user
-        http.request('/manager/login/', TEST_CREDENTIALS)
-        result = http.parse()
-        if 'code' in result and result['code'] == 200:
-            print 'authenticate user: test passed'
+        is_success = http.request('/manager/login/', TEST_CREDENTIALS)
+        if is_success:
+            result = http.parse()
+            if 'code' in result and result['code'] == 200:
+                print 'authenticate user: test passed'
+        else:
+            print http.error_msg
 
         # make autorized request
         from datetime import date
         params = {'to_date': date(2010, 5, 10)}
-        http.request('/manager/fill_week/', params)
-        result = http.parse()
-        if 'code' in result and result['code'] == 200:
-            print 'authorized request: test passed'
+        is_success = http.request('/manager/fill_week/', params)
+        if is_success:
+            result = http.parse()
+            if 'code' in result and result['code'] == 200:
+                print 'authorized request: test passed'
+        else:
+            print http.error_msg
 
 if __name__=="__main__":
     app = QApplication(sys.argv)

@@ -56,7 +56,9 @@ class ShowCoaches(UiDlgTemplate):
 
             if len(coach_id_list) > 0:
                 params = {'event_id': self.event_id, 'coach_id_list': ','.join([str(i) for i in coach_id_list])}
-                self.http.request('/manager/register_change/', params)
+                if not self.http.request('/manager/register_change/', params):
+                    QMessageBox.critical(self, _('Register change'), _('Unable to register: %s') % self.http.error_msg)
+                    return
                 default_response = None
                 response = self.http.parse(default_response)
                 if response:
