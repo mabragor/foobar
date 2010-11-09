@@ -316,6 +316,16 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('%s : %s' % (self.baseTitle, _('Login to start session')))
         self.schedule.model().storage_init()
 
+        # clear rooms layout
+        layout = self.panelRooms
+        while layout.count() > 0:
+            item = layout.takeAt(0)
+            if not item:
+                continue
+            w = item.widget()
+            if w:
+                w.deleteLater()
+
     def setupApp(self):
         self.dialog = DlgSettings(self)
         self.dialog.setModal(True)
