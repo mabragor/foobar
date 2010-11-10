@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 
 from settings import _
 from event_storage import EventStorage
+from dlg_settings import TabGeneral
+
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -374,6 +376,14 @@ class QtScheduleDelegate(QItemDelegate):
         QItemDelegate.__init__(self, parent)
         self.parent = parent
 
+        self.settings = QSettings()
+        general = TabGeneral(self.parent)
+        general.loadSettings(self.settings)
+        width = general.borderWidth.text()
+        self.borderWidth = int(width)
+        color = general.borderColor_value
+        self.borderColor = color
+
     def debug(self, msg):
         if self.DEBUG:
             print '[QtScheduleDelegate] %s' % msg
@@ -466,7 +476,7 @@ class QtScheduleDelegate(QItemDelegate):
 
                 # prepare to draw the borders
                 if self.parent.selected_event == event:
-                    self.prepare( painter, (Qt.blue, 3) )
+                    self.prepare( painter, (self.borderColor, self.borderWidth) )
                 else:
                     self.prepare( painter, (Qt.black, pen_width) )
 

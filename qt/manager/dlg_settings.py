@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-# (c) 2009 Ruslan Popov <ruslan.popov@gmail.com>
+# (c) 2009-2010 Ruslan Popov <ruslan.popov@gmail.com>
 
 from settings import _
+from ui_dialog import UiDlgTemplate
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -14,8 +15,8 @@ class DlgSettings(QDialog):
         self.parent = parent
 
         self.tabWidget = QTabWidget()
-        self.tabWidget.addTab(TabGeneral(), _('General'))
-        self.tabWidget.addTab(TabNetwork(), _('Network'))
+        self.tabWidget.addTab(TabGeneral(self), _('General'))
+        self.tabWidget.addTab(TabNetwork(self), _('Network'))
 
         self.tabIndex = ['general', 'network']
 
@@ -92,18 +93,75 @@ class TabAbstract(QWidget):
             elif type(field) is QCheckBox:
                 value = raw_value.toBool()
                 field.setChecked(value)
+            elif type(field) is QSpinBox:
+                value, ok = raw_value.toInt()
+                if ok:
+                    field.setValue(value)
             # keep for compare when saving
             self.defaults[name] = value
         settings.endGroup()
 
-class TabGeneral(TabAbstract):
+class TabGeneral(UiDlgTemplate):
 
-    def __init__(self, parent=None):
-        QWidget.__init__(self, parent)
+    ui_file = 'uis/dlg_settings_general.ui'
+
+    def __init__(self, parent, params=dict()):
+        UiDlgTemplate.__init__(self, parent, params)
+
+    def setupUi(self):
+        UiDlgTemplate.setupUi(self)
 
         self.groupName = 'general'
 
-        self.defaults = {}
+        self.defaults = {
+            'borderWidth': 2,
+            'borderColor': '#ff0000',
+            }
+
+        self.connect(self.borderColor, SIGNAL('clicked()'), self.getBorderColor)
+
+        self.borderWidth.setRange(0, 4)
+
+    def loadSettings(self, settings):
+        settings.beginGroup(self.groupName)
+        for name in self.defaults.keys():
+            field = getattr(self, name)
+            raw_value = settings.value(name, QVariant(self.defaults[name]))
+            if type(field) is QSpinBox:
+                value, ok = raw_value.toInt()
+                if ok:
+                    field.setValue(value)
+            if type(field) is QToolButton:
+                value = raw_value.toString()
+                setattr(self, '%s_value' % name, QColor(value))
+            # keep for compare when saving
+            self.defaults[name] = value
+        settings.endGroup()
+
+    def saveSettings(self, settings):
+        is_changed = False
+        settings.beginGroup(self.groupName)
+        for name in self.defaults.keys():
+            field = getattr(self, name)
+            if type(field) is QSpinBox:
+                value = field.value()
+            elif type(field) is QToolButton:
+                value = self.borderColor_value.name()
+            original_value = self.defaults[name]
+            if original_value != value:
+                is_changed = True
+            settings.setValue(name, QVariant(value))
+        settings.endGroup()
+        return is_changed
+
+    def getBorderColor(self):
+
+        def callback():
+            self.borderColor_value = dialog.selectedColor()
+
+        current_color = self.borderColor_value
+        dialog = QColorDialog(current_color, self)
+        dialog.open(callback)
 
 class TabNetwork(TabAbstract):
 
