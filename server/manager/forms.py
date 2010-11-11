@@ -79,7 +79,10 @@ class AjaxForm(forms.Form):
 
     def get_errors(self):
         from django.utils.encoding import force_unicode
-        return ''.join([force_unicode(v) for k, v in self.errors.items()])
+        response = []
+        for k,v in self.errors.items():
+            response.append( force_unicode(v.as_text()) )
+        return '\n'.join(response)
 
 class Login(AjaxForm):
     login = forms.CharField(max_length=30)
