@@ -49,6 +49,19 @@ class __Card(admin.ModelAdmin):
 admin.site.register(models.Card, __Card)
 models.Card.description = _(u'This model consists of records of training courses which clients ever had bought.')
 
+class __CardDuration(admin.ModelAdmin):
+
+    def title(self, record):
+        return record.__unicode__()
+    title.short_description = _(u'Title')
+
+    list_display = ('title', 'is_active', 'reg_datetime')
+    fieldsets = (
+        (None, {'fields': ('threshold', 'value', 'is_active')}),
+        )
+admin.site.register(models.CardDuration, __CardDuration)
+models.CardDuration.description = _(u'This model consists of thresholds and values for card.')
+
 class __CardType(admin.ModelAdmin):
 
     def categories(self, cardtype):

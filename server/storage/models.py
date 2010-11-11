@@ -107,9 +107,32 @@ class AbstractCardType(AbstractModel): # флаер, пробное, разов�
         result.update( { 'price_categories': [i.about() for i in self.category.all() ],} )
         return result
 
+class CardDuration(AbstractModel):
+    """
+    This model contains of the list:
+      *  number of sold visits;
+      *  number of days the card expires.
+    """
+
+    threshold = models.IntegerField(verbose_name=_(u'Threshold'),
+                                    help_text=_(u'The threshold of applying a rule.'))
+    value = models.IntegerField(verbose_name=_(u'Days.'),
+                                help_text=_(u'The count days before expiration.'))
+
+    class Meta:
+        verbose_name = _(u'Duration')
+        verbose_name_plural = _(u'Durations')
+
+    def __unicode__(self):
+        return 'Less or equal %(threshold)s then %(value)s' % {'threshold': self.threshold,
+                                                               'value': self.value}
+
 class CardOrdinary(AbstractCardType):
 
     is_priceless = models.BooleanField(verbose_name=_(u'Is priceless?'))
+    use_threshold = models.BooleanField(verbose_name=_(u'Use threshold'),
+                                        help_text=_(u'Use threshold to count an expiration date of the card?'),
+                                        default=False)
     available_formula = models.CharField(verbose_name=_(u'Formula'), max_length=128, null=True, blank=True,
                                          help_text=_(u'Enter the formula to calculate available visits.'))
 
@@ -271,13 +294,22 @@ class Card(AbstractModel):
                 today = date.today()
                 if self.card_ordinary:
                     card_title = _(u'Activate ordinary card')
-                    duration = timedelta(days=30)
+                    # using the threshold
+                    if self.card_ordinary.use_threshold:
+                        queryset = CardDuration.objects.filter(threshold__gte=self.count_sold)
+                        if len(queryset) > 0:
+                            value = queryset[0].value
+                            duration = timedelta(days=value)
+                        else:
+                            raise RuntimeWarning(_(u'Fill CardDuration model.'))
+                    else:
+                        duration = timedelta(days=30)
                 else:
                     card_title = _(u'Activate club card')
                     duration = timetelta(days=self.card_club.count_days)
                 self.begin_date = today
                 self.end_date = today + duration
-                print u'%s [%s .. %s]' % (card_title, self.begin_date, self.end_date)
+                #print u'%s [%s .. %s]' % (card_title, self.begin_date, self.end_date)
 
         self.save()
 
