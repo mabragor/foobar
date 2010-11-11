@@ -134,7 +134,7 @@ class WizardSpinDlg(WizardDialog):
             self.dialog.spinBox.setValue(self.SPIN_STEP)
             return
 
-        reminder = value % self.SPIN_STEP
+        reminder = value % (2 * self.SPIN_STEP)
         if reminder != 0:
             self.dialog.spinBox.setValue(value - reminder)
 
