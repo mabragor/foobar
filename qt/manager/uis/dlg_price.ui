@@ -29,7 +29,7 @@
     <item>
      <widget class="QLabel" name="label">
       <property name="text">
-       <string>Enter a value:</string>
+       <string>Payment:</string>
       </property>
      </widget>
     </item>
