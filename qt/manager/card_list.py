@@ -268,27 +268,36 @@ class CardListModel(QAbstractTableModel):
         record = self.storage[row]
         return record[COLUMN_ID_INDEX]
 
-    def data(self, index, role): # base class method
-        if not index.isValid():
-            return QVariant('error')
-        if role not in (Qt.DisplayRole, Qt.ToolTipRole, GET_ID_ROLE) :
-            return QVariant()
-        idx_row = index.row()
-        idx_col = index.column()
+    def index_to_meta(self, index):
+        row = index.row()
+        col = index.column()
 
-        field_obj = MODEL_MAP[idx_col]
+        field_obj = MODEL_MAP[col]
         field_name = field_obj['name']
         delegate_editor = field_obj['delegate']
         action = field_obj['action']
 
+        return (row, col, action)
+
+    def data(self, index, role): # base class method
+        if not index.isValid():
+            return QVariant('error')
+        if role == Qt.ForegroundRole:
+            return self.data_ForegroundRole(index)
+        if role not in (Qt.DisplayRole, Qt.ToolTipRole, GET_ID_ROLE) :
+            return QVariant()
+
+        row, col, action = self.index_to_meta(index)
+
         try:
-            record = self.storage[idx_row]
-            value = record[idx_col]
+            record = self.storage[row]
+            value = record[col]
         except KeyError:
             return QVariant('-err-')
         except IndexError:
             return QVariant('-err-')
 
+        # for Type and Meta fields
         if value is None:
             return QVariant('--')
 
@@ -296,6 +305,25 @@ class CardListModel(QAbstractTableModel):
             return QVariant(value['title'])
 
         return action(value)
+
+    def data_ForegroundRole(self, index):
+        """
+        change foreground color for closed courses
+        """
+        color = Qt.black
+
+        row, col, action = self.index_to_meta(index)
+
+        # find 'cancel_datetime' record
+        rec = filter(lambda record: record['name'] == 'cancel_datetime',
+                     MODEL_MAP)[0]
+        col = MODEL_MAP.index(rec)
+        name, delegate, title, action, static = MODEL_MAP_RAW[col]
+
+        value = self.storage[row][col]
+        if value is not None:
+            color = Qt.gray
+        return QBrush(color)
 
     def setData(self, index, value, role):
         if index.isValid() and role == Qt.EditRole:
