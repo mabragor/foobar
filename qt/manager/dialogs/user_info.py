@@ -538,7 +538,7 @@ class ClientInfo(UiDlgTemplate):
 
             # send data to user's model
             model = self.tableHistory.model()
-            model.insert_new(steps, 0)
+            model.insert_new(steps)
             # model.dump()
 
     def need_skip_next_dlg(self, node, conv, value):

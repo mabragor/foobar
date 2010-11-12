@@ -72,7 +72,7 @@ class CardListModel(QAbstractTableModel):
         Is called from DlgClientInfo::initData()
         """
         for item in card_list:
-            self.insert_exist(item, 0)
+            self.insert_exist(item)
         self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
                   QModelIndex(), 1, self.rowCount())
 
@@ -144,7 +144,7 @@ class CardListModel(QAbstractTableModel):
     def prepare_proxy(self, slug):
         return lambda card: self.prepare_testonce(card, slug)
 
-    def insert_new(self, card, position, role=Qt.EditRole):
+    def insert_new(self, card):
         """ Insert a record into the model. Parameter 'card' has an
         information obtained from UI dialogs."""
 
@@ -186,7 +186,7 @@ class CardListModel(QAbstractTableModel):
         self.emit(SIGNAL('rowsInserted(QModelIndex, int, int)'),
                   QModelIndex(), 1, 1)
 
-    def insert_exist(self, card, position, role=Qt.EditRole):
+    def insert_exist(self, card):
         """ Insert a record into the model. """
         if card['card_ordinary'] is not None:
             slug = card['card_ordinary']['slug']
@@ -206,7 +206,7 @@ class CardListModel(QAbstractTableModel):
             value = card.get(name, None)
             record.append(value)
 
-        self.storage.insert(0, record)
+        self.storage.append(record)
 
     def prepare_flyer(self, card):
         return {
