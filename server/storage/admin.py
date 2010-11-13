@@ -248,6 +248,7 @@ class __Team(admin.ModelAdmin):
 
     list_display = ('description', 'dance_styles',
                     'duration', 'is_active', 'reg_datetime')
+    list_filter = ('dance_style', 'coaches')
     ordering = ('price_category', 'title', 'coaches')
     search_fields = ('title',)
     fieldsets = (
