@@ -281,7 +281,9 @@ class Card(AbstractModel):
         if self.count_available > self.count_used:
             self.count_used += 1
         else:
-            raise RuntimeWarning(_(u'Check sources: %i and %i') % (self.count_available, self.count_used))
+            raise RuntimeWarning(_(u'Check sources: %(avail)i and %(used)i') % {
+                'avail': self.count_available,
+                'used': self.count_used})
 
         # close card
         if self.count_available == self.count_used:
