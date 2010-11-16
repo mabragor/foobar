@@ -23,8 +23,8 @@ class __User(UserAdmin):
 admin.site.unregister(UserModel)
 admin.site.register(UserModel, __User)
 
-UserModel.description = _(u'Users of this system.')
-GroupModel.description = _(u'User groups of this system.')
+UserModel.model_desc = _(u'Users of this system.')
+GroupModel.model_desc = _(u'User groups of this system.')
 
 ### Rest of the models
 
@@ -40,6 +40,7 @@ class __Card(admin.ModelAdmin):
                     'count_available', 'count_sold', 'count_used',
                     'begin_date', 'end_date',
                     'is_active', 'reg_datetime', 'cancel_datetime')
+    list_filter = ('client', 'discount', 'is_active')
     fieldsets = (
         (None, {'fields': ('card_ordinary', 'card_club', 'card_promo',
                            'client', 'discount', 'price', 'paid',
@@ -47,7 +48,7 @@ class __Card(admin.ModelAdmin):
                            'begin_date', 'end_date', 'is_active', 'cancel_datetime')}),
         )
 admin.site.register(models.Card, __Card)
-models.Card.description = _(u'This model consists of records of training courses which clients ever had bought.')
+models.Card.model_desc = _(u'This model consists of records of training courses which clients ever had bought.')
 
 class __CardDuration(admin.ModelAdmin):
 
@@ -60,7 +61,7 @@ class __CardDuration(admin.ModelAdmin):
         (None, {'fields': ('threshold', 'value', 'is_active')}),
         )
 admin.site.register(models.CardDuration, __CardDuration)
-models.CardDuration.description = _(u'This model consists of thresholds and values for card.')
+models.CardDuration.model_desc = _(u'This model consists of thresholds and values for card.')
 
 class __CardType(admin.ModelAdmin):
 
@@ -82,7 +83,7 @@ class __CardOrdinary(__CardType):
     search_fields = ('title',)
     ordering = ('priority', )
 admin.site.register(models.CardOrdinary, __CardOrdinary)
-models.CardOrdinary.description = _(u'This model consists of all possible types for ordinary cards.')
+models.CardOrdinary.model_desc = _(u'This model consists of all possible types for ordinary cards.')
 
 class __CardClub(__CardType):
     list_display = ('title', 'categories', 'discounts', 'priority', 'price',
@@ -90,7 +91,7 @@ class __CardClub(__CardType):
     search_fields = ('title',)
     ordering = ('priority', )
 admin.site.register(models.CardClub, __CardClub)
-models.CardClub.description = _(u'This model consists of all possible types for club cards.')
+models.CardClub.model_desc = _(u'This model consists of all possible types for club cards.')
 
 class __CardPromo(__CardType):
     list_display = ('title', 'categories', 'discounts', 'priority', 'price',
@@ -100,21 +101,21 @@ class __CardPromo(__CardType):
     search_fields = ('title',)
     ordering = ('priority', )
 admin.site.register(models.CardPromo, __CardPromo)
-models.CardPromo.description = _(u'This model consists of all possible types for promo cards.')
+models.CardPromo.model_desc = _(u'This model consists of all possible types for promo cards.')
 
 class __PriceCategoryTeam(admin.ModelAdmin):
     list_display = ('title', 'test_price', 'once_price', 'half_price', 'full_price', 'is_active', 'reg_datetime')
     search_fields = ('title',)
     fieldsets = ((None, {'fields': ('title', 'test_price', 'once_price', 'half_price', 'full_price', 'is_active')}),)
 admin.site.register(models.PriceCategoryTeam, __PriceCategoryTeam)
-models.PriceCategoryTeam.description = _(u'This model consists of prices for every price category for teams.')
+models.PriceCategoryTeam.model_desc = _(u'This model consists of prices for every price category for teams.')
 
 class __PriceCategoryRent(admin.ModelAdmin):
     list_display = ('title', 'test_price', 'once_price', 'half_price', 'full_price', 'is_active', 'reg_datetime')
     search_fields = ('title',)
     fieldsets = ((None, {'fields': ('title', 'test_price', 'once_price', 'half_price', 'full_price', 'is_active')}),)
 admin.site.register(models.PriceCategoryRent, __PriceCategoryRent)
-models.PriceCategoryRent.description = _(u'This model consists of prices for every price category for rents.')
+models.PriceCategoryRent.model_desc = _(u'This model consists of prices for every price category for rents.')
 
 class __Discount(admin.ModelAdmin):
     list_display = ('title', 'percent', 'is_active', 'reg_datetime')
@@ -122,7 +123,7 @@ class __Discount(admin.ModelAdmin):
     search_fields = ('title',)
     fieldsets = ((None, {'fields': ('title', 'percent', 'is_active')}),)
 admin.site.register(models.Discount, __Discount)
-models.Discount.description = _(u'This model consists of all possible discounts.')
+models.Discount.model_desc = _(u'This model consists of all possible discounts.')
 
 ### Interface for Room Model : Begin
 
@@ -134,7 +135,7 @@ class Room(admin.ModelAdmin):
 
     def colored_field(self, floor):
         return u'<div style="background-color: %s;">%s</div>' % (floor.color, floor.color)
-    colored_field.short_description = _(u'Color')
+    colored_field.short_model_desc = _(u'Color')
     colored_field.allow_tags = True
 
     def formfield_for_dbfield(self, db_field, **kwargs):
@@ -145,7 +146,7 @@ class Room(admin.ModelAdmin):
         return super(Room, self).formfield_for_dbfield(db_field, **kwargs)
 
 admin.site.register(models.Room, Room)
-models.Room.description = _(u'This model consists of all available rooms.')
+models.Room.model_desc = _(u'This model consists of all available rooms.')
 
 ### Interface for Room Model : End
 
@@ -155,15 +156,16 @@ class __DanceDirection(admin.ModelAdmin):
     search_fields = ('title',)
     fieldsets = ((None, {'fields': ('title', 'is_active')}),)
 admin.site.register(models.DanceDirection, __DanceDirection)
-models.DanceDirection.description = _(u'This model consists of all available dance directions.')
+models.DanceDirection.model_desc = _(u'This model consists of all available dance directions.')
 
 class __DanceStyle(admin.ModelAdmin):
     list_display = ('title', 'direction', 'is_active', 'reg_datetime')
+    list_filter = ('direction', 'is_active',)
     ordering = ('direction', 'title', )
     search_fields = ('title',)
     fieldsets = ((None, {'fields': ('direction', 'title', 'is_active')}),)
 admin.site.register(models.DanceStyle, __DanceStyle)
-models.DanceStyle.description = _(u'This model consists of all available dance styles.')
+models.DanceStyle.model_desc = _(u'This model consists of all available dance styles.')
 
 class __Coach(admin.ModelAdmin):
     def name(self, user):
@@ -177,7 +179,7 @@ class __Coach(admin.ModelAdmin):
         'fields': ('last_name', 'first_name', 'phone', 'email',
                    'birth_date', 'desc', 'is_active')}),)
 admin.site.register(models.Coach, __Coach)
-models.Coach.description = _(u'This model consists of all available coaches.')
+models.Coach.model_desc = _(u'This model consists of all available coaches.')
 
 class __Client(admin.ModelAdmin):
     def name(self, user):
@@ -187,12 +189,13 @@ class __Client(admin.ModelAdmin):
 
     list_display = ('name', 'discount', 'rfid_code',
                     'phone', 'email', 'is_active', 'reg_datetime')
+    list_filter = ('discount', 'is_active')
     search_fields = ('last_name', 'first_name')
     fieldsets = ((None, {
         'fields': ('last_name', 'first_name', 'phone', 'email',
                    'discount', 'birth_date', 'is_active')}),)
 admin.site.register(models.Client, __Client)
-models.Client.description = _(u'This model consists of all registered clients.')
+models.Client.model_desc = _(u'This model consists of all registered clients.')
 
 class __Renter(admin.ModelAdmin):
     def name(self, user):
@@ -206,7 +209,7 @@ class __Renter(admin.ModelAdmin):
         'fields': ('last_name', 'first_name', 'phone', 'email',
                    'birth_date', 'desc', 'is_active')}),)
 admin.site.register(models.Renter, __Renter)
-models.Renter.description = _(u'This model consists of all registered renters.')
+models.Renter.model_desc = _(u'This model consists of all registered renters.')
 
 
 ### Interface for Team Model : Begin
@@ -257,7 +260,7 @@ class __Team(admin.ModelAdmin):
         )
     inlines = [CalTeamItemInline]
 admin.site.register(models.Team, __Team)
-models.Team.description = _(u'This model consists of all available teams.')
+models.Team.model_desc = _(u'This model consists of all available teams.')
 
 ### Interface for Team Model : End
 
@@ -284,7 +287,7 @@ class __Rent(admin.ModelAdmin):
                     'fields': ('title', 'duration', 'desc')}))
     inlines = [CalRentItemInline]
 admin.site.register(models.Rent, __Rent)
-models.Rent.description = _(u'This model consists of all available rents.')
+models.Rent.model_desc = _(u'This model consists of all available rents.')
 
 ### Interface for Rent Model : End
 
@@ -309,6 +312,7 @@ class CalendarForm(forms.ModelForm):
 
 class __Calendar(admin.ModelAdmin):
     list_display = ('description', 'team', 'rent')
+    list_filter = ('team', 'rent')
     ordering = ('day', 'time', 'room')
     form = CalendarForm
 
@@ -318,7 +322,7 @@ class __Calendar(admin.ModelAdmin):
     description.allow_tags = False
 
 admin.site.register(models.Calendar, __Calendar)
-models.Calendar.description = _(u'This model consists of records with events (team or rent) which assigned on a week.')
+models.Calendar.model_desc = _(u'This model consists of records with events (team or rent) which assigned on a week.')
 models.Calendar.is_slave = True
 
 ### Interface for Calendar Model : End
@@ -332,9 +336,9 @@ class __Schedule(admin.ModelAdmin):
     coaches_list.short_description = _(u'List of coaches')
 
 admin.site.register(models.Schedule, __Schedule)
-models.Schedule.description = _(u'This model consists of records with scheduled events (team or rent).')
+models.Schedule.model_desc = _(u'This model consists of records with scheduled events (team or rent).')
 
 class __Visit(admin.ModelAdmin):
     list_display = ('client', 'schedule', 'card')
 admin.site.register(models.Visit, __Visit)
-models.Visit.description = _(u'This model consists of all registered visits of trainings.')
+models.Visit.model_desc = _(u'This model consists of all registered visits of trainings.')
