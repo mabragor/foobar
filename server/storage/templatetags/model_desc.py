@@ -15,7 +15,7 @@ def model_desc(url, app_name=None):
     else: # application mode
         model_name = values[0]
     model = get_model(app_name, model_name)
-    desc = getattr(model, 'description', '')
+    desc = getattr(model, 'model_desc', '')
     is_slave = getattr(model, 'is_slave', False)
     if is_slave:
         return u'%s<br/><span style="color: gray;">%s</span>' % (_(u'Slave model!'), desc)
