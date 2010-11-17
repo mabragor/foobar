@@ -228,7 +228,7 @@ class TeamInlineForm(forms.ModelForm):
             del(d['DELETE'])
 
         cal = models.Calendar(**d)
-        if not cal.may_save():
+        if d['id'] is None and not cal.may_save():
             raise forms.ValidationError(_(u'Impossible to place this event!'))
 
         return self.cleaned_data
