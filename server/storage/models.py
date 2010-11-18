@@ -410,6 +410,10 @@ class Team(AbstractModel):
     def dance_styles(self):
         return u', '.join([unicode(a) for a in self.dance_style.all()])
 
+    @property
+    def coach_list(self):
+        return u', '.join([unicode(a) for a in self.coaches.all()])
+
 class Rent(AbstractModel):
 
     price_category = models.ForeignKey(PriceCategoryRent)

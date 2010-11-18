@@ -239,25 +239,28 @@ class CalTeamItemInline(admin.TabularInline):
     extra = 1
 
 class __Team(admin.ModelAdmin):
-    def description(self, team):
-        calendar_items = models.Calendar.objects.filter(team=team)
-        cal_desc = u'<br>'.join([c.__unicode__() for c in calendar_items])
-        return u'%s - %s<hr/>%s<hr/>%s' % (team.price_category,
-                                           '',
-                                           ','.join([c.__unicode__() for c in team.coaches.all()]),
-                                           cal_desc)
-    description.short_description = _(u'Description')
-    description.allow_tags = True
-
-    list_display = ('description', 'dance_styles',
-                    'duration', 'is_active', 'reg_datetime')
-    list_filter = ('dance_style', 'coaches')
-    ordering = ('price_category', 'coaches')
+    list_display = ('price_category', 'dance_styles',
+                    'coach_list', 'room_list',
+                    'is_active', 'reg_datetime')
+    list_filter = ('price_category', 'dance_style',)
+    ordering = ('price_category',)
     fieldsets = (
         (None, {'fields': ('price_category', 'dance_style',
                            'coaches', 'duration', 'is_active')}),
         )
     inlines = [CalTeamItemInline]
+
+    def room_list(self, team):
+        template = '%s - %s - %s'
+        rooms = [
+            template % (i.get_day_display(),
+                        i.time.strftime('%H:%M'),
+                        i.room) \
+            for i in team.calendar_set.all()
+            ]
+        return '<br/>'.join(rooms)
+    room_list.short_description = _(u'Room List')
+    room_list.allow_tags = True
 admin.site.register(models.Team, __Team)
 models.Team.model_desc = _(u'This model consists of all available teams.')
 
