@@ -339,7 +339,7 @@ class ClientCard(AjaxForm):
         return self.check_obj_existence(storage.PriceCategoryTeam, 'price_category')
 
     def clean(self):
-        # In accordingly with Bug #NNN client may use flyer and test visit only once.
+        # In accordingly with Bug #149 client may use flyer and test visit only once.
         if self.cleaned_data['id'] == 0:
             slug = self.cleaned_data['card_type']
             info = {

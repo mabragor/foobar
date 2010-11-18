@@ -59,6 +59,9 @@ for name, delegate, title, action, static in MODEL_MAP_RAW:
 
 class CardListModel(QAbstractTableModel):
 
+    has_flyer = False
+    has_test = False
+
     def __init__(self, parent=None):
         QAbstractTableModel.__init__(self, parent)
 
@@ -191,6 +194,12 @@ class CardListModel(QAbstractTableModel):
         if card['card_ordinary'] is not None:
             slug = card['card_ordinary']['slug']
             card['card_type'] = slug
+
+            # bug 149
+            if slug == 'flyer':
+                self.has_flyer = True
+            if slug == 'test':
+                self.has_test = True
         elif card['card_club'] is not None:
             slug = card['card_club']['slug']
             card['card_type'] = 'club'

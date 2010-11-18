@@ -431,8 +431,16 @@ class ClientInfo(UiDlgTemplate):
         return self.wizard_data
 
     def generate_card_list(self):
+        has_flyer = self.tableHistory.model().has_flyer
+        has_test  = self.tableHistory.model().has_test
         card_list = []
         for i in self.static['card_ordinary']:
+            #bug 149
+            if i['slug'] == 'flyer' and has_flyer:
+                continue
+            if i['slug'] == 'test' and has_test:
+                continue
+
             item = (i['slug'], i['title'])
             card_list.append(item)
         if 0 < len(self.static['card_club']):
