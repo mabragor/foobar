@@ -169,6 +169,7 @@ class AbstractUser(AbstractModel):
 
     class Meta:
         abstract = True
+        ordering = ('last_name', 'first_name',)
 
     def __unicode__(self):
         return '%s %s' % (self.last_name, self.first_name)
