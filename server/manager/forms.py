@@ -338,6 +338,21 @@ class ClientCard(AjaxForm):
             return None
         return self.check_obj_existence(storage.PriceCategoryTeam, 'price_category')
 
+    def clean(self):
+        # In accordingly with Bug #NNN client may use flyer and test visit only once.
+        if self.cleaned_data['id'] == 0:
+            slug = self.cleaned_data['card_type']
+            info = {
+                'flyer': _(u'a Flyer Visit'),
+                'test': _(u'a Test Visit'),
+                }
+            if slug in info.keys():
+                o = storage.CardOrdinary.objects.get(slug=slug)
+                if storage.Card.used_once(self.cleaned_data['client'], o):
+                    raise forms.ValidationError(_(u'The client has %s already!') % info[slug])
+
+        return self.cleaned_data
+
     def save(self):
         data = self.cleaned_data
         card_id = data['id']

@@ -226,6 +226,10 @@ class Renter(AbstractUser):
 
 class Card(AbstractModel):
 
+    """
+    This models contains of the records with a cards is bought by clients.
+    """
+
     client = models.ForeignKey(Client, verbose_name=_(u'Client'))
     discount = models.ForeignKey(Discount)
     card_ordinary = models.ForeignKey(CardOrdinary, null=True, blank=True)
@@ -269,8 +273,10 @@ class Card(AbstractModel):
             return _(u'Expired')
 
     def may_register(self):
-        """ This method checks the possibility to register a visit on
-        the card."""
+        """
+        This method checks the possibility to register a visit on the
+        card.
+        """
         return self.count_used < self.count_available
 
     def register_visit(self):
@@ -314,6 +320,20 @@ class Card(AbstractModel):
                 #print u'%s [%s .. %s]' % (card_title, self.begin_date, self.end_date)
 
         self.save()
+
+    @staticmethod
+    def used_once(client, card):
+        """
+        Checks that ``client`` have used the ``card`` only once.
+
+        ** Arguments **
+
+        ``client`` is an instance of :model:`storage.models.Client`.
+
+        ``card`` is instance of :model:`storage.models.CardOrdinary`.
+        """
+        qs = Card.objects.filter(client=client, card_ordinary=card, card_ordinary__slug=card.slug)
+        return qs.count() > 0
 
 class Room(AbstractModel):
 
