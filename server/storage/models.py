@@ -384,12 +384,19 @@ class Team(AbstractModel):
     price_category = models.ForeignKey(PriceCategoryTeam)
     dance_style = models.ManyToManyField(DanceStyle, verbose_name=_(u'Dance style'))
     coaches = models.ManyToManyField(Coach, verbose_name=_(u'Coaches'))
-    title = models.CharField(verbose_name=_(u'Title'), max_length=64)
     duration = models.FloatField(verbose_name=_(u'Duration'), help_text=_(u'The duration of an event, in hours.'))
 
     class Meta:
         verbose_name = _(u'Team')
         verbose_name_plural = _(u'Teams')
+
+    def __unicode__(self):
+        coaches_list = ','.join([c.__unicode__() for c in self.coaches.all()])
+        return u'%s<hr/>%s' % (self.price_category, coaches_list)
+
+    @property
+    def title(self):
+        return self.price_category
 
     def about(self, short=False, exclude_fields=tuple()):
         exclude_fields = ('group',)

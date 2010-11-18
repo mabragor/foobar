@@ -58,7 +58,7 @@ class EventInfo(UiDlgTemplate):
         event = self.schedule['event']
         status = self.schedule.get('status', 0) # 0 means wainting
         room = self.schedule['room']
-        self.editTitle.setText(event['title'])
+        self.editStyle.setText(event['dance_styles'])
         self.editPriceCategory.setText( event['price_category']['title'] )
 
         if self.schedule_object.isTeam(): # get coaches list from schedule, not from team, because of exchange

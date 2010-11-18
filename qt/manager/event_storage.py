@@ -50,7 +50,7 @@ class Event(object):
 
     @property
     def title(self):
-        return self.data['event']['title']
+        return self.data['event']['dance_styles']
 
     @property
     def coaches(self):
@@ -65,9 +65,9 @@ class Event(object):
     def tooltip(self):
         coach_names = ','.join([c['name'] for c in self.data['coaches']])
         event = self.data['event']
-        return '%s\n%s\n%s' % (event['title'],
-                               coach_names,
-                               event['price_category']['title'])
+        return '%s\n%s\n%s' % (event['dance_styles'],
+                           coach_names,
+                           event['price_category']['title'])
 
     @property
     def fixed(self): #FIXME

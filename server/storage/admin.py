@@ -243,7 +243,7 @@ class __Team(admin.ModelAdmin):
         calendar_items = models.Calendar.objects.filter(team=team)
         cal_desc = u'<br>'.join([c.__unicode__() for c in calendar_items])
         return u'%s - %s<hr/>%s<hr/>%s' % (team.price_category,
-                                           team.title,
+                                           '',
                                            ','.join([c.__unicode__() for c in team.coaches.all()]),
                                            cal_desc)
     description.short_description = _(u'Description')
@@ -252,10 +252,9 @@ class __Team(admin.ModelAdmin):
     list_display = ('description', 'dance_styles',
                     'duration', 'is_active', 'reg_datetime')
     list_filter = ('dance_style', 'coaches')
-    ordering = ('price_category', 'title', 'coaches')
-    search_fields = ('title',)
+    ordering = ('price_category', 'coaches')
     fieldsets = (
-        (None, {'fields': ('price_category', 'dance_style', 'title',
+        (None, {'fields': ('price_category', 'dance_style',
                            'coaches', 'duration', 'is_active')}),
         )
     inlines = [CalTeamItemInline]

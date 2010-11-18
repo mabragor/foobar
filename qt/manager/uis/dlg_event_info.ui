@@ -31,16 +31,6 @@
       <property name="sizeConstraint">
        <enum>QLayout::SetMaximumSize</enum>
       </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="labelTitle">
-        <property name="text">
-         <string>Title</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <widget class="QLabel" name="labelCoaches">
         <property name="text">
@@ -88,13 +78,6 @@
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="editTitle">
-        <property name="readOnly">
-         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -146,6 +129,9 @@
       <item row="3" column="1">
        <widget class="QDateTimeEdit" name="editEnd"/>
       </item>
+      <item row="6" column="1">
+       <widget class="QLineEdit" name="editPriceCategory"/>
+      </item>
       <item row="6" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
@@ -153,8 +139,22 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="1">
-       <widget class="QLineEdit" name="editPriceCategory"/>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="editStyle">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelTitle">
+        <property name="text">
+         <string>Style</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
