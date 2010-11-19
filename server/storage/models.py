@@ -372,6 +372,9 @@ class DanceStyle(AbstractModel):
         verbose_name = _(u'Style')
         verbose_name_plural = _(u'Styles')
 
+    def __unicode__(self):
+        return u'%s, %s' % (self.direction.title, self.title)
+
     def about(self, short=False, exclude_fields=tuple()):
         result = super(DanceStyle, self).about(short, exclude_fields)
         result.update( { 'children': self.children(), } )
