@@ -168,13 +168,14 @@ admin.site.register(models.DanceStyle, __DanceStyle)
 models.DanceStyle.model_desc = _(u'This model consists of all available dance styles.')
 
 class __Coach(admin.ModelAdmin):
-    list_display = ('last_name', 'first_name', 'phone',
+    list_display = ('last_name', 'first_name', 'main_style', 'phone',
                     'email', 'is_active', 'reg_datetime')
     list_display_links = ('last_name', 'first_name',)
     search_fields = ('last_name', 'first_name', 'phone', 'email',)
     ordering = ('last_name', 'is_active', )
     fieldsets = ((None, {
-        'fields': ('last_name', 'first_name', 'phone', 'email',
+        'fields': ('last_name', 'first_name', 'main_style',
+                   'phone', 'email',
                    'birth_date', 'desc', 'is_active')}),
                  (_(u'Teams'), {
         'fields': ('teams',)}),

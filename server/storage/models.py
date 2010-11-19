@@ -159,6 +159,38 @@ class CardPromo(AbstractCardType):
         verbose_name = _(u'Promo card\'s type')
         verbose_name_plural = _(u'Promo card\'s types')
 
+class DanceDirection(AbstractModel):
+
+    title = models.CharField(verbose_name=_(u'Title'), max_length=64)
+
+    class Meta:
+        verbose_name = _(u'Direction')
+        verbose_name_plural = _(u'Directions')
+
+    def about(self, short=False, exclude_fields=tuple()):
+        result = super(DanceDirection, self).about(short, exclude_fields)
+        return result
+
+class DanceStyle(AbstractModel):
+
+    title = models.CharField(verbose_name=_(u'Title'), max_length=64)
+    direction = models.ForeignKey(DanceDirection)
+
+    class Meta:
+        verbose_name = _(u'Style')
+        verbose_name_plural = _(u'Styles')
+
+    def __unicode__(self):
+        return u'%s, %s' % (self.direction.title, self.title)
+
+    def about(self, short=False, exclude_fields=tuple()):
+        result = super(DanceStyle, self).about(short, exclude_fields)
+        result.update( { 'children': self.children(), } )
+        return result
+
+    def children(self):
+        return [item.about() for item in self.team_set.all()]
+
 class AbstractUser(AbstractModel):
 
     last_name = models.CharField(verbose_name=_(u'Last name'), max_length=64)
@@ -182,6 +214,7 @@ class AbstractUser(AbstractModel):
 class Coach(AbstractUser):
 
     desc = models.TextField(verbose_name=_(u'Description'), blank=True, default=u'')
+    main_style = models.ForeignKey(DanceStyle, verbose_name=_(u'Main Style'))
 
     class Meta:
         verbose_name = _(u'Coach')
@@ -350,38 +383,6 @@ class Room(AbstractModel):
     class Meta:
         verbose_name = _(u'Room')
         verbose_name_plural = _(u'Rooms')
-
-class DanceDirection(AbstractModel):
-
-    title = models.CharField(verbose_name=_(u'Title'), max_length=64)
-
-    class Meta:
-        verbose_name = _(u'Direction')
-        verbose_name_plural = _(u'Directions')
-
-    def about(self, short=False, exclude_fields=tuple()):
-        result = super(DanceDirection, self).about(short, exclude_fields)
-        return result
-
-class DanceStyle(AbstractModel):
-
-    title = models.CharField(verbose_name=_(u'Title'), max_length=64)
-    direction = models.ForeignKey(DanceDirection)
-
-    class Meta:
-        verbose_name = _(u'Style')
-        verbose_name_plural = _(u'Styles')
-
-    def __unicode__(self):
-        return u'%s, %s' % (self.direction.title, self.title)
-
-    def about(self, short=False, exclude_fields=tuple()):
-        result = super(DanceStyle, self).about(short, exclude_fields)
-        result.update( { 'children': self.children(), } )
-        return result
-
-    def children(self):
-        return [item.about() for item in self.team_set.all()]
 
 class Team(AbstractModel):
 
