@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pyqounter-server\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-11-19 16:50+0300\n"
-"PO-Revision-Date: 2010-11-19 16:50+0300\n"
+"POT-Creation-Date: 2010-11-19 17:02+0300\n"
+"PO-Revision-Date: 2010-11-19 17:02+0300\n"
 "Last-Translator: Ruslan Popov <ruslan.popov@gmail.com>\n"
 "Language-Team: ru <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -350,52 +350,56 @@ msgstr "Эта модель содержит все доступные танц�
 msgid "Teams"
 msgstr "Группы"
 
-#: storage/admin.py:197
+#: storage/admin.py:195
+msgid "Team List"
+msgstr "Список групп"
+
+#: storage/admin.py:198
 msgid "This model consists of all available coaches."
 msgstr "Эта модель содержит информацию о всех преподавателях."
 
-#: storage/admin.py:202 storage/admin.py:218 templates/statistic/teams.html:58
+#: storage/admin.py:203 storage/admin.py:219 templates/statistic/teams.html:58
 msgid "Name"
 msgstr "Имя"
 
-#: storage/admin.py:213
+#: storage/admin.py:214
 msgid "This model consists of all registered clients."
 msgstr "Эта модель содержит информацию о всех зарегистрированных клиентах."
 
-#: storage/admin.py:227
+#: storage/admin.py:228
 msgid "This model consists of all registered renters."
 msgstr "Эта модель содержит информацию о всех зарегистрированных арендаторах."
 
-#: storage/admin.py:247 storage/admin.py:326
+#: storage/admin.py:248 storage/admin.py:327
 msgid "Impossible to place this event!"
 msgstr "Невозможно разместить это событие!"
 
-#: storage/admin.py:277
+#: storage/admin.py:278
 msgid "Room List"
 msgstr "Список залов"
 
-#: storage/admin.py:280
+#: storage/admin.py:281
 msgid "This model consists of all available teams."
 msgstr "Эта модель содержит все доступные танцевальные группы."
 
-#: storage/admin.py:303
+#: storage/admin.py:304
 msgid "Info"
 msgstr "Инфо"
 
-#: storage/admin.py:307
+#: storage/admin.py:308
 msgid "This model consists of all available rents."
 msgstr "Эта модель содержит все доступные аренды."
 
-#: storage/admin.py:322
+#: storage/admin.py:323
 msgid "What event will happen?"
 msgstr "Какое событие должно быть размещено?"
 
-#: storage/admin.py:338 storage/models.py:216 storage/models.py:245
+#: storage/admin.py:339 storage/models.py:216 storage/models.py:245
 #: storage/models.py:427
 msgid "Description"
 msgstr "Описание"
 
-#: storage/admin.py:342
+#: storage/admin.py:343
 msgid ""
 "This model consists of records with events (team or rent) which assigned on "
 "a week."
@@ -403,15 +407,15 @@ msgstr ""
 "Эта модель содержит записи о всех событиях (группа или аренда), которые "
 "назначены на неделю."
 
-#: storage/admin.py:353
+#: storage/admin.py:354
 msgid "List of coaches"
 msgstr "Список преподавателей"
 
-#: storage/admin.py:356
+#: storage/admin.py:357
 msgid "This model consists of records with scheduled events (team or rent)."
 msgstr "Эта модель содержит все запланированные события (группа или аренда)."
 
-#: storage/admin.py:361
+#: storage/admin.py:362
 msgid "This model consists of all registered visits of trainings."
 msgstr "Эта модель содержит все зарегистрированные визиты на занятия."
 

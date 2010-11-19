@@ -192,6 +192,7 @@ class __Coach(admin.ModelAdmin):
         ul_tpl = '<ul class="object-tools">%s</ul>'
         return ul_tpl % ' '.join(listing)
     teams.allow_tags = True
+    teams.short_description = _(u'Team List')
 
 admin.site.register(models.Coach, __Coach)
 models.Coach.model_desc = _(u'This model consists of all available coaches.')
