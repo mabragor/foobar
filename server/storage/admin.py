@@ -171,11 +171,27 @@ class __Coach(admin.ModelAdmin):
     list_display = ('last_name', 'first_name', 'phone',
                     'email', 'is_active', 'reg_datetime')
     list_display_links = ('last_name', 'first_name',)
-    search_fields = ('name', 'first_name', 'phone', 'email',)
+    search_fields = ('last_name', 'first_name', 'phone', 'email',)
     ordering = ('last_name', 'is_active', )
     fieldsets = ((None, {
         'fields': ('last_name', 'first_name', 'phone', 'email',
-                   'birth_date', 'desc', 'is_active')}),)
+                   'birth_date', 'desc', 'is_active')}),
+                 (_(u'Teams'), {
+        'fields': ('teams',)}),
+                     )
+    readonly_fields = ('teams',)
+
+    def teams(self, obj):
+
+        def styles(team):
+            return ', '.join([i.title for i in team.dance_style.all()])
+
+        li_tpl = '<li style="margin: 2px;"><a class="historylink" href="#">%s, %s</a></li>'
+        listing = [li_tpl % (i.price_category.title, styles(i)) for i in obj.team_set.all()]
+        ul_tpl = '<ul class="object-tools">%s</ul>'
+        return ul_tpl % ' '.join(listing)
+    teams.allow_tags = True
+
 admin.site.register(models.Coach, __Coach)
 models.Coach.model_desc = _(u'This model consists of all available coaches.')
 
