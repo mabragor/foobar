@@ -23,7 +23,7 @@ class AbstractModel(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ('-is_active', '-reg_datetime')
+        ordering = ('-reg_datetime', '-is_active',)
 
     def __unicode__(self):
         return self.title
@@ -59,10 +59,10 @@ class PriceCategoryTeam(AbstractModel): # эконом, дисконт, экск
     once_price = models.FloatField(verbose_name=_(u'One visit price.'), default=0.00)
     test_price = models.FloatField(verbose_name=_(u'Test price.'), default=0.00)
 
-    class Meta:
+    class Meta(AbstractModel.Meta):
         verbose_name = _(u'Price category of a team')
         verbose_name_plural = _(u'Price categories of a team')
-        ordering = ('-is_active', '-full_price')
+        ordering = ('-is_active', '-reg_datetime', '-full_price')
 
         #FIXME добавить привязку к набору скидок
 
@@ -74,17 +74,17 @@ class PriceCategoryRent(AbstractModel):
     once_price = models.FloatField(verbose_name=_(u'One visit price.'), default=0.00)
     test_price = models.FloatField(verbose_name=_(u'Test price.'), default=0.00)
 
-    class Meta:
-
+    class Meta(AbstractModel.Meta):
         verbose_name = _(u'Price category of a rent')
         verbose_name_plural = _(u'Price categories of a rent')
+        ordering = ('-is_active', '-reg_datetime', '-full_price')
 
 class Discount(AbstractModel):
 
     title = models.CharField(verbose_name=_('Title'), max_length=64)
     percent = models.IntegerField(verbose_name=_(u'The percent of a discount.'), default=0)
 
-    class Meta:
+    class Meta(AbstractModel.Meta):
         verbose_name = _(u'Discount')
         verbose_name_plural = _(u'Discounts')
         ordering = ('percent', 'title')
@@ -98,9 +98,9 @@ class AbstractCardType(AbstractModel): # флаер, пробное, разов�
     discount = models.ManyToManyField(Discount, verbose_name=_(u'Discount'))
     priority = models.IntegerField(verbose_name=_('Priority'), help_text=_(u'Priority for the algorithm to automatically select while the registration of a visit.'))
 
-    class Meta:
+    class Meta(AbstractModel.Meta):
         abstract = True
-        ordering = ('-is_active', '-title')
+        ordering = ('-is_active', '-reg_datetime', '-title')
 
     def about(self, short=False, exclude_fields=tuple()):
         result = super(AbstractCardType, self).about(short, exclude_fields)
@@ -119,7 +119,7 @@ class CardDuration(AbstractModel):
     value = models.IntegerField(verbose_name=_(u'Days.'),
                                 help_text=_(u'The count days before expiration.'))
 
-    class Meta:
+    class Meta(AbstractModel.Meta):
         verbose_name = _(u'Duration')
         verbose_name_plural = _(u'Durations')
 
@@ -136,7 +136,7 @@ class CardOrdinary(AbstractCardType):
     available_formula = models.CharField(verbose_name=_(u'Formula'), max_length=128, null=True, blank=True,
                                          help_text=_(u'Enter the formula to calculate available visits.'))
 
-    class Meta:
+    class Meta(AbstractCardType.Meta):
         verbose_name = _(u'Ordinary card\'s type')
         verbose_name_plural = _(u'Ordinary card\'s types')
 
@@ -144,7 +144,7 @@ class CardClub(AbstractCardType): # 1day, 1month, 3m, 6m, 12m
     price = models.FloatField(verbose_name=_(u'Price.'), default=0.00)
     count_days = models.IntegerField(verbose_name=_(u'Duration in days.'))
 
-    class Meta:
+    class Meta(AbstractCardType.Meta):
         verbose_name = _(u'Club card\'s type')
         verbose_name_plural = _(u'Club card\'s types')
 
@@ -155,7 +155,7 @@ class CardPromo(AbstractCardType):
     date_activation = models.DateField(verbose_name=_(u'Last date of an activation'), null=True, blank=True)
     date_expiration = models.DateField(verbose_name=_(u'Date of an expiration'), null=True, blank=True)
 
-    class Meta:
+    class Meta(AbstractCardType.Meta):
         verbose_name = _(u'Promo card\'s type')
         verbose_name_plural = _(u'Promo card\'s types')
 
@@ -163,7 +163,7 @@ class DanceDirection(AbstractModel):
 
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
 
-    class Meta:
+    class Meta(AbstractModel.Meta):
         verbose_name = _(u'Direction')
         verbose_name_plural = _(u'Directions')
 
@@ -176,7 +176,7 @@ class DanceStyle(AbstractModel):
     title = models.CharField(verbose_name=_(u'Title'), max_length=64)
     direction = models.ForeignKey(DanceDirection)
 
-    class Meta:
+    class Meta(AbstractModel.Meta):
         verbose_name = _(u'Style')
         verbose_name_plural = _(u'Styles')
 
@@ -278,7 +278,7 @@ class Card(AbstractModel):
     end_date = models.DateField(verbose_name=_(u'Expired'), null=True)
     cancel_datetime = models.DateTimeField(verbose_name=_(u'Cancelled'), null=True, blank=True)
 
-    class Meta:
+    class Meta(AbstractModel.Meta):
         verbose_name = _(u'Client\'s card')
         verbose_name_plural = _(u'Client\'s cards')
 
@@ -379,7 +379,7 @@ class Room(AbstractModel):
     flooring = models.CharField(verbose_name=_(u'Flooring'), max_length=200,
                                 help_text=_(u'Flooring description, max 200 symbols'))
 
-    class Meta:
+    class Meta(AbstractModel.Meta):
         verbose_name = _(u'Room')
         verbose_name_plural = _(u'Rooms')
 
@@ -390,7 +390,7 @@ class Team(AbstractModel):
     coaches = models.ManyToManyField(Coach, verbose_name=_(u'Coaches'))
     duration = models.FloatField(verbose_name=_(u'Duration'), help_text=_(u'The duration of an event, in hours.'))
 
-    class Meta:
+    class Meta(AbstractModel.Meta):
         verbose_name = _(u'Team')
         verbose_name_plural = _(u'Teams')
 
@@ -428,7 +428,7 @@ class Rent(AbstractModel):
     paid = models.FloatField(verbose_name=_(u'Paid amount'))
     paid_status = models.CharField(verbose_name=_(u'Paid status'), max_length=1, choices=PAID_STATUS, default=0)
 
-    class Meta:
+    class Meta(AbstractModel.Meta):
         verbose_name = _(u'Rent')
         verbose_name_plural = _(u'Rents')
 
@@ -454,7 +454,7 @@ class Calendar(AbstractModel):
                            max_length=1, choices=DAYS_OF_WEEK,
                            default=0)
 
-    class Meta:
+    class Meta(AbstractModel.Meta):
         verbose_name = _(u'Calendar')
         verbose_name_plural = _(u'Calendars')
 
@@ -516,6 +516,7 @@ class Schedule(models.Model):
     class Meta:
         verbose_name = _(u'Schedule')
         verbose_name_plural = _(u'Schedules')
+        ordering = ('-begin_datetime', )
 
     def __unicode__(self):
         return u'%s(%s) %s' % (self.team, self.room, self.begin_datetime)
@@ -566,7 +567,7 @@ class Visit(AbstractModel): # FIXME models
     schedule = models.ForeignKey(Schedule, verbose_name=_(u'Event'))
     card = models.ForeignKey(Card, null=True, blank=True)
 
-    class Meta:
+    class Meta(AbstractModel.Meta):
         verbose_name = _(u'Visit')
         verbose_name_plural = _(u'Visits')
         unique_together = ('client', 'schedule')
