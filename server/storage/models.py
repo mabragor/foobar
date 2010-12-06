@@ -216,7 +216,7 @@ class Coach(AbstractUser):
     desc = models.TextField(verbose_name=_(u'Description'), blank=True, default=u'')
     main_style = models.ForeignKey(DanceStyle, verbose_name=_(u'Main Style'))
 
-    class Meta:
+    class Meta(AbstractUser.Meta):
         verbose_name = _(u'Coach')
         verbose_name_plural = _(u'Coaches')
 
@@ -225,10 +225,9 @@ class Client(AbstractUser):
     rfid_code = models.CharField(verbose_name=_(u'RFID'), max_length=8, null=True, blank=True)
     discount = models.ForeignKey(Discount)
 
-    class Meta:
+    class Meta(AbstractUser.Meta):
         verbose_name = _(u'Client')
         verbose_name_plural = _(u'Clients')
-        ordering = ('last_name', 'first_name')
 
     def about(self, short=False, exclude_fields=tuple()):
         result = super(Client, self).about()
@@ -244,7 +243,7 @@ class Renter(AbstractUser):
 
     desc = models.TextField(verbose_name=_(u'Description'), blank=True, default=u'')
 
-    class Meta:
+    class Meta(AbstractUser.Meta):
         verbose_name = _(u'Renter')
         verbose_name_plural = _(u'Renters')
 
