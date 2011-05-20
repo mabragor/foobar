@@ -27,7 +27,9 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
 class MainWindow(QMainWindow):
-
+    '''
+    Describes main window of a client application.
+    '''
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
 
@@ -61,9 +63,22 @@ class MainWindow(QMainWindow):
         self.resize(640, 480)
 
     def loggedTitle(self, name):
+        '''
+        Appends name of a manager to basic title of main window. Indended to be
+        called after successful L{log in<???>}.
+        
+        @type  name: string
+        @param name: Name of a manager, that have logged in.
+        '''
         self.setWindowTitle('%s : %s' % (self.baseTitle, name))
 
     def logoutTitle(self):
+        '''
+        Appends 'Log in to start session' to basic title of main window.
+        Indended to be used on L{logout<>} and when application
+        L{starts<__init__>}. 
+        '''
+        
         self.setWindowTitle('%s : %s' % (self.baseTitle, _('Login to start session')))
 
     def get_dynamic(self):
@@ -116,6 +131,18 @@ class MainWindow(QMainWindow):
         return handler
 
     def setup_views(self):
+        '''
+        This method sets up layout of main window, except for dropdown menus.
+        
+        At the center of the window there is a custon L{QtSchedule} widget,
+        which shows timetable of some week or of particular day.
+        
+        Under it there are widgets for navigation: two labels bpMonday and
+        bpSunday display information on what date range is displayed in
+        schedule widget, and buttons buttonPrev, buttonNext and buttonToday
+        are used to tell schedule to show previous week, next week and current
+        week respectively.
+        '''
         self.panelRooms = QHBoxLayout()
 
         schedule_params = {
@@ -180,9 +207,35 @@ class MainWindow(QMainWindow):
         return self.mimes.get(name, None)
 
     def create_menus(self):
-        """ This method generates the application menu. Usage:
-        Describe the menu with all its action in data block and
-        realize handlers for each action."""
+        """
+        This method generates the application dropdown menu.
+        
+        Menu items are specified in 'data' variable inside the method.
+        Format is as follows:
+        - data is list of tuples of form (menu_title, list_of_submenus), where
+        menu_name is the name of a given menu (e.g. 'File') and
+        list_of_submenus contains menu items, that drop down, when you click
+        on menu_name.
+        - submenu items are tuples (title, shortcut, handler function, comment)
+        
+        Current menu structure is as follows:
+        - File.
+            - L{Log in<login>}.
+            - L{Log out<logout>}.
+            - L{Application settings<setupApp>}.
+            - Exit.
+        - Client. 
+            - L{New<client_new>}.
+            - L{Search by RFID<client_search_rfid>}.
+            - L{Search by name<client_search_name>}.
+        - Renter.
+            - L{New<renterNew>}.
+            - L{Search by name<renterSearchName>}.
+        - Calendar.
+            - L{Fill week<fillWeek>}.
+            
+        @important: Style of naming of functions is mixed!!!
+        """
         data = [
             (_('File'), [
                 (_('Log in'), 'Ctrl+I',
@@ -253,6 +306,12 @@ class MainWindow(QMainWindow):
                 self.menus.append(menu)
 
     def interface_disable(self, state): # True = disabled, False = enabled
+        '''
+        This method is to be invoked on L{log out<logout>} or when the
+        application L{starts<__init__>}.
+        
+        It disables schedule navigation buttons and  
+        '''
         # Enable menu's action
         for menu in self.menus:
             if menu.title() != _('File'):
