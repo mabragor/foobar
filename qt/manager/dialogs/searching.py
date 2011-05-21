@@ -11,7 +11,11 @@ from PyQt4.QtCore import *
 GET_ID_ROLE = userRoles['getObjectID']
 
 class Searching(UiDlgTemplate):
-
+    '''
+    Dialog for searching clients in the database by their names.
+    
+    UID (user identificator) is returned via callback function.
+    '''
     ui_file = 'uis/dlg_searching.ui'
     title = None
     mode = None

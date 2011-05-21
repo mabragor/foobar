@@ -126,11 +126,23 @@ class Http:
         In case of unknown error, error code and description are written into
         .error_msg and False is returned
         
+        Possible requests are listed below:
+        - /manager/login/. Use this to authenticate on server. params are
+            {'login': string, 'password': string}
+        - /manager/get_rooms/. Get list of available rooms. params is empty
+            dict.
+        - /manager/static/. Get static information. params is empty dict.
+            Static information is ???
+        - /manager/get_client_info/. Get info about specific client. Client
+        can be specified either by his UID, or by his RFID.
+        In the former case params are {'rfid': RFID, 'mode': client},
+        in the latter {'user_id':, 'mode': client}
+        
         @type     url: string
         @param    url: URL to be requested.
         @type  params: dict
-        @param params: Various parameters of the request. Can depend on
-            the case.
+        @param params: Various parameters of the request. Vary depending on
+            type of request.
         @rtype       : bool
         @return      : Return True if request succeeded, and False otherwise.
         @important   : All urls that can be requested (with meaning of these

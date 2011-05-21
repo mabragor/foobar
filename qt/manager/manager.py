@@ -82,22 +82,34 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('%s : %s' % (self.baseTitle, _('Login to start session')))
 
     def get_dynamic(self):
+        '''
+        Updates L{labels<create_views>} bpMonday and bpSunday, that show date
+        of beginning and end of the week, that is currently displayed by
+        L{QtSchedule} widget.
+        '''
+        
         self.bpMonday.setText(self.schedule.model().getMonday().strftime('%d/%m/%Y'))
         self.bpSunday.setText(self.schedule.model().getSunday().strftime('%d/%m/%Y'))
 
     def get_static(self):
-        """ This methods get static information from server. """
+        """
+        Gets static information from server.
+        
+        First, all present rooms are L{retrieved<Http.request>}. They are
+        returned as a dict in the following format::
+            {'rows': [{'color': 'FFAAAA', 'text': 'red', 'id': 1},
+                  {'color': 'AAFFAA', 'text': 'green', 'id': 2},
+            ...]}
+        
+        Then, other static info is retrieved???
+        """
         # get rooms
         if not self.http.request('/manager/get_rooms/', {}):
             QMessageBox.critical(self, _('Room info'), _('Unable to fetch: %s') % self.http.error_msg)
             return
         default_response = {'rows': []}
         response = self.http.parse(default_response)
-        """
-        {'rows': [{'color': 'FFAAAA', 'text': 'red', 'id': 1},
-                  {'color': 'AAFFAA', 'text': 'green', 'id': 2},
-            ...]}
-        """
+        
         self.rooms = tuple( [ (a['title'], a['color'], a['id']) for a in response['rows'] ] )
         self.schedule.update_static( {'rooms': self.rooms} )
 
@@ -310,7 +322,8 @@ class MainWindow(QMainWindow):
         This method is to be invoked on L{log out<logout>} or when the
         application L{starts<__init__>}.
         
-        It disables schedule navigation buttons and  
+        It disables schedule navigation buttons and L{all dropdown menus except
+        File<create_menus>}.
         '''
         # Enable menu's action
         for menu in self.menus:
@@ -322,7 +335,13 @@ class MainWindow(QMainWindow):
         self.buttonToday.setDisabled(state)
 
     def refresh_data(self):
-        """ This method get the data from a server. It call periodically using timer. """
+        """
+        This method gets current timetable from the server using
+        L{update<QtSchedule.update>} method of L{QtSchedule} widget.
+        
+        It is called periodically using timer. Interaction with server only
+        occurs if manager is logged in.
+        """
 
         # Do nothing until user authoruized
         if not self.http.is_session_open():
@@ -333,6 +352,23 @@ class MainWindow(QMainWindow):
     # Menu handlers: The begin
 
     def login(self):
+        '''
+        Shows log in dialog, where manager is asked to provide login/password
+        pair.
+        
+        If 'Ok' button is clicked, authentication L{request<Http.request>} is
+        made to the server, which is then L{parsed<Http.parse>}.
+        
+        On success:
+        - information about schedule is retrieved from the server and
+        and L{QtSchedule} widget is L{updated<update_interface>}.
+        - controls are L{activated<interface_disable>}.
+        - window title is L{updated<loggedTitle>}
+        - schedule information is being L{refreshed<refresh_data>} from now on.
+        
+        In case of failure to authenticate a message is displayed.
+        '''
+         
         def callback(credentials):
             self.credentials = credentials
 
@@ -371,6 +407,11 @@ class MainWindow(QMainWindow):
                                     _('It seems you\'ve entered wrong login/password.'))
 
     def logout(self):
+        '''
+        Performs sequence of clean up actions when manager logs out:
+        - L{disables controls<interface_disable>};
+        - Deletes information about schedule and rooms, that are present.
+        '''
         self.interface_disable(True)
         self.setWindowTitle('%s : %s' % (self.baseTitle, _('Login to start session')))
         self.schedule.model().storage_init()
@@ -386,6 +427,13 @@ class MainWindow(QMainWindow):
                 w.deleteLater()
 
     def setupApp(self):
+        '''
+        Displays dialog with settings for client application.
+        
+        After that date range, that is being displayed is refreshed and
+        L{reconnect<Http.reconnect>} to server is performed (just in case network settings)
+        had been altered.
+        '''
         self.dialog = DlgSettings(self)
         self.dialog.setModal(True)
         self.dialog.exec_()
@@ -393,6 +441,13 @@ class MainWindow(QMainWindow):
         self.http.reconnect()
 
     def client_new(self):
+        '''
+        Opens empty client information L{dialog<ClientInfo>} for adding
+        new client to the database.
+        
+        Class for L{accessing server<Http>} and static information (???) are
+        passed as parameters.
+        '''
         params = {
             'http': self.http,
             'static': self.static,
@@ -402,6 +457,19 @@ class MainWindow(QMainWindow):
         self.dialog.exec_()
 
     def client_search_rfid(self):
+        '''
+        Search client in the database
+        by RFID (Radio Frequency IDentificator).
+        
+        After RFID was successfully read from card, server is
+        L{requested<Http.request>} client info.
+        
+        If user is found in database, L{dialog<ClientInfo>}
+        with information about client is displayed.
+        
+        Otherwise, messageboxes with warnings are displayed.
+        '''
+        
         if not self.http or not self.http.is_session_open():
             return # login first
 
@@ -443,6 +511,16 @@ class MainWindow(QMainWindow):
                 self.rfid_id = None
 
     def client_search_name(self):
+        '''
+        Search client in the database by name.
+        
+        First it launches client search L{dialog<Searching>}, which
+        tries to fetch unique user_id from the server based on information
+        provided.
+        
+        If that succeeds, user_id-based search then Works analogously to
+        L{RFID-based<client_search_rfid>} search.
+        '''
         if not self.http or not self.http.is_session_open():
             return # login first
 
@@ -482,11 +560,20 @@ class MainWindow(QMainWindow):
                 self.dialog.exec_()
 
     def renterNew(self):
+        '''
+        Adding new renter.
+        '''
         self.dialog = DlgRenterInfo(self)
         self.dialog.setModal(True)
         self.dialog.exec_()
 
     def renterSearchName(self):
+        '''
+        Search renter by his name.
+        
+        @important: by some strange reason, HttpAjax class is used instead of
+        Http to fetch information from the server.
+        '''
         def callback(id):
             self.user_id = id
 
