@@ -13,10 +13,15 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
 class Event(object):
-
-    """ Event. """
-
+    '''
+    Class describing particular event.
+    
+    '''
+    
     def __init__(self, monday, data_dict):
+        '''
+        '''
+        
         self.monday = monday
         self.data = data_dict
 
@@ -77,8 +82,38 @@ class Event(object):
         self.data['status'] = str(value)
 
 class ModelStorage:
-
-    SET = 1; GET = 2; DEL = 3
+    '''
+    Lowlevel structure, representing the timetable. Data is organized as
+        follows:
+    @important: add some general words here.
+    
+    @type SET: OP_TYPE
+    @type GET: OP_TYPE
+    @type DEL: OP_TYPE
+    @cvar SET: Serves for specification of what action to perform with a
+        given event, index. Same for GET and DEL.
+        
+    @type rc2e: dict
+    @ivar rc2e: (row, col, room): event. Maps (row, column, room) triple into
+        event, that takes place there.
+    @type e2rc: dict
+    @ivar e2rc: (event, room): [(row, col), (row, col), ...]. Maps
+        (event, room) tuple into list of (row, columns), that are spanned by
+        this event.
+    
+    @important: Setting/Getting/Deleting from/to rc2e and e2rc is done
+        independently, so it is YOUR responsibility to ensure both lists are
+        consistent with each other.
+    
+    @type  column: int
+    @ivar column: Prevents access to columns with number less than column.
+        Defaults to None.
+    '''
+    class OP_TYPE(int):
+        pass
+    SET = OP_TYPE(1)
+    GET = OP_TYPE(2)
+    DEL = OP_TYPE(3)
 
     def __init__(self):
         self.init()
@@ -89,20 +124,58 @@ class ModelStorage:
         self.e2rc = {} # (event, room): [(row, col), (row, col), ...]
 
     def dump(self):
+        '''
+        Dump current timetable to standard output.
+        '''
         import pprint
         pprint.pprint(self.rc2e)
         pprint.pprint(self.e2rc)
 
     def setFilter(self, column):
+        '''
+        Setter for self.column variable, that prevents access to some columns
+            (see above).
+        
+        @type  column: int
+        @param column: Number of first columns in timetable to hide.
+        @return: None
+        '''
         self.column = column
 
     def searchByID(self, id):
+        '''
+        Performs search of event in timetable by its ID.
+
+        @type  id: int
+        @param id: ID of the requested event.
+        @rtype : Event
+        @return: If found, returns corresponding L{Event} instance, otherwise
+            None.
+        '''
         for event, room in self.e2rc.keys():
             if event.id == id:
                 return event
         return None
 
     def byRCR(self, op, key, value=None):
+        '''
+        Unified getter, setter, deleter method for individual cell in the
+            model.
+        
+        @type  op: OP_TYPE.
+        @param op: Action to be performed.
+        @type  key: tuple(int, int, int)
+        @param key: (row, column, room ID) triple, specifying particular cell
+            in the timetable.
+        @type  value: Event
+        @param value: Optional. When op = ModelStorage.SET, event, specified by
+        value is said to take place in the given cell.
+        
+        @raise Exception: If op does not match any of thought of operations,
+            raise general type exception.
+            
+        @important: Add more specific exception types.
+        '''
         if self.column is not None:
             row, column, room_id = key
             key = (row, column + self.column, room_id)
@@ -116,6 +189,16 @@ class ModelStorage:
             raise _('ModelStorage: Unknown operation')
 
     def getByER(self, key):
+        '''
+        Get list of (rows, columns), that given (event, room) pair spans.
+        
+        @type  key: (Event, int)
+        @param key: Tuple, containing particular event, and room number, where
+            it takes place.  
+        @rtype : list
+        @return: Returns list of (row, column) tuples, that current event
+            spans.
+        '''
         cells = self.e2rc.get(key, None)
         if self.column is not None:
             result = []
@@ -125,14 +208,85 @@ class ModelStorage:
         return cells
 
     def setByER(self, key, value):
+        '''
+        Set, which cells of the timetable current event spans.
+        
+        @type  key: (Event, int)
+        @param key: Tuple, containing particular event, and room number, where
+            it takes place.
+        @type  value: list
+        @param value: List of (row, column) tuples, that this particular event
+            should span.
+        @returns: None
+        '''
         self.e2rc.update( { key: value } )
 
     def delByER(self, key):
+        '''
+        Delete current event from timetable.
+        
+        @type  key: (Event, int)
+        @param key: Tuple, containing particular event, and room number, where
+            it takes place.
+        '''
         del(self.e2rc[key])
 
 class EventStorage(QAbstractTableModel):
-
+    '''
+    Represents model of L{QtSchedule} widget.
+    
+    Attributes:
+    
+    @important: Duplicate variables: entries of params are with no reason
+        (???) duplicated by individual variables.
+        
+    @type parent:  QWidget
+    @ivar parent: View part of the widget
+        (responsible for data-rendering).
+    @type params:  dict
+    @ivar params: Dictionary of parameters, which include:
+        
+        @type  work_hours: tuple(int, int)
+        @param work_hours: The start and the end of working day. 
+        @type  quant: datetime.timedelta
+        @param quant: Minimal interval between the events in the timetable.
+        @type   rooms: ???
+        @param rooms: ???
+        @type  mode: string
+        @param mode: Either 'week' of 'day'. Specifies if the widget contains
+            timetable for a week, or for a particular day.
+    
+    @type work_hours: tuple(int, int)
+    @ivar work_hours: The start and the end of working day. 
+    @type quant: datetime.timedelta
+    @ivar quant: Minimal interval between the events in the timetable.
+    @type  rooms: ???
+    @ivar rooms: ???
+    @type mode: string
+    @ivar mode: Either 'week' of 'day'. Specifies if the widget contains
+        timetable for a week, or for a particular day.
+    @type week_days: [string, string, ...]
+    @ivar week_days: List of names of days of the week. If mode == 'day', than
+        internally 'week' is thought of as consisting from one day named 'Day'.
+    @type multiplier: float
+    @ivar multiplier: How many events (in principle) can occur in one hour?
+    @type rows_count: int
+    @ivar rows_count: Number of rows in a timetable for particular room.
+    @type cols_count: int
+    @ivar cols_count: Number of columns in a timetable (7 for weekly schedule
+        and 1 for daily)
+    @type weekRange:
+    @ivar weekRange:
+        
+    '''
     def __init__(self, parent=None, params={}):
+        '''
+        @type  parent: QWidget
+        @param parent: View of the model.
+        @type  params: dict
+        @param params: Dictionary of parameters, see L{params} attribute.
+        '''
+        # class originates from most basic table model.
         QAbstractTableModel.__init__(self, parent)
 
         self.parent = parent
@@ -165,16 +319,25 @@ class EventStorage(QAbstractTableModel):
         self.storage_init()
 
     def storage_init(self):
+        '''
+        Wraps L{ModelStorage.init} method with signals.
+        
+        Needed for coordination with view part of the widget.
+        '''
         self.emit(SIGNAL('layoutAboutToBeChanged()'))
         self.storage.init()
         self.emit(SIGNAL('layoutChanged()'))
 
     def update(self):
+        '''
+        '''
         if 'week' == self.mode:
             self.load_data()
 
     def insert(self, room_id, event, emit_signal=False):
-        """ This method registers new event. """
+        '''
+        This method registers new event.
+        '''
         self.emit(SIGNAL('layoutAboutToBeChanged()'))
 
         row, col = self.datetime2rowcol(event.begin_datetime)
@@ -191,7 +354,9 @@ class EventStorage(QAbstractTableModel):
             self.emit(SIGNAL('layoutChanged()'))
 
     def remove(self, event, index, emit_signal=False):
-        """ This method removes the event. """
+        '''
+        This method removes the event.
+        '''
         room = event.data['room']['id']
         cell_list = self.get_cells_by_event(event, room)
         if cell_list:
@@ -203,18 +368,32 @@ class EventStorage(QAbstractTableModel):
                 self.emit(SIGNAL('dataChanged(QModelIndex, QModelIndex)'), index, index)
 
     def change(self, event, index):
-        """ Change event's info."""
+        '''
+        Change event's info.
+        '''
         self.emit(SIGNAL('dataChanged(QModelIndex, QModelIndex)'), index, index)
 
     def move(self, row, col, room, event):
-        """ This method moves the event to new cell. """
+        '''
+        This method moves the event to new cell.
+        '''
         self.remove(event, room)
         self.insert(row, col, room, event)
 
     def load_data(self):
+        '''
+        Requests information about current timetable from the server.
+        
+        Only performes request, if schedule is currently showing weekly, not
+        daily, timetable.
+        
+        @important: Reimplement non-object-oriented handlement of status bar
+            messages.
+        '''
         if 'day' == self.mode:
             return False
 
+        # THIS IS UGLY!!! NEED TO REIMPLEMENT
         self.parent.parent.statusBar().showMessage(_('Request information for the calendar.'))
         monday, sunday = self.weekRange
 
@@ -399,7 +578,10 @@ class EventStorage(QAbstractTableModel):
         return self.storage.getByER( (event, room_id) )
 
     def date2range(self, dt):
-        """ This methods returns the day rango for a given week. """
+        '''
+        This methods returns the day range for a given week.
+        '''
+        
         if type(dt) is datetime:
             dt = dt.date()
         monday = dt - timedelta(days=dt.weekday())
