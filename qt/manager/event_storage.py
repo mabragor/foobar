@@ -275,9 +275,11 @@ class EventStorage(QAbstractTableModel):
     @type cols_count: int
     @ivar cols_count: Number of columns in a timetable (7 for weekly schedule
         and 1 for daily)
-    @type weekRange:
-    @ivar weekRange:
-        
+    @type weekRange: (datetime.date, datetime.date)
+    @ivar weekRange: Tuple (Monday, Sunday) of the week shown.
+    @type  storage: ModelStorage
+    @param storage: Low-level representation of a timetable. Not for
+        public use.
     '''
     def __init__(self, parent=None, params={}):
         '''
@@ -330,13 +332,16 @@ class EventStorage(QAbstractTableModel):
 
     def update(self):
         '''
+        Gets timetable from the server, only if schedule is showing weelky
+        timetable.
         '''
         if 'week' == self.mode:
             self.load_data()
 
     def insert(self, room_id, event, emit_signal=False):
         '''
-        This method registers new event.
+        This method registers new event. Wrapped in signals for coordination
+        with 'view' part.
         '''
         self.emit(SIGNAL('layoutAboutToBeChanged()'))
 
@@ -492,6 +497,15 @@ class EventStorage(QAbstractTableModel):
         return False
 
     def showCurrWeek(self):
+        '''
+        Display timetable for present week. Works only if schedule is in weekly
+        mode.
+        
+        @important: Data is requested from a server on a call.
+        
+        @rtype : (datetime.date, datetime.date)
+        @return: New L{weekRange<EventModel>} or None (if self.mode is unfit).
+        '''
         if 'week' == self.mode:
             now = datetime.now()
             self.weekRange = self.date2range(now)
@@ -501,6 +515,15 @@ class EventStorage(QAbstractTableModel):
             return None
 
     def showPrevWeek(self):
+        '''
+        Display timetable for previous week. Works only if schedule is in weekly
+        mode.
+        
+        @important: Data is requested from a server on a call.
+        
+        @rtype : (datetime.date, datetime.date)
+        @return: New L{weekRange<EventModel>} or None (if self.mode is unfit).
+        '''
         if 'week' == self.mode:
             current_monday, current_sunday = self.weekRange
             prev_monday = current_monday - timedelta(days=7)
@@ -512,6 +535,15 @@ class EventStorage(QAbstractTableModel):
             return None
 
     def showNextWeek(self):
+        '''
+        Display timetable for the next week. Works only if schedule is in weekly
+        mode.
+        
+        @important: Data is requested from a server on a call.
+        
+        @rtype : (datetime.date, datetime.date)
+        @return: New L{weekRange<EventModel>} or None (if self.mode is unfit).
+        '''
         if 'week' == self.mode:
             current_monday, current_sunday = self.weekRange
             next_monday = current_monday + timedelta(days=7)
@@ -564,22 +596,58 @@ class EventStorage(QAbstractTableModel):
         return QVariant()
 
     def getMonday(self):
+        '''
+        @rtype : datetime.date
+        @return: Date of the Monday of the week shown.
+        '''
         return self.weekRange[0]
 
     def getSunday(self):
+        '''
+        @rtype : datetime.date
+        @return: Date of the Sunday of the week shown.
+        '''
         return self.weekRange[1]
 
     def get_event_by_cell(self, row, col, room_id):
-        """ This methods returns the event by given coordinates. """
+        """
+        This methods returns the event that takes place in a given room and at
+        timedate, specified by row and column of a timetable. 
+        
+        @type  row: int
+        @param row: Row number of the cell.
+        @type  col: int
+        @param col: Column number of the cell.
+        @type  room_id: int
+        @param room_id: Number of the room, event takes place in.
+        @rtype : Event
+        @return: Event, that occurs (in particular) at the given position of
+            the timetable.
+        """
         return self.storage.byRCR(ModelStorage.GET, (row, col, room_id))
 
     def get_cells_by_event(self, event, room_id):
-        """ This method returns the cells list for given event. """
-        return self.storage.getByER( (event, room_id) )
+        """
+        This method returns the cell list for given event.
+        
+        @type  event: Event
+        @param event: Given event
+        @type  room_id: int
+        @param room_id: number of room, event takes place in.
+        @rtype : [(int, int), ...]
+        @return: List of tuples (row, column), that are spanned by given event.
+        """
+        return self.storage.getByER((event, room_id))
 
     def date2range(self, dt):
         '''
-        This methods returns the day range for a given week.
+        This methods returns date of monday and sunday of the week, dt belongs
+        to.
+        
+        @type  dt: datetime.datetime or datetime.date
+        @param dt: A day, we want to know about
+        @rtype : (date, date)
+        @return: Returns corresponding Monday and Sunday as a tuple.
         '''
         
         if type(dt) is datetime:
@@ -589,9 +657,25 @@ class EventStorage(QAbstractTableModel):
         return (monday, sunday)
 
     def date2timestamp(self, d):
+        '''
+        Returns a timestamp of a given datetime.
+        
+        @type  d: datetime.datetime
+        @param d: Any datetime
+        @rtype : float
+        @return: A timestamp
+        '''
         return int(time.mktime(d.timetuple()))
 
     def datetime2rowcol(self, dt):
+        '''
+        Returns, to which cell of a timetable current datetime dt fits.
+        
+        @type  dt: datetime.datetime
+        @param dt: Just any datetime structure.
+        @rtype : (int, int)
+        @return: A tuple (row, column), specifying a cell in timetable.
+        '''
         row = (dt.hour - self.work_hours[0]) * self.multiplier
         if dt.minute >= 30:
             row += 1
@@ -638,7 +722,12 @@ class EventStorage(QAbstractTableModel):
     # DnD support - the begin
 
     def supportedDropActions(self):
-        """ This method defines the actions supported by this model. """
+        """
+        This method defines DnD actions supported by this model.
+        
+        These are 'copy' and 'move'.
+        """
+        
         if DEBUG:
             print 'EventStorage::supportedDropActions'
         return (Qt.CopyAction | Qt.MoveAction)
