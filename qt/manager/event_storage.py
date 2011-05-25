@@ -16,10 +16,34 @@ class Event(object):
     '''
     Class describing particular event.
     
+    Event is characterized by:
+        - @type  begin_datetime: datetime.datetime
+          @ivar begin_datetime: Date and time of the beginnig of the event.
+        - @type  end_datetime: datetime.datetime
+          @ivar end_datetime: Date and time of the ending of the event.
+        - @type  duration: datetime.timedelta
+          @ivar duration: The duration of the event.
+        - @type  monday: datetime.date
+          @ivar monday: Date of the monday of the week, event takes place on.
+    
+    Also there are number of properties, attached to an event:
+    
     '''
     
     def __init__(self, monday, data_dict):
         '''
+        @type  monday: datetime.date
+        @param monday: Date of the monday of the week, event takes place on.
+        
+        @type  data_dict: dict
+        @param data_dict: Dicrtionary of parameters, describing an event.
+        These include in particular:
+            -
+        
+        @important: was:
+            self.end_datetime = __( self.data['begin_datetime'] )
+            now:
+            self.end_datetime = __( self.data['end_datetime'] )
         '''
         
         self.monday = monday
@@ -31,43 +55,99 @@ class Event(object):
              datetime(*time.strptime(x, '%Y-%m-%d %H:%M:%S')[:6])
 
         self.begin_datetime = __( self.data['begin_datetime'] )
-        self.end_datetime = __( self.data['begin_datetime'] )
+        self.end_datetime = __( self.data['end_datetime'] )
 
         minutes = int( self.data['event']['duration'] * 60 )
         self.duration = timedelta(minutes=minutes)
 
     def dump(self, value):
+        '''
+        Pretty prints specified value to the standard output.
+        
+        @type  value: any
+        @param value: Just any variable we may find useful to look at.
+        
+        @rtype : NoneType
+        @return: None
+        '''
         import pprint
         pprint.pprint(value)
 
     def __unicode__(self):
+        '''
+        Magic method that returns title of the event.
+        '''
         return self.title
 
     def isTeam(self):
+        '''
+        @rtype : bool
+        @return: True if the event is the training event of the dancing studio,
+        False otherwise.
+        
+        @important: Probably, names of the variables and the logic should be
+        made so that it can be applicable to abstract (not necessary dancing)
+        studio schedule.
+        '''
         return 'training' == self.data['type']
 
     def isRent(self):
+        '''
+        @rtype : bool
+        @return: True if the event is renting a room by a third party, False
+        otherwise.
+        '''
         return 'rent' == self.data['type']
 
     @property
     def id(self):
+        '''
+        @rtype : int
+        @return: Unique database identifier of the event.
+        '''
         return int( self.data['id'] )
 
     @property
     def title(self):
+        '''
+        @rtype : ???
+        @return: List of dancing styles this event belongs to.
+        '''
         return self.data['event']['dance_styles']
 
     @property
     def coaches(self):
+        '''
+        @rtype : string
+        @return: Names of coaches for a given event, separated by commas.
+        '''
         # warning: self.data['event']['coaches'] contains of initial coaches list
         coach_names = ','.join([c['name'] for c in self.data['coaches']])
         return coach_names
 
     def set_coaches(self, coaches_list):
+        '''
+        Sets list of coaches for the event to the specified list.
+        
+        @type  coaches_list: [dict, dict, ...]
+        @param coaches_list: Some list of coaches, we want to relate to a
+        given event.
+        
+        @rtype : NoneType
+        @return: None
+        '''
         self.data['coaches'] = coaches_list
 
     @property
     def tooltip(self):
+        '''
+        Returns compressed information about the event. For display of tooltip,
+        as the name suggests.
+        
+        @rtype : string
+        @return: Comma-separated dance styles, coach names and price
+        category of the event.
+        '''
         coach_names = ','.join([c['name'] for c in self.data['coaches']])
         event = self.data['event']
         return '%s\n%s\n%s' % (event['dance_styles'],
@@ -76,9 +156,15 @@ class Event(object):
 
     @property
     def fixed(self): #FIXME
+        '''
+        @important: Do not know, for what this is needed...
+        '''
         return int( self.data['status'] )
 
     def set_fixed(self, value):
+        '''
+        @important: Do not know, for what this is needed...
+        '''
         self.data['status'] = str(value)
 
 class ModelStorage:
@@ -161,6 +247,12 @@ class ModelStorage:
         '''
         Unified getter, setter, deleter method for individual cell in the
             model.
+        
+        - Get part returns an event, that happens to take place, particularly,
+        at the given day/hour of the timetable. 
+        - Set part tells schedule, that current cell is occupied by given
+        event.
+        - Del part tells schedule, that current cell is from now on empty.
         
         @type  op: OP_TYPE.
         @param op: Action to be performed.
@@ -258,25 +350,34 @@ class EventStorage(QAbstractTableModel):
     
     @type work_hours: tuple(int, int)
     @ivar work_hours: The start and the end of working day. 
+    
     @type quant: datetime.timedelta
     @ivar quant: Minimal interval between the events in the timetable.
-    @type  rooms: ???
-    @ivar rooms: ???
+    
+    @type rooms: ???
+    @ivar rooms: List of rooms, that events can take place in.
+    
     @type mode: string
     @ivar mode: Either 'week' of 'day'. Specifies if the widget contains
         timetable for a week, or for a particular day.
+    
     @type week_days: [string, string, ...]
     @ivar week_days: List of names of days of the week. If mode == 'day', than
         internally 'week' is thought of as consisting from one day named 'Day'.
+    
     @type multiplier: float
     @ivar multiplier: How many events (in principle) can occur in one hour?
+    
     @type rows_count: int
     @ivar rows_count: Number of rows in a timetable for particular room.
+    
     @type cols_count: int
     @ivar cols_count: Number of columns in a timetable (7 for weekly schedule
         and 1 for daily)
+    
     @type weekRange: (datetime.date, datetime.date)
     @ivar weekRange: Tuple (Monday, Sunday) of the week shown.
+    
     @type  storage: ModelStorage
     @param storage: Low-level representation of a timetable. Not for
         public use.
@@ -342,6 +443,23 @@ class EventStorage(QAbstractTableModel):
         '''
         This method registers new event. Wrapped in signals for coordination
         with 'view' part.
+        
+        This is a wrapper for low-level insertion functions
+        L{ModelStorage.byRCR} and L{ModelStorage.setByER} that ensures, that both dictionaries of the
+        model are updates synchronously.
+        
+        @type  room_id: int
+        @param room_id: Number of room, event takes place in.
+        
+        @type  event: Event
+        @param event: Event to be added to the schedule.
+        
+        @type  emit_signal: bool
+        @param emit_signal: Specifies, if the signal about layout change
+        (that normally triggers redrawal) should be emitted.
+        
+        @rtype : NoneType
+        @return: None
         '''
         self.emit(SIGNAL('layoutAboutToBeChanged()'))
 
@@ -360,7 +478,18 @@ class EventStorage(QAbstractTableModel):
 
     def remove(self, event, index, emit_signal=False):
         '''
-        This method removes the event.
+        This method removes the event from the schedule.
+        
+        @type  event: Event
+        @param event: Event to be removed.
+        
+        @type  index: ???
+        @param index: Probably is needed for view part only redraw given
+        fragment of the GUI.
+        
+        @type  emit_signal: bool
+        @param emit_signal: Specifies, if GUI should be informed about the
+        change.
         '''
         room = event.data['room']['id']
         cell_list = self.get_cells_by_event(event, room)
@@ -374,13 +503,34 @@ class EventStorage(QAbstractTableModel):
 
     def change(self, event, index):
         '''
-        Change event's info.
+        Change event's info in the view part.
+        
+        @type  event: Event
+        @param event: Event, that changed.
+        
+        @type  index: ???
+        @param index: Model index of the event.
         '''
         self.emit(SIGNAL('dataChanged(QModelIndex, QModelIndex)'), index, index)
 
     def move(self, row, col, room, event):
         '''
         This method moves the event to new cell.
+        
+        @type  row: int
+        @param row: New starting row (that is 'time') for the event.
+        @type  col: int
+        @param col: New column (that is 'weekday') for the event.
+        
+        @type  room: int
+        @param room: Room, that event takes place in. Is left unchanged by this
+        method.
+        
+        @type  event: Event
+        @param event: Event we want to move.
+        
+        @rtype : NoneType
+        @return: None
         '''
         self.remove(event, room)
         self.insert(row, col, room, event)
@@ -391,6 +541,12 @@ class EventStorage(QAbstractTableModel):
         
         Only performes request, if schedule is currently showing weekly, not
         daily, timetable.
+        
+        If request is successful, list of events is obtained from server, which
+        are then added to the model one by one using L{insert} method.
+        
+        Of failure, status bar of the main window gets updated with the error
+        message.
         
         @important: Reimplement non-object-oriented handlement of status bar
             messages.
@@ -429,25 +585,27 @@ class EventStorage(QAbstractTableModel):
                 self.parent.parent.statusBar().showMessage(_('No reply'))
                 return False
 
-    def rowCount(self, parent): # protected
-        if parent.isValid():
-            return 0
-        else:
-            return self.rows_count
-
-    def columnCount(self, parent): # protected
-        if parent.isValid():
-            return 0
-        else:
-            if 'week' == self.mode:
-                return self.cols_count
-            else:
-                return 1
-
+    
     def getShowMode(self):
+        '''
+        Getter for mode atribute.
+        
+        @important: Why not access mode directly???
+        '''
         return self.mode
 
-    def changeShowMode(self, column):
+    def changeShowMode(self, column=0):
+        '''
+        Switches presentation mode of the schedule from weekly to daily and
+        wise versa.
+        
+        @type  column: int
+        @param column: Optional argument, specifies what day of the week to
+        show, when switching to daily mode.
+        
+        @important: Emits 'layoutChanged()' signal, but no
+        'layoutAboutToBeChanged()' signal.
+        '''
         if 'week' == self.mode:
             self.mode = 'day'
             self.storage.setFilter(column)
@@ -457,12 +615,32 @@ class EventStorage(QAbstractTableModel):
         self.emit(SIGNAL('layoutChanged()'))
 
     def colByMode(self, column):
+        '''
+        @important: This function is not called anywhere in this module. Nor
+        dayColumn attribute is set anywhere. Looks useless.
+        '''
         if self.mode == 'week':
             return column
         else:
             return self.dayColumn
 
     def exchangeRoom(self, data_a, data_b):
+        '''
+        Swaps two events in space, not changing their position in time, if that
+        is possible.
+        
+        @important: if exchange is, in principle, possible, send a request to
+        the server. HttpAjax is used, not Http!
+        
+        @type  data_a: (int, int, int)
+        @param data_a: (row, column, room ID) that belongs to event 'a'.
+        
+        @type  data_b: (int, int, int)
+        @param data_b: (row, column, room ID) that belongs to event 'b'.
+        
+        @rtype : bool
+        @return: If swap successfully occured, True, otherwise False.
+        '''
         room_a = data_a[2]
         room_b = data_b[2]
         # events data
@@ -474,9 +652,9 @@ class EventStorage(QAbstractTableModel):
         # remove all records for each event
         self.remove(event_a, room_a)
         self.remove(event_b, room_b)
-        # chech the exchange ability
-        if self.may_insert(event_a, room_b) and \
-                self.may_insert(event_b, room_a):
+        # check the exchange ability
+        if (self.may_insert(event_a, room_b) and
+                self.may_insert(event_b, room_a)):
             # send the information to the server
             params = {'id_a': event_a.id,
                       'id_b': event_b.id}
@@ -553,47 +731,6 @@ class EventStorage(QAbstractTableModel):
             return self.weekRange
         else:
             return None
-
-    def headerData(self, section, orientation, role):
-        """ This method fills header cells. """
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            mon, sun = self.weekRange
-            if 'week' == self.mode:
-                delta = section
-            else:
-                delta = self.storage.column
-            daystr = (mon + timedelta(days=delta)).strftime('%d/%m')
-            return QVariant('%s\n%s' % (self.week_days[delta], daystr))
-        if orientation == Qt.Vertical and role == Qt.DisplayRole:
-            begin_hour, end_hour = self.work_hours
-            start = timedelta(hours=begin_hour)
-            step = timedelta(seconds=(self.quant.seconds * section))
-            return QVariant(str(start + step)[:-3])
-        return QVariant()
-
-    def data(self, index, role, room_id=0):
-        """ This method returns the data from model. Parameter 'role' here means room. """
-        if not index.isValid():
-            return QVariant()
-        if role not in (Qt.DisplayRole, Qt.ToolTipRole):
-            return QVariant()
-        row = index.row()
-        col = index.column()
-        event = self.get_event_by_cell(row, col, room_id)
-        if event:
-            if role == Qt.ToolTipRole:
-                return QVariant( event.tooltip )
-            if role == Qt.DisplayRole:
-                cells = self.get_cells_by_event(event, room_id)
-                if cells:
-                    if cells[0] == (row, col):
-                        event.show_type = 'head'
-                    elif cells[-1] == (row, col):
-                        event.show_type = 'tail'
-                    else:
-                        event.show_type = 'body'
-                return QVariant(event)
-        return QVariant()
 
     def getMonday(self):
         '''
@@ -684,7 +821,22 @@ class EventStorage(QAbstractTableModel):
         return (row, col)
 
     def may_insert(self, event, room_id):
-        """ This method checks the ability of placing the event on schedule. """
+        """
+        This method checks the ability of placing the event on schedule.
+        
+        @type  event: Event
+        @param event: Event, we want to insert.
+        
+        @type  room_id: int
+        @param room_id: Number of the room, event should take place in. 
+        
+        @rtype : bool
+        @return: True if event does not interfere with already present events
+        and thus can be placed and False otherwise.
+
+        @warn: it seems that Event class has no 'begin' attribute, so,
+        probably, a bug.
+        """
         row, col = self.datetime2rowcol(event.begin)
         for i in xrange(event.duration.seconds / self.quant.seconds):
             if self.storage.byRCR(
@@ -719,21 +871,106 @@ class EventStorage(QAbstractTableModel):
 #                 result.append(room_id)
 #         return result
 
-    # DnD support - the begin
+    ##########################################################################
+    # Inplementing methods, that are needed for correct subclassing of
+    # QAbstractTableModel.
+    ##########################################################################
+    
+    def headerData(self, section, orientation, role):
+        """
+        This method fills header cells (that is sets names of rows and columns
+        of the table).
+        
+        Horizontal header contains names of days of the week
+        (special hook is made to incorporate daily schedule mode)
+        
+        Vertical header contains time of the day, corresponding to the start
+        of the given cell.
+        
+        @type  section: int
+        @param section: Row or column number.
+        
+        @type  orientation: Qt.Orientation
+        @param orientation: Wether we are filling horizontal or vertical
+        header.
+        
+        @type  role: Qt.ItemDataRole
+        @param role: Here Qt.DisplayRole, for every other roles returns empty
+        object. 
+        """
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            mon, sun = self.weekRange
+            if 'week' == self.mode:
+                delta = section
+            else:
+                delta = self.storage.column
+            daystr = (mon + timedelta(days=delta)).strftime('%d/%m')
+            return QVariant('%s\n%s' % (self.week_days[delta], daystr))
+        if orientation == Qt.Vertical and role == Qt.DisplayRole:
+            begin_hour, end_hour = self.work_hours
+            start = timedelta(hours=begin_hour)
+            step = timedelta(seconds=(self.quant.seconds * section))
+            return QVariant(str(start + step)[:-3])
+        return QVariant()
 
-    def supportedDropActions(self):
+    def data(self, index, role, room_id=0):
         """
-        This method defines DnD actions supported by this model.
+        This method returns the data from model.
         
-        These are 'copy' and 'move'.
+        @type  index: QModelIndex
+        @param index: Model index of the data.
+        
+        @type  role: Qt.ItemDataRole
+        @param role: Either Qt.DisplayRole or Qt.ToolTipRole 
+        
+        @type  room_id: int
+        @param room_id: room ID.
+        
+        @rtype : QVariant
+        @return:
+            Depending on a role returns the following:
+            - ToolTipRole: returns L{tooltip<Event.tooltip>} for an event in
+            the cell, specified by index.
+            - DisplayRole: returns event, that occurs in a given cell.
+            Depending on wether event, starts, ends, or is in the middle in a
+            specified cell, new show_type attribute of the event is set.
+            
+        @important: What this show_type attribute means, anyway?
         """
-        
-        if DEBUG:
-            print 'EventStorage::supportedDropActions'
-        return (Qt.CopyAction | Qt.MoveAction)
+        if not index.isValid():
+            return QVariant()
+        if role not in (Qt.DisplayRole, Qt.ToolTipRole):
+            return QVariant()
+        row = index.row()
+        col = index.column()
+        event = self.get_event_by_cell(row, col, room_id)
+        if event:
+            if role == Qt.ToolTipRole:
+                return QVariant( event.tooltip )
+            if role == Qt.DisplayRole:
+                cells = self.get_cells_by_event(event, room_id)
+                if cells:
+                    if cells[0] == (row, col):
+                        event.show_type = 'head'
+                    elif cells[-1] == (row, col):
+                        event.show_type = 'tail'
+                    else:
+                        event.show_type = 'body'
+                return QVariant(event)
+        return QVariant()
 
     def flags(self, index):
-        """ This method defines the list of items that may in DnD operations. """
+        """
+        This method defines the list of actions that may be done to
+        the item in DnD operations.
+        
+        @type  index: QModelIndex 
+        @param index: Index of requested cell of the schedule.
+        
+        @rtype : Qt.ItemFlag
+        @return: Combination of operations, that can be performed with a cell.
+        These include, select, drag and drop. 
+        """
         #if DEBUG:
         #    print 'EventStorage::flags', index.row(), index.column()
         if index.isValid():
@@ -743,14 +980,85 @@ class EventStorage(QAbstractTableModel):
             res = (Qt.ItemIsEnabled | Qt.ItemIsDropEnabled)
         return res
 
+    def setData(self, index, value, role):
+        """
+        Parameter 'role' means room.
+        
+        @important: so, nothing ad hoc can be written into the cell of
+        the model.
+        """
+        return True
+
+    def setHeaderData(self, section, orientation, value, role):
+        '''
+        @important: so, nothing ad hoc can be written into the header
+        of the model.
+        '''
+        return True
+
+    def rowCount(self, parent): # protected
+        '''
+        @return: Number of rows in the schedule
+        
+        @important: By Qt specification, this method should return 0, when
+        parent is valid.
+        '''
+        
+        if parent.isValid():
+            return 0
+        else:
+            return self.rows_count
+
+    def columnCount(self, parent): # protected
+        '''
+        @return: Number of columns in the schedule
+        
+        @important: By Qt specification, this method should return 0, when
+        parent is valid.
+        '''
+        
+        if parent.isValid():
+            return 0
+        else:
+            if 'week' == self.mode:
+                return self.cols_count
+            else:
+                return 1
+
+    
+    ##########################################################################
+    # DnD support - the beginning
+    # Currently I don't understand this =/
+    ##########################################################################
+    
+    
+    
+
+    def supportedDropActions(self):
+        """
+        This method defines DnD actions supported by this model.
+        
+        @rtype : Qt.DropAction ???
+        @return: Bitwise 'or' of 'copy' and 'move' actions.
+        """
+        
+        if DEBUG:
+            print 'EventStorage::supportedDropActions'
+        return (Qt.CopyAction | Qt.MoveAction)
+
+    
     def mimeTypes(self):
-        """ This method declares supported MIME types. """
+        """
+        This method declares supported MIME types.
+        """
         types = QStringList()
         types << self.getMime('event') << self.getMime('team')
         return types
 
     def mimeData(self, indexes):
-        """ This method converts objects into supported MIME format. """
+        """
+        This method converts objects into supported MIME format.
+        """
         mimeData = QMimeData()
         encodedData = QByteArray()
 
@@ -776,8 +1084,8 @@ class EventStorage(QAbstractTableModel):
         event_mime = self.getMime('event')
         team_mime = self.getMime('team')
 
-        if not data.hasFormat(event_mime) and \
-                not data.hasFormat(team_mime):
+        if (not data.hasFormat(event_mime) and
+                not data.hasFormat(team_mime)):
             return False
         if column > 0:
             return False
@@ -790,13 +1098,7 @@ class EventStorage(QAbstractTableModel):
 
         return True
 
-    def setData(self, index, value, role):
-        """ Parameter 'role' means room. """
-        return True
-
-    def setHeaderData(self, section, orientation, value, role):
-        return True
-
+    
 #     def removeRows(self, row, count, parent):
 #         print 'EventStorage::removeRows'
 #         if parent.isValid():

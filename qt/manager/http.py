@@ -126,6 +126,11 @@ class Http:
         In case of unknown error, error code and description are written into
         .error_msg and False is returned
         
+        @important: some of these requests are made not using this function,
+        but instead invoking HttpAjax directly!!! (probably, something should
+        be done with that, and for now we just summarize all possible requests
+        here and hope, that this will not lead to confusion)
+        
         Possible requests are listed below:
         - /manager/login/. Use this to authenticate on server. params are
             {'login': string, 'password': string}
@@ -136,7 +141,11 @@ class Http:
         - /manager/get_client_info/. Get info about specific client. Client
         can be specified either by his UID, or by his RFID.
         In the former case params are {'rfid': RFID, 'mode': client},
-        in the latter {'user_id':, 'mode': client}
+        in the latter {'user_id': user ID, 'mode': client}
+        - /manager/get_week. Get schedule for specified week. params are
+        {'monday': datetime.date, 'filter': []}. Filter for now is empty list,
+        but it is needed to implement the retrieval of schedule for a
+        particular day, not the whole week.
         
         @type     url: string
         @param    url: URL to be requested.
